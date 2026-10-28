@@ -1764,6 +1764,8 @@ export const COPY = {
     rippleHelp: /*i18n*/ { id: 'room.rippleHelp', message: 'Writes {command} in the bar', comment: 'Commands stay English' },
     notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },
     unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
+    // The Parliament mark at the top of a narrow room (C252, after).
+    home: /*i18n*/ { id: 'room.home', message: "Go to Parliament's start", comment: 'The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen' },
   },
 
   // The Almanac (stage 5, piece 3; Almanac v30): the table of everything

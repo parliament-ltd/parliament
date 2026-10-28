@@ -20,6 +20,8 @@ import IconButton from '../IconButton'
 import ParliamentMark from '../ParliamentMark'
 import { useChatFrame } from '../ChatFrameContext'
 import { RoomHost } from '../../lib/useViewportWidth'
+import { useLingui } from '@lingui/react'
+import { COPY } from '../../copy'
 
 export default function NarrowChrome({
   onLeftClick,
@@ -33,6 +35,8 @@ export default function NarrowChrome({
   // A room hosted on the shell keeps its top line to its own panels: the
   // shell has its own way home (C126).
   const hosted = useContext(RoomHost) != null
+  const { i18n } = useLingui()
+  const homeLabel = i18n._(COPY.room.home)
 
   return (
     <div className="flex justify-evenly items-center h-10 bg-white shrink-0">
@@ -53,8 +57,8 @@ export default function NarrowChrome({
         <button
           type="button"
           onClick={() => navigate('/')}
-          aria-label="Go to The Study"
-          title="The Study"
+          aria-label={homeLabel}
+          title={homeLabel}
           className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--p-text-primary)] hover:text-[var(--p-gold-light)] transition-colors"
         >
           <ParliamentMark />

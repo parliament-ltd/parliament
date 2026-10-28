@@ -3106,6 +3106,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   Not tried: Continue on a cut-off reply, which needs a model.
 - **Noticed, not changed:** the Parliament mark in a narrow room's header is labelled "Go to The Study", the retired homepage. It takes you to the new screens; only its words are old.
+  - **Changed after (27 October):** it now reads "Go to Parliament's start", read aloud and on hover, from one new copy entry (`room.home`), in both places the mark is drawn (`NarrowChrome` and the single column with sheet layout). The copy table had no wording for going home, so this is new; a ruling changes one entry.
 - **Stage 13:** all eight pieces are built. Still open from its lines: R39 (Drafting Desk), deferred until after the refactor; `@dnd-kit` leaving the dependencies, at stage 15.
 
 **C253. Stage 14 in pieces: focus, calm, screens, small screens** (proposed 27 October; **ruled 27 October, as suggested: (b) 1, focus per room on the room record; (c) 1, calm off for someone new; (i) 1, narrow windows and the phone as proposed, built last; the rest as suggested**; refactor-plan.md, stage 14; the editing spec, "Focus", "Calm", "Legibility"; the arrangements spec §7a, §8; `parliament_screens_v1.html`; welcome spec §12.4; C98, C126, C135, C182). Waiting for Stefan: (b), (c) and (i) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.

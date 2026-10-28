@@ -7623,6 +7623,11 @@ msgstr "你正在查看的回复。你在各条回复间切换时，提示词会
 msgid "room.empty"
 msgstr "空房间。在输入栏中写下第一条提示词，即可开启它的对话。"
 
+#. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
+#. js-lingui-explicit-id
+msgid "room.home"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "room.newTitle"
 msgstr "新房间"

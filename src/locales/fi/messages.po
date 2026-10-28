@@ -7623,6 +7623,11 @@ msgstr "Vastaus, jota katsot. Kehotteesi seuraa sitä, kun siirryt vastausten v�
 msgid "room.empty"
 msgstr "Tyhjä huone. Sen ensimmäinen kehote, joka kirjoitetaan palkkiin, aloittaa keskustelun."
 
+#. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
+#. js-lingui-explicit-id
+msgid "room.home"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "room.newTitle"
 msgstr "Uusi huone"
