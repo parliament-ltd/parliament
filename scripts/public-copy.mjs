@@ -28,7 +28,10 @@ import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from '
 import { join, resolve, relative } from 'node:path'
 import { stripPngText, pngText } from './png-text.mjs'
 
-const NOREPLY_RE = /(^|\.)users\.noreply\.github\.com$|^noreply@github\.com$/
+const NOREPLY_RE = /@users\.noreply\.github\.com$|^noreply@github\.com$/
+// A safety stop: only a handful of text files should change. More means a
+// rule matched what it should not, and nothing is rewritten.
+const TEXT_CHANGES_MAX = 50
 const KEYS = [
   ['an Anthropic key', /sk-ant-api03-[A-Za-z0-9_-]{60,}/],
   ['a Google key', /AIza[0-9A-Za-z_-]{35}/],
@@ -92,7 +95,8 @@ const toolIds = new Set()
 for (const b of before.filter((x) => x.path.endsWith('.png'))) {
   let text = ''
   try { text = pngText(b.body).map((t) => t.text).join('\n') } catch { continue }
-  for (const m of text.matchAll(/Author>\s*([^<\n]+?)\s*</g)) if (/\s/.test(m[1])) fullNames.add(m[1])
+  // A full name: two or more words of letters, nothing else.
+  for (const m of text.matchAll(/Author>\s*([^<\n]+?)\s*</g)) if (/^\p{L}{2,}(\s+\p{L}{2,})+$/u.test(m[1].trim())) fullNames.add(m[1].trim())
   for (const m of text.matchAll(/\b(?:doc|user|brand)=([A-Za-z0-9_-]{8,})/g)) toolIds.add(m[1])
 }
 const surnames = [...fullNames].map((n) => n.split(/\s+/).pop())
@@ -108,11 +112,12 @@ say(`From the history: ${personal.length} personal address(es), ${fullNames.size
 // ── 3. Every version that changes, written beside it ───
 const map = new Map()
 const write = (body) => run(['hash-object', '-w', '--stdin'], { cwd: dest, input: body })
+const pending = [] // [sha, new body, path], written only after the safety stop
 for (const b of before) {
   if (b.path.endsWith('.png')) {
     let after
     try { after = stripPngText(b.body) } catch { continue }
-    if (!after.equals(b.body)) map.set(b.sha, write(after))
+    if (!after.equals(b.body)) pending.push([b.sha, after, b.path])
     continue
   }
   if (b.body.includes(0)) continue // other binary files
@@ -123,9 +128,12 @@ for (const b of before) {
   for (const n of fullNames) next = next.replace(new RegExp(`(?<![A-Za-z])${esc(n.split(/\s+/).pop())}`, 'g'), n.split(/\s+/)[0])
   for (const a of personal) next = next.split(a).join(noreply)
   for (const id of toolIds) next = next.split(id).join('removed')
-  if (next !== text) map.set(b.sha, write(Buffer.from(next, 'utf8')))
+  if (next !== text) pending.push([b.sha, Buffer.from(next, 'utf8'), b.path])
 }
-say(`File versions to change: ${map.size}.`)
+const textChanges = pending.filter(([, , p]) => !p.endsWith('.png'))
+say(`File versions to change: ${pending.length} (${textChanges.length} text): ${[...new Set(pending.map(([, , p]) => p))].join(', ')}.`)
+if (textChanges.length > TEXT_CHANGES_MAX) throw new Error(`Stopping before any rewrite: ${textChanges.length} text versions would change, more than ${TEXT_CHANGES_MAX}. A rule matched what it should not.`)
+for (const [sha, body] of pending) map.set(sha, write(body))
 const mapFile = join(dest, '.git', 'blob-map').replace(/\\/g, '/')
 writeFileSync(mapFile, [...map].map(([a, b]) => `${a} ${b}`).join('\n') + '\n')
 const filterFile = join(dest, '.git', 'index-filter.sh').replace(/\\/g, '/')

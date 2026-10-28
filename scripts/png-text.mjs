@@ -51,7 +51,7 @@ export function stripPngText(buf) {
   return Buffer.concat([SIGNATURE, ...keep.map((c) => buf.subarray(c.start, c.end))])
 }
 
-if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}` || process.argv[1]?.endsWith('png-text.mjs')) {
+if (process.argv[1]?.endsWith('png-text.mjs')) {
   const [cmd, input, output] = process.argv.slice(2)
   if (cmd === 'list') {
     for (const t of pngText(readFileSync(input))) console.log(`${t.type} ${t.key}: ${t.text.replace(/\s+/g, ' ').slice(0, 300)}`)
