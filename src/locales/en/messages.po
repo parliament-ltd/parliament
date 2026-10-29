@@ -2971,7 +2971,7 @@ msgstr "Enter takes out the heading {heading}. The cards under it stay"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "Enter shows every command that works here"
+msgstr "Enter shows every command"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6561,7 +6561,7 @@ msgstr "Type a command. The > stays in the field"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "Every command that works here, or how one works"
+msgstr "Every command, or how one works"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -7653,9 +7653,44 @@ msgstr "Reply to"
 msgid "replyPicker.viewed"
 msgstr "The reply you are viewing. Your prompt follows it as you move between them."
 
+#. The handle of the sheet that holds the chat in a narrow data or drafting room
+#. js-lingui-explicit-id
+msgid "room.chatSheet"
+msgstr "Chat"
+
+#. The button on a room's left column, while it is open
+#. js-lingui-explicit-id
+msgid "room.closeLeft"
+msgstr "Close the left column"
+
+#. The button on a room's right column, while it is open
+#. js-lingui-explicit-id
+msgid "room.closeRight"
+msgstr "Close the right column"
+
+#. A room's left column, read aloud
+#. js-lingui-explicit-id
+msgid "room.columnLeft"
+msgstr "Left column"
+
+#. A room's right column, read aloud
+#. js-lingui-explicit-id
+msgid "room.columnRight"
+msgstr "Right column"
+
 #. js-lingui-explicit-id
 msgid "room.empty"
 msgstr "An empty room. Its first prompt, written in the bar, starts its chat."
+
+#. A narrow data room's button for its column inspector, while it shows
+#. js-lingui-explicit-id
+msgid "room.hideInspector"
+msgstr "Hide the inspector"
+
+#. A narrow drafting room's button for its margin notes, while they show
+#. js-lingui-explicit-id
+msgid "room.hideMargin"
+msgstr "Hide the margin"
 
 #. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
 #. js-lingui-explicit-id
@@ -7670,6 +7705,21 @@ msgstr "New room"
 msgid "room.notFound"
 msgstr "This chat could not be found. It may have been removed."
 
+#. The wrench at the top of a narrow room, outside the shell: it opens the room's editor
+#. js-lingui-explicit-id
+msgid "room.openEditor"
+msgstr "Open the editor"
+
+#. The button on a room's left column, while it is closed
+#. js-lingui-explicit-id
+msgid "room.openLeft"
+msgstr "Open the left column"
+
+#. The button on a room's right column, while it is closed
+#. js-lingui-explicit-id
+msgid "room.openRight"
+msgstr "Open the right column"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "room.rippleHelp"
@@ -7682,6 +7732,16 @@ msgstr "ripple: off"
 #. js-lingui-explicit-id
 msgid "room.rippleOn"
 msgstr "ripple: on"
+
+#. A narrow data room's button for its column inspector, while it is hidden
+#. js-lingui-explicit-id
+msgid "room.showInspector"
+msgstr "Show the inspector"
+
+#. A narrow drafting room's button for its margin notes, while they are hidden
+#. js-lingui-explicit-id
+msgid "room.showMargin"
+msgstr "Show the margin"
 
 #. js-lingui-explicit-id
 msgid "room.unavailable"
@@ -8544,10 +8604,30 @@ msgstr "Runs {command}"
 msgid "shell.referenceClose"
 msgstr "Escape closes this"
 
+#. Beside the heading of the ? reference
+#. js-lingui-explicit-id
+msgid "shell.referenceFainter"
+msgstr "A fainter command works on another board, named beside it"
+
+#. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
+#. js-lingui-explicit-id
+msgid "shell.referenceKeys"
+msgstr "A click writes a command into the field, and Enter runs it. {example} shows the forms of one command."
+
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
 msgid "shell.referenceName"
 msgstr "Every command"
+
+#. Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection
+#. js-lingui-explicit-id
+msgid "shell.referenceOn"
+msgstr "Works on {boards}"
+
+#. The heading of the ? reference, drawn in capitals
+#. js-lingui-explicit-id
+msgid "shell.referenceTitle"
+msgstr "Commands"
 
 #. Editable text on a placeholder board; nothing typed here is kept
 #. js-lingui-explicit-id

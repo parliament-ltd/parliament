@@ -11,7 +11,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `>` | Type a command. The > stays in the field |
 | `p>`, `prompt>` | Write a prompt. Nothing is sent before Enter |
 | `s>`, `search>` | Search |
-| `?`, `help`, `?open` | Every command that works here, or how one works |
+| `?`, `help`, `?open` | Every command, or how one works |
 
 ## Go to
 

@@ -7653,8 +7653,43 @@ msgstr ""
 msgid "replyPicker.viewed"
 msgstr ""
 
+#. The handle of the sheet that holds the chat in a narrow data or drafting room
+#. js-lingui-explicit-id
+msgid "room.chatSheet"
+msgstr ""
+
+#. The button on a room's left column, while it is open
+#. js-lingui-explicit-id
+msgid "room.closeLeft"
+msgstr ""
+
+#. The button on a room's right column, while it is open
+#. js-lingui-explicit-id
+msgid "room.closeRight"
+msgstr ""
+
+#. A room's left column, read aloud
+#. js-lingui-explicit-id
+msgid "room.columnLeft"
+msgstr ""
+
+#. A room's right column, read aloud
+#. js-lingui-explicit-id
+msgid "room.columnRight"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "room.empty"
+msgstr ""
+
+#. A narrow data room's button for its column inspector, while it shows
+#. js-lingui-explicit-id
+msgid "room.hideInspector"
+msgstr ""
+
+#. A narrow drafting room's button for its margin notes, while they show
+#. js-lingui-explicit-id
+msgid "room.hideMargin"
 msgstr ""
 
 #. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
@@ -7670,6 +7705,21 @@ msgstr ""
 msgid "room.notFound"
 msgstr ""
 
+#. The wrench at the top of a narrow room, outside the shell: it opens the room's editor
+#. js-lingui-explicit-id
+msgid "room.openEditor"
+msgstr ""
+
+#. The button on a room's left column, while it is closed
+#. js-lingui-explicit-id
+msgid "room.openLeft"
+msgstr ""
+
+#. The button on a room's right column, while it is closed
+#. js-lingui-explicit-id
+msgid "room.openRight"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "room.rippleHelp"
@@ -7681,6 +7731,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "room.rippleOn"
+msgstr ""
+
+#. A narrow data room's button for its column inspector, while it is hidden
+#. js-lingui-explicit-id
+msgid "room.showInspector"
+msgstr ""
+
+#. A narrow drafting room's button for its margin notes, while they are hidden
+#. js-lingui-explicit-id
+msgid "room.showMargin"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8544,9 +8604,29 @@ msgstr ""
 msgid "shell.referenceClose"
 msgstr ""
 
+#. Beside the heading of the ? reference
+#. js-lingui-explicit-id
+msgid "shell.referenceFainter"
+msgstr ""
+
+#. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
+#. js-lingui-explicit-id
+msgid "shell.referenceKeys"
+msgstr ""
+
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
 msgid "shell.referenceName"
+msgstr ""
+
+#. Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection
+#. js-lingui-explicit-id
+msgid "shell.referenceOn"
+msgstr ""
+
+#. The heading of the ? reference, drawn in capitals
+#. js-lingui-explicit-id
+msgid "shell.referenceTitle"
 msgstr ""
 
 #. Editable text on a placeholder board; nothing typed here is kept
