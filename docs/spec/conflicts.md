@@ -4482,6 +4482,27 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **Unused now, kept:** the old `.ch-answers` styles and the copy entry `picker.models` ("Models"). Each goes only on your yes.
   - Still open from C279: letter one's third paragraph, and the foot's "Source published at launch".
 
+**C281. After trying 0.7.0: the edited prompt, the marks, switching who answers** (29 October; **ruled by Stefan as he asked for each, 29 October**; replaces C255 (a)'s blue tick and C214 (b)'s editing of the joined words in the bar; C172 (c); C280; inline editing v5). **Built on `claude/after-0.7`, not released.**
+- **Ruled and built:**
+  - **No blue ticks.** "There are little blue checkmarks after I deleted part of a prompt and reply, can we not have those?" They were calm's mark for a reply holding edits it hides (C255 (a): "a small blue tick"), drawn on the block and on each edited card, so one deletion gave three, two of them over the words. The mark is now what inline editing v5 draws: a 2px rule at the reply's edge, in the colour of struck words. A source's answer already has a rule there, and it darkens instead. Near it, the markup shows and the rule goes. An edited prompt has none, since its line underneath already says it was edited.
+  - **The edited prompt is held, not written out.** "Instead of writing the entire text, which can be a lot, let's have a placeholder." After a deletion across a prompt and its reply, the field shows "Your edited prompt" and holds the words; Enter sends them unchanged. Typing replaces them; Backspace, Delete and Escape clear them; `>` and `s>` keep them. The Enter line adds "Typing replaces it. Escape clears it". Not "resend": the words go as a new prompt and include the reply's.
+  - **Step 9 crosses off** the moment a prompt goes out carrying an edit: to the model answering, to the model that reads edits beside a source, or as joined words with edits in them. Before, the held words were cleared only when a prompt went to a model, so a new prompt typed over them, or one sent to a source, left their edits out and the step open.
+  - **The tab shows the three birds** (`public/favicon.svg`), dark on a light tab bar and light on a dark one. The PNG stays for browsers that cannot show an SVG icon, and for the home screen.
+  - **`close:tour`** closes the welcome page, as `close:welcome` does.
+  - **"The bar points here" is gone** from every board; the addressed board's dark line still shows it. The copy entry `shell.addressed` is unused, kept.
+  - **markup · clean in a room's head**, as the newer mockup draws it; only the Collection had it. Each runs its command, `markup:on` or `markup:off`.
+  - **Typing closes a menu:** who answers, frameworks and languages close as the bar is typed in, as on a click outside (C280). `?` stays open, to type from it.
+  - **Switching who answers mid-chat.** "Shouldn't be locked into one model." A click on a name in who answers, or Enter, answers with it alone from then on (`by:`; `undo:` takes it back). Its box, or Shift and a click, adds it beside the others as a branch, as C172 (c) has a tick do. Before, a click always added.
+  - Tests: 1,436. Lint: 30 warnings, all older. Both builds pass.
+- **For you:**
+  - **A key for one provider, Settings' model another's.** C150: a chat with no choice takes Settings' model when its provider has a key, else Wikipedia. So with only a Mistral key, and Settings' model Sonnet 5.5, a new prompt still goes to Wikipedia, and the Enter line still says "A model reads them once it has a key". This is likely why step 9 stayed open after the Mistral key went in. **Suggestion:** with no key for Settings' model's provider, the default is the first current model of a provider that has a key (the default provider first, then the list's order; Mistral Medium 3.5 today), named on the Enter line before anything goes. Wikipedia answers only with no key at all. Nothing stored changes. Changes C150, so it waits for your yes.
+  - **The language picker** shows only with more than one language to choose (C280), and the live site has English alone. Review a draft language to ship, or show the picker anyway?
+  - **A room's title "appears on hover":** not found. A name given with `name:` always shows in the room's head, after its number and the chat's title. Where is it seen only on hover?
+  - **Editing the held words:** C214 (b) had them editable in the bar; now they are edited in the chat. Should a key (End or →) write them out in the field?
+  - **Joined words sent to a source:** step 9 crosses, but their edits are not marked as gone into that prompt, so the line says the source reads none of them and they wait for the next model as a note. Mark them as gone into it, as when joined words go to a model (an existing field, no schema change)?
+  - **Small, not fixed:** the line under the cards, "Your prompt and this reply, as they read now, are in the bar as your next prompt", stays after the words are sent or cleared.
+  - Still open: letter one's third paragraph; the foot's "Source published at launch"; commands for the one-message actions; removing `.ch-answers`, `picker.models` and `shell.addressed`, each only on your yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
