@@ -117,11 +117,27 @@ export async function loadArrangement(db, id, context = {}) {
  * @param {{ fresh: boolean }} who fresh: nothing made yet
  */
 export async function loadSpace(db, { fresh }) {
-  const stored = db.objectStoreNames.contains(STORE) ? cleanArrangement(await db.get(STORE, SPACE)) : null
+  return (await openSpace(db, { fresh })).space
+}
+
+/**
+ * The space to start on, as loadSpace gives it, and what this device keeps,
+ * for telling the very first start from the others (the birds on first
+ * load, C279 (e)). Reads only; nothing stored changes.
+ * @param {import('idb').IDBPDatabase} db
+ * @param {{ fresh: boolean }} who fresh: nothing made yet
+ * @returns {Promise<{ space: import('../shell/arrangement').Arrangement, kept: boolean, canKeep: boolean }>}
+ *   kept: a space is kept on this device, read back or not; canKeep: the list it is kept in exists
+ */
+export async function openSpace(db, { fresh }) {
+  const canKeep = db.objectStoreNames.contains(STORE)
+  const record = canKeep ? await db.get(STORE, SPACE) : undefined
+  const kept = record != null
+  const stored = kept ? cleanArrangement(record) : null
   // A space left in the Lab opens on Records while the Lab waits for a later
   // release (C279 (a)); the stored space is not changed.
-  if (stored) return stored.lab && !LAB ? shipped(SPACE) : stored
-  return fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE)
+  if (stored) return { space: stored.lab && !LAB ? shipped(SPACE) : stored, kept, canKeep }
+  return { space: fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE), kept, canKeep }
 }
 
 /** Your saved arrangements on this device, by name (C257). */

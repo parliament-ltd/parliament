@@ -6,7 +6,7 @@ import { COPY } from '../copy'
 import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat } from '../lib/db'
 import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
 import { TEMPLATES } from '../lib/seedTemplates'
-import { loadSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arrangements'
+import { openSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
@@ -51,6 +51,8 @@ import { boardName, roomLabel, andList } from './say'
 import RoomBoard from './RoomBoard'
 import PlanBoard from './PlanBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
+import Intro from './Intro'
+import { showIntro } from './firstLoad'
 import AlmanacBoard from './AlmanacBoard'
 import LibraryBoard from './LibraryBoard'
 import { readCatalogue } from '../lib/catalogue'
@@ -358,9 +360,16 @@ export default function Shell() {
     setSetting(WELCOME_SETTING, next).catch(() => {})
   }, [])
 
+  // The birds on first load (C279 (e)): over the welcome page the first
+  // time it shows, until they end or are skipped.
+  const [intro, setIntro] = useState(false)
+  const endIntro = useCallback(() => setIntro(false), [])
+
   // The space and the history this device kept, once the database is open.
   // With no space kept yet, someone who has made nothing starts on the
-  // welcome page, anyone else on the Almanac (C118, C125).
+  // welcome page, anyone else on the Almanac (C118, C125). That start is
+  // the first on this device, and the birds come in; the space is kept
+  // straight away, so it is the only one.
   useEffect(() => {
     let live = true
     initDB().then(async (handle) => {
@@ -368,13 +377,14 @@ export default function Shell() {
       const [chats, history, stored] = await Promise.all([
         handle.count('conversations'), readCommands(handle), getSetting(WELCOME_SETTING).catch(() => null),
       ])
-      const kept = await loadSpace(handle, { fresh: !chats })
+      const opened = await openSpace(handle, { fresh: !chats })
       if (!live) return
       welcomeRef.current = cleanWelcome(stored)
       welcomeRead.current = true
       setWelcomeState(welcomeRef.current)
-      commit(backOnPage(kept))
+      commit(backOnPage(opened.space))
       setLines(history)
+      setIntro(showIntro({ kept: opened.kept, fresh: !chats, canKeep: opened.canKeep }))
       setStarted(true)
     }).catch(() => setStarted(true))
     return () => { live = false }
@@ -3918,6 +3928,7 @@ export default function Shell() {
         p.board,
       ))}
       {onWelcome && <WelcomeFoot />}
+      {intro && <Intro onEnd={endIntro} />}
     </div>
   )
 }

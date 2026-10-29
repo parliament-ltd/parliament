@@ -1114,3 +1114,22 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
    the key panel lays it over its field's slot. */
 .ch-vault { position: fixed; left: 0; top: 0; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; }
 .ch-keyfield.ch-keyvault { display: block; height: 36px; }
+
+/* ── the birds on first load (C279 (e)) ──
+   Only on the very first start, laid over the welcome page as it first
+   shows (Intro.jsx): one bird, then two, then three, a short hold, then
+   the paper fades and the welcome page is there. About 1.2 seconds in all.
+   The timings are set from script (firstLoad.js), which ends it on the same
+   clock; with reduced motion they are zero but for a short still hold, so
+   the three show at once and the page follows. The birds are ink, as the
+   mark is everywhere. No mockup draws this, so its size is a choice: the
+   mark 64px across, centred on the paper. */
+.ch-intro { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--ch-paper); animation: ch-intro-out var(--intro-fade, 0ms) var(--ch-ease) var(--intro-out, 0ms) both; }
+.ch-intro-mark { width: 64px; height: 54px; color: var(--ch-ink); overflow: visible; }
+/* Each bird fades in and rises. The rise is in the mark's own units: 48 of
+   its 752 across, about 4px at this size, as the welcome page's ch-rise. */
+.ch-intro-mark path { animation: ch-intro-bird var(--intro-bird, 0ms) ease both; }
+.ch-intro-mark path:nth-child(2) { animation-delay: var(--intro-2, 0ms); }
+.ch-intro-mark path:nth-child(3) { animation-delay: var(--intro-3, 0ms); }
+@keyframes ch-intro-bird { from { opacity: 0; transform: translateY(48px); } to { opacity: 1; transform: none; } }
+@keyframes ch-intro-out { to { opacity: 0; } }
