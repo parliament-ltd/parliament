@@ -12,6 +12,22 @@
 //   layout's narrow form: the conversation, with the columns behind the
 //   buttons at its top.
 // Open or closed is not remembered: each room starts as its form says.
+//
+// For now the columns are not drawn at all (C280 (a); release.js, COLUMNS):
+// a room is its chat. drawsColumn says which a layout draws.
+
+import { COLUMNS } from './release'
+
+/**
+ * Whether a layout draws a side column, or a phone room's sheet, that has
+ * blocks (C280 (a)): only with the columns on. A column that holds the chat
+ * itself (chat: true) draws either way, so no room loses its chat.
+ * @param {boolean} has the column has blocks
+ * @param {{ chat?: boolean, columns?: boolean }} [o] columns: whether this
+ *   release draws side columns (release.js)
+ * @returns {boolean}
+ */
+export const drawsColumn = (has, { chat = false, columns = COLUMNS } = {}) => Boolean(has) && (columns || chat)
 
 /** Two side columns of 288px and a chat of about 360px. */
 export const ROOM_OPEN = 940

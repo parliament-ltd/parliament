@@ -6,6 +6,22 @@
 
 export const LAB = false
 
+// A room is its chat only, for now (C280 (a); Stefan, 29 October: "I've
+// changed my mind on columns, let's hide those for now"). Its side columns,
+// and the buttons that open them, are not drawn in any form: alone, sharing
+// the screen, narrow or on a phone. Their blocks stay in the room file and
+// their code stays; COLUMNS = true brings them back as C279 (b) built them.
+// A column that holds the chat itself (the chat panel of the Data Workspace
+// and the Drafting Desk) still draws, with only the chat in it.
+export const COLUMNS = false
+
+// The strip along the top of each prompt and reply card (C280 (b); Stefan,
+// 29 October: "hide the top bar on the reply that has the old favorite and
+// branch icons"): its number, the favourite and note marks, and the buttons
+// for favourite, note, branch from here, delete, and a menu of hide, send to
+// branch, quote and copy. CARD_HEAD = true draws it again.
+export const CARD_HEAD = false
+
 /** The room people start in, the one template the Library offers meanwhile. */
 export const DEFAULT_TEMPLATE = 'writing-studio@1.0'
 

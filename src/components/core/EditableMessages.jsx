@@ -20,6 +20,7 @@ import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
 import MessageCard from './MessageCard'
+import { isReleased, onRelease } from '../../editing/across'
 
 // A prompt and its reply, edited in place as one (stage 11, piece 2; the
 // editing spec, "Editing prompts"; C214, ruled 26 October). One editor draws
@@ -42,6 +43,9 @@ import MessageCard from './MessageCard'
 //
 // Each card's text is saved beside what was written, as blocks with a record
 // for each edit, half a second after a change and on leaving (C212).
+//
+// While a selection is dragged across cards, out of this editor or into it,
+// the editor lets go and is not one (editing/across.js; C280 (d)).
 
 const SAVE_AFTER_MS = 500
 // Joined by typing over both cards: the bar is filled once the typing pauses.
@@ -235,7 +239,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     }
     const v = new EditorView(host.current, {
       state: EditorState.create({ doc, plugins }),
-      editable: () => !cleanRef.current,
+      editable: () => !cleanRef.current && !isReleased(),
       nodeViews: { section: sectionView, chart: (node) => chartView(node) },
       attributes: () => ({ class: `p-pair${cleanRef.current ? ' clean' : ''}`, 'aria-label': wordsRef.current?.label ?? '', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' }),
       dispatchTransaction(tr) {
@@ -337,9 +341,12 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   // markup · clean: the result only, read-only while it is shown.
   useEffect(() => {
     cleanRef.current = clean
-    view.current?.setProps({ editable: () => !clean })
+    view.current?.setProps({ editable: () => !clean && !isReleased() })
     if (clean) closeMenu()
   }, [clean, closeMenu])
+
+  // A selection dragged across cards: not an editor while it lasts (C280 (d)).
+  useEffect(() => onRelease(() => view.current?.setProps({ editable: () => !cleanRef.current && !isReleased() })), [])
 
   return (
     <div className="p-pair-host">

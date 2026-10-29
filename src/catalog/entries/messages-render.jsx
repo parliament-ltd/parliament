@@ -77,6 +77,7 @@ import {
   getDocket as dbGetDocket,
 } from '../../lib/db'
 import { onRecordsChanged } from '../../lib/records'
+import { watchAcross } from '../../editing/across'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 
@@ -570,13 +571,13 @@ export default function MessagesRender() {
     const top = family.reduce((n, c) => Math.max(n, c.branch.charCodeAt(0)), 0)
     const next = top ? `${planNum}${String.fromCharCode(top + 1)}` : null
     return (
-      <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]">
+      <p className="p-marg">
         {i18n._(COPY.chat.promptEdited, { address })}
         {others && <>; {i18n._(COPY.chat.promptEditedOthers)}</>}
         {hosted && (
           <>
-            <span aria-hidden="true"> · </span>
-            <button type="button" className="underline underline-offset-2 italic" onClick={() => window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value: `>again:${address}` } }))}>
+            <span className="sep" aria-hidden="true"> · </span>
+            <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value: `>again:${address}` } }))}>
               {next ? i18n._(COPY.chat.askAgainAs, { next }) : i18n._(COPY.chat.askAgain)}
             </button>
           </>
@@ -647,8 +648,12 @@ export default function MessagesRender() {
 
   void conversationId
 
+  // A selection dragged from one card into another (C280 (d); editing/across.js).
+  const chatRef = useRef(null)
+  useEffect(() => watchAcross(chatRef.current), [])
+
   return (
-    <div className="relative h-full flex flex-col">
+    <div className="relative h-full flex flex-col" ref={chatRef}>
       {pins.length > 0 && (
         <PinnedReferences pins={pins} onRemove={handleRemovePin} />
       )}
@@ -788,7 +793,7 @@ function UndoBanner({ pendingDeletes, onUndo }) {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => onUndo(pendingDeletes[pendingDeletes.length - 1].messageId)}
-            className="text-xs font-medium text-[#B8A070] hover:text-[var(--p-text-primary)] transition-colors shrink-0"
+            className="text-xs font-medium text-[var(--p-text-primary)] underline underline-offset-2 shrink-0"
           >
             Undo
           </motion.button>

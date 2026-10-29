@@ -1,0 +1,100 @@
+/* A room's chat as the newer mockups draw it (C280 (c); Stefan, 29 October:
+   "let's have the chat board follow the more recent HTML mockups").
+
+   Where the values come from, newest first (docs/spec/README.md, "What wins"):
+   - The reply's text: the bar reference (9 October), .reply: the serif at
+     15.5px, line height 1.68, paragraphs .75em apart. The token sheet's t-lead.
+   - The prompt: inline editing v5 (6 October), .you: a quiet box, the paper's
+     subtle fill, 12px corners, padding 11px 14px, 13.5px at 1.5, at most
+     600px wide and centred, 12px above its reply. Branch slider v9 the same.
+   - Turns 20px apart (v5, .turn); a source's answer with a 2px rule at its
+     edge (v5 and slider v9, .ans.wiki); headings, quotes and code inside a
+     reply (v5, .ans h1 to h3, blockquote, pre); hover on what can be edited
+     (v5, .ans[contenteditable], .you[contenteditable]).
+   - Marginalia under a reply or a prompt: v5's legibility, 11.5px italic
+     serif at 62% ink, separators at 40%; under a prompt, centred (v5, .pm).
+   - The reading width: the reply's column in v5 at 1440px is about 650px,
+     the bar reference's 600px; 640px here, the prompt's 600px inside it.
+   Colours are the token sheet's; the text keeps the room's own ink. No gold. */
+@import '../../styles/tokens.css';
+
+.p-chat { --p-measure: 640px; padding: 14px 16px 20px; }
+/* One turn under another; a prompt starts a turn. */
+.p-chat > * + * { margin-top: 12px; }
+.p-chat > * + :is(.p-pair-host, .p-msg-prompt) { margin-top: 20px; }
+.p-pair > .p-section + .p-section { margin-top: 12px; }
+/* The tabs of several branches, as wide as a reply with its arrows. */
+.p-chat .ch-branches { max-width: calc(var(--p-measure) + 72px); margin: 12px auto 0; }
+/* The tabs stay at the top as their replies scroll, on the board's own
+   paper, so the words pass under them (slider v9, .tabs). */
+.p-chat .ch-btabs { background: var(--p-bg-base, var(--ch-surface)); }
+/* A selection runs past the tabs and the arrows, and leaves them out. */
+.p-chat :is(.ch-btabs, .ch-barrow) { user-select: none; }
+.ch-bslide > :is(.p-msg, .p-pair-host, .ch-branches) + :is(.p-msg, .p-pair-host, .ch-branches) { margin-top: 12px; }
+.ch-bslide > :is(.p-msg, .p-pair-host, .ch-branches) + :is(.p-pair-host, .p-msg-prompt) { margin-top: 20px; }
+
+.p-msg { margin-inline: auto; color: var(--p-text-primary, var(--ch-ink)); }
+.p-msg-reply { max-width: var(--p-measure, 640px); }
+.p-msg-prompt { max-width: 600px; }
+.p-msg-body { position: relative; overflow-wrap: break-word; }
+
+/* The prompt, set apart. */
+.p-msg-prompt > .p-msg-box { padding: 11px 14px; background: var(--ch-subtle); border-radius: 12px; transition: box-shadow .15s; }
+.p-msg-prompt .p-msg-text { font: 400 13.5px/1.5 var(--ch-sans); }
+
+/* The reply, text on the board. */
+.p-msg-reply .p-msg-text { font: 400 var(--ch-t-lead)/1.68 var(--ch-serif); }
+.p-msg-text .parliament-md p { margin: 0 0 .75em; }
+.p-msg-text .parliament-md p:last-child { margin-bottom: 0; }
+/* Headings in a reply, in the sans (v5); a reply's own and the editor's. */
+.p-msg-reply .parliament-md > h1, .p-msg-reply .p-text > .pm-h1 { font: 600 22px/1.3 var(--ch-sans); margin: .4em 0; }
+.p-msg-reply .parliament-md > h2, .p-msg-reply .p-text > .pm-h2 { font: 600 18px/1.35 var(--ch-sans); margin: .4em 0 .35em; }
+.p-msg-reply .parliament-md > h3, .p-msg-reply .p-text > .pm-h3 { font: 600 var(--ch-t-lead)/1.4 var(--ch-sans); margin: .4em 0 .3em; }
+.p-msg-reply .parliament-md > :is(h4, h5, h6) { font: 600 var(--ch-t-body)/1.4 var(--ch-sans); margin: .4em 0 .3em; }
+.p-msg .parliament-md blockquote { margin: 0 0 .75em; padding-inline-start: 12px; border-inline-start: 2px solid var(--ch-soft); color: var(--ch-ink-2); }
+.p-msg .parliament-md pre { margin: 0 0 .75em; padding: 10px 12px; border: 0; border-radius: var(--ch-r-btn); background: var(--ch-subtle); font: 12.5px/1.5 var(--ch-mono); white-space: pre-wrap; }
+.p-msg .parliament-md pre code { font-size: inherit; }
+.p-msg .parliament-md hr { border-top-color: var(--ch-divider); margin: 1em 0; }
+/* Links in ink, never gold: a reply's own, a source's results, the sources it cited. */
+.p-msg :is(.p-msg-body, .p-msg-lines) a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* An answer from a source: a rule at its edge. One cut off: the rule dashed. */
+.p-msg-reply.from-source > .p-msg-box > .p-msg-body,
+.p-msg-reply.ghost > .p-msg-box > .p-msg-body { padding-inline-start: 12px; border-inline-start: 2px solid var(--ch-divider); }
+.p-msg-reply.ghost > .p-msg-box > .p-msg-body { border-inline-start-style: dashed; border-inline-start-color: var(--ch-soft); }
+/* A source's list of results. */
+.p-results { list-style: none; margin: 0; padding: 0; }
+.p-results > li + li { margin-top: .85em; }
+.p-results .p-marg { display: block; margin: 0; }
+/* Nothing where words would be. */
+.p-msg-empty { font-style: italic; color: var(--ch-ink-3); }
+
+/* What can be edited shows it under the pointer. */
+.p-pair[contenteditable="true"] .p-msg-reply .p-edit { margin: -2px -6px; padding: 2px 6px; border-radius: 6px; transition: background-color .15s; }
+.p-pair[contenteditable="true"] .p-msg-reply .p-edit:hover,
+.p-msg .p-edit .ProseMirror[contenteditable="true"]:hover { background: var(--ch-subtle); }
+.p-pair[contenteditable="true"] .p-msg-prompt > .p-msg-box:hover { box-shadow: inset 0 0 0 1px var(--ch-divider); }
+
+/* Marginalia. */
+.p-msg-lines { margin-top: 6px; }
+.p-msg-lines:empty { display: none; }
+.p-msg-prompt > .p-msg-lines { text-align: center; }
+.p-marg { margin: 2px 0 0; font: italic 400 var(--ch-t-marg)/1.7 var(--ch-serif); color: var(--ch-marg); }
+.p-marg.ink { color: var(--ch-ink); }
+.p-marg .sep { margin: 0 2px; opacity: .4; }
+.p-marg button { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+.p-marg button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.p-msg :is(.p-marg, .p-marg-block) a:hover { color: var(--ch-ink); }
+.p-marg-block { margin-top: 6px; font: italic 400 var(--ch-t-marg)/1.7 var(--ch-serif); color: var(--ch-marg); }
+.p-marg-block ol { margin: 2px 0 0; padding-inline-start: 1.4em; list-style: decimal; }
+.p-msg :is(button, a):focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 3px; }
+
+/* A model's thinking, above its answer: the label as marginalia, the
+   thinking itself quiet, behind a dotted rule. */
+.p-msg .parliament-thinking { margin-bottom: 10px; }
+.p-msg .parliament-thinking > .p-marg { margin: 0; }
+.p-thinking-text { margin-top: 4px; padding-inline-start: 12px; border-inline-start: 1px dotted var(--ch-soft); font: italic 400 12.5px/1.6 var(--ch-serif); color: var(--ch-ink-2); white-space: pre-wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .p-msg-prompt > .p-msg-box, .p-pair[contenteditable="true"] .p-msg-reply .p-edit { transition: none; }
+}

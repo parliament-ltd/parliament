@@ -15,6 +15,9 @@
 // screen, the rails stand open beside the chat; sharing it, they are strips
 // with a button each, and the chat takes the room's width; the narrow tree
 // only when there is no room for a chat at all.
+//
+// C280 (a): for now the rails are not drawn in any form (release.js,
+// COLUMNS): the room is its chat. Turning COLUMNS on draws them as above.
 
 import { useState } from 'react'
 import { useRoomForm } from '../../lib/useViewportWidth'
@@ -22,6 +25,7 @@ import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
 import RoomColumn from '../../components/layouts/RoomColumn'
 import { useColumns } from '../../components/layouts/useColumns'
+import { drawsColumn } from '../../lib/roomForm'
 import { COPY } from '../../copy'
 
 // Narrow-drawer rail class. The desktop tree uses .layout-rail-card
@@ -68,8 +72,9 @@ export default {
     const input      = slotContents['input-dock']
     const right      = slotContents['right-rail']
     const rightExtra = slotContents['right-rail-extra']
-    const hasRight   = (right && right.length > 0) || (rightExtra && rightExtra.length > 0)
-    const hasLeft    = left && left.length > 0
+    // Drawn only with the columns on (C280 (a)).
+    const hasRight   = drawsColumn((right && right.length > 0) || (rightExtra && rightExtra.length > 0))
+    const hasLeft    = drawsColumn(left && left.length > 0)
     const form       = useRoomForm()
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [panelOpen, setPanelOpen]   = useState(false)

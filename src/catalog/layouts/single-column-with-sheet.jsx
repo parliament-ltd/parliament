@@ -11,6 +11,9 @@
 // is hidden by default; clicking the small chevron handle expands it. The
 // `data-sheet-open` attribute is set on the root for components that want
 // to react to expansion.
+//
+// C280 (a): for now the sheet, a phone room's columns, is not drawn
+// (release.js, COLUMNS): the room is its chat.
 
 import { useState } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
@@ -18,6 +21,7 @@ import { useNavigate } from 'react-router-dom'
 import ParliamentMark from '../../components/ParliamentMark'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
+import { drawsColumn } from '../../lib/roomForm'
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
@@ -43,7 +47,7 @@ export default {
     const msgs  = slotContents['msg-area']
     const input = slotContents['input-dock']
     const sheet = slotContents['sheet']
-    const hasSheet = sheet && sheet.length > 0
+    const hasSheet = drawsColumn(sheet && sheet.length > 0)
     const [open, setOpen] = useState(false)
     const navigate = useNavigate()
     const { i18n } = useLingui()

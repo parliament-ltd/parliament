@@ -24,6 +24,10 @@
 // three-panel. Alone on screen, both columns stand open; sharing it, the
 // canvas takes the room's width and the left rail and the right column
 // (chat and inspector) are strips, each opening over the canvas's edge.
+//
+// C280 (a): for now the left rail and the inspector are not drawn in any
+// form (release.js, COLUMNS). The chat panel is the room's chat, so the
+// right column still draws, with the chat alone in it.
 
 import { useState } from 'react'
 import { useLingui } from '@lingui/react'
@@ -33,6 +37,7 @@ import NarrowChrome from '../../components/layouts/NarrowChrome'
 import NarrowSheet from '../../components/layouts/NarrowSheet'
 import RoomColumn from '../../components/layouts/RoomColumn'
 import { useColumns } from '../../components/layouts/useColumns'
+import { drawsColumn } from '../../lib/roomForm'
 import { COPY } from '../../copy'
 
 const RAIL_BASE   = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
@@ -73,9 +78,10 @@ export default {
     const input     = slotContents['input-dock']
     const chat      = slotContents['chat-panel']
     const inspector = slotContents['inspector']
-    const hasLeft      = left && left.length > 0
-    const hasChat      = chat && chat.length > 0
-    const hasInspector = inspector && inspector.length > 0
+    // The left rail and the inspector only with the columns on; the chat always (C280 (a)).
+    const hasLeft      = drawsColumn(left && left.length > 0)
+    const hasChat      = drawsColumn(chat && chat.length > 0, { chat: true })
+    const hasInspector = drawsColumn(inspector && inspector.length > 0)
     const hasRight     = hasChat || hasInspector
     const { i18n }     = useLingui()
     const form         = useRoomForm()

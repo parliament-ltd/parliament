@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { ROOM_CHAT, ROOM_OPEN, ROOM_EDGES, roomForm, bandWidth, columnsAt, toggleColumn } from './roomForm'
+import { ROOM_CHAT, ROOM_OPEN, ROOM_EDGES, roomForm, bandWidth, columnsAt, toggleColumn, drawsColumn } from './roomForm'
+import { COLUMNS } from './release'
 
 describe("a room's columns (C279 (b))", () => {
   it('opens its columns when it is alone on screen and wide enough for them', () => {
@@ -54,5 +55,27 @@ describe("a room's columns (C279 (b))", () => {
     const one = toggleColumn(columnsAt('open'), 'left', 'open')
     expect(one).toEqual({ left: false, right: true })
     expect(toggleColumn(one, 'left', 'open')).toEqual({ left: true, right: true })
+  })
+})
+
+describe('the columns hidden for now (C280 (a))', () => {
+  it('draws no side column with blocks while the columns are off', () => {
+    expect(drawsColumn(true, { columns: false })).toBe(false)
+    expect(drawsColumn(false, { columns: false })).toBe(false)
+  })
+
+  it('draws a column that holds the chat itself either way', () => {
+    expect(drawsColumn(true, { chat: true, columns: false })).toBe(true)
+    expect(drawsColumn(false, { chat: true, columns: false })).toBe(false)
+  })
+
+  it('draws every column with blocks when the columns are on, as C279 (b) built them', () => {
+    expect(drawsColumn(true, { columns: true })).toBe(true)
+    expect(drawsColumn(undefined, { columns: true })).toBe(false)
+  })
+
+  it('reads the release: off in this one', () => {
+    expect(COLUMNS).toBe(false)
+    expect(drawsColumn(true)).toBe(COLUMNS)
   })
 })

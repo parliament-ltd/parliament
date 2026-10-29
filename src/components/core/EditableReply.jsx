@@ -15,6 +15,7 @@ import { useAskBox } from './useAskBox'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
+import { isReleased, onRelease } from '../../editing/across'
 
 // A finished reply, edited in place (stage 11, piece 1; the editing spec,
 // "Editing replies"; C210, C212). Deleting strikes the model's words, typing
@@ -119,7 +120,7 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     ]
     const v = new EditorView(host.current, {
       state: EditorState.create({ doc, plugins }),
-      editable: () => !cleanRef.current,
+      editable: () => !cleanRef.current && !isReleased(),
       nodeViews: { chart: (node) => chartView(node) },
       attributes: { class: 'p-text', 'aria-label': 'The reply. Every word can be edited', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true', dir: 'auto' },
       dispatchTransaction(tr) {
@@ -184,12 +185,15 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
   // markup · clean: the result only, and read-only while it is shown.
   useEffect(() => {
     cleanRef.current = clean
-    view.current?.setProps({ editable: () => !clean })
+    view.current?.setProps({ editable: () => !clean && !isReleased() })
     if (clean) closeMenu()
   }, [clean, closeMenu])
 
+  // A selection dragged across cards: not an editor while it lasts (editing/across.js; C280 (d)).
+  useEffect(() => onRelease(() => view.current?.setProps({ editable: () => !cleanRef.current && !isReleased() })), [])
+
   return (
-    <div className={`p-edit parliament-md text-[15px]${clean ? ' clean' : ''}`}>
+    <div className={`p-edit parliament-md${clean ? ' clean' : ''}`}>
       <div ref={host} />
       {said && <p className="p-edit-said" role="status">{said}</p>}
       {blockMenu.element}

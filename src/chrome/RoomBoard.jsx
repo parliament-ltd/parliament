@@ -41,6 +41,10 @@ import { useBand } from './useNarrower'
 //   narrow form: the conversation, with the columns behind the buttons at
 //   its top (C126).
 // Open or closed is not remembered: each room starts as its form says.
+//
+// For now the columns are not drawn in any of these forms (C280 (a);
+// release.js, COLUMNS): the room is its chat. The form still decides the
+// narrow layout.
 
 const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]

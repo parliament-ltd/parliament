@@ -16,6 +16,10 @@
 // Its words are the copy table's (C279 (b)): the left button opens the
 // left column, and the layout names what the right one shows and hides
 // (rightWords, two copy entries).
+//
+// With the columns not drawn (C280 (a); release.js, COLUMNS), a room on the
+// shell with nothing to open here draws no top line at all: the chat starts
+// at the top of the room.
 
 import { useContext } from 'react'
 import { Menu, PanelRight, Wrench } from 'lucide-react'
@@ -26,6 +30,7 @@ import { useChatFrame } from '../ChatFrameContext'
 import { RoomHost } from '../../lib/useViewportWidth'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
+import { COLUMNS } from '../../lib/release'
 
 export default function NarrowChrome({
   onLeftClick,
@@ -44,6 +49,8 @@ export default function NarrowChrome({
   const leftLabel = i18n._(COPY.room.openLeft)
   const editorLabel = i18n._(COPY.room.openEditor)
   const rightLabel = i18n._(rightActive ? rightWords.hide : rightWords.show)
+
+  if (!COLUMNS && hosted && !onLeftClick && !onRightClick && !wrenchTarget) return null
 
   return (
     <div className="flex justify-evenly items-center h-10 bg-white shrink-0">

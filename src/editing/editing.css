@@ -107,6 +107,8 @@
 
 /* Said to a screen reader at the edges of a mark: real words, unseen. */
 .p-text .pm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* Left out of a selection copied across cards (across.js; C280 (d)). */
+.p-copying .p-text .pm-sr { display: none; }
 
 /* Highlights and quoted passages, drawn over the words as before. */
 .p-text .pm-hl { border-radius: 2px; padding: 0 1px; }
