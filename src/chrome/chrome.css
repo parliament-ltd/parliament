@@ -507,9 +507,6 @@
 /* Narrow, by its own width, the card keeps its one column, closer in
    (welcome spec §5; C126). */
 .ch-welcome.narrow .ch-wnow { margin-top: 26px; }
-/* One line under "Welcome" on narrow or touch-only screens (W §12.4). */
-.ch-wsmall { display: none; margin: 4px 2px 0; }
-@media (max-width: 760px), (hover: none) and (pointer: coarse) { .ch-wsmall { display: block; } }
 /* The ending (W §7): one line under the field once the steps are done, the
    size of the heading, with focus: to click. */
 .ch-wnow { grid-area: now; margin: 22px 2px 0; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
@@ -865,7 +862,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 /* ── The globe (stage 9, piece 4; C184): marginalia that opens the languages. */
 .ch-shell button.ch-globe { padding: 0; border: none; background: none; cursor: pointer; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-align: start; }
 .ch-shell button.ch-globe:hover, .ch-shell button.ch-globe:focus-visible { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
-.ch-wtop .ch-globe { margin-top: 6px; }
+/* The language in the welcome card's top corner (29 October). */
+.ch-wlang { position: absolute; top: 18px; inset-inline-end: 22px; z-index: 1; }
 
 /* ── About: the privacy copy and what leaves the device (stage 9, piece 5; C185). */
 .ch-prose, .ch-leaves { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 8px; max-width: 64ch; }

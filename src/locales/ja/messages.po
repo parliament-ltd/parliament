@@ -9262,6 +9262,7 @@ msgstr "では、{command} で集中しましょう"
 msgid "welcome.signature"
 msgstr "So Lov"
 
+#. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
 msgstr "今のところコンピュータ向けです。スマートフォンへの対応はこれからです"

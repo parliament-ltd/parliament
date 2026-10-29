@@ -1735,7 +1735,8 @@ export const COPY = {
     // The ending (W §7): the letter gives way to one line. {command} is focus:, drawn as a link that writes it in the bar.
     now: /*i18n*/ { id: 'welcome.now', message: 'Now, let’s {command}', comment: '{command} is focus:, which stays English' },
     // On narrow or touch-only screens only (W §12.4).
-    small: /*i18n*/ { id: 'welcome.small', message: 'built for a computer for now; the phone comes later' },
+    // In the page's foot with the other marginalia, on every screen (29 October).
+    small: /*i18n*/ { id: 'welcome.small', message: 'Built for computer, phone later', comment: 'In the foot of the welcome page, beside "Created with Claude Code"' },
     // Where the browser has not agreed to keep Parliament's data (C94). Names no browser.
     keepNot: /*i18n*/ { id: 'welcome.keepNot', message: 'This browser has not agreed to keep what you make here, so it may clear it to save space, or each time it closes. To keep it, let this site keep its data in the browser’s settings, and back up now and then.' },
     keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask the browser again' },

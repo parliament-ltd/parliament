@@ -9262,6 +9262,7 @@ msgstr "Nu kör vi {command}"
 msgid "welcome.signature"
 msgstr "So Lov"
 
+#. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
 msgstr "byggt för datorn än så länge; mobilen kommer senare"

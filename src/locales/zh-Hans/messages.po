@@ -9262,6 +9262,7 @@ msgstr "现在，来试试 {command}"
 msgid "welcome.signature"
 msgstr "So Lov"
 
+#. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
 msgstr "目前为电脑设计，手机版稍后推出"

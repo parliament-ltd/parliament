@@ -73,6 +73,8 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
       aria-current={addressed ? 'true' : undefined}
       onMouseDown={() => onAddress('welcome')}
     >
+      {/* The language in the card's top corner, where many sites keep it (29 October). */}
+      {languages && <div className="ch-wlang"><Globe now={languages.now} onOpen={onLanguage} /></div>}
       <div className="ch-wscroll">
         <div className="ch-wgrid">
           <div className="ch-wtop">
@@ -81,8 +83,6 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               {i18n._(COPY.welcome.heading)}
               <span className="ch-wto">{i18n._(COPY.welcome.headingTo)}</span>
             </h1>
-            <p className="ch-wsmall ch-marg">{i18n._(COPY.welcome.small)}</p>
-            {languages && <Globe now={languages.now} onOpen={onLanguage} />}
           </div>
           {steps && (
             <ol className="ch-steps" aria-label={i18n._(COPY.welcome.steps)}>
@@ -126,6 +126,8 @@ export function WelcomeFoot() {
   const { i18n } = useLingui()
   return (
     <footer className="ch-foot ch-marg">
+      <span>{i18n._(COPY.welcome.small)}</span>
+      <span className="sep" aria-hidden="true">·</span>
       <span>{i18n._(COPY.welcome.footMade)}</span>
       <span className="sep" aria-hidden="true">·</span>
       <span>{i18n._(COPY.welcome.footLicence)}</span>

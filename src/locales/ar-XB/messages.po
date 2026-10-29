@@ -9262,6 +9262,7 @@ msgstr ""
 msgid "welcome.signature"
 msgstr ""
 
+#. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
 msgstr ""

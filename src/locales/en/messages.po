@@ -9262,9 +9262,10 @@ msgstr "Now, let’s {command}"
 msgid "welcome.signature"
 msgstr "Stef"
 
+#. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
-msgstr "built for a computer for now; the phone comes later"
+msgstr "Built for computer, phone later"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"
