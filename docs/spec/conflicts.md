@@ -4460,6 +4460,28 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - The birds' size and the reduced-motion pause, the `?` panel pushing the boards down rather than floating over them (v30 floats it), and its one column in the welcome card are first choices, easy to change.
   - The four draft languages lack the new strings and still say "that works here" for `?`.
 
+**C280. One bar, one point of control; the menus and the chat after the first release** (29 October; **ruled by Stefan as he asked for each, 29 October**; replaces C6's "each window keeps its own bar"; C279; the bar reference; inline editing v5; Almanac v30). On the branch `claude/one-bar`, not released.
+- **Ruled and built:**
+  - **One bar.** "There should only be one bar, one point of control." A popped board has no bar of its own; the one bar, on the page or in its own window (`pop:command`), commands every board, and focusing a popped board points it there. Ctrl+K and `/` reach it from any window. A popped board's window cannot bring the page forward (the browser lets a page raise the windows it opened, not the other way), so after Ctrl+K there it says where the bar is. Checked in a real Chrome: never more than one bar in any window.
+  - **Popped windows** open at the size the board showed on the page, leaving room for the window's frame, and the board fills its window.
+  - **The command menu as a board:** `open:commandmenu` beside the work, `pop:commandmenu` into a window. `commandmenu`, since `command` is the bar's own word. A click writes a command into the bar.
+  - **`close:letter`** closes the letter, as Escape does.
+  - **The welcome page's first step** says the keys: "Ctrl+K then >" (⌘K on a Mac).
+  - **"answered from multiple"** when several sources are ticked, "answered by multiple" when a model is among them.
+  - **The ink pot shows on a fast answer:** a first dip as a reply starts, at least 1.5 seconds of drain, then the refill, holding its level through the refill's delay. The drawing's own cycle is unchanged; with reduced motion only the slow drain shows.
+  - **Every menu in the command menu's layout:** who answers, frameworks, languages and reply to, in Almanac v30's columns as `?` is, one shared piece (`Menu.jsx`). A click outside closes a menu; with the bar at the bottom they open above it and the bar never moves.
+  - **A room is its chat:** "I've changed my mind on columns, let's hide those for now." `COLUMNS = false` in `src/lib/release.js` hides every side column; `true` brings C279 (b) back unchanged. The strip of old icons on each card is hidden too (`CARD_HEAD = false`).
+  - **The chat as the newer mockups draw it:** the prompt in a quiet box at most 600px (v5), the reply as serif text on the board at most 640px (the bar reference's 15.5px), a source's answer with a rule at its edge, marginalia under each in italic serif. Gold is gone from the chat's buttons and links.
+  - **A selection can run from a prompt into its reply,** and across cards, in Chrome and Firefox (`src/editing/across.js`). Strike-through and the ask box work as before inside one prompt and its reply.
+  - **The language in the top corner** shows only with more than one language to choose; the live site has English alone until the drafts are reviewed.
+  - Tests: 1,424. Lint: 30 warnings, all older. Both builds pass.
+- **For you:**
+  - **Hidden with the columns:** the branch list (`open:201a`, `new:branch` and Records still reach branches), the highlights and notes lists (in Records), the context meter, and Data Workspace's file shelf, so a Data Workspace cannot load a file. Neither Data Workspace nor Drafting Desk is offered now; their chat sits in their right column, so beside another board it is behind a strip.
+  - **Hidden with the old card strip, and no command for them yet:** favourite one message, a note on one message, delete one message, hide one, send one to a branch, quote a whole message. Commands for them, or v5's selection menu, are for a later piece.
+  - **First choices, easy to change:** the reply 640px wide and 15.5px; names in the menus in mono, as commands are; every menu as wide as the screen; in the welcome card a menu opens under the field and the card re-centres; a board brought back with `pop:back` returns as a column of its own.
+  - **Unused now, kept:** the old `.ch-answers` styles and the copy entry `picker.models` ("Models"). Each goes only on your yes.
+  - Still open from C279: letter one's third paragraph, and the foot's "Source published at launch".
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
