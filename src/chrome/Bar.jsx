@@ -383,7 +383,6 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={note.onGo}>{i18n._(COPY.screensMap.extraGo)}</button>
           </p>
         )}
-        {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
         {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && frameworkPicker && (
@@ -419,6 +418,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           />
         )}
       </div>
+      {/* The ? reference: as wide as the stage, not the bar (C279 (f)). */}
+      {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
     </div>
   )
 }

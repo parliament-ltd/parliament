@@ -66,7 +66,7 @@ export const COPY = {
   // lists the bar joins in the reader's language.
   enter: {
     empty: /*i18n*/ { id: 'enter.empty', message: 'Type a command, or ? for every command' },
-    help: /*i18n*/ { id: 'enter.help', message: 'Enter shows every command that works here' },
+    help: /*i18n*/ { id: 'enter.help', message: 'Enter shows every command' },
     helpVerb: /*i18n*/ { id: 'enter.helpVerb', message: 'Enter shows how {verb} works' },
     unknownHelp: /*i18n*/ { id: 'enter.unknownHelp', message: 'No command called {verb}. Enter shows every command' },
     notCommand: /*i18n*/ { id: 'enter.notCommand', message: 'A command starts with a verb and a colon, like open:201' },
@@ -2528,6 +2528,11 @@ export const COPY = {
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },
     referenceClose: /*i18n*/ { id: 'shell.referenceClose', message: 'Escape closes this' },
     referenceName: /*i18n*/ { id: 'shell.referenceName', message: 'Every command', comment: 'The name of the ? reference, read by screen readers' },
+    // The ? reference lists every command on every board (C279 (f)).
+    referenceTitle: /*i18n*/ { id: 'shell.referenceTitle', message: 'Commands', comment: 'The heading of the ? reference, drawn in capitals' },
+    referenceFainter: /*i18n*/ { id: 'shell.referenceFainter', message: 'A fainter command works on another board, named beside it', comment: 'Beside the heading of the ? reference' },
+    referenceOn: /*i18n*/ { id: 'shell.referenceOn', message: 'Works on {boards}', comment: 'Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection' },
+    referenceKeys: /*i18n*/ { id: 'shell.referenceKeys', message: 'A click writes a command into the field, and Enter runs it. {example} shows the forms of one command.', comment: 'The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English' },
     windowTitle: /*i18n*/ { id: 'shell.windowTitle', message: '{board} · Parliament', comment: "A popped window's title: a board name only, never anything someone wrote" },
     barWindow: /*i18n*/ { id: 'shell.barWindow', message: 'Parliament', comment: "The popped bar's window title" },
     barAway: /*i18n*/ { id: 'shell.barAway', message: 'The bar is in its own window. pop:back command brings it back.' },

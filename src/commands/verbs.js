@@ -72,7 +72,7 @@ export const LEADERS = Object.freeze({
     { example: '>', gloss: /*i18n*/ { id: 'leader.command', message: 'Type a command. The > stays in the field' } },
     { example: 'p>', forms: ['p>', 'prompt>'], gloss: /*i18n*/ { id: 'leader.prompt', message: 'Write a prompt. Nothing is sent before Enter' } },
     { example: 's>', forms: ['s>', 'search>'], gloss: /*i18n*/ { id: 'leader.search', message: 'Search' } },
-    { example: '?', forms: ['?', 'help', '?open'], gloss: /*i18n*/ { id: 'leader.help', message: 'Every command that works here, or how one works' } },
+    { example: '?', forms: ['?', 'help', '?open'], gloss: /*i18n*/ { id: 'leader.help', message: 'Every command, or how one works' } },
   ],
 })
 

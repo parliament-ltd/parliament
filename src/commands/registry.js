@@ -240,18 +240,26 @@ export function complete(body, board = null) {
   return keywordsOf(entry).filter((w) => w.startsWith(typed)).map((w) => `${entry.verb}:${w}`)
 }
 
+// The boards a verb works on, as the reference names them: the Lab left out
+// while it waits for a later release (C279 (a)).
+const shownOn = (on) => (on === 'everywhere' ? on : on.filter((b) => b !== 'lab' || offered('lab')))
+
 /**
  * The reference `?` opens: the leaders first, then the verbs in the order
- * GROUPS gives. On a board, the verbs that work there; with no board, every
- * verb. Each row carries its examples and the gloss's copy entry.
+ * GROUPS gives. Every verb this release offers, on every board (C279 (f),
+ * ruled 29 October: a complete reference). Each row carries its examples,
+ * the gloss's copy entry, the boards it works on (`on`: 'everywhere' or
+ * board keys) and whether it works on this board (`here`); with no board,
+ * every row is here.
  * @param {string|null} board
  */
 export function reference(board = null) {
   const groups = GROUPS.map((group) => ({
     group: group.key,
     title: group.title,
-    rows: VERBS.filter((v) => v.group === group.key && worksOn(v, board) && offered(v.verb))
-      .map((v) => ({ verb: v.verb, example: v.example, forms: v.forms ?? [v.example], gloss: v.gloss, spends: v.spends })),
+    rows: VERBS.filter((v) => v.group === group.key && offered(v.verb))
+      .map((v) => ({ verb: v.verb, example: v.example, forms: v.forms ?? [v.example], gloss: v.gloss, spends: v.spends, on: shownOn(v.on), here: worksOn(v, board) })),
   })).filter((g) => g.rows.length)
-  return [{ group: 'leaders', title: LEADERS.title, rows: LEADERS.rows }, ...groups]
+  const leaders = LEADERS.rows.map((r) => ({ ...r, on: 'everywhere', here: true }))
+  return [{ group: 'leaders', title: LEADERS.title, rows: leaders }, ...groups]
 }
