@@ -4363,6 +4363,22 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - Released here as `v0.5.1`. Nothing pushed: `main` and the tag go to both remotes on your yes, with the CLAUDE.md commit, and then you make the GitHub release, as for 0.5.0. The switch then publishes 0.5.1.
   - **Noticed, not changed:** the version is written by hand in three places. `src/lib/modes.js` still gives rooms 0.4.0, though its comment says to raise it at each release; `src/catalog/dev-modes.js` says 0.5.0. Reading `package.json` instead is for a later piece.
 
+**C278. Stage 15, piece 7, as built: going public** (29 October; C276 as ruled; C277 as ruled). Parliament is public, and `parliament.ltd` serves 0.5.1.
+- **Ready here** (step 1): the two fixes merged (C276 (b)), Node 24 on both sites ((c)), the changelog dated 28 October. The copy made again at `C:\Users\stefan\Desktop\parliament`, and `v0.5.0` released from it.
+- **The repositories** (steps 2 and 3): `parliament-ltd/parliament`, public, on GitHub under the organization `parliament-ltd` and on Bitbucket in the workspace of that name. `main` and `v0.5.0` pushed to both, then `v0.5.1` (C277). No force push.
+- **GitHub's settings** (step 4), as (e) lists them. Checked from outside: the description and the website; private vulnerability reporting on; an active ruleset on `main` that blocks deletion and force pushes; both releases immutable. Secret scanning and Dependabot show only to you. CodeQL, the check and Scorecard ran on the new `main` and passed.
+- **The releases:** `v0.5.0` on 28 October, and `v0.5.1` the same day, for its vault hashes (C277). Each carries its two archives and `SHA256SUMS`, exactly the files built here.
+- **The vault's site** (step 5): `parliament-keys`, from the `vault` folder, at `keys.parliament.ltd`, auto publishing locked. It serves exactly the three files `v0.5.1`'s `SHA256SUMS` lists, every header as set. The build Netlify made after the push waits unpublished: its files are the same, so the vault is not deployed again.
+- **The backup** (step 6), made by you on the old site before the switch.
+- **The switch** (step 7), 29 October:
+  - `project-apollo-v1` locked first, then linked to the public repository's `main`.
+  - Its build, checked at its own address before publishing: 19 of the app's 20 files exactly as the `v0.5.1` archive holds them (the 20th below), every header as set, a missing asset answered 404 and any other path with the app.
+  - Published. `www.parliament.ltd` serves the same files. `parliament.ltd`, plain HTTP and old paths redirect to it. The page frames only `keys.parliament.ltd`, the vault lets only `www.parliament.ltd` frame it, and SECURITY.md quotes the live policy word for word.
+- **After it** (step 8): `docs/hosting.md` records the repository, both sites, the vault's record and how a release is published. The live testing list is yours to go through, its "Stage 15" and "After the switch" sections first; its line on the narrow room's mark now says the fix shipped in 0.5.0.
+- **Noticed, not changed:**
+  - The 20th file, `sw.js`, lists the same 17 files with the same revisions as the archive's, in another order, since Netlify's computers sort file names differently from this one. Browsers take the two alike, and `SHA256SUMS` covers only the archives and the vault's files, so nothing published is wrong. But the app's archive is not byte for byte what the site serves. Sorting the list in the build (`vite.config.js`, the service worker's `manifestTransforms`) would make them the same; for the next release.
+  - Still open from (f): the earlier copy, `parliament-public`, goes to the Recycle Bin on your yes. The standby site is piece 8.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
