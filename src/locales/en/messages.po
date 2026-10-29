@@ -7233,7 +7233,7 @@ msgstr "kept up to 30 days"
 #. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr "A click, or Enter on a row, ticks it or unticks it. A row that needs a key writes api: into the field instead."
+msgstr "A click on a name, or Enter, answers with it alone from now on. Its box, or Shift and a click, adds it. A row that needs a key writes api: into the field instead."
 
 #. The foot of the menu of who answers one step of a plan, before "Escape closes this"
 #. js-lingui-explicit-id

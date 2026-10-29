@@ -36,7 +36,7 @@ const GROUP_TITLES = {
  *   the first runs, aligned with picked (branch slider v9; C201);
  *   forStep: choosing for one step of a plan (C202)
  */
-export default function AnswerPicker({ rows, now, picked = null, reference, onPick, order: sending = 'together', conds = [], onOrder = null, onCond = null, forStep = null, onClose = null }) {
+export default function AnswerPicker({ rows, now, picked = null, reference, onPick, onSwitch = null, order: sending = 'together', conds = [], onOrder = null, onCond = null, forStep = null, onClose = null }) {
   // The ticked boxes, in order: each shows its place, the order of the tabs.
   const order = picked?.length ? picked : [now?.id].filter(Boolean)
   const { i18n } = useLingui()
@@ -59,7 +59,7 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
     const at = order.indexOf(r.id)
     const help = r.later ? null : r.needsKey || r.unchecked ? `api:${r.provider}` : `by:${r.id}`
     return [
-      <MenuRow key={r.id} on={at >= 0} mark={at >= 0 ? String(at + 1) : ''} faint={r.needsKey} later={r.later} title={help ?? undefined} label={r.name} onClick={() => onPick(r)}>
+      <MenuRow key={r.id} on={at >= 0} mark={at >= 0 ? String(at + 1) : ''} faint={r.needsKey} later={r.later} title={help ?? undefined} label={r.name} onClick={(e) => (!onSwitch || forStep || e.shiftKey || e.target?.closest?.('.ch-menu-box') ? onPick(r) : onSwitch(r))}>
         {about(r)}
         <MenuFacts items={facts(r)} />
         {r.perDay && !r.later && <span className="ch-menu-facts">{i18n._(COPY.picker.perDay, { count: r.perDay })}</span>}

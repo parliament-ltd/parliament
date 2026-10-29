@@ -2315,7 +2315,7 @@ export const COPY = {
     // the list of providers.
     title: /*i18n*/ { id: 'picker.title', message: 'Who answers', comment: 'The heading of the menu of who answers, drawn in capitals' },
     laterGroup: /*i18n*/ { id: 'picker.laterGroup', message: 'Later', comment: 'A group in the menu of who answers: providers not built yet, one row each' },
-    keys: /*i18n*/ { id: 'picker.keys', message: 'A click, or Enter on a row, ticks it or unticks it. A row that needs a key writes api: into the field instead.', comment: 'The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English' },
+    keys: /*i18n*/ { id: 'picker.keys', message: 'A click on a name, or Enter, answers with it alone from now on. Its box, or Shift and a click, adds it. A row that needs a key writes api: into the field instead.', comment: 'The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English' },
     keysStep: /*i18n*/ { id: 'picker.keysStep', message: 'A click, or Enter on a row, chooses it for this step.', comment: 'The foot of the menu of who answers one step of a plan, before "Escape closes this"' },
     // One after another (branch slider v9; C201).
     order: /*i18n*/ { id: 'picker.order', message: 'Order' },

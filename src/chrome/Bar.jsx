@@ -56,7 +56,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null, onAway = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null, onAway = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -465,7 +465,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       {menu === 'picker' && (
         picker.kind === 'reply'
           ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} onClose={() => closeMenu('picker', true)} />
-          : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} onClose={() => closeMenu('picker', true)} />
+          : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} onSwitch={onSwitchAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} onClose={() => closeMenu('picker', true)} />
       )}
       {menu === 'frameworks' && <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} onClose={() => closeMenu('frameworks', true)} />}
       {menu === 'languages' && <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} onClose={() => closeMenu('languages', true)} />}

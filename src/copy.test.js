@@ -9,7 +9,7 @@ const entries = Object.entries(COPY).flatMap(([group, items]) => Object.entries(
 const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikipedia', 'Claude', 'Code', 'MIT', 'Lov', 'Markdown', 'English', 'EU', 'US', 'Privacy', 'Anonymous',
   // The key's name, as the keyboard writes it ("when you press Enter"), the
   // web host the privacy copy names, and an IP address (About; C185).
-  'Enter', 'Parliament’s', 'Netlify', 'IP',
+  'Enter', 'Shift', 'Parliament’s', 'Netlify', 'IP',
   // A passkey's PIN (Lock Parliament).
   'PIN',
   // The welcome letter, in Stefan's own words (C265): I with its contractions, and a language he has written in.

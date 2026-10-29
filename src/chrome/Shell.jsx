@@ -3642,6 +3642,16 @@ export default function Shell() {
     const p = planLabOpen(current.current, typeof askedLab === 'string' ? askedLab : null)
     if (p.next) run(p.next, null)
   }, [started, askedLab, goTo, run])
+  // A click on a name in who answers (29 October): that one alone, from now
+  // on, as by: does, so undo: takes it back; a step of a plan, a row that
+  // needs a key and one not checked go as a tick does.
+  const switchAnswerer = useCallback(async (row) => {
+    if (row.later) return
+    if (stepPickNow.current || row.needsKey || row.unchecked) return pickAnswererNow.current?.(row)
+    setPicking(false)
+    await onPlanDelete(`by:"${row.id}"`)
+  }, [onPlanDelete])
+  const pickAnswererNow = useRef(null)
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
     // For one step of a plan (C202): its model, or none for the branch's own.
@@ -3668,6 +3678,7 @@ export default function Shell() {
     if (!p.act) { if (next.length === 1) setPicking(false); return }
     await onRun(p.next ?? null, body, null, p.act)
   }, [onRun, writeField])
+  useEffect(() => { pickAnswererNow.current = pickAnswerer }, [pickAnswerer])
   const toggleFramework = useCallback(async (id) => {
     const fw = frameworkScreens
     const ids = fw.now.includes(id) ? fw.now.filter((x) => x !== id) : [...fw.now, id]
@@ -3930,7 +3941,7 @@ export default function Shell() {
           picker={replyPicking && branchShown && targets
             ? { kind: 'reply', members: branchShown.members, targets, line: branchShown.line, onToggle: toggleReplyTarget, onAll: allReplyTargets }
             : picking && stepPick ? { rows: answerRows, now: stepPick.model ? stepWho : null, picked: null, reference: referenceName, forStep: { ...stepPick, branchName: stepBranchWho?.name ?? null } }
-            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
+            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onSwitchAnswerer={switchAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
           languagePicker={langPicking ? { items: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,
