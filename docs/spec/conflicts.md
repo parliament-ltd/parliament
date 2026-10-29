@@ -4379,6 +4379,72 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - The 20th file, `sw.js`, lists the same 17 files with the same revisions as the archive's, in another order, since Netlify's computers sort file names differently from this one. Browsers take the two alike, and `SHA256SUMS` covers only the archives and the vault's files, so nothing published is wrong. But the app's archive is not byte for byte what the site serves. Sorting the list in the build (`vite.config.js`, the service worker's `manifestTransforms`) would make them the same; for the next release.
   - Still open from (f): the earlier copy, `parliament-public`, goes to the Recycle Bin on your yes. The standby site is piece 8.
 
+**C279. After the switch: three fixes, a smaller first release, and its open points** (proposed 29 October; C95; C126; C130; C238 (e); C250; C265; welcome spec §2, §3, §14; Almanac v30; welcome v9; bar reference). From your first look at the live site. The fixes are built; (a) to (g) wait for you. Everything is on the branch `claude/after-switch`, nothing pushed or published.
+- **Built:**
+  - **`settings:` opens Settings**, and `settings:data` one section of it, as `open:settings` does (C181). The arrangements spec names the verb; C95 left it for its stage, and it was never added, so the bar said "No command called settings:".
+  - **The quill no longer covers the marginalia.** The 42px kept for the quill (bar reference) was zeroed by the chrome's reset for buttons once who answers became a button (stage 7), so its last 30px ran under the quill at every width. It is now 11.5px clear, as drawn. On a narrow field the marginalia shorten with an ellipsis rather than run past the edge; see (g).
+  - **Reflection keeps its own class.** It shared one with the `?` reference, so Reflection's body took the reference's card, shadow and 52vh limit, and the reference took Reflection's spacing. Each looks as built again; Reflection's headings keep their capitals, as inline editing v5 draws them.
+  - Tests: 1,360. Lint: 30 warnings, all older. The build passes. Tried in the browser: `settings:data` opens Settings at its data section, and the quill sits clear of the marginalia.
+- **(a) A smaller first release** (a choice). Your words: hide the Lab and the other rooms until they are designed, so the default room is what people get, with inline editing, Ripple and the rest.
+  - **How:** one switch in the code, off for this release, so nothing is deleted. While off:
+    - the Lab is not offered: `lab:`, the "Building rooms" commands (`edit:`, `done:`, `place:`, `layout:`, `theme:`, `device:`, `local:`, and `set:` in a room) and `new:room`;
+    - no room but Writing Studio is offered: Data Workspace, Drafting Desk, Pocket Chat and Quiet Room;
+    - those commands answer "Not in this release" if typed, and leave `?` and Tab;
+    - the welcome page's `lab:` step goes, see (d).
+  - **What stays:** anything someone has already made. A room, a chat in another room or a Drafting Desk document already in Records still opens, since hiding it would hide their own work. Only making new ones waits.
+  - **How I read "extend the columns":** people cannot change what the columns hold or pick another layout, which is the Lab's work. The buttons that open and close the columns stay, as (b) suggests. Tell me if you meant no side columns at all.
+  - **Other boards:** you said "certain boards". Records, the Collection, the Library, the Plan board, Reflection and Settings stay unless you name one.
+
+  **Suggestion:** yes, as above.
+- **(b) A room's columns** (a choice).
+  - **Today:** a room at least 940px wide shows both side columns, 288px each, so beside another board its chat gets 360 to 440px. Under 940px it switches to its narrow form, with the columns behind buttons at its top (C126). Nothing tells a room whether it is alone on screen.
+  - **Suggested:**
+    1. **Alone on screen** (the only board, or popped into its own window): as today, columns open.
+    2. **Sharing the screen:** the columns start closed, each a thin strip with a button, and the chat takes the room's width. A button opens its column over the chat's edge, inside the room; Escape, the button again or a click on the chat closes it. This is your "pop out and close", kept inside the room.
+    3. The narrow form only when the room is too narrow for a chat at all, about 600px, rather than 940px. So a focused room (`focus:`, 820px) keeps its columns behind its side buttons rather than switching to the narrow form.
+    4. Open or closed is not remembered: each room starts as above. Remembering it would be a new stored field, shown first.
+  - **Columns as real boards** (movable, poppable, in the arrangement): not now. The arrangements spec keeps boards out of rooms, it would change stored arrangements, and "pop" already means a window of its own.
+  - **The stored panel buttons** (`panelButtons`, C238 (e), C250) chose which columns had a button in the wide form. Under this every column with blocks has one, so they stop mattering; they stay stored, unchanged.
+
+  **Suggestion:** 1 to 4.
+- **(c) `letter:`** (a choice). Welcome spec §14 already sketches it: letters ship with each release and nothing is fetched, the welcome letter is letter one, and `letter:all` lists every letter, "a changelog written by a person".
+  - **Built as:** `letter:` opens the newest letter, `letter:1` one by its number, `letter:all` the list. A letter opens in a panel under the bar, as `?` does, and Escape closes it.
+  - Letters live in the copy table like the welcome letter now, so they can be translated. Letter one is today's letter, word for word (C265).
+  - Which letters someone has read is kept on this device, as the welcome steps are, and is not backed up. No stored data changes shape.
+  - **Secret or announced:**
+    1. **Secret:** no notice anywhere. `letter:` is in `?` and Tab like any command, so whoever reads the list finds it. Your idea.
+    2. **Announced,** as §14 has it: one line of marginalia under a board's heading while a letter is unread.
+
+  **Suggestion:** 1, and a later letter can be announced by its release's changelog line if you want it read.
+- **(d) The welcome page without the letter** (with (c)). The steps and the bar only, in one column; the storage notice stays. `tour:` already brings back just the steps. The letter's first sentence stays in About and in the manifest (C272 (a)). This replaces welcome spec §2 and §3's letter beside the steps. With (a), the `lab:` step goes, leaving nine.
+
+  **Suggestion:** yes.
+- **(e) The birds on first load** (a choice). One bird, then two, then three, then the welcome page fades in.
+  - Only on the very first visit, the same moment the welcome page first shows; never again.
+  - About 1.2 seconds in all. The screen is blank today while the browser's storage opens, so most of it costs nothing.
+  - A key or a click skips it. With reduced motion, all three birds show at once and the page follows.
+  - The mark is one shape holding three birds; it is split into three so each can come in. Drawn with the stylesheet, since the policy allows no inline style or script.
+  - The language ruling asks for "nothing in the way on first load"; short and skippable keeps to it.
+
+  **Suggestion:** yes.
+- **(f) The command menu** (a choice).
+  - **Almanac v30** (23 September) draws `?` as groups flowing into as many 318px columns as fit, two to four, each row the command and its description, a hairline under each heading and the keys at its foot. Settings v1 and Lab v6 and v7 use the same.
+  - **Welcome v9** (6 October), the newest, draws it in two fixed columns. CLAUDE.md takes the newest mockup, so v30 needs your yes.
+  - **Today:** one column, under a bar 720px at most. More than two columns needs the panel to reach across the screen under the bar.
+  1. **v30:** the panel as wide as the screen, its groups in as many columns as fit, with headings, hairlines and the keys at the foot. The sizes rise to the token sheet's smallest, 11.5px. Opening and the keys stay as today.
+  2. **v9:** two fixed columns, under the bar.
+
+  **Suggestion:** 1. v30's narrowing as you type after `?`, and the arrow keys walking the list, could follow later.
+- **(g) Narrow fields** (a choice). In the welcome card's bar and on a phone, the marginalia now shorten rather than run under the quill, but the prompt itself still has little room: about 80px in the welcome card.
+  1. On a narrow field only who answers shows; voice, attach and the framework hide there. `attach:` and `framework:` still work from the bar.
+  2. The prompt keeps a least width, and the marginalia shorten further.
+
+  **Suggestion:** 1.
+- **Noticed, not changed:**
+  - `collection:`, `reflection:`, `almanac:` and `docket:` answer "No command called". `records:` brings the Collection; the last two are the old names. A word for each, if you want them.
+  - In a second room and in the Lab, Tab does not complete the commands that work there (`tell:`, `place:` and the like), since it asks with the board's own name.
+  - The narrow room's top line and the column buttons have English written into the code rather than the copy table; (b) moves them there.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
