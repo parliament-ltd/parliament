@@ -136,6 +136,39 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   }, [board, own, searched, onSearch])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
 
+  // The menus under the bar, drawn as the ? reference is (29 October;
+  // Menu.jsx): the reference, who answers or where a reply goes, the
+  // frameworks, the languages. One at a time, as wide as the stage, and
+  // above the field with the bar at the bottom, so the bar never moves; a
+  // panel under the field (inspect:, compare:, the keys, a backup) hides
+  // them, as before. Escape closes one, from the field or from a row.
+  const root = useRef(null)
+  const under = !reference && !inspect && !compare && !keyPanel && !backupPanel
+  const menu = reference ? 'reference' : !under ? null : picker ? 'picker' : frameworkPicker ? 'frameworks' : languagePicker ? 'languages' : null
+  const closeMenu = (which, refocus = false) => {
+    if (which === 'reference') setReference(null)
+    else if (which === 'picker') onPickerClose?.()
+    else if (which === 'frameworks') onFrameworkPickerClose?.()
+    else if (which === 'languages') onLanguagePickerClose?.()
+    if (refocus) input.current?.focus()
+  }
+  const closeNow = useRef(closeMenu)
+  useEffect(() => { closeNow.current = closeMenu })
+  // A click outside the open menu closes it (29 October): anywhere on the
+  // page or in a window of its own, but not in the menu, and not on the
+  // field, whose marginalia open and close the menus themselves.
+  useEffect(() => {
+    if (!menu) return undefined
+    const docs = [doc, ...(alsoDocs ?? [])].filter(Boolean)
+    function onDown(e) {
+      const at = e.target
+      if (root.current?.contains(at) && at.closest?.('.ch-ref, .ch-frow, .ch-fheld')) return
+      closeNow.current(menu)
+    }
+    for (const d of docs) d.addEventListener('pointerdown', onDown, true)
+    return () => { for (const d of docs) d.removeEventListener('pointerdown', onDown, true) }
+  }, [menu, doc, alsoDocs])
+
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere: in this document,
   // and in every other window of the page, since this bar is the one point of
   // control (C280). From another window it brings its own forward, where the
@@ -339,7 +372,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   }
 
   return (
-    <div className={className}>
+    <div className={className} ref={root}>
       <div className="ch-dock-in">
         <div className="ch-frow">
         <Field
@@ -395,17 +428,6 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
         {!reference && !inspect && !compare && letter && <Letter letter={letter} read={letter.read ?? []} onPick={pick} />}
-        {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && frameworkPicker && (
-          <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} />
-        )}
-        {!reference && !inspect && !compare && !keyPanel && !backupPanel && picker && (
-          picker.kind === 'reply'
-            ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} />
-            : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} />
-        )}
-        {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && !frameworkPicker && languagePicker && (
-          <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} />
-        )}
         {!reference && !inspect && !compare && !keyPanel && backupPanel && (
           <BackupPanel
             mode={backupPanel.mode} file={backupPanel.file}
@@ -428,8 +450,15 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           />
         )}
       </div>
-      {/* The ? reference: as wide as the stage, not the bar (C279 (f)). */}
-      {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
+      {/* The ? reference and the menus: as wide as the stage, not the bar (C279 (f); 29 October). */}
+      {menu === 'reference' && <Reference board={board} topic={reference.topic} onPick={pick} onClose={() => closeMenu('reference', true)} />}
+      {menu === 'picker' && (
+        picker.kind === 'reply'
+          ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} onClose={() => closeMenu('picker', true)} />
+          : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} onClose={() => closeMenu('picker', true)} />
+      )}
+      {menu === 'frameworks' && <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} onClose={() => closeMenu('frameworks', true)} />}
+      {menu === 'languages' && <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} onClose={() => closeMenu('languages', true)} />}
     </div>
   )
 }
