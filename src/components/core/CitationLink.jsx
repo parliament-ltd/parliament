@@ -16,7 +16,8 @@ function sanitizeHref(href) {
 /**
  * Renders a markdown link as a highlighted inline citation. Before it opens,
  * it shows its whole address: on hover, on keyboard focus, and on a touch
- * screen at the first tap, the second opening it (C146 (b)).
+ * screen at the first tap, the second opening it (C146 (b)). In ink, not
+ * gold: gold is the api: ignition's and the folded bar's alone (C280 (c)).
  *
  * Internal/relative links → plain styled link, its address as its title.
  */
@@ -35,7 +36,7 @@ export default function CitationLink({ href, children }) {
 
   if (!address) {
     return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-[#B8A070] underline" title={safeHref}>
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="underline" title={safeHref}>
         {children}
       </a>
     )
@@ -57,7 +58,9 @@ export default function CitationLink({ href, children }) {
         target="_blank"
         rel="noopener noreferrer"
         aria-description={address}
-        onMouseEnter={show}
+        // Not while a selection is dragged over it: the address would lie
+        // over the words being selected (C280 (d)).
+        onMouseEnter={(e) => { if (!e.buttons) show() }}
         onMouseLeave={hide}
         onFocus={show}
         onBlur={hide}
@@ -67,8 +70,8 @@ export default function CitationLink({ href, children }) {
           if (touched.current && !showTooltip) { e.preventDefault(); show() }
         }}
         style={{
-          backgroundColor: 'rgba(184, 160, 112, 0.14)',
-          borderBottom: '1px solid rgba(184, 160, 112, 0.45)',
+          backgroundColor: 'rgba(25, 25, 25, 0.045)',
+          borderBottom: '1px solid rgba(25, 25, 25, 0.30)',
           borderRadius: 2,
           padding: '0 2px',
           color: 'inherit',
@@ -76,8 +79,8 @@ export default function CitationLink({ href, children }) {
           cursor: 'pointer',
           transition: 'background-color 0.15s',
         }}
-        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(184, 160, 112, 0.24)' }}
-        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(184, 160, 112, 0.14)' }}
+        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(25, 25, 25, 0.075)' }}
+        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(25, 25, 25, 0.045)' }}
       >
         {children}
       </a>
@@ -97,7 +100,7 @@ export default function CitationLink({ href, children }) {
               style={{ backgroundColor: '#1E2532', color: '#FFFFFF', width: 'max-content', maxWidth: 'min(420px, 80vw)' }}
             >
               <span
-                className="w-2.5 h-2.5 mt-[3px] rounded-sm flex-shrink-0 bg-[#B8A070] opacity-70"
+                className="w-2.5 h-2.5 mt-[3px] rounded-sm flex-shrink-0 bg-white opacity-70"
               />
               <span dir="ltr" style={{ overflowWrap: 'anywhere', whiteSpace: 'normal' }}>{address}</span>
             </span>

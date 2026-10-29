@@ -16,6 +16,8 @@ import EditableReply from './EditableReply'
 import CitationLink from './CitationLink'
 import { modelFacts } from '../../net'
 import { instructionLike } from '../../lib/injection'
+import { CARD_HEAD } from '../../lib/release'
+import './chat.css'
 
 const NO_QUOTES = Object.freeze([])
 
@@ -36,6 +38,13 @@ const messageVariants = {
 }
 
 /* ── MessageCard ─────────────────────────────────────────── */
+
+// A prompt or a reply in a room's chat, drawn as the newer mockups draw a
+// chat (C280 (c); chat.css): the prompt set apart in a quiet box, narrower
+// than the reply and centred over it; the reply as text on the board, in the
+// serif at a reading width, with what is said about it in marginalia under
+// it. An answer from a source keeps a rule at its edge. The strip along the
+// top of a card, with its old buttons, waits behind CARD_HEAD (C280 (b)).
 
 export default function MessageCard({
   id, type, content, number, index = 0,
@@ -171,7 +180,7 @@ export default function MessageCard({
 
   const renderContent = useMemo(() => {
     // A prompt that was only the person's edits, told (C216 (e)).
-    if (!displayContent && type === 'user' && toldTo) return <p className="text-sm italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.toldOnly, { name: toldTo })}</p>
+    if (!displayContent && type === 'user' && toldTo) return <p className="p-msg-empty">{i18n._(COPY.chat.toldOnly, { name: toldTo })}</p>
     if (!displayContent) return null
 
     // A finished reply edited in place, a source's answer too, as plain text (stage 11).
@@ -210,7 +219,7 @@ export default function MessageCard({
     }
     if (source) {
       const text = translated && typeof translation.text === 'string' ? translation.text : displayContent
-      return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>{text}</p>
+      return <p className="parliament-md whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>{text}</p>
     }
 
     function highlightString(text) {
@@ -327,7 +336,7 @@ export default function MessageCard({
     }
 
     return (
-      <div className="parliament-md text-[15px]">
+      <div className="parliament-md">
         <Markdown components={{ ...highlightedComponents, code: chartCodeComponent }}>
           {displayContent}
         </Markdown>
@@ -343,18 +352,11 @@ export default function MessageCard({
       initial={index !== undefined ? 'hidden' : false}
       animate={index !== undefined ? 'show' : { opacity: isGhostText ? 0.55 : 1 }}
       layout="position"
-      className={`relative group ${type === 'user' ? 'ml-12' : 'mr-12'}`}
+      className={`p-msg ${type === 'user' ? 'p-msg-prompt' : 'p-msg-reply'}${isGhostText ? ' ghost' : ''}${source && type !== 'user' ? ' from-source' : ''} relative group`}
     >
-      <motion.div
-        whileHover={{ borderColor: '#E0E0E0' }}
-        transition={{ duration: 0.2 }}
-        className={`rounded-lg border transition-colors ${
-          isGhostText ? 'border-dashed border-[#9B9A97]' : 'border-[#E9E9E7]'
-        }`}
-        style={{ backgroundColor: 'var(--p-bg-surface)' }}
-      >
-        {/* Header row */}
-        <div
+      <div className="p-msg-box">
+        {/* The old strip along the top: hidden for now (C280 (b); release.js). */}
+        {CARD_HEAD && (<div
           {...fixed}
           className="flex items-center justify-between px-4 py-3"
           style={{ borderBottom: '1px solid var(--p-border-subtle)' }}
@@ -421,12 +423,12 @@ export default function MessageCard({
               </AnimatePresence>
             </div>
           </div>
-        </div>
+        </div>)}
 
         {/* Content */}
         {/* Typing in an edited reply puts the highlight picker away. */}
-        <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp} onKeyDown={() => { if (popoverPos) { setPopoverPos(null); onPopoverChange?.(false) } }}>
-          <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
+        <div className="p-msg-body" ref={contentRef} onMouseUp={handleMouseUp} onKeyDown={() => { if (popoverPos) { setPopoverPos(null); onPopoverChange?.(false) } }}>
+          <div className="p-msg-text">
             {thinking?.text && <div {...fixed}><Thinking thinking={thinking} /></div>}
             {hostContent ? <HostedText el={hostContent} /> : renderContent}
             {/* A source that found nothing says so where its answer would be. */}
@@ -541,11 +543,12 @@ export default function MessageCard({
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
-      <div {...fixed}>
+      {/* What is said about it, as marginalia under it. */}
+      <div {...fixed} className="p-msg-lines">
       {stoppedNote && (
-        <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{stoppedNote}</p>
+        <p className="p-marg">{stoppedNote}</p>
       )}
 
       {/* Where an answer from a source came from: the page, its revision and
@@ -561,7 +564,7 @@ export default function MessageCard({
       {type === 'user' && Array.isArray(included) && included.length > 0 && <IncludedLine included={included} />}
       {/* The notes it carried for the model, told once (C225 (d)). As text. */}
       {type === 'user' && Array.isArray(tells) && tells.map((t, i) => (
-        <p key={i} className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{i18n._(COPY.chat.toldNote, { note: t })}</p>
+        <p key={i} className="p-marg" dir="auto">{i18n._(COPY.chat.toldNote, { note: t })}</p>
       ))}
       {/* The summary a branch starts from, said to be one, and by whom (C175). */}
       {summary && <SummaryLine summary={summary} />}
@@ -572,14 +575,9 @@ export default function MessageCard({
 
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          onClick={onContinue}
-          className="mt-2 px-3 py-1.5 rounded-lg text-xs font-medium text-[#B8A070] border border-[#E9E9E7] hover:border-[#B8A070] transition-colors"
-        >
-          Continue
-        </motion.button>
+        <p className="p-marg">
+          <button type="button" onClick={onContinue}>Continue</button>
+        </p>
       )}
       {editedLine}
       </div>
@@ -597,7 +595,7 @@ function HostedText({ el }) {
   useLayoutEffect(() => {
     if (box.current && el && el.parentNode !== box.current) box.current.appendChild(el)
   }, [el])
-  return <div ref={box} className="p-edit parliament-md text-[15px]" />
+  return <div ref={box} className="p-edit parliament-md" />
 }
 
 // A minute and seconds: 2:31.
@@ -627,13 +625,13 @@ function Thinking({ thinking }) {
     ? i18n._(COPY.chat.thinking, { time: clock(now - (thinking.since ?? now)) })
     : thinking.ms != null ? i18n._(COPY.chat.thought, { minutes: Math.max(1, Math.round(thinking.ms / 60000)), short: thinking.ms < 60000 ? 1 : 0 }) : i18n._(COPY.chat.thoughtUntimed)
   return (
-    <div className="parliament-thinking mb-3" aria-live={live ? 'polite' : undefined}>
-      <p className="text-xs italic text-[var(--p-text-secondary)] flex gap-1.5 items-baseline">
+    <div className="parliament-thinking" aria-live={live ? 'polite' : undefined}>
+      <p className="p-marg">
         <span>{label}</span>
         {!live && (
           <>
-            <span aria-hidden="true">·</span>
-            <button type="button" className="underline underline-offset-2" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+            <span className="sep" aria-hidden="true"> · </span>
+            <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
               {i18n._(open ? COPY.chat.thoughtHide : COPY.chat.thoughtShow)}
             </button>
           </>
@@ -642,7 +640,7 @@ function Thinking({ thinking }) {
       {(live || open) && (
         <div
           ref={box}
-          className={`mt-1 ps-3 border-s border-dotted border-[var(--p-text-secondary)]/40 text-xs italic leading-relaxed text-[var(--p-text-secondary)] whitespace-pre-wrap ${live ? 'max-h-32 overflow-hidden' : 'max-h-80 overflow-y-auto'}`}
+          className={`p-thinking-text ${live ? 'max-h-32 overflow-hidden' : 'max-h-80 overflow-y-auto'}`}
           dir="auto"
         >
           {thinking.text}
@@ -658,13 +656,13 @@ function Thinking({ thinking }) {
 function CitedSources({ citations }) {
   const { i18n } = useLingui()
   return (
-    <div className="mt-2 text-xs text-[var(--p-text-secondary)]">
-      <p className="italic">{i18n._(COPY.cited.heading)}</p>
-      <ol className="mt-1 space-y-1 list-decimal ps-5">
+    <div className="p-marg-block">
+      <p>{i18n._(COPY.cited.heading)}</p>
+      <ol>
         {citations.map((c, i) => (
           <li key={i} dir="auto">
             <CitationLink href={c.url}>{c.title || c.url}</CitationLink>
-            {(c.quoted ?? []).map((q, j) => <span key={j} className="block italic">“{q}”</span>)}
+            {(c.quoted ?? []).map((q, j) => <span key={j} className="block">“{q}”</span>)}
           </li>
         ))}
       </ol>
@@ -679,7 +677,7 @@ function InstructionLine({ text }) {
   const phrases = useMemo(() => instructionLike(text), [text])
   if (!phrases.length) return null
   const list = new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(phrases.map((p) => `“${p}”`))
-  return <p className="mt-1 text-xs italic text-[var(--p-text-primary)]" dir="auto">{i18n._(COPY.chat.instructionLike, { phrases: list })}</p>
+  return <p className="p-marg ink" dir="auto">{i18n._(COPY.chat.instructionLike, { phrases: list })}</p>
 }
 
 // A language's name in the reader's language, from the browser.
@@ -699,10 +697,10 @@ function TranslationLine({ translation, original, onToggle }) {
     ? i18n._(COPY.chat.translatedByBrowser, { language })
     : i18n._(COPY.chat.translatedBy, { language, by: modelFacts(translation.by)?.name ?? translation.by })
   return (
-    <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]">
+    <p className="p-marg">
       {words}
-      <span aria-hidden="true"> · </span>
-      <button type="button" onClick={onToggle} className="underline underline-offset-2 italic">
+      <span className="sep" aria-hidden="true"> · </span>
+      <button type="button" onClick={onToggle}>
         {i18n._(original ? COPY.chat.showTranslation : COPY.chat.showOriginal)}
       </button>
     </p>
@@ -713,7 +711,7 @@ function TranslationLine({ translation, original, onToggle }) {
 function AskedLine({ asked }) {
   const { i18n } = useLingui()
   const words = asked.by === 'search' ? i18n._(COPY.chat.searchedFor, { text: asked.text }) : i18n._(COPY.chat.askedAs, { language: languageName(i18n.locale, asked.lang), text: asked.text })
-  return <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{words}</p>
+  return <p className="p-marg" dir="auto">{words}</p>
 }
 
 // "With the answer from Wikipedia (Barn owl), sent as material from a
@@ -723,7 +721,7 @@ function IncludedLine({ included }) {
   const names = included.map((x) => (x.source?.title ? `${x.source?.name ?? x.source?.id} (${x.source.title})` : x.source?.name ?? x.source?.id ?? ''))
   const flagged = included.some((x) => x.phrases?.length)
   return (
-    <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">
+    <p className="p-marg" dir="auto">
       {i18n._(COPY.chat.includedWith, { count: included.length, sources: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(names) })}
       {flagged && <> {i18n._(COPY.chat.includedFlagged)}</>}
     </p>
@@ -736,7 +734,7 @@ function SummaryLine({ summary }) {
   const { i18n } = useLingui()
   const name = summary.name || i18n._(COPY.chat.summaryBy)
   const words = summary.address ? i18n._(COPY.chat.summaryOf, { address: summary.address, name }) : i18n._(COPY.chat.summaryOfGone, { name })
-  return <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{words}</p>
+  return <p className="p-marg" dir="auto">{words}</p>
 }
 
 // "Written under Push back on me and Editor": the built in by their names in
@@ -745,7 +743,7 @@ function SummaryLine({ summary }) {
 function FrameworkLine({ frameworks }) {
   const { i18n } = useLingui()
   const names = frameworks.map((f) => (COPY.frameworks[f?.id] ? i18n._(COPY.frameworks[f.id]) : f?.name || i18n._(COPY.chat.frameworkGone)))
-  return <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.writtenUnder, { names: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(names) })}</p>
+  return <p className="p-marg">{i18n._(COPY.chat.writtenUnder, { names: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(names) })}</p>
 }
 
 // A date as a source gives it: a year stays a year; a full date is written
@@ -774,11 +772,12 @@ function SourceResults({ items }) {
     it.facts?.comments != null && i18n._(COPY.chat.sourceComments, { count: Number(it.facts.comments) || 0 }),
   ].filter(Boolean)
   return (
-    <ol className="parliament-md text-[15px] space-y-3 list-none p-0 m-0">
+    <ol className="parliament-md p-results">
       {items.map((it, i) => (
         <li key={i} dir="auto">
           {it.url || it.discussion ? <CitationLink href={it.url ?? it.discussion}>{it.title}</CitationLink> : <span>{it.title}</span>}
-          <span className="block text-xs italic text-[var(--p-text-secondary)]">
+          {/* Lines of their own, so a selection copied across keeps them apart. */}
+          <div className="p-marg">
             {facts(it).join(' · ')}
             {it.discussion && it.url && (
               <>
@@ -786,8 +785,8 @@ function SourceResults({ items }) {
                 <CitationLink href={it.discussion}>{i18n._(COPY.chat.sourceDiscussion)}</CitationLink>
               </>
             )}
-          </span>
-          {it.text && <span className="block mt-1 whitespace-pre-wrap">{it.text}</span>}
+          </div>
+          {it.text && <div className="mt-1 whitespace-pre-wrap">{it.text}</div>}
         </li>
       ))}
     </ol>
@@ -800,10 +799,10 @@ function SourceLine({ source }) {
   const { i18n } = useLingui()
   const name = source.name || source.id
   if (source.found === false) {
-    return <p className="italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.sourceNothing, { source: name })}</p>
+    return <p className="p-msg-empty">{i18n._(COPY.chat.sourceNothing, { source: name })}</p>
   }
   const link = (href, text) => (href && /^https:\/\//.test(href)
-    ? <a href={href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{text}</a>
+    ? <a href={href} target="_blank" rel="noopener noreferrer">{text}</a>
     : <span>{text}</span>)
   const parts = [
     <span key="from">{i18n._(COPY.chat.answeredFrom, { source: name })}</span>,
@@ -812,8 +811,8 @@ function SourceLine({ source }) {
     source.licence?.name && <span key="lic">{link(source.licence.url, source.licence.name)}</span>,
   ].filter(Boolean)
   return (
-    <p className="mt-2 text-xs italic text-[var(--p-text-secondary)] flex flex-wrap gap-x-1.5">
-      {parts.flatMap((p, i) => (i ? [<span key={`s${i}`} aria-hidden="true">·</span>, p] : [p]))}
+    <p className="p-marg">
+      {parts.flatMap((p, i) => (i ? [<span key={`s${i}`} className="sep" aria-hidden="true"> · </span>, p] : [p]))}
     </p>
   )
 }

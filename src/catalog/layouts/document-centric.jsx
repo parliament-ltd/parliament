@@ -18,6 +18,10 @@
 // three-panel. Alone on screen, the outline and the right column stand
 // open, each with a button; sharing it, the document takes the room's width
 // and they are strips, each opening over the document's edge.
+//
+// C280 (a): for now the outline and the margin are not drawn in any form
+// (release.js, COLUMNS). The chat panel is the room's chat, so the right
+// column still draws, with the chat alone in it.
 
 import { useState } from 'react'
 import { useLingui } from '@lingui/react'
@@ -27,6 +31,7 @@ import NarrowChrome from '../../components/layouts/NarrowChrome'
 import NarrowSheet from '../../components/layouts/NarrowSheet'
 import RoomColumn from '../../components/layouts/RoomColumn'
 import { useColumns } from '../../components/layouts/useColumns'
+import { drawsColumn } from '../../lib/roomForm'
 import { COPY } from '../../copy'
 
 const RAIL_BASE   = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
@@ -60,9 +65,10 @@ export default {
     const document = slotContents['document']
     const margin   = slotContents['margin']
     const chat     = slotContents['chat-panel']
-    const hasOutline = outline && outline.length > 0
-    const hasMargin  = margin && margin.length > 0
-    const hasChat    = chat && chat.length > 0
+    // The outline and the margin only with the columns on; the chat always (C280 (a)).
+    const hasOutline = drawsColumn(outline && outline.length > 0)
+    const hasMargin  = drawsColumn(margin && margin.length > 0)
+    const hasChat    = drawsColumn(chat && chat.length > 0, { chat: true })
     const hasRight   = hasMargin || hasChat
     const { i18n }   = useLingui()
     const form       = useRoomForm()
