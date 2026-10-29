@@ -148,6 +148,17 @@
 .ch-inspect-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .ch-inspect-tags { margin-inline-start: auto; display: flex; gap: 4px; flex-wrap: wrap; }
 .ch-inspect h3 { font: 600 15px var(--ch-sans); margin: 0 0 4px; }
+/* letter: under the bar (C279 (c)): the panel inspect: draws, the letter in
+   the type it had on the welcome page. */
+.ch-letterp { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 60vh; overflow: auto; padding: 14px 18px 16px; color: var(--ch-ink); }
+.ch-letterp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.ch-letterp h3 { font: 600 var(--ch-t-small) var(--ch-sans); margin: 0; }
+.ch-letterp h3 .ch-marg { font-weight: 400; margin-inline-start: 8px; }
+.ch-letterp .ch-letter { margin: 10px 0 0; max-width: 62ch; }
+.ch-letterp-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.ch-shell .ch-letterp-list button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); text-align: start; font: 400 13px var(--ch-serif); color: var(--ch-ink); }
+.ch-shell .ch-letterp-list button:hover { background: var(--ch-wash); }
+.ch-dock.bottom .ch-letterp { position: absolute; inset-inline: 0; bottom: 100%; margin: 0 0 10px; }
 .ch-inspect blockquote { margin: 0 0 6px; padding-inline-start: 10px; border-inline-start: 2px solid var(--ch-ink); font-style: italic; font-size: 14px; white-space: pre-wrap; }
 .ch-inspect p { margin: 6px 0; white-space: pre-wrap; }
 .ch-inspect .ch-inspect-foot { margin-top: 12px; }
@@ -370,6 +381,14 @@
    with an ellipsis rather than run under the quill (C279). */
 .ch-shell .ch-field .ch-fmarg:not(.fw, .feat) { margin-inline-end: 42px; }
 .ch-shell .ch-field .ch-fmarg { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* On a narrow bar only who answers shows: voice, attach and the framework
+   wait for a wider one, and attach: and framework: still work (C279 (g)).
+   The bar's inner box is the container, since its width never follows what
+   it holds. */
+.ch-dock-in { container-type: inline-size; }
+@container (max-width: 560px) {
+  .ch-shell .ch-field .ch-fmarg.feat, .ch-shell .ch-field .ch-fmarg.fw { display: none; }
+}
 .ch-field.prompt.with-marg input { padding-inline-end: 6px; }
 /* The field draws the focus ring around itself; the input inside needs none. */
 .ch-shell .ch-field input:focus-visible { outline: none; }
@@ -464,17 +483,15 @@
 .ch-shell.on-welcome.bar-bottom .ch-stage { padding-bottom: calc(var(--welcome-foot) + 96px); }
 .ch-shell.on-welcome .ch-dock.bottom { bottom: var(--welcome-foot); padding-bottom: 6px; }
 .ch-card.ch-welcome { flex: 1; min-height: 0; }
-/* Narrow, by its own width, the card is one column: steps, field, then
-   the letter (welcome spec §5; C126). */
-.ch-welcome.narrow .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter" "keep"; max-width: 520px; }
-.ch-welcome.narrow .ch-letter { margin-top: 26px; }
+/* Narrow, by its own width, the card keeps its one column, closer in
+   (welcome spec §5; C126). */
 .ch-welcome.narrow .ch-wnow { margin-top: 26px; }
 /* One line under "Welcome" on narrow or touch-only screens (W §12.4). */
 .ch-wsmall { display: none; margin: 4px 2px 0; }
 @media (max-width: 760px), (hover: none) and (pointer: coarse) { .ch-wsmall { display: block; } }
-/* The ending (W §7): the letter gives way to one line, the size of the
-   heading, with focus: to click. */
-.ch-wnow { grid-area: letter; margin: 22px 2px 0; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
+/* The ending (W §7): one line under the field once the steps are done, the
+   size of the heading, with focus: to click. */
+.ch-wnow { grid-area: now; margin: 22px 2px 0; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
 .ch-shell .ch-wnow .c { font: inherit; color: var(--ch-ink); text-decoration: underline; text-decoration-color: var(--ch-soft); text-underline-offset: 4px; }
 .ch-shell .ch-wnow .c:hover { text-decoration-color: var(--ch-ink); }
 @keyframes ch-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -489,8 +506,10 @@
 .ch-welcome.narrow .ch-wscroll { padding: 28px 18px; padding-inline-start: 50px; }
 .ch-welcome.narrow .ch-wlogo { inset-inline-end: calc(100% + 10px); top: calc((1.3em - 19px) / 2); width: 22px; height: 19px; }
 .ch-wscroll { flex: 1; overflow: auto; display: flex; flex-direction: column; padding: 32px 28px; padding-inline-start: 66px; }
-.ch-wgrid { width: 100%; max-width: 960px; margin: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px;
-  grid-template-areas: "top ." "list letter" "bar letter" "keep keep"; grid-template-rows: auto auto 1fr auto; align-items: start; }
+/* One column since the letter left the page (C279 (d)): the heading, the
+   steps, the field, then the ending and the note on keeping data. */
+.ch-wgrid { width: 100%; max-width: 520px; margin: auto; display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "top" "list" "bar" "now" "keep"; align-items: start; }
 .ch-wtop { grid-area: top; }
 .ch-wh { position: relative; display: flex; flex-direction: column; margin: 0; padding: 0 2px; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); }
 /* Parliament's mark hangs before "Welcome", in the card's margin, so the
@@ -512,9 +531,7 @@
 .ch-letter p { margin: 0; }
 .ch-letter p + p { margin-top: 9px; }
 .ch-letter .sig { margin-top: 12px; }
-@media (max-width: 760px) {
-  .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter" "keep"; max-width: 520px; }
-}
+
 
 /* The field resting in the welcome card: no box, only a faint rule under it
    (welcome spec §2). It takes its fills in command and prompt mode. */

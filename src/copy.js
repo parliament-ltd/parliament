@@ -183,6 +183,10 @@ export const COPY = {
     tourOn: /*i18n*/ { id: 'enter.tourOn', message: 'Enter shows the steps again' },
     tourHere: /*i18n*/ { id: 'enter.tourHere', message: 'The steps are here already' },
     tourOff: /*i18n*/ { id: 'enter.tourOff', message: 'Enter puts the steps away. tour: brings them back' },
+    // letter: (C279 (c)).
+    letterOpen: /*i18n*/ { id: 'enter.letterOpen', message: 'Enter opens letter {n}', comment: 'A letter from the maker of Parliament; {n} is its number' },
+    letterAll: /*i18n*/ { id: 'enter.letterAll', message: 'Enter lists every letter' },
+    letterNone: /*i18n*/ { id: 'enter.letterNone', message: 'There is no letter {n}. letter:all lists them', comment: 'letter:all stays English' },
     tourOffAlready: /*i18n*/ { id: 'enter.tourOffAlready', message: 'The steps are put away already' },
     // On the welcome page (W §2, §6): the one line at rest, and the next
     // step's command leading the command line's.
@@ -1684,12 +1688,12 @@ export const COPY = {
   },
 
   // The welcome page (stage 5; welcome spec, welcome v9). The letter is v9's,
-  // for Stefan to edit here (C122). The signature's dash is drawn by the
-  // page: the one em dash, a deliberate exception (W §3).
+  // for Stefan to edit here (C122). Since C279 (c) it is letter one, opened
+  // by letter: (chrome/letters.js) rather than drawn on the page.
   welcome: {
     heading: /*i18n*/ { id: 'welcome.heading', message: 'Welcome' },
     headingTo: /*i18n*/ { id: 'welcome.headingTo', message: 'to Parliament', comment: 'The heading finishes its sentence when the steps are done: Welcome / to Parliament' },
-    steps: /*i18n*/ { id: 'welcome.steps', message: 'Ten things to try', comment: 'The name of the list of steps, read by screen readers' },
+    steps: /*i18n*/ { id: 'welcome.steps', message: 'Things to try', comment: 'The name of the list of steps, read by screen readers' },
     stepCommand: /*i18n*/ { id: 'welcome.step.command', message: 'Open the command line' },
     stepBar: /*i18n*/ { id: 'welcome.step.bar', message: 'Move the bar to the bottom' },
     stepAsk: /*i18n*/ { id: 'welcome.step.ask', message: 'Ask a question' },
@@ -2456,6 +2460,13 @@ export const COPY = {
     counts: /*i18n*/ { id: 'compare.counts', message: '{gone, plural, one {# word out} other {# words out}}, {added, plural, one {# word in} other {# words in}}' },
     same: /*i18n*/ { id: 'compare.same', message: 'The same words' },
     close: /*i18n*/ { id: 'compare.close', message: 'Nothing was sent. Escape closes this' },
+  },
+
+  // letter: under the bar (C279 (c)).
+  letter: {
+    heading: /*i18n*/ { id: 'letter.heading', message: 'Letter {n}', comment: 'A letter from the maker of Parliament; {n} is its number' },
+    list: /*i18n*/ { id: 'letter.list', message: 'Letters', comment: 'The heading over the list letter:all opens' },
+    unread: /*i18n*/ { id: 'letter.unread', message: 'not read yet', comment: 'Beside a letter in the list that this browser has not opened' },
   },
 
   inspect: {

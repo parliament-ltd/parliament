@@ -3293,6 +3293,20 @@ msgid "enter.leaveSearch"
 msgstr "Escape goes back to search"
 
 #. js-lingui-explicit-id
+msgid "enter.letterAll"
+msgstr "Enter lists every letter"
+
+#. letter:all stays English
+#. js-lingui-explicit-id
+msgid "enter.letterNone"
+msgstr "There is no letter {n}. letter:all lists them"
+
+#. A letter from the maker of Parliament; {n} is its number
+#. js-lingui-explicit-id
+msgid "enter.letterOpen"
+msgstr "Enter opens letter {n}"
+
+#. js-lingui-explicit-id
 msgid "enter.localGo"
 msgstr "{on, select, on {Enter makes {room} send only to models on this computer} other {Enter lets {room} send to any model or source again}}"
 
@@ -6557,6 +6571,21 @@ msgstr "Write a prompt. Nothing is sent before Enter"
 msgid "leader.search"
 msgstr "Search"
 
+#. A letter from the maker of Parliament; {n} is its number
+#. js-lingui-explicit-id
+msgid "letter.heading"
+msgstr "Letter {n}"
+
+#. The heading over the list letter:all opens
+#. js-lingui-explicit-id
+msgid "letter.list"
+msgstr "Letters"
+
+#. Beside a letter in the list that this browser has not opened
+#. js-lingui-explicit-id
+msgid "letter.unread"
+msgstr "not read yet"
+
 #. js-lingui-explicit-id
 msgid "library.aboutAlmanac"
 msgstr "Everything you have made, in one table, by number."
@@ -8872,6 +8901,10 @@ msgid "verb.layout"
 msgstr "Choose the shape of a room"
 
 #. js-lingui-explicit-id
+msgid "verb.letter"
+msgstr "Read the newest letter from the maker of Parliament, one by its number, or the list of them"
+
+#. js-lingui-explicit-id
 msgid "verb.library"
 msgstr "Bring the Library beside what is on screen, or one shelf of it"
 
@@ -9216,4 +9249,4 @@ msgstr "select words in a reply, then {keys}"
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
 msgid "welcome.steps"
-msgstr "Ten things to try"
+msgstr "Things to try"

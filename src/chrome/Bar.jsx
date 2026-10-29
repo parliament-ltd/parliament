@@ -13,6 +13,7 @@ import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
 import Inspect from './Inspect'
+import Letter from './Letter'
 import Compare from './Compare'
 import KeyPanel from './KeyPanel'
 import BackupPanel from './BackupPanel'
@@ -54,7 +55,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -282,6 +283,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (reference) { setReference(null); return }
       if (inspect) { onInspectClose?.(); return }
       if (compare) { onCompareClose?.(); return }
+      if (letter) { onLetterClose?.(); return }
       if (keyPanel) { onKeysClose?.(); return }
       if (backupPanel) { onBackupDone?.(null); return }
       if (picker) { onPickerClose?.(); return }
@@ -386,6 +388,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
+        {!reference && !inspect && !compare && letter && <Letter letter={letter} read={letter.read ?? []} onPick={pick} />}
         {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && frameworkPicker && (
           <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} />
         )}

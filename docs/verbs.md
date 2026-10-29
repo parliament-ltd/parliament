@@ -24,6 +24,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `room:` | Bring the last room beside what is on screen, or a room by name | `room:` | everywhere | no |
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |
 | `tour:` | Show the welcome steps, put them away, or show the second list | `tour:`, `tour:off`, `tour:advanced` | everywhere | no |
+| `letter:` | Read the newest letter from the maker of Parliament, one by its number, or the list of them | `letter:`, `letter:1`, `letter:all` | everywhere | no |
 
 ## Start
 

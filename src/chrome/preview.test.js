@@ -94,6 +94,17 @@ describe('one space: records: and room: bring boards beside what is here (C125, 
     expect(q.next.columns).toEqual([['almanac'], ['collection'], ['room'], ['room-2']])
   })
 
+  it('letter: opens the newest letter, one by its number, or the list, and nothing else moves (C279 (c))', () => {
+    expect(at('>letter:').text).toBe('Enter opens letter 1')
+    expect(at('>letter:').act).toEqual({ kind: 'letter', n: 1 })
+    expect(at('>letter:1').act).toEqual({ kind: 'letter', n: 1 })
+    expect(at('>letter:all').text).toBe('Enter lists every letter')
+    expect(at('>letter:all').act).toEqual({ kind: 'letter', all: true })
+    expect(at('>letter:9').text).toBe('There is no letter 9. letter:all lists them')
+    expect(at('>letter:9').act).toBeNull()
+    expect(at('>letter:').next).toBeNull()
+  })
+
   it('settings: opens Settings, and settings:data a section of it (C279)', () => {
     expect(at('>settings:').text).toBe('Enter opens Settings on the right')
     expect(at('>settings:data').text).toBe('Enter opens Settings at Data and backups')

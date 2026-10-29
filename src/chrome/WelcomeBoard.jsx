@@ -102,19 +102,9 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
             </ol>
           )}
           <div className="ch-wbar" ref={barSlot} />
-          {welcome.finished ? (
-            // The ending (W §7): the letter gives way to one line.
-            <p className="ch-wnow">{withCommand(i18n, COPY.welcome.now, 'focus:', onWrite)}</p>
-          ) : (
-            <div className="ch-letter">
-              <p>{i18n._(COPY.welcome.letter1)}</p>
-              <p>{i18n._(COPY.welcome.letter2)}</p>
-              <p>{i18n._(COPY.welcome.letter3)}</p>
-              <p>{i18n._(COPY.welcome.letter4)}</p>
-              <p>{i18n._(COPY.welcome.letter5)}</p>
-              <p className="sig">{i18n._(COPY.welcome.closing)}<br />{i18n._(COPY.welcome.signature)}</p>
-            </div>
-          )}
+          {/* The ending (W §7): one line once the steps are done. The letter
+              is letter one, opened by letter: rather than drawn here (C279 (d)). */}
+          {welcome.finished && <p className="ch-wnow">{withCommand(i18n, COPY.welcome.now, 'focus:', onWrite)}</p>}
           {keep && (
             <div className="ch-wkeep" role="note">
               <p>{i18n._(COPY.welcome.keepNot)}</p>

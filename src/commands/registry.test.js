@@ -19,7 +19,7 @@ describe('the verb list', () => {
       expect(groups.has(v.group), v.verb).toBe(true)
       expect(Array.isArray(v.takes) && v.takes.length > 0, v.verb).toBe(true)
       expect(['apply', 'fill'], v.verb).toContain(v.click)
-      expect(Number.isInteger(v.stage) && v.stage >= 3 && v.stage <= 14, v.verb).toBe(true)
+      expect(Number.isInteger(v.stage) && v.stage >= 3 && v.stage <= 15, v.verb).toBe(true)
       expect(typeof v.gloss?.id, v.verb).toBe('string')
     }
   })
@@ -52,7 +52,7 @@ describe('the verb list', () => {
   })
 
   it('never applies on a click what undo cannot take back, apart from screen-only moves', () => {
-    const SCREEN_ONLY = ['records', 'plan', 'library', 'settings', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
+    const SCREEN_ONLY = ['records', 'plan', 'library', 'settings', 'letter', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
     // Filters only change the view, and clear:filters puts it back.
     for (const v of VERBS.filter((x) => x.click === 'apply' && !x.undoable && x.group !== 'filters')) expect(SCREEN_ONLY, v.verb).toContain(v.verb)
     expect(verbEntry('delete').click).toBe('fill')

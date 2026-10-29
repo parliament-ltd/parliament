@@ -3293,6 +3293,20 @@ msgid "enter.leaveSearch"
 msgstr "Escape palaa hakuun"
 
 #. js-lingui-explicit-id
+msgid "enter.letterAll"
+msgstr ""
+
+#. letter:all stays English
+#. js-lingui-explicit-id
+msgid "enter.letterNone"
+msgstr ""
+
+#. A letter from the maker of Parliament; {n} is its number
+#. js-lingui-explicit-id
+msgid "enter.letterOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.localGo"
 msgstr ""
 
@@ -6557,6 +6571,21 @@ msgstr "Kirjoita kehote. Mitään ei lähetetä ennen Enter-painallusta"
 msgid "leader.search"
 msgstr "Hae"
 
+#. A letter from the maker of Parliament; {n} is its number
+#. js-lingui-explicit-id
+msgid "letter.heading"
+msgstr ""
+
+#. The heading over the list letter:all opens
+#. js-lingui-explicit-id
+msgid "letter.list"
+msgstr ""
+
+#. Beside a letter in the list that this browser has not opened
+#. js-lingui-explicit-id
+msgid "letter.unread"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "library.aboutAlmanac"
 msgstr "Kaikki, mitä olet tehnyt, yhdessä taulukossa numeroittain."
@@ -8870,6 +8899,10 @@ msgstr "Vaihda kieli sen koodilla tai nimellä"
 #. js-lingui-explicit-id
 msgid "verb.layout"
 msgstr "Valitse huoneen muoto"
+
+#. js-lingui-explicit-id
+msgid "verb.letter"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.library"

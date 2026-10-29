@@ -97,6 +97,7 @@ import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
 import { LAB } from '../lib/release'
+import { LETTERS_SETTING, cleanRead, markRead } from './letters'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -365,13 +366,15 @@ export default function Shell() {
     let live = true
     initDB().then(async (handle) => {
       db.current = handle
-      const [chats, history, stored] = await Promise.all([
-        handle.count('conversations'), readCommands(handle), getSetting(WELCOME_SETTING).catch(() => null),
+      const [chats, history, stored, letters] = await Promise.all([
+        handle.count('conversations'), readCommands(handle), getSetting(WELCOME_SETTING).catch(() => null), getSetting(LETTERS_SETTING).catch(() => null),
       ])
       const kept = await loadSpace(handle, { fresh: !chats })
       if (!live) return
       welcomeRef.current = cleanWelcome(stored)
       welcomeRead.current = true
+      lettersReadRef.current = cleanRead(letters)
+      setLettersRead(lettersReadRef.current)
       setWelcomeState(welcomeRef.current)
       commit(backOnPage(kept))
       setLines(history)
@@ -574,6 +577,10 @@ export default function Shell() {
     rowWaiters.current.add(check)
   }), [])
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
+  // letter: under the bar, and which letters were read, on this device only (C279 (c)).
+  const [letterShown, setLetterShown] = useState(null)
+  const [lettersRead, setLettersRead] = useState([])
+  const lettersReadRef = useRef([])
   const [compared, setCompared] = useState(null) // the two numbers compare: shows under the bar
 
   // ── What Records shows (stage 6, piece 1; C132) ───────
@@ -1135,7 +1142,21 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'letter') {
+      setInspected(null)
+      setCompared(null)
+      setLetterShown(what.all ? { all: true } : { n: what.n })
+      const read = what.all ? lettersReadRef.current : markRead(lettersReadRef.current, what.n)
+      if (read !== lettersReadRef.current) {
+        lettersReadRef.current = read
+        setLettersRead(read)
+        setSetting(LETTERS_SETTING, read).catch(() => {})
+      }
+      remember(body)
+      return null
+    }
     if (what.kind === 'inspect') {
+      setLetterShown(null)
       setCompared(null)
       setInspected(what.num)
       remember(body)
@@ -3849,7 +3870,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)} letter={letterShown ? { ...letterShown, read: lettersRead } : null} onLetterClose={() => setLetterShown(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}

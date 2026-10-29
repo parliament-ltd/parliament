@@ -98,6 +98,10 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.jump', message: 'Scroll to a number on this board' } }),
   v({ verb: 'tour', group: 'go', example: 'tour:', forms: ['tour:', 'tour:off', 'tour:advanced'], takes: [[], [['off', 'advanced']]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.tour', message: 'Show the welcome steps, put them away, or show the second list' } }),
+  // letter: (C279 (c); welcome spec §14): the newest letter, one by its
+  // number, or the list. Nothing announces it; it is found here, in ?.
+  v({ verb: 'letter', group: 'go', example: 'letter:', forms: ['letter:', 'letter:1', 'letter:all'], takes: [[], [['all']], ['number']], stage: 15, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.letter', message: 'Read the newest letter from the maker of Parliament, one by its number, or the list of them' } }),
   v({ verb: 'resources', group: 'go', example: 'resources:', takes: [[]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.resources', message: 'Open the guides and references, with every command in full' } }),
 
