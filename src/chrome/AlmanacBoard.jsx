@@ -229,7 +229,6 @@ export default function AlmanacBoard({ rows, filtered = null, columns: kept = nu
     >
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.almanac)}</h2>
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       {backup && (
         // The backup reminder: one line, in ink, only when it is due (C146 (a), C94).

@@ -123,7 +123,7 @@ export const VERBS = Object.freeze([
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']]], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   // close:204 closes the room showing chat 204; close:welcome the welcome card (C146 (c)).
-  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:welcome'], takes: [[], [[...BOARD_NAMES, 'welcome', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
+  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:welcome'], takes: [[], [[...BOARD_NAMES, 'welcome', 'tour', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen, or close the letter. Nothing is lost' } }),
 
   // Run

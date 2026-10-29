@@ -7718,6 +7718,11 @@ msgstr "The reply you are viewing. Your prompt follows it as you move between th
 msgid "room.chatSheet"
 msgstr "Chat"
 
+#. Show replies as they read now, without marks
+#. js-lingui-explicit-id
+msgid "room.cleanWord"
+msgstr "clean"
+
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -7756,6 +7761,16 @@ msgstr "Hide the margin"
 #. js-lingui-explicit-id
 msgid "room.home"
 msgstr "Go to Parliament's start"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "room.markupRuns"
+msgstr "Runs {command}"
+
+#. Show replies with their edits marked up
+#. js-lingui-explicit-id
+msgid "room.markupWord"
+msgstr "markup"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"

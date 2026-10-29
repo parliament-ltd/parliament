@@ -169,7 +169,6 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
     <article className={`ch-card ch-settings${addressed ? ' addressed' : ''}`} aria-current={addressed ? 'true' : undefined} onMouseDown={() => onAddress('settings')}>
       <header className="ch-chead">
         <h2>{say(COPY.boards.settings)}</h2>
-        {addressed && <span className="ch-marg">{say(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-set">
         <nav className="ch-set-rail" aria-label={say(COPY.settings.rail)}>

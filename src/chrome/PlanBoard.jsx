@@ -217,7 +217,6 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
     >
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.docket)}</h2>
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-cbody">
         {!plan && !loading && (

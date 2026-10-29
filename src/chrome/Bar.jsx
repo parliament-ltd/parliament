@@ -405,6 +405,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             setArmed(null) // any typing asks for both Enters again (C199)
             // The key panel closes when the line turns to another command.
             if (keyPanel && !/^>\s*api:/i.test(v)) onKeysClose?.()
+            // Typing again closes who answers, the frameworks and the
+            // languages (29 October); ? stays, to type from it.
+            if (menu && menu !== 'reference') closeMenu(menu)
             dispatch({ type: 'input', value: v })
           }}
           onKeyDown={onKeyDown}

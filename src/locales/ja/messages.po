@@ -7718,6 +7718,11 @@ msgstr "表示中の返答。返答を切り替えると、プロンプトもそ
 msgid "room.chatSheet"
 msgstr ""
 
+#. Show replies as they read now, without marks
+#. js-lingui-explicit-id
+msgid "room.cleanWord"
+msgstr ""
+
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -7755,6 +7760,16 @@ msgstr ""
 #. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
 #. js-lingui-explicit-id
 msgid "room.home"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "room.markupRuns"
+msgstr ""
+
+#. Show replies with their edits marked up
+#. js-lingui-explicit-id
+msgid "room.markupWord"
 msgstr ""
 
 #. js-lingui-explicit-id

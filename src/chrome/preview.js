@@ -954,7 +954,11 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     // close:204 and width:204 40%: the room showing that chat (C146 (c)).
     const byRoom = (step.verb === 'close' || step.verb === 'width') ? roomByNumber(a, step, screens) : null
     if (byRoom?.bad) return { answer, says: byRoom.bad, next: null }
-    const planned = byRoom?.step ?? step
+    // close:tour is close:welcome: the tour is the welcome page (29 October).
+    const tourShut = step.verb === 'close' && step.match?.values?.[0]?.value === 'tour'
+      ? { ...step, match: { ...step.match, values: [{ ...step.match.values[0], value: 'welcome', text: 'welcome' }] } }
+      : null
+    const planned = byRoom?.step ?? tourShut ?? step
     const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && step.match?.values?.[0]?.value === 'run' ? planOpenRun(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)

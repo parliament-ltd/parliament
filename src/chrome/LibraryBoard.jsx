@@ -231,7 +231,6 @@ export default function LibraryBoard({ items, addressed, onAddress, onWrite, que
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.library)}</h2>
         {narrowed && <span className="ch-marg">{i18n._(L.shown, { shown: shown.length, all: items.length })}</span>}
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-lfilt" role="group" aria-label={i18n._(L.shelves)}>
         {FILTERS.map((f) => (

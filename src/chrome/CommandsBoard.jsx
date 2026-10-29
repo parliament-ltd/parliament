@@ -25,7 +25,6 @@ export default function CommandsBoard({ board, addressed, onAddress, onPick }) {
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.commands)}</h2>
         {anyAway(groups) && <span className="ch-marg">{i18n._(COPY.shell.referenceFainter)}</span>}
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-cbody ch-ref ch-ref-board">
         <ReferenceColumns groups={groups} onPick={onPick} />

@@ -1778,6 +1778,10 @@ export const COPY = {
     rippleOff: /*i18n*/ { id: 'room.rippleOff', message: 'ripple: off' },
     rippleOn: /*i18n*/ { id: 'room.rippleOn', message: 'ripple: on' },
     rippleHelp: /*i18n*/ { id: 'room.rippleHelp', message: 'Writes {command} in the bar', comment: 'Commands stay English' },
+    // markup · clean in a room's head, as the Collection has (inline editing v5; 29 October).
+    markupWord: /*i18n*/ { id: 'room.markupWord', message: 'markup', comment: 'Show replies with their edits marked up' },
+    cleanWord: /*i18n*/ { id: 'room.cleanWord', message: 'clean', comment: 'Show replies as they read now, without marks' },
+    markupRuns: /*i18n*/ { id: 'room.markupRuns', message: 'Runs {command}', comment: 'Commands stay English' },
     notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },
     unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
     // The Parliament mark at the top of a narrow room (C252, after).

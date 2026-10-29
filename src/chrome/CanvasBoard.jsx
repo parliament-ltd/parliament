@@ -157,7 +157,6 @@ export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room
     >
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.canvas)}</h2>
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-cbody">{body}</div>
     </article>

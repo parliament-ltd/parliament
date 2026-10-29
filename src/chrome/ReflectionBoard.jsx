@@ -39,7 +39,6 @@ export default function ReflectionBoard({ addressed, onAddress, onWrite, scope, 
         {scope && <span className="ch-marg ch-aside">{i18n._(C.from, { head })}</span>}
         {scope && <span className="ch-marg ch-aside ch-sep" aria-hidden="true">·</span>}
         {scope && <span className="ch-marg ch-aside">{i18n._(C.readsOnly)}</span>}
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-cbody ch-reflect">
         {!scope ? <p className="ch-marg">{i18n._(C.noRoom)}</p> : (

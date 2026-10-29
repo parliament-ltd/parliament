@@ -861,6 +861,9 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(at('>close:welcome', both).text).toBe('Enter closes the welcome page. tour: brings it back')
     expect(at('>close:welcome', both).next.columns.flat()).not.toContain('welcome')
     expect(at('>close:welcome').text).toBe('Welcome page is not open')
+    // close:tour is close:welcome (29 October).
+    expect(at('>close:tour', both).text).toBe('Enter closes the welcome page. tour: brings it back')
+    expect(at('>close:tour', both).next.columns.flat()).not.toContain('welcome')
   })
 })
 

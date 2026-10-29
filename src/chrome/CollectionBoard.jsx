@@ -455,7 +455,6 @@ export default function CollectionBoard({ collection, collections, label, entrie
     >
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.collection)}</h2>
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       {collections.length > 1 && (
         <div className="ch-alm-saved ch-marg" role="group" aria-label={i18n._(COPY.collections.line)}>

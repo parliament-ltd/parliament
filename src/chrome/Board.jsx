@@ -17,7 +17,6 @@ export default function Board({ board, addressed, onAddress }) {
     >
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards[board])}</h2>
-        {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       <div className="ch-cbody">
         <p className="ch-marg">{i18n._(COPY.shell.boardLater)}</p>
