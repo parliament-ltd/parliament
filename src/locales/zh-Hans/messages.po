@@ -3526,6 +3526,11 @@ msgstr "笔记是写给人看的，绝不会被发送"
 msgid "enter.noteWords"
 msgstr "笔记需要文字，例如 {example}"
 
+#. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
+#. js-lingui-explicit-id
+msgid "enter.notOffered"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.numNone"
 msgstr "这里没有编号为 {num} 的内容"

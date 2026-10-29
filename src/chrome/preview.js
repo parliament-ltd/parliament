@@ -34,6 +34,7 @@ import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
 import { planReflect, reflectTalkPreview } from '../lib/reflection'
+import { LAB } from '../lib/release'
 import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate, planLocal } from '../lib/lab'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
@@ -251,6 +252,8 @@ const newStep = (a, step, screens) => {
   if (what === 'framework') return planNewFramework(step, screens)
   // new:room (stage 13, piece 1; C238): a room, in the Lab. The guide comes with piece 4.
   // new:room guided (piece 4; C244 (f)): with the guide.
+  // new:room builds a room in the Lab, which waits for a later release (C279 (a)).
+  if (what === 'room' && !LAB) return { says: { message: 'notOffered', values: { verb: 'new:room' } }, next: null }
   if (what === 'room') return !second ? planNewRoom() : second.value === 'guided' ? planNewRoom(true) : null
   if (what === 'branch') {
     // On the Plan board, or with a name: a branch with no chat until it

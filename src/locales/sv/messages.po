@@ -3526,6 +3526,11 @@ msgstr "En anteckning är till för människor och skickas aldrig"
 msgid "enter.noteWords"
 msgstr "En anteckning behöver några ord, som {example}"
 
+#. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
+#. js-lingui-explicit-id
+msgid "enter.notOffered"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.numNone"
 msgstr "Inget här har numret {num}"

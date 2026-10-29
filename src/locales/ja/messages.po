@@ -3526,6 +3526,11 @@ msgstr "メモは人のためのもので、送信されることはありませ
 msgid "enter.noteWords"
 msgstr "メモには言葉が必要です。例：{example}"
 
+#. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
+#. js-lingui-explicit-id
+msgid "enter.notOffered"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.numNone"
 msgstr "ここには番号{num}のものはありません"

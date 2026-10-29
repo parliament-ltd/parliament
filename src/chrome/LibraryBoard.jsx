@@ -4,6 +4,7 @@ import { COPY } from '../copy'
 import { roomLabel } from './say'
 import { wordFor } from '../shell/boards'
 import { nameOf } from '../lib/lab'
+import { LAB, LAB_SHELVES } from '../lib/release'
 import { settingsOf, wordOfBlock } from '../lib/labBlocks'
 
 // The Library (refactor-plan.md, stage 5, piece 4, thin; stage 13, piece 3,
@@ -23,7 +24,8 @@ const SHELF_WORDS = {
   all: COPY.library.shelfAll, room: COPY.library.shelfRooms, board: COPY.library.shelfBoards, layout: COPY.library.shelfLayouts,
   block: COPY.library.shelfBlocks, theme: COPY.library.shelfThemes, resource: COPY.library.shelfResources,
 }
-const FILTERS = ['all', 'room', 'board', 'layout', 'block', 'theme', 'resource']
+// The shelves for building wait with the Lab (C279 (a)).
+const FILTERS = ['all', 'room', 'board', 'layout', 'block', 'theme', 'resource'].filter((f) => LAB || !LAB_SHELVES.includes(f))
 const FEATURE_WORDS = { 'web-search': COPY.library.featureWebSearch, 'voice-input': COPY.library.featureVoice, 'file-attach': COPY.library.featureAttach }
 const BOARD_WORDS = {
   almanac: COPY.library.aboutAlmanac, collection: COPY.library.aboutCollection, library: COPY.library.aboutLibrary,

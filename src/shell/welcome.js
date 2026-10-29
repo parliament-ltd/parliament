@@ -11,6 +11,10 @@
 // Progress is kept on this device only, as one setting (C121): which steps
 // are done, whether the list is put away (tour:off), whether the ending was
 // reached, and the chat the page started, so its card comes back.
+//
+// While the Lab waits for a later release, its step does too: nine (C279 (a)).
+
+import { LAB } from '../lib/release'
 
 /**
  * @typedef {{ id: string, shows: string, writes: string|null }} Step
@@ -34,7 +38,8 @@ export const STEPS = Object.freeze([
   { id: 'strike', shows: 'strikethrough:', writes: '>strikethrough:' },
   // Crossed off when a prompt goes out carrying an edit (C225 (b)).
   { id: 'send', shows: 'p>', writes: 'p>' },
-].map((s) => Object.freeze(s)))
+// The Lab's step waits with the Lab (C279 (a)).
+].filter((s) => LAB || s.id !== 'lab').map((s) => Object.freeze(s)))
 
 const IDS = new Set(STEPS.map((s) => s.id))
 

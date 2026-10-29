@@ -17,6 +17,7 @@
 
 import { boardEntry, isRoom } from '../shell/boards'
 import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS } from '../shell/arrangement'
+import { LAB } from './release'
 
 const STORE = 'arrangements'
 /** The kind of id a saved arrangement has, 'saved:…', and the longest name it takes (C257). */
@@ -117,7 +118,9 @@ export async function loadArrangement(db, id, context = {}) {
  */
 export async function loadSpace(db, { fresh }) {
   const stored = db.objectStoreNames.contains(STORE) ? cleanArrangement(await db.get(STORE, SPACE)) : null
-  if (stored) return stored
+  // A space left in the Lab opens on Records while the Lab waits for a later
+  // release (C279 (a)); the stored space is not changed.
+  if (stored) return stored.lab && !LAB ? shipped(SPACE) : stored
   return fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE)
 }
 

@@ -3,18 +3,20 @@ import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, w
 import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
-  it('are the ten as ruled: bar:bottom second, pop:records sixth, api: eighth, then strike and send (C131 names, C225)', () => {
-    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'lab:', 'api:', 'strikethrough:', 'p>'])
+  it('are the nine as ruled, the Lab step waiting with the Lab: bar:bottom second, pop:records sixth, api: seventh, then strike and send (C131 names, C225, C279 (a))', () => {
+    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'api:', 'strikethrough:', 'p>'])
     expect(STEPS.find((s) => s.id === 'strike').writes).toBe('>strikethrough:')
     expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>records:')
   })
 
   it('cross off in any order, and the last one finishes the page', () => {
     let w = freshWelcome()
-    w = tick(w, 'lab')
+    w = tick(w, 'key')
     w = tick(w, 'command')
-    expect(w.done).toEqual(['command', 'lab'])
+    expect(w.done).toEqual(['command', 'key'])
     expect(nextStep(w).id).toBe('bar')
+    expect(tick(w, 'key')).toBe(w)
+    // The Lab's step is no step while the Lab waits (C279 (a)).
     expect(tick(w, 'lab')).toBe(w)
     expect(tick(w, 'nonsense')).toBe(w)
     for (const s of STEPS) w = tick(w, s.id)
@@ -45,8 +47,8 @@ describe('the welcome steps (stage 5)', () => {
     expect(stepsShown({ ...b, lab: { columns: [['canvas']], popped: [], addressed: 'canvas', bar: b.bar } })).toEqual(['bar', 'almanac', 'pop', 'lab'])
   })
 
-  it('counts the Library step ticked before C265 as the Lab step', () => {
-    expect(cleanWelcome({ done: ['command', 'library'] }).done).toEqual(['command', 'lab'])
+  it('drops the Lab step, and the Library step ticked before C265, while the Lab waits (C279 (a))', () => {
+    expect(cleanWelcome({ done: ['command', 'library', 'lab'] }).done).toEqual(['command'])
   })
 })
 

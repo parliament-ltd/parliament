@@ -3526,6 +3526,11 @@ msgstr ""
 msgid "enter.noteWords"
 msgstr ""
 
+#. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
+#. js-lingui-explicit-id
+msgid "enter.notOffered"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.numNone"
 msgstr ""

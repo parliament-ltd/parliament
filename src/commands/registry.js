@@ -12,6 +12,7 @@
 
 import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS } from './verbs'
 import { parseCommand, readField, shapedLikeKey } from './parse'
+import { offered } from '../lib/release'
 
 const BY_VERB = new Map(VERBS.map((v) => [v.verb, v]))
 
@@ -113,7 +114,7 @@ function distance(a, b) {
 export function nearest(verb) {
   if (KEPT_FREE.includes(verb)) return null
   let best = null
-  for (const v of VERBS) {
+  for (const v of VERBS.filter((x) => offered(x.verb))) {
     const d = distance(verb, v.verb)
     if (d <= Math.min(2, verb.length - 1) && (!best || d < best.d)) best = { verb: v.verb, d }
   }
@@ -196,6 +197,8 @@ function answer(command, board, built, body) {
       ? { state: 'unknown', message: 'didYouMean', values: { verb: said, near: `${near}:` }, verb }
       : { state: 'unknown', message: 'unknown', values: { verb: said }, verb }
   }
+  // The Lab's commands wait for a later release (C279 (a)).
+  if (!offered(verb)) return { state: 'later', message: 'notOffered', values: { verb: said }, verb }
   if (command.minus && !entry.minus) return { state: 'misfit', message: 'noMinus', values: { verb: said }, verb }
   if (!worksOn(entry, board)) return { state: 'elsewhere', message: 'elsewhere', values: { verb: said, boards: entry.on }, verb }
   const first = command.args[0]?.value
@@ -228,10 +231,10 @@ export function complete(body, board = null) {
   if (colon < 0) {
     const start = text.trim().toLowerCase()
     if (!start) return []
-    return VERBS.filter((v) => v.verb.startsWith(start) && worksOn(v, board)).map((v) => `${v.verb}:`).sort()
+    return VERBS.filter((v) => v.verb.startsWith(start) && worksOn(v, board) && offered(v.verb)).map((v) => `${v.verb}:`).sort()
   }
   const entry = BY_VERB.get(text.slice(0, colon).toLowerCase())
-  if (!entry || !worksOn(entry, board)) return []
+  if (!entry || !worksOn(entry, board) || !offered(entry.verb)) return []
   const typed = text.slice(colon + 1).trim().toLowerCase()
   if (/\s/.test(typed)) return []
   return keywordsOf(entry).filter((w) => w.startsWith(typed)).map((w) => `${entry.verb}:${w}`)
@@ -247,7 +250,7 @@ export function reference(board = null) {
   const groups = GROUPS.map((group) => ({
     group: group.key,
     title: group.title,
-    rows: VERBS.filter((v) => v.group === group.key && worksOn(v, board))
+    rows: VERBS.filter((v) => v.group === group.key && worksOn(v, board) && offered(v.verb))
       .map((v) => ({ verb: v.verb, example: v.example, forms: v.forms ?? [v.example], gloss: v.gloss, spends: v.spends })),
   })).filter((g) => g.rows.length)
   return [{ group: 'leaders', title: LEADERS.title, rows: LEADERS.rows }, ...groups]

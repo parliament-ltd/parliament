@@ -96,6 +96,7 @@ import { readUploadedFile, categorizeFile, ACCEPTED_FILE_TYPES } from '../lib/fi
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
+import { LAB } from '../lib/release'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -3574,6 +3575,8 @@ export default function Shell() {
   useEffect(() => {
     if (!started || !askedLab) return
     goTo('/', { replace: true, state: null })
+    // While the Lab waits for a later release, they open the start (C279 (a)).
+    if (!LAB) return
     const p = planLabOpen(current.current, typeof askedLab === 'string' ? askedLab : null)
     if (p.next) run(p.next, null)
   }, [started, askedLab, goTo, run])

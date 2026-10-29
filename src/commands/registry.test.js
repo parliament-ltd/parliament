@@ -4,6 +4,7 @@ import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, BOARD_NAMES } from
 import { lookup, parse, matchForm, verbEntry, nearest, enterLine, complete, reference } from './registry'
 import { COPY } from '../copy'
 import { boardFor } from '../shell/boards'
+import { offered, LAB_VERBS } from '../lib/release'
 import { messages as en } from '../locales/en/messages.mjs'
 
 const ALL = new Set(VERBS.map((v) => v.verb))
@@ -247,7 +248,19 @@ describe('the reference', () => {
     const all = reference()
     expect(all[0].group).toBe('leaders')
     expect(all.slice(1).map((g) => g.group)).toEqual(GROUPS.map((g) => g.key))
-    expect(all.flatMap((g) => g.rows).length).toBe(VERBS.length + LEADERS.rows.length)
+    expect(all.flatMap((g) => g.rows).length).toBe(VERBS.filter((v) => offered(v.verb)).length + LEADERS.rows.length)
+  })
+
+  it('leaves out the commands of the Lab while it waits, and the bar says so (C279 (a))', () => {
+    const listed = reference().flatMap((g) => g.rows.map((r) => r.verb)).filter(Boolean)
+    for (const verb of LAB_VERBS) {
+      expect(listed).not.toContain(verb)
+      expect(complete(verb)).toEqual([])
+      expect(enterLine(`>${verb}:`, { mode: 'command', board: 'lab', built: new Set([verb]) }).message).toBe('notOffered')
+    }
+    expect(nearest('labs')).not.toBe('lab')
+    expect(listed).toContain('set')
+    expect(listed).toContain('new')
   })
 
   it('shows on a board only what works there', () => {

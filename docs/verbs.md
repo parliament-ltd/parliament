@@ -21,7 +21,6 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `plan:` | Bring the Plan board beside what is on screen | `plan:` | everywhere | no |
 | `library:` | Bring the Library beside what is on screen, or one shelf of it | `library:`, `library:themes` | everywhere | no |
 | `settings:` | Bring Settings beside what is on screen, or one section of it | `settings:`, `settings:data` | everywhere | no |
-| `lab:` | Go to the Lab, where rooms are built | `lab:` | everywhere | no |
 | `room:` | Bring the last room beside what is on screen, or a room by name | `room:` | everywhere | no |
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |
 | `tour:` | Show the welcome steps, put them away, or show the second list | `tour:`, `tour:off`, `tour:advanced` | everywhere | no |
@@ -139,14 +138,6 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `duplicate:"Writing studio"` | Copy a room, yours or a template, and open the copy in the Lab | `duplicate:"Writing studio"`, `duplicate:"Writing studio" template`, `duplicate:` | everywhere | yes |
-| `edit:"Reading room"` | Open a room in the Lab to change it | `edit:"Reading room"` | everywhere | no |
-| `done:` | Leave the Lab with your changes | `done:` | Lab, Rooms | no |
-| `place:notes right` | Put a block in a slot of the room, or move it | `place:notes right`, `place:notes up` | Lab, Rooms | yes |
-| `layout:"Three-panel"` | Choose the shape of a room | `layout:"Three-panel"` | Lab, Rooms | yes |
-| `theme:"Deep Calm"` | Choose a room's colours and type | `theme:"Deep Calm"` | Lab, Rooms | yes |
-| `device:desktop` | Say what the room is built for | `device:desktop`, `device:mobile` | Lab, Rooms | yes |
-| `local:on` | Say whether a room sends only to models on this computer | `local:on`, `local:off` | Lab, Rooms | yes |
 | `set:notes order oldest` | Change a setting of a block or of Parliament. The Enter line states the change in full | `set:notes order oldest`, `set:contents most 50`, `set:input web on`, `set:default haiku` | Lab, Rooms, Settings | yes |
 
 ## Settings and data
@@ -165,3 +156,17 @@ The bar knows these words and says they come later.
 
 - `resources:`: Open the guides and references, with every command in full
 - `rewrite:234`: Write a new dated summary beside the old one
+
+## In a later release
+
+The Lab, where rooms are built, comes in a later release with its commands. The bar knows these words and says so.
+
+- `lab:`: Go to the Lab, where rooms are built
+- `duplicate:"Writing studio"`: Copy a room, yours or a template, and open the copy in the Lab
+- `edit:"Reading room"`: Open a room in the Lab to change it
+- `done:`: Leave the Lab with your changes
+- `place:notes right`: Put a block in a slot of the room, or move it
+- `layout:"Three-panel"`: Choose the shape of a room
+- `theme:"Deep Calm"`: Choose a room's colours and type
+- `device:desktop`: Say what the room is built for
+- `local:on`: Say whether a room sends only to models on this computer

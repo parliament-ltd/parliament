@@ -22,6 +22,7 @@
 import { TEMPLATES } from './seedTemplates'
 import { SCHEMES } from './schemes'
 import { roomName } from './roomNames'
+import { shownInLibrary } from './release'
 
 /** The Library's shelves, in the order it shows them (Lab v7). */
 export const SHELVES = Object.freeze(['room', 'board', 'layout', 'block', 'theme', 'resource'])
@@ -117,5 +118,7 @@ export function catalogueItems({
 export async function readCatalogue(db, { blocks, layouts }) {
   const all = (store) => (db?.objectStoreNames.contains(store) ? db.getAll(store).catch(() => []) : Promise.resolve([]))
   const [modes, storedLayouts, resources] = await Promise.all(['modes', 'libraryLayouts', 'libraryResources'].map(all))
-  return catalogueItems({ modes, storedLayouts, resources, blocks, layouts })
+  // This release shows the default room's template and no shelf for building
+  // (C279 (a)); every room someone made is still listed.
+  return catalogueItems({ modes, storedLayouts, resources, blocks, layouts }).filter((item) => shownInLibrary(item))
 }

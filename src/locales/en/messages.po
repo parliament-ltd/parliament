@@ -3526,6 +3526,11 @@ msgstr "A note is for people and is never sent"
 msgid "enter.noteWords"
 msgstr "A note needs some words, like {example}"
 
+#. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
+#. js-lingui-explicit-id
+msgid "enter.notOffered"
+msgstr "{verb} comes in a later release"
+
 #. js-lingui-explicit-id
 msgid "enter.numNone"
 msgstr "Nothing here has the number {num}"

@@ -80,6 +80,7 @@ export const COPY = {
     takesWords: /*i18n*/ { id: 'enter.takesWords', message: '{verb} takes {words}', comment: '{words} is a list joined with "or"' },
     takesExample: /*i18n*/ { id: 'enter.takesExample', message: '{verb} does not take that. For example: {example}' },
     later: /*i18n*/ { id: 'enter.later', message: '{verb} is not built yet', comment: 'While the new shell is behind its flag' },
+    notOffered: /*i18n*/ { id: 'enter.notOffered', message: '{verb} comes in a later release', comment: 'The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:' },
     ready: /*i18n*/ { id: 'enter.ready', message: 'Enter runs {verb}' },
     sequence: /*i18n*/ {
       id: 'enter.sequence',

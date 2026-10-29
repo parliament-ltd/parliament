@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { vi, describe, it, expect } from 'vitest'
 import { setupI18n } from '@lingui/core'
 import { nameOf } from './lab'
 import { BLOCK_SETTINGS, findBlock, valueOf, wordOfBlock, slotForWord } from './labBlocks'
@@ -6,6 +6,13 @@ import { preview } from '../chrome/preview'
 import { say } from '../chrome/say'
 import { shipped } from '../shell/arrangement'
 import { messages as en } from '../locales/en/messages.mjs'
+
+// The Lab waits for a later release (C279 (a)); its code is kept and tried
+// here with the switch on.
+vi.mock('./release', async (importOriginal) => {
+  const real = await importOriginal()
+  return { ...real, LAB: true, offered: (verb) => real.offered(verb, true), shownInLibrary: (item) => real.shownInLibrary(item, true) }
+})
 
 // The Blocks board's commands (stage 13, piece 2; C240). Fixture layouts and
 // fits, as the manifests declare them; the catalogue cannot load in tests.

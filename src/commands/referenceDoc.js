@@ -4,6 +4,7 @@
 // `npm run reference` writes it; a test fails when it is out of date.
 
 import { GROUPS, LEADERS, VERBS } from './verbs'
+import { offered } from '../lib/release'
 import { COPY } from '../copy'
 
 const boardName = (key) => COPY.boards[key]?.message ?? key
@@ -33,8 +34,9 @@ export function verbsMarkdown(built) {
   out.push('| --- | --- |')
   for (const r of LEADERS.rows) out.push(`| ${(r.forms ?? [r.example]).map(code).join(', ')} | ${cell(r.gloss.message)} |`)
   const later = []
+  const held = VERBS.filter((v) => !offered(v.verb))
   for (const g of GROUPS) {
-    const rows = VERBS.filter((v) => v.group === g.key)
+    const rows = VERBS.filter((v) => v.group === g.key && offered(v.verb))
     const now = rows.filter((v) => built.has(v.verb))
     later.push(...rows.filter((v) => !built.has(v.verb)))
     if (!now.length) continue
@@ -56,6 +58,14 @@ export function verbsMarkdown(built) {
     out.push('The bar knows these words and says they come later.')
     out.push('')
     for (const v of later) out.push(`- ${code(v.example)}: ${v.gloss.message}`)
+  }
+  if (held.length) {
+    out.push('')
+    out.push('## In a later release')
+    out.push('')
+    out.push('The Lab, where rooms are built, comes in a later release with its commands. The bar knows these words and says so.')
+    out.push('')
+    for (const v of held) out.push(`- ${code(v.example)}: ${v.gloss.message}`)
   }
   out.push('')
   return out.join('\n')

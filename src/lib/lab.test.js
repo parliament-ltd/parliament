@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { vi, describe, it, expect } from 'vitest'
 import { setupI18n } from '@lingui/core'
 import { planLayoutChange, slotsOf, nameOf } from './lab'
 import { preview } from '../chrome/preview'
@@ -6,6 +6,13 @@ import { say } from '../chrome/say'
 import { shipped, planLabOpen, planLabDone } from '../shell/arrangement'
 import { cleanArrangement } from './arrangements'
 import { messages as en } from '../locales/en/messages.mjs'
+
+// The Lab waits for a later release (C279 (a)); its code is kept and tried
+// here with the switch on.
+vi.mock('./release', async (importOriginal) => {
+  const real = await importOriginal()
+  return { ...real, LAB: true, offered: (verb) => real.offered(verb, true), shownInLibrary: (item) => real.shownInLibrary(item, true) }
+})
 
 // The Lab, piece 1 (stage 13; C238).
 
