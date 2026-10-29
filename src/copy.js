@@ -1665,6 +1665,8 @@ export const COPY = {
   field: {
     answeredFrom: /*i18n*/ { id: 'field.answeredFrom', message: 'answered from {source}' },
     answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
+    answeredFromMany: /*i18n*/ { id: 'field.answeredFromMany', message: 'answered from multiple', comment: 'In the prompt field, when several sources are ticked to answer' },
+    answeredByMany: /*i18n*/ { id: 'field.answeredByMany', message: 'answered by multiple', comment: 'In the prompt field, when several models, or models and sources, are ticked to answer' },
     // Among a prompt's branches, where the next prompt goes (C174).
     toOne: /*i18n*/ { id: 'field.toOne', message: 'to {address} · {name}' },
     toSome: /*i18n*/ { id: 'field.toSome', message: 'to {nums}' },

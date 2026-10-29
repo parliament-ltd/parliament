@@ -5853,8 +5853,18 @@ msgstr ""
 msgid "field.answeredBy"
 msgstr ""
 
+#. In the prompt field, when several models, or models and sources, are ticked to answer
+#. js-lingui-explicit-id
+msgid "field.answeredByMany"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "field.answeredFrom"
+msgstr ""
+
+#. In the prompt field, when several sources are ticked to answer
+#. js-lingui-explicit-id
+msgid "field.answeredFromMany"
 msgstr ""
 
 #. Shown on hover over who answers, in the prompt field

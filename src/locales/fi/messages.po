@@ -5853,9 +5853,19 @@ msgstr "Poistetaan"
 msgid "field.answeredBy"
 msgstr "vastaa {model}"
 
+#. In the prompt field, when several models, or models and sources, are ticked to answer
+#. js-lingui-explicit-id
+msgid "field.answeredByMany"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "field.answeredFrom"
 msgstr "vastaus lähteestä {source}"
+
+#. In the prompt field, when several sources are ticked to answer
+#. js-lingui-explicit-id
+msgid "field.answeredFromMany"
+msgstr ""
 
 #. Shown on hover over who answers, in the prompt field
 #. js-lingui-explicit-id

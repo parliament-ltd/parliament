@@ -206,9 +206,12 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     // Among a prompt's branches, where it goes (C174): "to 201a · Sonnet 5.5".
     marginalia = to && !(prompt.many?.length > 1 && !prompt.toMany)
       ? (to.all ? i18n._(COPY.field.toAll, { count: to.count }) : to.count > 1 ? i18n._(COPY.field.toSome, { nums: to.chats.join(', ') }) : i18n._(COPY.field.toOne, { address: to.chats[0], name: to.name }))
-      : who.group === 'source'
-        ? i18n._(COPY.field.answeredFrom, { source: who.name })
-        : i18n._(COPY.field.answeredBy, { model: who.name })
+      // Several ticked: "answered from multiple" for sources, "by" when a model is among them (29 October).
+      : prompt.many?.length > 1
+        ? i18n._(prompt.many.every((w) => w.group === 'source') ? COPY.field.answeredFromMany : COPY.field.answeredByMany)
+        : who.group === 'source'
+          ? i18n._(COPY.field.answeredFrom, { source: who.name })
+          : i18n._(COPY.field.answeredBy, { model: who.name })
   }
   // The frameworks on this chat: "framework: none", or the first and how many more (C164).
   const names = prompt?.frameworkNames ?? []
