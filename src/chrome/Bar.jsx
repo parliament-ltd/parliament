@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
-import { fieldReducer, initialField, fieldValue } from '../shell/field'
+import { fieldReducer, initialField, fieldValue, showsHeld, dropsHeld } from '../shell/field'
 import { barKey, isTextField } from '../shell/keys'
 import { stepRecall } from '../lib/commandHistory'
 import { restingMode } from '../shell/arrangement'
@@ -47,6 +47,11 @@ import { formatSize } from '../lib/fileUpload'
 // what it costs before Enter; onPrompt sends it, and answers at once
 // whether it went ({ refused } or { done }), then once it is answered
 // (done resolves to a notice, or null).
+//
+// A prompt and reply edited in the chat come to the field held, shown as a
+// placeholder (Stefan, 29 October); Enter sends their words. onDropDraft
+// says when they are dropped unsent (typed over, Backspace, Delete,
+// Escape), so their edits go with the next prompt as usual (C216 (h)).
 
 // Search narrows the board the bar points at as it is typed (C132 (a)):
 // Records and the Collection, each keeping its own (C144 (h)). `searches`
@@ -56,7 +61,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null, onAway = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null, onAway = null, onDropDraft = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -260,7 +265,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     lang: typeof navigator === 'undefined' ? 'en-US' : navigator.language || 'en-US',
     onTranscript: (said, isFinal) => {
       if (!isFinal || !said || field.mode !== 'prompt') return
-      const now = field.text.prompt ?? ''
+      // Spoken over a held prompt: what is said takes its place.
+      if (showsHeld(field)) onDropDraft?.()
+      const now = showsHeld(field) ? '' : field.text.prompt ?? ''
       dispatch({ type: 'input', value: now ? `${now.replace(/s+$/, '')} ${said}` : said })
     },
   })
@@ -337,6 +344,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (frameworkPicker) { onFrameworkPickerClose?.(); return }
       if (languagePicker) { onLanguagePickerClose?.(); return }
       if (map) { onMapClose?.(); return }
+      // A held prompt is cleared, and that is all this Escape does.
+      if (showsHeld(field)) { dispatch({ type: 'escape' }); onDropDraft?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -346,6 +355,14 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         if (field.editingReply && reply.current?.isConnected) reply.current.focus()
         else input.current?.blur()
       }
+      return
+    }
+    // Backspace or Delete on a held prompt clears it whole: the placeholder
+    // stands for its words, which are not in the field to delete one by one.
+    if ((e.key === 'Backspace' || e.key === 'Delete') && showsHeld(field)) {
+      e.preventDefault()
+      dispatch({ type: 'drop' })
+      onDropDraft?.()
       return
     }
     // The slider of branches on screen: ⌥← ⌥→ from the field, ← → when it is
@@ -408,6 +425,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             // Typing again closes who answers, the frameworks and the
             // languages (29 October); ? stays, to type from it.
             if (menu && menu !== 'reference') closeMenu(menu)
+            // Typed over a held prompt: it is dropped, unsent (C216 (h)).
+            if (dropsHeld(field, v)) onDropDraft?.()
             dispatch({ type: 'input', value: v })
           }}
           onKeyDown={onKeyDown}
@@ -426,7 +445,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             ))}
           </div>
         )}
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} />
         {/* Extra screen detected (C259 (g)): once, under the field. */}
         {note && !folded && (
           <p className="ch-snote ch-marg">

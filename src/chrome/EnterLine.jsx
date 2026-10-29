@@ -26,8 +26,10 @@ function Parts({ parts }) {
  *   room; left out when the screen has no room. A prompt goes there.
  *   search: on Records, how many rows the search leaves ({ count }); null
  *   where search does not reach yet (C132 (a))
+ *   held: the prompt field holds a prompt edited in the chat, shown as a
+ *   placeholder; the line says what typing and Escape do to it
  */
-export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false }) {
   const { i18n } = useLingui()
   // What Enter will do, in the language a language: line names, once its
   // words are loaded (C184); until then, in the page's.
@@ -90,6 +92,8 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
     // Who receives the prompt and what it costs, before Enter (C83).
     parts = [target]
     if (says?.message) parts.push({ key: 'does', now: true, text: say(i18n, says.message, says.values) }, ...also)
+    // A prompt edited in the chat, held: what typing and Escape do to it.
+    if (held) parts.push({ key: 'held', text: i18n._(COPY.enter.heldPrompt) })
     // On the welcome page, the way to the command line from a prompt (C119).
     if (welcome) parts.push({ key: 'cmd', text: i18n._(COPY.enter.toCommand, { leader: '>' }) })
     if (resting !== 'prompt') parts.push(leave)

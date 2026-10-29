@@ -119,6 +119,10 @@
 .ch-field input { position: relative; z-index: 1; flex: 1; min-width: 0; height: 100%; padding: 0 42px 0 72px; border: none; background: transparent; font: 400 13.5px var(--ch-sans); color: var(--ch-ink); outline: none; }
 .ch-field.command input { font-family: var(--ch-mono); font-size: 13px; color: #fff; padding-inline: 86px 14px; text-shadow: 0 0 3px rgba(12, 20, 40, .95), 0 1px 2px rgba(12, 20, 40, .85); caret-color: #fff; }
 .ch-field.prompt input { padding-inline-start: 78px; }
+/* A prompt edited in the chat, held: its placeholder, as the bar reference
+   draws a prompt's (.sfield input::placeholder), in the token sheet's ink-3,
+   which replaced that grey to be read (Stefan, 29 October). */
+.ch-field.held input::placeholder { color: var(--ch-ink-3); opacity: 1; }
 .ch-field:focus-within { box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10), 0 0 0 1px var(--ch-focus-ink); }
 .ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity var(--ch-dur-fade) ease, transform var(--ch-dur-fade) ease; pointer-events: none; }
 .ch-chip.on { opacity: 1; transform: none; }
@@ -1131,16 +1135,26 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 /* A board's head: its title only. */
 .ch-shell.calm .ch-card:not(:hover):not(:focus-within):not(.near) > .ch-chead > :not(h2) { visibility: hidden; }
 
-/* A reply as it stands (as markup:off reads it), with a tick in the margin
-   where something is marked; near, the markup. It stays editable. */
+/* A reply as it stands (as markup:off reads it); near, the markup. It stays
+   editable. A reply with something marked keeps a rule at its edge, as
+   inline editing v5 draws the margin tick (.calm .ans:has(…): a 2px inset
+   rule, not a check mark), in the chat's ink rather than blue (Stefan,
+   29 October: "little blue checkmarks ... can we not have those?"): ink-3,
+   the colour of the struck words it stands for. A source's answer has its
+   rule already, which darkens. An edited prompt says so on the line under
+   it. */
 .ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text del { display: none; }
 .ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(del.pm-sug-out, del.pm-replaced) { display: inline; color: inherit; text-decoration: none; }
 .ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text ins.pm-added { color: inherit; text-decoration: none; }
 .ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(ins.pm-answer, ins.pm-sug-in, .pm-ask-point) { display: none; }
 .ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text .pm-ask { text-decoration: none; }
-.ch-shell.calm :is(.p-pair-host, .p-edit) { position: relative; }
-.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point))::before {
-  content: "\2713"; position: absolute; inset-inline-start: -2px; top: 4px; font: 600 11px var(--ch-sans); color: var(--ch-you); pointer-events: none;
+.ch-shell.calm .p-pair-host:not(:hover):not(:focus-within):not(.near) .p-msg-reply:not(.from-source, .ghost):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body::before,
+.ch-shell.calm .p-msg-reply:not(.from-source, .ghost):not(.p-pair-host .p-msg-reply):has(.p-edit:not(:hover):not(:focus-within):not(.near) .p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body::before {
+  content: ""; position: absolute; inset-block: 2px; inset-inline-start: -12px; width: 2px; border-radius: 1px; background: var(--ch-ink-3); pointer-events: none;
+}
+.ch-shell.calm .p-pair-host:not(:hover):not(:focus-within):not(.near) .p-msg-reply:is(.from-source, .ghost):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body,
+.ch-shell.calm .p-msg-reply:is(.from-source, .ghost):not(.p-pair-host .p-msg-reply):has(.p-edit:not(:hover):not(:focus-within):not(.near) .p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body {
+  border-inline-start-color: var(--ch-ink-3);
 }
 
 /* Inline markers: small numbered dots, green for asks and sweeps, rust for Ripple. */

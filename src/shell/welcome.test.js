@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, withChat, stepsShown, stepsMade } from './welcome'
+import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, withChat, stepsShown, stepsMade, carriesEdit } from './welcome'
 import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
@@ -69,5 +69,35 @@ describe('steps 9 and 10 (stage 11, piece 7; C225)', () => {
     expect(part.finished).toBe(false)
     expect(nextStep(tick(part, 'key')).id).toBe('strike')
     expect(tick(tick(tick(part, 'key'), 'strike'), 'send').finished).toBe(true)
+  })
+})
+
+describe('step 9 crosses off at once when a prompt goes out carrying an edit (C225 (b); Stefan, 29 October)', () => {
+  it('when a model answering reads the edits or asks the line counted', () => {
+    expect(carriesEdit({ edits: { count: 2, asks: 0 }, read: true })).toBe(true)
+    expect(carriesEdit({ edits: { count: 0, asks: 1 }, read: true })).toBe(true)
+    expect(carriesEdit({ edits: null, read: true })).toBe(false)
+    expect(carriesEdit({ edits: { count: 0, asks: 0 }, read: true })).toBe(false)
+  })
+
+  it('on a branch a source answers, only when a model reads them at the same time (C218 (e)); waiting, they do not go', () => {
+    expect(carriesEdit({ edits: { count: 2 }, read: true })).toBe(true)
+    expect(carriesEdit({ edits: { count: 2 }, read: false })).toBe(false)
+  })
+
+  it('when the words of a prompt and reply joined with edits in them go as the prompt, to a model or a source (C214)', () => {
+    expect(carriesEdit({ edits: null, read: false, joined: 2 })).toBe(true)
+    expect(carriesEdit({ edits: null, read: true, joined: 1 })).toBe(true)
+    // Joined with nothing edited in them: no edit goes.
+    expect(carriesEdit({ edits: null, read: false, joined: 0 })).toBe(false)
+    expect(carriesEdit()).toBe(false)
+  })
+
+  it('and the step it crosses off is the last one, so the page finishes with it', () => {
+    let w = freshWelcome()
+    for (const st of STEPS.filter((x) => x.id !== 'send')) w = tick(w, st.id)
+    expect(w.finished).toBe(false)
+    if (carriesEdit({ edits: null, joined: 1 })) w = tick(w, 'send')
+    expect([isDone(w, 'send'), w.finished]).toEqual([true, true])
   })
 })
