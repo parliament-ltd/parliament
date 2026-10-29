@@ -86,6 +86,10 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.plan', message: 'Bring the Plan board beside what is on screen' } }),
   v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:', 'library:themes'], takes: [[], ['word']], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.library', message: 'Bring the Library beside what is on screen, or one shelf of it' } }),
+  // settings: is open:settings, and settings:data open:settings data
+  // (arrangements spec §5; C95 left it for its stage; C181; C279).
+  v({ verb: 'settings', group: 'go', example: 'settings:', forms: ['settings:', 'settings:data'], takes: [[], ['word']], stage: 9, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.settings', message: 'Bring Settings beside what is on screen, or one section of it' } }),
   v({ verb: 'lab', group: 'go', example: 'lab:', takes: [[]], stage: 13, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.lab', message: 'Go to the Lab, where rooms are built' } }),
   v({ verb: 'room', group: 'go', example: 'room:', takes: [[], ['text']], stage: 4, click: 'apply',

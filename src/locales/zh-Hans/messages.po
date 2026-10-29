@@ -8983,6 +8983,10 @@ msgid "verb.set"
 msgstr "更改模块或 Parliament 的设置。Enter 提示行会完整写明更改内容"
 
 #. js-lingui-explicit-id
+msgid "verb.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.since"
 msgstr "显示某个日期以来创建的内容"
 

@@ -20,6 +20,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `records:` | Bring Records and the Collection beside what is on screen | `records:` | everywhere | no |
 | `plan:` | Bring the Plan board beside what is on screen | `plan:` | everywhere | no |
 | `library:` | Bring the Library beside what is on screen, or one shelf of it | `library:`, `library:themes` | everywhere | no |
+| `settings:` | Bring Settings beside what is on screen, or one section of it | `settings:`, `settings:data` | everywhere | no |
 | `lab:` | Go to the Lab, where rooms are built | `lab:` | everywhere | no |
 | `room:` | Bring the last room beside what is on screen, or a room by name | `room:` | everywhere | no |
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |

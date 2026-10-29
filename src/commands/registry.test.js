@@ -51,7 +51,7 @@ describe('the verb list', () => {
   })
 
   it('never applies on a click what undo cannot take back, apart from screen-only moves', () => {
-    const SCREEN_ONLY = ['records', 'plan', 'library', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
+    const SCREEN_ONLY = ['records', 'plan', 'library', 'settings', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
     // Filters only change the view, and clear:filters puts it back.
     for (const v of VERBS.filter((x) => x.click === 'apply' && !x.undoable && x.group !== 'filters')) expect(SCREEN_ONLY, v.verb).toContain(v.verb)
     expect(verbEntry('delete').click).toBe('fill')
@@ -63,7 +63,7 @@ describe('the verb list', () => {
 describe('the glosses', () => {
   const glosses = [...VERBS.map((v) => ({ where: v.verb, ...v.gloss })), ...GROUPS.map((g) => ({ where: g.key, ...g.title })), { where: 'leaders', ...LEADERS.title }, ...LEADERS.rows.map((r) => ({ where: r.example, ...r.gloss }))]
   // Names that keep their capital in a sentence: boards, formats and a key.
-  const PROPER = new Set(['Parliament', 'Records', 'Plan', 'Collection', 'Library', 'Lab', 'Markdown', 'JSONL', 'Enter', 'English'])
+  const PROPER = new Set(['Parliament', 'Records', 'Plan', 'Collection', 'Library', 'Settings', 'Lab', 'Markdown', 'JSONL', 'Enter', 'English'])
 
   it('have unique ids and follow the copy rules', () => {
     const ids = glosses.map((g) => g.id)

@@ -94,6 +94,14 @@ describe('one space: records: and room: bring boards beside what is here (C125, 
     expect(q.next.columns).toEqual([['almanac'], ['collection'], ['room'], ['room-2']])
   })
 
+  it('settings: opens Settings, and settings:data a section of it (C279)', () => {
+    expect(at('>settings:').text).toBe('Enter opens Settings on the right')
+    expect(at('>settings:data').text).toBe('Enter opens Settings at Data and backups')
+    expect(at('>settings:data').next.context.settings).toBe('data')
+    expect(at('>settings:nonsense').next).toBeNull()
+    expect(at('>settings: bar:bottom').text).toBe('Enter runs 2 commands in turn: settings: and bar:')
+  })
+
   it('room: with no chat yet opens an empty room beside', () => {
     const p = at('>room:', space(), { lastRoom: null })
     expect(p.text).toBe('Enter opens an empty room beside what is here. Its first prompt starts it')

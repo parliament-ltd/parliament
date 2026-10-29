@@ -8983,6 +8983,10 @@ msgid "verb.set"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.since"
 msgstr ""
 

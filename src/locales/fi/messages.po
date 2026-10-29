@@ -8983,6 +8983,10 @@ msgid "verb.set"
 msgstr "Muuta lohkon tai Parliamentin asetusta. Enter-rivi kertoo muutoksen kokonaan"
 
 #. js-lingui-explicit-id
+msgid "verb.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.since"
 msgstr "Näytä, mitä on tehty tietystä päivästä alkaen"
 

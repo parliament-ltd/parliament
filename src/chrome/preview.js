@@ -51,7 +51,7 @@ import { searchWords } from '../lib/searchWords'
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
 // Verbs that bring an arrangement, or a board, into the space (C95, C125).
-const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
+const BRINGS = Object.freeze(['records', 'room', 'library', 'plan', 'settings'])
 // Verbs that act on what the bar points at, rather than only on the space:
 // name: (C40), tour:, which also shows the welcome steps (A20), and
 // inspect:, which shows one thing in detail under the bar, and api:, which
@@ -378,7 +378,8 @@ function focusSetLine(a, step, screens = {}) {
 // records: brings the Records arrangement, the Records board and the
 // Collection, or whatever its owner has made it (C125, C131). room: brings
 // the last room, or an empty room when there is no chat yet. library: and
-// plan: are open:library and open:plan (C95). A room or a shelf by name
+// plan: are open:library and open:plan (C95), settings: open:settings, and
+// settings:data open:settings data (C181, C279). A room or a shelf by name
 // comes later.
 function bring(a, step, screens = {}) {
   const named = Boolean(step.match?.values?.length)
@@ -386,6 +387,7 @@ function bring(a, step, screens = {}) {
   if (step.verb === 'room') return named ? null : planRoom(a, screens.lastRoom?.id ?? null)
   if (step.verb === 'library') return named ? null : planOpen(a, 'library')
   if (step.verb === 'plan') return planOpen(a, 'docket')
+  if (step.verb === 'settings') return named ? planOpenSettings(a, step.match.values[0].value) : planOpen(a, 'settings')
   return null
 }
 

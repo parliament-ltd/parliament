@@ -8983,6 +8983,10 @@ msgid "verb.set"
 msgstr "ブロックやParliamentの設定を変える。変更の内容はEnter行ですべて示します"
 
 #. js-lingui-explicit-id
+msgid "verb.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.since"
 msgstr "ある日付以降に作ったものを表示する"
 

@@ -8983,6 +8983,10 @@ msgid "verb.set"
 msgstr "Ändra en inställning för ett block eller för Parliament. Enter-raden beskriver ändringen i sin helhet"
 
 #. js-lingui-explicit-id
+msgid "verb.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.since"
 msgstr "Visa vad som skapats sedan ett datum"
 
