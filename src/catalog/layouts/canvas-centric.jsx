@@ -19,28 +19,35 @@
 // implemented — the user taps the chevron to see Claude's reply. Render
 // is inlined as a single named function so the file has one
 // component-shaped declaration (matches single-column-with-sheet).
+//
+// C279 (b): on the shell the room's form decides (roomForm.js), as in
+// three-panel. Alone on screen, both columns stand open; sharing it, the
+// canvas takes the room's width and the left rail and the right column
+// (chat and inspector) are strips, each opening over the canvas's edge.
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useIsNarrow } from '../../lib/useViewportWidth'
+import { useLingui } from '@lingui/react'
+import { useRoomForm } from '../../lib/useViewportWidth'
 import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
 import NarrowSheet from '../../components/layouts/NarrowSheet'
+import RoomColumn from '../../components/layouts/RoomColumn'
+import { useColumns } from '../../components/layouts/useColumns'
+import { COPY } from '../../copy'
 
 const RAIL_BASE   = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
 const RAIL_BORDER = 'border-[var(--p-border)]'
+// Each column's width (w-72), open beside the canvas or over it.
+const COLUMN_WIDTH = 288
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
   return nodes
 }
 
-// PR-27: per-slot panel-toggle opt-in. The canvas-centric right aside
-// holds both chat-panel and inspector — we key the toggle off 'chat-panel'
-// since that's the primary slot the user thinks of when opting in.
-function panelEnabled(mode, slotId) {
-  return mode?.layoutConfig?.panelButtons?.[slotId] === true
-}
+// PR-27's per-slot opt-in, mode.layoutConfig.panelButtons (keyed on
+// 'left-rail' and 'chat-panel' here), is no longer read: every column with
+// blocks has its button (C279 (b)). It stays stored.
 
 export default {
   name: 'canvas-centric',
@@ -60,7 +67,7 @@ export default {
     { id: 'input-dock', capacity: 'single' },
   ],
 
-  render: function CanvasCentricRender({ slotContents = {}, mode }) {
+  render: function CanvasCentricRender({ slotContents = {} }) {
     const left      = slotContents['left-rail']
     const canvas    = slotContents['canvas']
     const input     = slotContents['input-dock']
@@ -70,18 +77,15 @@ export default {
     const hasChat      = chat && chat.length > 0
     const hasInspector = inspector && inspector.length > 0
     const hasRight     = hasChat || hasInspector
-    const isNarrow     = useIsNarrow(768)
+    const { i18n }     = useLingui()
+    const form         = useRoomForm()
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [panelOpen, setPanelOpen]   = useState(false)
-    // PR-27: desktop panel-collapse local state. Defaults to expanded.
-    // Right toggle keys off 'chat-panel' but collapses the whole aside
-    // (chat + inspector) since they live in one aside element.
-    const [leftCollapsed,  setLeftCollapsed]  = useState(false)
-    const [rightCollapsed, setRightCollapsed] = useState(false)
-    const leftToggleEnabled  = panelEnabled(mode, 'left-rail')
-    const rightToggleEnabled = panelEnabled(mode, 'chat-panel')
+    // The columns, open or closed: each room starts as its form says. The
+    // right one holds the chat and the inspector, in one aside.
+    const columns = useColumns(form)
 
-    if (isNarrow) {
+    if (form === 'narrow') {
       // h-[100dvh] anchors the narrow tree to the viewport so stacked
       // canvas content (chart + table + summary) doesn't push the
       // chat sheet and input dock off-screen. The parent route doesn't
@@ -91,7 +95,7 @@ export default {
           <NarrowChrome
             onLeftClick={hasLeft ? () => setDrawerOpen(true) : undefined}
             onRightClick={hasInspector ? () => setPanelOpen((v) => !v) : undefined}
-            rightLabel="Inspector"
+            rightWords={{ show: COPY.room.showInspector, hide: COPY.room.hideInspector }}
             rightActive={panelOpen}
           />
 
@@ -105,7 +109,7 @@ export default {
                 {renderSlot(canvas)}
               </div>
               {hasChat && (
-                <NarrowSheet label="Chat">
+                <NarrowSheet label={i18n._(COPY.room.chatSheet)}>
                   {renderSlot(chat)}
                 </NarrowSheet>
               )}
@@ -133,34 +137,22 @@ export default {
     }
 
     return (
-      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]">
-        {/* Left rail */}
+      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]" ref={columns.root}>
+        {/* Left rail. Its padding is its blocks' holder's, so the rail
+            looks the same open in its place or over the canvas. */}
         {hasLeft && (
-          <aside
-            className={`layout-panel w-72 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE} ${
-              leftToggleEnabled && leftCollapsed ? 'layout-panel-collapsed' : ''
-            }`}
+          <RoomColumn
+            side="left" form={form} open={columns.open.left} onToggle={() => columns.toggle('left')}
+            width={COLUMN_WIDTH} className={`border-r ${RAIL_BORDER} bg-white`}
+            contentClassName="flex flex-col gap-3 p-3 overflow-y-auto"
           >
-            <div className="layout-panel-content flex flex-col gap-3">
-              {renderSlot(left)}
-            </div>
-            {leftToggleEnabled && (
-              <button
-                type="button"
-                className="layout-panel-toggle left"
-                onClick={() => setLeftCollapsed((v) => !v)}
-                aria-label={leftCollapsed ? 'Expand left rail' : 'Collapse left rail'}
-              >
-                {leftCollapsed
-                  ? <ChevronRight className="w-3 h-3" />
-                  : <ChevronLeft className="w-3 h-3" />}
-              </button>
-            )}
-          </aside>
+            {renderSlot(left)}
+          </RoomColumn>
         )}
 
-        {/* Center: canvas + input */}
-        <main className="flex-1 flex flex-col min-w-0">
+        {/* Center: canvas + input. A click on it closes a column open over
+            it (C279 (b)). */}
+        <main className="flex-1 flex flex-col min-w-0" onPointerDown={columns.over ? columns.close : undefined}>
           <div className="flex-1 min-h-0 overflow-auto">
             {renderSlot(canvas)}
           </div>
@@ -179,36 +171,22 @@ export default {
 
         {/* Right: chat panel above, inspector below */}
         {hasRight && (
-          <aside
-            className={`layout-panel w-72 shrink-0 border-l ${RAIL_BORDER} flex flex-col bg-white ${
-              rightToggleEnabled && rightCollapsed ? 'layout-panel-collapsed' : ''
-            }`}
+          <RoomColumn
+            side="right" form={form} open={columns.open.right} onToggle={() => columns.toggle('right')}
+            width={COLUMN_WIDTH} className={`border-l ${RAIL_BORDER} flex flex-col bg-white`}
+            contentClassName="flex-1 flex flex-col min-h-0"
           >
-            <div className="layout-panel-content flex-1 flex flex-col min-h-0">
-              {hasChat && (
-                <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
-                  {renderSlot(chat)}
-                </div>
-              )}
-              {hasInspector && (
-                <div className="border-t border-[var(--p-border)] p-3 max-h-72 overflow-y-auto space-y-3">
-                  {renderSlot(inspector)}
-                </div>
-              )}
-            </div>
-            {rightToggleEnabled && (
-              <button
-                type="button"
-                className="layout-panel-toggle right"
-                onClick={() => setRightCollapsed((v) => !v)}
-                aria-label={rightCollapsed ? 'Expand right rail' : 'Collapse right rail'}
-              >
-                {rightCollapsed
-                  ? <ChevronLeft className="w-3 h-3" />
-                  : <ChevronRight className="w-3 h-3" />}
-              </button>
+            {hasChat && (
+              <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
+                {renderSlot(chat)}
+              </div>
             )}
-          </aside>
+            {hasInspector && (
+              <div className="border-t border-[var(--p-border)] p-3 max-h-72 overflow-y-auto space-y-3">
+                {renderSlot(inspector)}
+              </div>
+            )}
+          </RoomColumn>
         )}
       </div>
     )

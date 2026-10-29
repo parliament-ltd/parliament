@@ -16,10 +16,18 @@
 // The board says so through RoomHost, and then the room's own width
 // decides, not the window's: a narrow room draws the narrow form its layout
 // has, the conversation first (C126).
+//
+// The board also says which form the room takes (roomForm.js; C279 (b)):
+// its columns open, as strips beside a chat that takes its width, or its
+// narrow form. A room drawn anywhere else is open, or narrow by the window.
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
-/** Set by a board that hosts a room: { narrow } from the room's own width. */
+/**
+ * Set by a board that hosts a room, from the room's own width and whether it
+ * has the screen to itself: { narrow, form, alone, systemFor }. narrow is
+ * form === 'narrow', for what reads only that.
+ */
 export const RoomHost = createContext(null)
 
 export function useIsNarrow(threshold = 768) {
@@ -37,4 +45,16 @@ export function useIsNarrow(threshold = 768) {
   }, [threshold])
 
   return host ? host.narrow : isNarrow
+}
+
+/**
+ * Which form a room's layout takes (roomForm.js): its board's, or, drawn
+ * anywhere else, open unless the window is narrow.
+ * @returns {'open'|'strips'|'narrow'}
+ */
+export function useRoomForm() {
+  const host = useContext(RoomHost)
+  const narrow = useIsNarrow(768)
+  if (host?.form) return host.form
+  return narrow ? 'narrow' : 'open'
 }

@@ -13,15 +13,27 @@
 // components carry their own input. Render is inlined as a single named
 // function so the file has one component-shaped declaration (matches
 // single-column-with-sheet).
+//
+// C279 (b): on the shell the room's form decides (roomForm.js), as in
+// three-panel. Alone on screen, the outline and the right column stand
+// open, each with a button; sharing it, the document takes the room's width
+// and they are strips, each opening over the document's edge.
 
 import { useState } from 'react'
-import { useIsNarrow } from '../../lib/useViewportWidth'
+import { useLingui } from '@lingui/react'
+import { useRoomForm } from '../../lib/useViewportWidth'
 import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
 import NarrowSheet from '../../components/layouts/NarrowSheet'
+import RoomColumn from '../../components/layouts/RoomColumn'
+import { useColumns } from '../../components/layouts/useColumns'
+import { COPY } from '../../copy'
 
 const RAIL_BASE   = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
 const RAIL_BORDER = 'border-[var(--p-border)]'
+// The outline's width (w-56) and the right column's (w-80).
+const OUTLINE_WIDTH = 224
+const MARGIN_WIDTH  = 320
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
@@ -52,11 +64,15 @@ export default {
     const hasMargin  = margin && margin.length > 0
     const hasChat    = chat && chat.length > 0
     const hasRight   = hasMargin || hasChat
-    const isNarrow   = useIsNarrow(768)
+    const { i18n }   = useLingui()
+    const form       = useRoomForm()
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [panelOpen, setPanelOpen]   = useState(false)
+    // The outline and the right column, open or closed: each room starts as
+    // its form says.
+    const columns = useColumns(form)
 
-    if (isNarrow) {
+    if (form === 'narrow') {
       // h-[100dvh] anchors the narrow tree to the viewport so stacked
       // sections (chrome / body / sheet) stay within bounds. The parent
       // route doesn't enforce a height; locking here makes it fit.
@@ -65,7 +81,7 @@ export default {
           <NarrowChrome
             onLeftClick={hasOutline ? () => setDrawerOpen(true) : undefined}
             onRightClick={hasMargin ? () => setPanelOpen((v) => !v) : undefined}
-            rightLabel="Margin"
+            rightWords={{ show: COPY.room.showMargin, hide: COPY.room.hideMargin }}
             rightActive={panelOpen}
           />
 
@@ -79,7 +95,7 @@ export default {
                 {renderSlot(document)}
               </div>
               {hasChat && (
-                <NarrowSheet label="Chat">
+                <NarrowSheet label={i18n._(COPY.room.chatSheet)}>
                   {renderSlot(chat)}
                 </NarrowSheet>
               )}
@@ -98,22 +114,32 @@ export default {
     }
 
     return (
-      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]">
-        {/* Outline rail */}
+      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]" ref={columns.root}>
+        {/* Outline rail. Its padding is its blocks' holder's, so the rail
+            looks the same open in its place or over the document. */}
         {hasOutline && (
-          <aside className={`w-56 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE}`}>
+          <RoomColumn
+            side="left" form={form} open={columns.open.left} onToggle={() => columns.toggle('left')}
+            width={OUTLINE_WIDTH} className={`border-r ${RAIL_BORDER} bg-white`}
+            contentClassName="flex flex-col gap-3 p-3 overflow-y-auto"
+          >
             {renderSlot(outline)}
-          </aside>
+          </RoomColumn>
         )}
 
-        {/* Document canvas */}
-        <main className="flex-1 min-w-0 overflow-y-auto bg-white">
+        {/* Document canvas. A click on it closes a column open over it
+            (C279 (b)). */}
+        <main className="flex-1 min-w-0 overflow-y-auto bg-white" onPointerDown={columns.over ? columns.close : undefined}>
           {renderSlot(document)}
         </main>
 
         {/* Right: margin annotations above, chat panel below */}
         {hasRight && (
-          <aside className={`w-80 shrink-0 border-l ${RAIL_BORDER} flex flex-col bg-white`}>
+          <RoomColumn
+            side="right" form={form} open={columns.open.right} onToggle={() => columns.toggle('right')}
+            width={MARGIN_WIDTH} className={`border-l ${RAIL_BORDER} flex flex-col bg-white`}
+            contentClassName="flex-1 flex flex-col min-h-0"
+          >
             {hasMargin && (
               <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
                 {renderSlot(margin)}
@@ -124,7 +150,7 @@ export default {
                 {renderSlot(chat)}
               </div>
             )}
-          </aside>
+          </RoomColumn>
         )}
       </div>
     )

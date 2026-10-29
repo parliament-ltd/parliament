@@ -1771,6 +1771,23 @@ export const COPY = {
     unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
     // The Parliament mark at the top of a narrow room (C252, after).
     home: /*i18n*/ { id: 'room.home', message: "Go to Parliament's start", comment: 'The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen' },
+    // A room's side columns (C279 (b)): each column's name, and the button
+    // on it, read aloud and shown on hover. Sharing the screen, a column is
+    // a thin strip, and its button opens it over the chat's edge.
+    columnLeft: /*i18n*/ { id: 'room.columnLeft', message: 'Left column', comment: "A room's left column, read aloud" },
+    columnRight: /*i18n*/ { id: 'room.columnRight', message: 'Right column', comment: "A room's right column, read aloud" },
+    openLeft: /*i18n*/ { id: 'room.openLeft', message: 'Open the left column', comment: "The button on a room's left column, while it is closed" },
+    closeLeft: /*i18n*/ { id: 'room.closeLeft', message: 'Close the left column', comment: "The button on a room's left column, while it is open" },
+    openRight: /*i18n*/ { id: 'room.openRight', message: 'Open the right column', comment: "The button on a room's right column, while it is closed" },
+    closeRight: /*i18n*/ { id: 'room.closeRight', message: 'Close the right column', comment: "The button on a room's right column, while it is open" },
+    // The rest of a narrow room's top line (C126; C279 (b)), which the
+    // left and right column buttons above share.
+    showInspector: /*i18n*/ { id: 'room.showInspector', message: 'Show the inspector', comment: "A narrow data room's button for its column inspector, while it is hidden" },
+    hideInspector: /*i18n*/ { id: 'room.hideInspector', message: 'Hide the inspector', comment: "A narrow data room's button for its column inspector, while it shows" },
+    showMargin: /*i18n*/ { id: 'room.showMargin', message: 'Show the margin', comment: "A narrow drafting room's button for its margin notes, while they are hidden" },
+    hideMargin: /*i18n*/ { id: 'room.hideMargin', message: 'Hide the margin', comment: "A narrow drafting room's button for its margin notes, while they show" },
+    openEditor: /*i18n*/ { id: 'room.openEditor', message: 'Open the editor', comment: "The wrench at the top of a narrow room, outside the shell: it opens the room's editor" },
+    chatSheet: /*i18n*/ { id: 'room.chatSheet', message: 'Chat', comment: 'The handle of the sheet that holds the chat in a narrow data or drafting room' },
   },
 
   // The Almanac (stage 5, piece 3; Almanac v30): the table of everything

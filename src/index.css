@@ -895,14 +895,20 @@
   height: 100%;
 }
 
-/* ── Runtime layout-panel slide toggle (PR-27) ────────────
-   Per-slot opt-in lives in mode.layoutConfig.panelButtons. When
-   enabled, layouts render a small chevron button at the panel's
-   outside edge; clicking it animates the panel collapsed (slim
-   strip retains the chevron) or expanded back to full width.
-   Animation is CSS-only; prefers-reduced-motion strips it. */
+/* ── A room's side columns (PR-27; C279 (b)) ──────────────
+   Every column with blocks has a small chevron button at its inner
+   edge (RoomColumn.jsx). Alone on screen, the column stands beside
+   the chat at its width (--column), and the button animates it
+   collapsed (slim strip retains the chevron) or expanded back.
+   Sharing the screen, the column is that strip, and its button
+   opens it over the chat's edge, inside the room, with a light
+   shadow (.strip, below). The stored panelButtons opt-in is no
+   longer read. Animation is CSS-only; prefers-reduced-motion
+   strips it. */
 .layout-panel {
   position: relative;
+  flex: none;
+  width: var(--column, auto);
   transition: width 220ms ease;
 }
 .layout-panel-collapsed {
@@ -936,22 +942,84 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--p-text-muted);
+  /* The secondary ink, not the muted one: as strips the button is
+     the way to a column, so it has to be seen (C279 (b)). */
+  color: var(--p-text-secondary);
   /* z-index high enough to sit above the main column's content
      stacking context. PR-28 bumped from 2 → 10 after the chevron
      was reported partially hidden by the adjacent column. */
   z-index: 10;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, border-color 0.15s, inset-inline-start 220ms ease, inset-inline-end 220ms ease;
 }
+/* Ink, not gold: gold is the ignition's and the folded field's
+   only (C50). Keyboard focus is ink at half strength (C117), in
+   the room's own colours. */
 .layout-panel-toggle:hover {
-  color: var(--p-gold-light);
-  border-color: var(--p-gold-light);
+  color: var(--p-text-primary);
+  border-color: color-mix(in srgb, var(--p-text-primary) 30%, transparent);
 }
-.layout-panel-toggle.left  { right: -9px; }
-.layout-panel-toggle.right { left:  -9px; }
+.layout-panel-toggle:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--p-text-primary) 50%, transparent);
+  outline-offset: 2px;
+}
+.layout-panel-toggle.left  { inset-inline-end: -9px; }
+.layout-panel-toggle.right { inset-inline-start: -9px; }
+[dir="rtl"] .layout-panel-toggle svg { transform: scaleX(-1); }
+
+/* Sharing the screen (C279 (b)): the column is a 24px strip with its
+   button in it, and the chat takes the rest of the room. Open, the
+   column lies over the chat's edge at its width, as a card 12px in
+   from the room's edges, and the button moves to the card's inner
+   edge. */
+.layout-panel.strip {
+  width: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+  z-index: 20;
+  transition: none;
+}
+.layout-panel.strip > .layout-panel-content {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  width: var(--column);
+  height: auto;
+  overflow-y: auto;
+  background: var(--p-bg-surface);
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.06),
+    0 8px 28px rgba(0, 0, 0, 0.10);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 220ms ease, visibility 0s linear 220ms;
+}
+.layout-panel.strip.left  > .layout-panel-content { inset-inline-start: 12px; transform: translateX(-8px); }
+.layout-panel.strip.right > .layout-panel-content { inset-inline-end: 12px; transform: translateX(8px); }
+[dir="rtl"] .layout-panel.strip.left  > .layout-panel-content { transform: translateX(8px); }
+[dir="rtl"] .layout-panel.strip.right > .layout-panel-content { transform: translateX(-8px); }
+.layout-panel.strip.shown > .layout-panel-content,
+[dir="rtl"] .layout-panel.strip.shown > .layout-panel-content {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition: opacity 180ms ease, transform 220ms ease, visibility 0s;
+}
+.layout-panel.strip > .layout-panel-toggle.left  { inset-inline-end: auto; inset-inline-start: 3px; }
+.layout-panel.strip > .layout-panel-toggle.right { inset-inline-start: auto; inset-inline-end: 3px; }
+.layout-panel.strip.shown > .layout-panel-toggle.left  { inset-inline-start: calc(var(--column) + 3px); }
+.layout-panel.strip.shown > .layout-panel-toggle.right { inset-inline-end: calc(var(--column) + 3px); }
 @media (prefers-reduced-motion: reduce) {
   .layout-panel,
-  .layout-panel-content { transition: none; }
+  .layout-panel-content,
+  .layout-panel-toggle,
+  .layout-panel.strip > .layout-panel-content,
+  .layout-panel.strip.shown > .layout-panel-content,
+  [dir="rtl"] .layout-panel.strip.shown > .layout-panel-content { transition: none; }
 }
 
 /* ── Showcase ─────────────────────────────────────────────── */

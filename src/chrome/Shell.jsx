@@ -3765,11 +3765,14 @@ export default function Shell() {
   const featureActs = useMemo(() => ({ onWeb: toggleWeb, onAttach: () => { pickFiles().then((says) => { if (says) setBarSaid({ says }) }) }, onDropFile: dropFile }), [toggleWeb, pickFiles, dropFile])
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid, featureActs }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
-  const drawBoard = (board) => {
+  // A room alone on screen opens its side columns; sharing it, they are strips
+  // (C279 (b)). A board popped into its own window is alone there.
+  const onlyBoard = arrangement.columns.flat().length === 1
+  const drawBoard = (board, windowed = false) => {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} alone={windowed || onlyBoard} />
     }
     if (board === 'almanac') {
       return (
@@ -3925,7 +3928,7 @@ export default function Shell() {
               />
             )}
             <div className="ch-col" style={{ '--share': shares[i] }}>
-              {column.map(drawBoard)}
+              {column.map((b) => drawBoard(b))}
             </div>
           </Fragment>
         ))}
@@ -3941,7 +3944,7 @@ export default function Shell() {
           <Bar {...shared} board={p.board} doc={windows[p.board].win.document} className="ch-dock window" onFocusBoard={focusBoard} />
           <main className="ch-stage">
             <div className="ch-col main">
-              {drawBoard(p.board)}
+              {drawBoard(p.board, true)}
             </div>
           </main>
         </div>,
