@@ -3,7 +3,7 @@ import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
 import { upgradeSchema } from './schema'
-import { cleanArrangement, loadArrangement, saveArrangement } from './arrangements'
+import { cleanArrangement, loadArrangement, saveArrangement, loadSpace, openSpace } from './arrangements'
 import { shipped, planOpen, planPop, planBar, planCols, SPACE } from '../shell/arrangement'
 import { FIELDS } from './backupSchema'
 
@@ -125,5 +125,47 @@ describe('the columns Records keeps (C141)', () => {
 
   it('reads a space kept without them as before', () => {
     expect(cleanArrangement(shipped(SPACE)).recordsCols).toBeUndefined()
+  })
+})
+
+// What the start reads, for the birds on first load (C279 (e)).
+describe('the space to start on', () => {
+  let db
+  beforeEach(async () => { db = await open(6) })
+  afterEach(() => db.close())
+
+  it('is the welcome page on the very first start, with nothing kept yet', async () => {
+    const first = await openSpace(db, { fresh: true })
+    expect(first).toEqual({ space: { ...shipped('welcome'), id: SPACE }, kept: false, canKeep: true })
+    expect(await loadSpace(db, { fresh: true })).toEqual(first.space)
+    expect((await openSpace(db, { fresh: false })).space).toEqual(shipped(SPACE))
+  })
+
+  it('is kept once the first space is, so the next start is not a first', async () => {
+    const { space } = await openSpace(db, { fresh: true })
+    await saveArrangement(db, space)
+    const next = await openSpace(db, { fresh: true })
+    expect(next.kept).toBe(true)
+    expect(next.space.columns).toEqual([['welcome']])
+  })
+
+  it('counts a damaged space as kept, though it starts from the default', async () => {
+    await db.put('arrangements', { id: SPACE, columns: 'broken' })
+    const next = await openSpace(db, { fresh: true })
+    expect(next.kept).toBe(true)
+    expect(next.space).toEqual({ ...shipped('welcome'), id: SPACE })
+  })
+
+  it('changes nothing stored', async () => {
+    await openSpace(db, { fresh: true })
+    expect(await db.getAll('arrangements')).toEqual([])
+  })
+})
+
+describe('the space to start on, at version 5', () => {
+  it('says it cannot be kept', async () => {
+    const db = await open(5)
+    expect(await openSpace(db, { fresh: true })).toMatchObject({ kept: false, canKeep: false })
+    db.close()
   })
 })
