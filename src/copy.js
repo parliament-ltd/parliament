@@ -2564,6 +2564,8 @@ export const COPY = {
     referenceClose: /*i18n*/ { id: 'shell.referenceClose', message: 'Escape closes this' },
     referenceName: /*i18n*/ { id: 'shell.referenceName', message: 'Every command', comment: 'The name of the ? reference, read by screen readers' },
     // The ? reference lists every command on every board (C279 (f)).
+    // In a popped board's window, after Ctrl+K or /: the browser keeps that window in front (C280).
+    barAway: /*i18n*/ { id: 'shell.barAway', message: 'The bar is in the main window. Switch to it to type, or pop:command keeps it over every window', comment: 'pop:command stays English' },
     referenceTitle: /*i18n*/ { id: 'shell.referenceTitle', message: 'Commands', comment: 'The heading of the ? reference, drawn in capitals' },
     referenceFainter: /*i18n*/ { id: 'shell.referenceFainter', message: 'A fainter command works on another board, named beside it', comment: 'Beside the heading of the ? reference' },
     referenceOn: /*i18n*/ { id: 'shell.referenceOn', message: 'Works on {boards}', comment: 'Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection' },

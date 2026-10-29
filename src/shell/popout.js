@@ -13,11 +13,13 @@
 // always-on-top window per tab (Almanac spec §4; C107).
 
 const SIZES = { bar: { width: 600, height: 150 }, board: { width: 760, height: 600 } }
+// Room for a window's own frame and title bar, outside the size asked for.
+const FRAME = { width: 16, height: 80 }
 
-/** A size asked for, kept between a least one and the screen; the usual size when none is asked. */
+/** A size asked for, kept between a least one and the screen, leaving room for the window's frame; the usual size when none is asked. */
 export function fitSize(asked, usual, screen = globalThis.screen) {
   if (!asked) return usual
-  const most = { width: screen?.availWidth || 4000, height: screen?.availHeight || 3000 }
+  const most = { width: (screen?.availWidth || 4000) - FRAME.width, height: (screen?.availHeight || 3000) - FRAME.height }
   return {
     width: Math.round(Math.min(Math.max(asked.width, 320), most.width)),
     height: Math.round(Math.min(Math.max(asked.height, 240), most.height)),

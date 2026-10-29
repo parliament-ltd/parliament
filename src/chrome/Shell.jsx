@@ -122,7 +122,9 @@ import CommandsBoard from './CommandsBoard'
 // which needs no key (stage 4). The Enter line names which before Enter.
 //
 // Windows: a popped board, and the popped bar, are drawn into blank windows
-// through portals (popout.js), each board's window with its own bar (C6).
+// through portals (popout.js). There is one bar (C280, replacing C6's bar in
+// every window): a popped board's window has none, and opens at the size the
+// board had on the page.
 // Closing a window brings its board back; leaving the page closes them all.
 // A window cannot be reopened without a click, so on load what was popped
 // comes back to the page.
@@ -271,6 +273,12 @@ export default function Shell() {
   const { conversations, createConversation, loadConversations } = useConversations()
   const [arrangement, setArrangement] = useState(() => shipped(SPACE))
   const [windows, setWindows] = useState({}) // board or 'command' -> { win, container }
+  // A popped board's window where Ctrl+K or / was pressed while the page could not come forward (C280).
+  const [awayIn, setAwayIn] = useState(null)
+  const onAway = useCallback((doc) => {
+    setAwayIn(doc)
+    doc.defaultView?.setTimeout(() => setAwayIn((d) => (d === doc ? null : d)), 6000)
+  }, [])
   const [lines, setLines] = useState([])
   const [started, setStarted] = useState(false)
   const current = useRef(arrangement)
@@ -487,7 +495,10 @@ export default function Shell() {
     const ci = columns.findIndex((c) => c.includes(key))
     const el = ci >= 0 ? cols[ci]?.children[columns[ci].indexOf(key)] : null
     const r = el?.getBoundingClientRect()
-    return r && r.width > 0 ? { width: Math.round(r.width) + 2 * POPPED_MARGIN, height: Math.round(r.height) + 2 * POPPED_MARGIN } : null
+    if (!r || r.width <= 0) return null
+    // What shows of it: a board taller than the page opens as tall as it showed.
+    const shown = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0)
+    return { width: Math.round(r.width) + 2 * POPPED_MARGIN, height: Math.round(Math.max(shown, 0)) + 2 * POPPED_MARGIN }
   }, [])
 
   const run = useCallback(async (next, body) => {
@@ -3911,7 +3922,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)} letter={letterShown ? { ...letterShown, read: lettersRead } : null} onLetterClose={() => setLetterShown(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} onAway={onAway} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)} letter={letterShown ? { ...letterShown, read: lettersRead } : null} onLetterClose={() => setLetterShown(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
@@ -3971,6 +3982,7 @@ export default function Shell() {
         // A popped board has no bar of its own: the one bar commands it, and
         // focusing its window points the bar at it (C280).
         <div className="ch-shell ch-in-window">
+          {awayIn === windows[p.board].win.document && <p className="ch-away ch-marg" role="status">{i18n._(COPY.shell.barAway)}</p>}
           <main className="ch-stage">
             <div className="ch-col main">
               {drawBoard(p.board, true)}

@@ -337,6 +337,8 @@
 .ch-in-window { min-height: 100vh; }
 .ch-in-window .ch-stage { padding: 12px; }
 .ch-in-window .ch-col > * { flex: 1 1 auto; }
+/* Where the bar is, said in a popped board's window after Ctrl+K or / (C280). */
+.ch-away { margin: 10px 12px 0; padding: 6px 10px; border-inline-start: 2px solid var(--ch-ink); background: var(--ch-surface); }
 .ch-dock.window { position: static; padding: 12px 14px 6px; background: var(--ch-paper); border-bottom: .5px solid var(--ch-rule); }
 .ch-dock.window .ch-dock-in { max-width: none; }
 .ch-away { padding: 10px clamp(16px, 4vw, 32px) 0; }

@@ -56,7 +56,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null, onAway = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -153,11 +153,15 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         if (here !== doc) { try { doc.defaultView?.focus() } catch { /* the browser decides */ } }
         input.current?.focus()
         dispatch({ type: 'open' })
+        // A popped board's window cannot bring the page forward (the browser
+        // lets a page raise the windows it opened, not the other way), so
+        // that window says where the bar is (C280).
+        if (here !== doc) here.defaultView?.setTimeout(() => { if (!doc.hasFocus()) onAway?.(here) }, 80)
       }
     }
     for (const d of docs) d.addEventListener('keydown', onKey)
     return () => { for (const d of docs) d.removeEventListener('keydown', onKey) }
-  }, [doc, alsoDocs])
+  }, [doc, alsoDocs, onAway])
 
   // Editing a reply on a board folds the field; leaving it opens the field.
   useEffect(() => {

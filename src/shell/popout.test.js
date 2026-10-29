@@ -69,7 +69,7 @@ describe('a popped board opens at its size on the page (C280)', () => {
   it('takes the size asked, kept between a least one and the screen', () => {
     expect(fitSize({ width: 612.4, height: 380 }, usual, screen)).toEqual({ width: 612, height: 380 })
     expect(fitSize({ width: 100, height: 90 }, usual, screen)).toEqual({ width: 320, height: 240 })
-    expect(fitSize({ width: 5000, height: 4000 }, usual, screen)).toEqual({ width: 1920, height: 1040 })
+    expect(fitSize({ width: 5000, height: 4000 }, usual, screen)).toEqual({ width: 1904, height: 960 })
   })
   it('opens at the usual size for a board not on the page', () => {
     expect(fitSize(null, usual, screen)).toBe(usual)
