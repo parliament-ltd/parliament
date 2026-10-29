@@ -195,6 +195,8 @@ export const COPY = {
     toBegin: /*i18n*/ { id: 'enter.toBegin', message: '{leader} to begin', comment: '{leader} is >, the command leader' },
     nextStep: /*i18n*/ { id: 'enter.nextStep', message: 'next: {command}', comment: 'The next welcome step\'s command, which stays English' },
     toCommand: /*i18n*/ { id: 'enter.toCommand', message: '{leader} for the command line', comment: 'In prompt mode on the welcome page (C119)' },
+    // A prompt edited in the chat, held in the field as a placeholder (Stefan, 29 October).
+    heldPrompt: /*i18n*/ { id: 'enter.heldPrompt', message: 'Typing replaces it. Escape clears it', comment: 'On the Enter line while the prompt field holds a prompt edited in the chat' },
     // Search and filters on Records (stage 6, piece 1; C132). {verb} and
     // {filters} are commands, which stay English; {day} is a date the bar
     // writes as the reader's language does; {name} is the person's words.
@@ -1693,6 +1695,8 @@ export const COPY = {
     fileDrop: /*i18n*/ { id: 'field.fileDrop', message: 'Take {name} out' },
     held: /*i18n*/ { id: 'field.held', message: 'With your next prompt' },
     answeredHelp: /*i18n*/ { id: 'field.answeredHelp', message: 'Choose who answers here (by:)', comment: 'Shown on hover over who answers, in the prompt field' },
+    // A prompt edited in the chat, held in the field instead of its words (Stefan, 29 October).
+    heldPrompt: /*i18n*/ { id: 'field.heldPrompt', message: 'Your edited prompt', comment: 'Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words' },
   },
 
   // The welcome page (stage 5; welcome spec, welcome v9). The letter is v9's,

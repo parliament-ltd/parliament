@@ -12,7 +12,7 @@ import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
 import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
-import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade } from '../shell/welcome'
+import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, movePopout, onPopoutClosed } from '../shell/popout'
 import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../shell/screens'
@@ -39,7 +39,7 @@ import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd, useMessa
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, stopStream, streamingIds } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { useChatEdits } from '../stores/useChatEdits'
-import { noteFor, tellNote, waiting as editWaits } from '../editing/told'
+import { noteFor, tellNote, waiting as editWaits, waitingAsk } from '../editing/told'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
 import { answerFor, includedOf } from '../lib/included'
 import { promptFacts, promptNow } from '../lib/branchVerbs'
@@ -2473,6 +2473,9 @@ export default function Shell() {
   // A prompt and reply joined into the bar (C216 (h)): what was drafted, and from which messages.
   const joinedDraft = useRef(null)
   const [joinedNow, setJoinedNow] = useState(null)
+  // The joined words dropped from the field unsent (typed over, cleared):
+  // their edits go with the next prompt as usual (C216 (h)).
+  const dropJoined = useCallback(() => { joinedDraft.current = null; setJoinedNow(null) }, [])
   // The open chat is the room a prompt goes to; the rooms hold their own.
   useEffect(() => { focusChat(roomId ?? null) }, [roomId, focusChat])
   const shown = roomId ? roomMessages : NONE
@@ -3043,6 +3046,13 @@ export default function Shell() {
     // Changes accepted from a sweep go too (C233 (a)).
     return note.ids.length || note.askIds.length || note.sweepIds.length ? { count: note.ids.length, asks: note.askIds.length, sweeps: note.sweepIds.length, chars: note.text.length } : null
   }, [kept, roomEdits, roomAsks, roomSweeps, roomId, joinedNow])
+  // The edits and asks in the words joined into the field (C214 (c)): they go
+  // as those words, so the welcome step counts them when the words go.
+  const joinedHere = useMemo(() => {
+    const from = new Set(joinedNow?.from ?? [])
+    if (!from.size) return 0
+    return [...(roomEdits.get(roomId) ?? []).filter(editWaits), ...(roomAsks.get(roomId) ?? []).filter(waitingAsk)].filter((r) => from.has(r.messageId)).length
+  }, [roomEdits, roomAsks, roomId, joinedNow])
   // Ripple's checks if the edits here go now (stage 12, piece 2; C231 (d)):
   // each other branch of the plan, one call each to the helper, about as
   // long as what is edited here.
@@ -3163,6 +3173,8 @@ export default function Shell() {
     resend: !about && Boolean(roomId) && stalledIn === roomId,
     // The person's edits waiting here, and the size of their note (C216).
     edits: about ? null : editsHere,
+    // Of them, the ones in the words joined into the field, which go as those words (C214 (c)).
+    joined: about ? 0 : joinedHere,
     // tell: notes held for it, and the size of their part of the note (C225 (d)).
     told: about || !tellsHere?.length ? null : { count: tellsHere.length, chars: tellNote(tellsHere).length },
     // Ripple's checks when the edits here go (stage 12, piece 2; C231 (d)).
@@ -3178,7 +3190,7 @@ export default function Shell() {
     features: { offered, web: webHere, canSearch: whosHere.some(canSearch), files: filesHere.map((f) => ({ id: f.id, name: f.name, size: f.size })) },
     // Ripple's checks are skipped in a room that sends only to this computer, when its helper is not on it.
     rippleHeld: Boolean(localHere && !localHere.helperLocal && rippleFacts),
-  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, keyInfo, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
+  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, keyInfo, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, joinedHere, readerHere, tellsHere, rippleFacts, reflecting])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and
@@ -3450,13 +3462,19 @@ export default function Shell() {
       if (r.group === 'model' && !fresh[r.provider]) return null
       return sendMessage(to, '', r.id, system(), [], null, { describe: false })
     }
+    // A prompt going out with an edit crosses the welcome step off at once,
+    // from what the Enter line counted (C225 (b)); the stored marks say so
+    // again once they are read.
+    const sendsEdit = (going) => { if (carriesEdit(going)) updateWelcome((w) => tick(w, 'send')) }
     if (!text && chatId && who.group === 'source' && shown?.edits) {
       const sent = toReader(chatId)
       if (!sent) return { refused: 'promptFailed' }
+      sendsEdit({ edits: shown.edits, read: true })
       return { done: sent.then(() => { loadConversations().catch(() => {}); return null }).catch(failure) }
     }
     if (!text && (shown?.edits?.count || shown?.edits?.asks) && chatId && who.group !== 'source' && !shown?.resend) {
       if (who.group === 'model' && !fresh[who.provider]) return { refused: 'promptFailed' }
+      sendsEdit({ edits: shown.edits, read: true })
       const going = await rippleGoing(chatId)
       const done = sendMessage(chatId, '', who.id, system(), [], null, { ...under })
         .then(() => { loadConversations().catch(() => {}); return null })
@@ -3513,9 +3531,20 @@ export default function Shell() {
     if (aboutNow) clearPicked()
     const send = () => {
       const { locale } = latest.current
-      return who.group !== 'source'
-        ? (() => { const f = featured(who, full); return sendMessage(id, f.content, who.id, system(), f.tools, f.attachments, { ...under, ...withInc(who), ...joinedInto(text) }) })()
-        : Promise.all([askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) }), toReader(id)])
+      // The joined words go as this prompt, to a model or a source; with a
+      // source, nothing marks their edits, which wait for a model as before.
+      const into = joinedInto(text)
+      const joined = into.into ? shown?.joined ?? 0 : 0
+      if (who.group !== 'source') {
+        sendsEdit({ edits: shown?.edits, read: true, joined })
+        const f = featured(who, full)
+        return sendMessage(id, f.content, who.id, system(), f.tools, f.attachments, { ...under, ...withInc(who), ...into })
+      }
+      // The source is asked first, then the reader, as before.
+      const asking = askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) })
+      const reading = toReader(id)
+      sendsEdit({ edits: shown?.edits, read: Boolean(reading), joined })
+      return Promise.all([asking, reading])
     }
     // The edition a source with one in each language is asked in (C166 (e));
     // nothing found there, the English one (LPN §6).
@@ -3798,7 +3827,7 @@ export default function Shell() {
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
   // Features of input, from the field's marginalia (C248).
   const featureActs = useMemo(() => ({ onWeb: toggleWeb, onAttach: () => { pickFiles().then((says) => { if (says) setBarSaid({ says }) }) }, onDropFile: dropFile }), [toggleWeb, pickFiles, dropFile])
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid, featureActs }
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid, featureActs, onDropDraft: dropJoined }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   // A room alone on screen opens its side columns; sharing it, they are strips
   // (C279 (b)). A board popped into its own window is alone there.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { initialField, fieldReducer, fieldValue } from './field'
+import { initialField, fieldReducer, fieldValue, shownValue, showsHeld, dropsHeld } from './field'
 
 // Types each value in turn, as the input reports it after each edit.
 const typing = (state, ...values) => values.reduce((s, value) => fieldReducer(s, { type: 'input', value }), state)
@@ -189,5 +189,64 @@ describe('a prompt written in from a room (stage 11, piece 2; C214 (b))', () => 
     expect(fieldValue(s)).toBe('Write the opening. It had not gone out in a century.')
     expect([s.minimised, s.editingReply, s.focused]).toEqual([false, false, true])
     expect(s.text.command).toBe('open:records')
+  })
+})
+
+describe('a prompt edited in the chat, held as a placeholder (Stefan, 29 October)', () => {
+  const words = 'Write the opening. It had not gone out in a century, and the whole of the reply after it, which can be a lot.'
+  const held = () => fieldReducer(initialField('prompt'), { type: 'draft', value: words })
+
+  it('holds the words for Enter and shows the placeholder in their place', () => {
+    const s = held()
+    expect(showsHeld(s)).toBe(true)
+    expect(shownValue(s)).toBe('')
+    // What Enter sends and the Enter line reads: the words as they are.
+    expect(fieldValue(s)).toBe(words)
+    expect(s.text.prompt).toBe(words)
+  })
+
+  it('takes what is typed in place of the held words, and drops them', () => {
+    const s = held()
+    expect(dropsHeld(s, 'H')).toBe(true)
+    const t = typing(s, 'H', 'Ho', 'How tall')
+    expect([t.mode, t.text.prompt, t.held, shownValue(t)]).toEqual(['prompt', 'How tall', false, 'How tall'])
+    // A paste does the same.
+    expect(fieldReducer(s, { type: 'input', value: 'pasted words' }).text.prompt).toBe('pasted words')
+  })
+
+  it('keeps them held through a command, as typed text stays with its mode, and shows them again after', () => {
+    const s = held()
+    expect(dropsHeld(s, '>')).toBe(false)
+    let t = typing(s, '>', '>api:')
+    expect([t.mode, t.text.command, t.text.prompt, showsHeld(t)]).toEqual(['command', 'api:', words, false])
+    t = fieldReducer({ ...t, focused: true }, { type: 'escape' })
+    expect([t.mode, showsHeld(t), fieldValue(t)]).toEqual(['prompt', true, words])
+    // Written from outside, as a step's command is: held too.
+    expect(fieldReducer(s, { type: 'input', value: '>api:' }).text.prompt).toBe(words)
+  })
+
+  it('clears them with Escape, and with Backspace or Delete (drop), and nothing else', () => {
+    const s = { ...held(), focused: true }
+    const t = fieldReducer(s, { type: 'escape' })
+    expect([t.mode, t.text.prompt, t.held, t.focused]).toEqual(['prompt', '', false, true])
+    // The next Escape does what Escape does.
+    expect(fieldReducer(t, { type: 'escape' }).focused).toBe(false)
+    expect(fieldReducer(s, { type: 'drop' })).toMatchObject({ held: false, text: { prompt: '' } })
+    const plain = typing(initialField('prompt'), 'my words')
+    expect(fieldReducer(plain, { type: 'drop' })).toBe(plain)
+  })
+
+  it('lets go once sent, and a draft again holds the new words', () => {
+    const s = fieldReducer(held(), { type: 'sent' })
+    expect([s.text.prompt, s.held, showsHeld(s)]).toEqual(['', false, false])
+    const again = fieldReducer(held(), { type: 'draft', value: 'Other words' })
+    expect([showsHeld(again), fieldValue(again)]).toEqual([true, 'Other words'])
+    // Nothing to hold, nothing held.
+    expect(showsHeld(fieldReducer(initialField('prompt'), { type: 'draft', value: '' }))).toBe(false)
+  })
+
+  it('never holds what was typed in the field itself', () => {
+    const s = typing(initialField('prompt'), 'typed here')
+    expect([showsHeld(s), shownValue(s), dropsHeld(s, 'typed here!')]).toEqual([false, 'typed here', false])
   })
 })

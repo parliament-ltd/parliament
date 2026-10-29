@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
-import { fieldValue } from '../shell/field'
+import { shownValue, showsHeld } from '../shell/field'
 import { CommandFill, PromptFill, Magnifier, Quill, MoonMark } from './Fills'
 
 // The field: one input read three ways (bar reference, "The field"). The
@@ -16,12 +16,17 @@ import { CommandFill, PromptFill, Magnifier, Quill, MoonMark } from './Fills'
 // here: "answered from Wikipedia", "answered by Sonnet 4.6" (stage 4), and
 // the ink pot shows a reply arriving, arrived, or stopped (C114). A click on
 // the marginalia opens the picker of who can answer (stage 7; C149).
+//
+// A prompt edited in the chat and held for Enter shows as a placeholder in
+// place of its words (Stefan, 29 October), as the bar reference draws a
+// prompt's placeholder in the field ("Reply to 201a").
 
 const Field = forwardRef(function Field({ state, folded, win, marginalia = null, onMarginalia = null, marginaliaOpen = false, frameworks = null, onFrameworks = null, frameworksOpen = false, features = [], ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
   const { i18n } = useLingui()
   const { mode } = state
+  const held = showsHeld(state)
   return (
-    <div className={`ch-field ${mode}${folded ? ' min' : ''}${marginalia ? ' with-marg' : ''}`} role="search" onMouseEnter={onHover} onMouseLeave={onLeave}>
+    <div className={`ch-field ${mode}${folded ? ' min' : ''}${marginalia ? ' with-marg' : ''}${held ? ' held' : ''}`} role="search" onMouseEnter={onHover} onMouseLeave={onLeave}>
       <div className={`ch-fillwrap${mode === 'command' ? ' on' : ''}`}><div className="ch-fill command"><CommandFill /></div></div>
       <div className={`ch-fillwrap${mode === 'prompt' ? ' on' : ''}`}><div className="ch-fill prompt"><PromptFill /></div></div>
       <span className={`ch-chip search${mode === 'search' ? ' on' : ''}`} aria-hidden="true">{i18n._(COPY.modes.search)}</span>
@@ -29,7 +34,8 @@ const Field = forwardRef(function Field({ state, folded, win, marginalia = null,
       <span className={`ch-chip prompt${mode === 'prompt' ? ' on' : ''}`} aria-hidden="true">{i18n._(COPY.modes.prompt)}</span>
       <input
         ref={ref}
-        value={fieldValue(state)}
+        value={shownValue(state)}
+        placeholder={held ? i18n._(COPY.field.heldPrompt) : undefined}
         onChange={(e) => onInput(e.target.value)}
         onKeyDown={onKeyDown}
         onFocus={onFocus}

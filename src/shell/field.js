@@ -23,6 +23,13 @@
 //   click opens it in the mode it was left in. Hovering opens it without
 //   taking focus, and it folds again when the pointer leaves unless
 //   something was typed.
+// - A prompt edited in the chat and sent to the bar (C214 (b)) is held, not
+//   written out (Stefan, 29 October: "instead of writing the entire text,
+//   which can be a lot, let's have a placeholder"). The field shows a short
+//   placeholder in its place; Enter sends the held words as they are.
+//   Typing replaces them with what is typed, and Backspace, Delete or
+//   Escape clear them. A leader to another mode leaves them held, as text
+//   typed in a mode stays with it.
 
 import { leaderOf } from '../commands/parse'
 
@@ -31,16 +38,36 @@ export const MODES = Object.freeze(['search', 'command', 'prompt'])
 /**
  * @typedef {{ mode: 'search'|'command'|'prompt', resting: 'search'|'prompt',
  *   text: { search: string, command: string, prompt: string },
- *   focused: boolean, minimised: boolean, editingReply: boolean, peek: boolean }} FieldState
+ *   focused: boolean, minimised: boolean, editingReply: boolean, peek: boolean,
+ *   held: boolean }} FieldState
+ *   held: the prompt's text is a prompt edited in the chat, shown as a
+ *   placeholder until it is sent, typed over or cleared
  */
 
 /** @param {'search'|'prompt'} resting the mode this screen rests in @returns {FieldState} */
 export function initialField(resting = 'search') {
-  return { mode: resting, resting, text: { search: '', command: '', prompt: '' }, focused: false, minimised: false, editingReply: false, peek: false }
+  return { mode: resting, resting, text: { search: '', command: '', prompt: '' }, focused: false, minimised: false, editingReply: false, peek: false, held: false }
 }
 
-/** What the field shows: the `>` stays in command mode; the other leaders are swallowed. */
+/** What the field holds: the `>` stays in command mode; the other leaders are swallowed. */
 export const fieldValue = (state) => (state.mode === 'command' ? `>${state.text.command}` : state.text[state.mode])
+
+/** Whether the field shows a held prompt as its placeholder (the prompt mode only). */
+export const showsHeld = (state) => Boolean(state.held) && state.mode === 'prompt' && Boolean(state.text.prompt)
+
+/** What the input shows: nothing in place of a held prompt, which the placeholder stands for. */
+export const shownValue = (state) => (showsHeld(state) ? '' : fieldValue(state))
+
+/**
+ * Whether what was typed into the field drops the prompt it holds: anything
+ * but a leader to another mode, which leaves it held for when the field
+ * comes back to the prompt.
+ */
+export function dropsHeld(state, value) {
+  if (!showsHeld(state)) return false
+  const leader = leaderOf(String(value ?? ''))
+  return !(leader && leader.mode !== 'prompt')
+}
 
 // The field after an edit, given its whole new value.
 function input(state, value) {
@@ -88,16 +115,26 @@ function input(state, value) {
 /**
  * @param {FieldState} state
  * @param {{ type: string, value?: string, resting?: 'search'|'prompt' }} action
- *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), sent, clearSearch, setSearch (value), surface (resting), focus, blur, open,
+ *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), draft (value, focus), drop, sent, clearSearch, setSearch (value), surface (resting), focus, blur, open,
  *   editReply, doneEditing, hover, leave
  * @returns {FieldState}
  */
 export function fieldReducer(state, action) {
   switch (action.type) {
-    case 'input':
-      return input(state, String(action.value ?? ''))
+    case 'input': {
+      const value = String(action.value ?? '')
+      // Typed over a held prompt: what is typed takes its place.
+      if (dropsHeld(state, value)) return input({ ...state, held: false, text: { ...state.text, prompt: '' } }, value)
+      return input(state, value)
+    }
+
+    case 'drop':
+      // A held prompt cleared, unsent (Backspace, Delete or Escape on it).
+      return state.held ? { ...state, held: false, text: { ...state.text, prompt: '' } } : state
 
     case 'escape':
+      // Escape on a held prompt clears it, and nothing else (Stefan, 29 October).
+      if (showsHeld(state) && (state.focused || state.peek)) return { ...state, held: false, text: { ...state.text, prompt: '' } }
       if (!state.focused && !state.peek) return state
       if (state.mode !== state.resting) return { ...state, mode: state.resting }
       return { ...state, focused: false, peek: false, minimised: state.editingReply }
@@ -116,12 +153,13 @@ export function fieldReducer(state, action) {
       // prompt and its reply joined (stage 11, piece 2; C214 (b)).
       // It opens the field, folded while the reply was edited.
       // Without focus (joined by typing), it is filled and opened, and the
-      // person goes on typing where they were.
-      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: action.focus !== false, minimised: false, editingReply: false, peek: false }
+      // person goes on typing where they were. Held: the placeholder shows
+      // in its place, and Enter sends it.
+      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: action.focus !== false, minimised: false, editingReply: false, peek: false, held: Boolean(String(action.value ?? '')) }
 
     case 'sent':
       // A prompt went, or a search was done with: its text is cleared.
-      return { ...state, text: { ...state.text, [state.mode]: '' } }
+      return { ...state, text: { ...state.text, [state.mode]: '' }, held: state.mode === 'prompt' ? false : state.held }
 
     case 'clearSearch':
       // clear:filters or clear:search on Records (C132 (c)): the search goes,

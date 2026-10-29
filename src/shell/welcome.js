@@ -95,6 +95,24 @@ export function stepsMade(rows) {
   return out
 }
 
+/**
+ * Whether a prompt going out carries an edit, so its step crosses off at
+ * once, without waiting for the stored marks to be read again (C225 (b);
+ * Stefan, 29 October: it "didn't cross off"). From what the Enter line
+ * counted: edits or asks that go with the prompt to a model that reads them,
+ * the one answering or, on a source's branch, the one that reads edits there
+ * (C218 (e)); or a prompt and reply joined with edits in them, whose words
+ * are the prompt, to a model or a source (C214 (b), (c)). Edits that wait,
+ * with a source answering and no model to read them, do not go with it.
+ * @param {{ edits?: { count?: number, asks?: number }|null, read?: boolean, joined?: number }} [going]
+ *   edits: what the line counted going; read: whether a model reads them;
+ *   joined: the edits and asks in the joined words sent
+ */
+export function carriesEdit({ edits = null, read = false, joined = 0 } = {}) {
+  if (joined > 0) return true
+  return read && Boolean(edits) && ((edits.count ?? 0) > 0 || (edits.asks ?? 0) > 0)
+}
+
 /** The chat the page started, so its card comes back. */
 export const withChat = (w, chat) => (w.chat === chat ? w : { ...w, chat })
 
