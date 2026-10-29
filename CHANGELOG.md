@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.7.0, 29 October 2026
+
+- One bar commands every board. A board popped into a window of its own has none, and opens at the size it had on the page.
+- A room is its chat, in a calmer type, and a selection can run from a prompt into its reply.
+- The menus for who answers, frameworks and languages are laid out like the list of commands, and a click outside closes them.
+- The list of commands can stay open as a board: open:commandmenu, or pop:commandmenu for a window of its own.
+- The ink pot shows even while a quick answer arrives.
+
 ## 0.6.0, 29 October 2026
 
 - A room beside another board keeps its side columns folded, so the chat has the room's width. A button at each side opens one over the chat.
