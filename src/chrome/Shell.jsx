@@ -99,7 +99,11 @@ import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
 import { LAB } from '../lib/release'
+
+// The margin round a board in a window of its own (chrome.css, .ch-in-window).
+const POPPED_MARGIN = 12
 import { LETTERS_SETTING, cleanRead, markRead } from './letters'
+import CommandsBoard from './CommandsBoard'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -475,6 +479,17 @@ export default function Shell() {
   }), [commit, forget])
 
   /** Runs a planned arrangement: opens, closes and places its windows, then keeps it. */
+  // A board's size on the page, so its window opens at that size (C280): the
+  // board itself, plus the window's own margin. Null when it is not on the page.
+  const boardSize = useCallback((key) => {
+    const cols = [...(stageRef.current?.children ?? [])].filter((el) => el.classList.contains('ch-col'))
+    const columns = current.current.columns
+    const ci = columns.findIndex((c) => c.includes(key))
+    const el = ci >= 0 ? cols[ci]?.children[columns[ci].indexOf(key)] : null
+    const r = el?.getBoundingClientRect()
+    return r && r.width > 0 ? { width: Math.round(r.width) + 2 * POPPED_MARGIN, height: Math.round(r.height) + 2 * POPPED_MARGIN } : null
+  }, [])
+
   const run = useCallback(async (next, body) => {
     setInspected(null)
     setKeyPanel(null)
@@ -490,7 +505,7 @@ export default function Shell() {
       const title = key === BAR ? i18n._(COPY.shell.barWindow) : i18n._(COPY.shell.windowTitle, { board: i18n._(COPY.boards[key]) })
       const w = windowOf(key)
       const at = w?.display ? placeOn(shown?.list, w.display, w.side) : null
-      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop, at })
+      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop, at, size: key === BAR ? null : boardSize(key) })
       if (!handle) { opened.forEach(([, h]) => closePopout(h)); return 'popBlocked' }
       opened.push([key, handle])
     }
@@ -518,7 +533,7 @@ export default function Shell() {
       keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
     }
     return null
-  }, [commit, i18n, watch, learnScreens])
+  }, [commit, i18n, watch, learnScreens, boardSize])
 
   // ── The room in the space (stage 4; C125) ─────────────
   // The chat it shows, and a prompt waiting for a new room to load.
@@ -1149,6 +1164,11 @@ export default function Shell() {
       // tour: may bring the welcome card back into the space first.
       if (next) { const refused = await run(next, null); if (refused) return refused }
       updateWelcome((w) => showSteps(w, what.kind === 'tourOn'))
+      remember(body)
+      return null
+    }
+    if (what.kind === 'letterClose') {
+      setLetterShown(null)
       remember(body)
       return null
     }
@@ -3720,6 +3740,10 @@ export default function Shell() {
   // The welcome card keeps its field.
   const bar = size === 'phone' && arrangement.bar.at !== 'card' ? { ...arrangement.bar, at: 'bottom' } : arrangement.bar
   const barWindow = windows[BAR]
+  // The other windows the one bar listens in (C280): every popped board's,
+  // and the page itself while the bar is in a window of its own.
+  const boardDocs = useMemo(() => Object.entries(windows).filter(([key, h]) => key !== BAR && h?.win).map(([, h]) => h.win.document), [windows])
+  const otherDocs = useMemo(() => (barWindow ? [document, ...boardDocs] : boardDocs), [barWindow, boardDocs])
   const onWelcome = arrangement.columns.some((c) => c.includes('welcome'))
   const shares = useMemo(() => columnShares(arrangement), [arrangement])
   const shareTotal = shares.reduce((sum, x) => sum + x, 0) || 1
@@ -3793,6 +3817,10 @@ export default function Shell() {
           onOpenRun={(num, n) => { run(showPlan(current.current, num, n), null) }}
         />
       )
+    }
+    if (board === 'commands') {
+      // The command menu (C280): its fainter rows follow the board the bar points at.
+      return <CommandsBoard key="commands" board={arrangement.addressed === 'commands' ? null : arrangement.addressed} addressed={arrangement.addressed === 'commands'} onAddress={focusBoard} onPick={(form) => writeField(`>${form}`)} />
     }
     if (board === 'library') {
       return (
@@ -3883,7 +3911,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)} letter={letterShown ? { ...letterShown, read: lettersRead } : null} onLetterClose={() => setLetterShown(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)} letter={letterShown ? { ...letterShown, read: lettersRead } : null} onLetterClose={() => setLetterShown(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
@@ -3935,13 +3963,14 @@ export default function Shell() {
       </main>
       {barWindow && createPortal(
         <div className="ch-shell ch-in-window">
-          <Bar {...shared} board={arrangement.addressed} doc={barWindow.win.document} className="ch-dock window" autoFocus write={write} onMode={onMode} />
+          <Bar {...shared} board={arrangement.addressed} doc={barWindow.win.document} alsoDocs={otherDocs} className="ch-dock window" autoFocus write={write} onMode={onMode} />
         </div>,
         barWindow.container,
       )}
       {arrangement.popped.filter((p) => windows[p.board]).map((p) => createPortal(
+        // A popped board has no bar of its own: the one bar commands it, and
+        // focusing its window points the bar at it (C280).
         <div className="ch-shell ch-in-window">
-          <Bar {...shared} board={p.board} doc={windows[p.board].win.document} className="ch-dock window" onFocusBoard={focusBoard} />
           <main className="ch-stage">
             <div className="ch-col main">
               {drawBoard(p.board, true)}

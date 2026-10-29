@@ -34,6 +34,7 @@ const TITLES = {
 
 // What a step's command line says, where it is more than its command.
 function howOf(i18n, s, keyed) {
+  if (s.id === 'command') return i18n._(COPY.welcome.stepCommandHow, { keys: modKey() === '⌘' ? '⌘K' : 'Ctrl+K', command: s.shows })
   if (s.id === 'ask') return i18n._(keyed ? COPY.welcome.stepAskHow : COPY.welcome.stepAskHowFree, { command: s.shows })
   if (s.id === 'strike') return i18n._(COPY.welcome.stepStrikeHow, { keys: modKey() === '⌘' ? '⌘⇧X' : 'Ctrl+Shift+X' })
   if (s.id === 'send') return i18n._(COPY.welcome.stepSendHow, { command: s.shows })

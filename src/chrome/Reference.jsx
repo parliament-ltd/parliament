@@ -1,7 +1,6 @@
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
-import { reference } from '../commands/registry'
-import { isRoom } from '../shell/boards'
+import { referenceGroups, anyAway } from './referenceGroups'
 import { andList, boardName } from './say'
 
 // The ? reference: every command, grouped, generated from the verb list
@@ -20,18 +19,25 @@ const ONE_VERB = '?bar'
 
 export default function Reference({ board, topic, onPick }) {
   const { i18n } = useLingui()
-  // A second room (room-2) is a room to the commands that work in one, as on the Enter line.
-  const groups = reference(isRoom(board) ? 'room' : board)
-    .map((g) => ({ ...g, rows: topic ? g.rows.filter((r) => r.verb === topic) : g.rows }))
-    .filter((g) => g.rows.length)
-  const fainter = !topic && groups.some((g) => g.rows.some((r) => !r.here))
-  const where = (row) => i18n._(COPY.shell.referenceOn, { boards: andList(i18n, row.on.map((b) => boardName(i18n, b))) })
+  const groups = referenceGroups(board, topic)
+  const fainter = !topic && anyAway(groups)
   return (
     <section className="ch-ref" aria-label={i18n._(COPY.shell.referenceName)}>
       <header className="ch-ref-head">
         <h2>{i18n._(COPY.shell.referenceTitle)}</h2>
         {fainter && <span className="ch-marg">{i18n._(COPY.shell.referenceFainter)}</span>}
       </header>
+      <ReferenceColumns groups={groups} topic={topic} onPick={onPick} />
+      <p className="ch-ref-foot">{i18n._(COPY.shell.referenceKeys, { example: ONE_VERB })} {i18n._(COPY.shell.referenceClose)}</p>
+    </section>
+  )
+}
+
+/** The groups in v30's flowing columns, each row a command and what it does; the ? panel and the command menu board share it. */
+export function ReferenceColumns({ groups, topic = null, onPick }) {
+  const { i18n } = useLingui()
+  const where = (row) => i18n._(COPY.shell.referenceOn, { boards: andList(i18n, row.on.map((b) => boardName(i18n, b))) })
+  return (
       <div className="ch-ref-cols">
         {groups.map((g) => (
           <div key={g.group} className="ch-ref-grp">
@@ -48,7 +54,5 @@ export default function Reference({ board, topic, onPick }) {
           </div>
         ))}
       </div>
-      <p className="ch-ref-foot">{i18n._(COPY.shell.referenceKeys, { example: ONE_VERB })} {i18n._(COPY.shell.referenceClose)}</p>
-    </section>
   )
 }

@@ -14,6 +14,16 @@
 
 const SIZES = { bar: { width: 600, height: 150 }, board: { width: 760, height: 600 } }
 
+/** A size asked for, kept between a least one and the screen; the usual size when none is asked. */
+export function fitSize(asked, usual, screen = globalThis.screen) {
+  if (!asked) return usual
+  const most = { width: screen?.availWidth || 4000, height: screen?.availHeight || 3000 }
+  return {
+    width: Math.round(Math.min(Math.max(asked.width, 320), most.width)),
+    height: Math.round(Math.min(Math.max(asked.height, 240), most.height)),
+  }
+}
+
 /**
  * Copies the page's stylesheets into another document: links always, and
  * style text only in development. Returns how many of each went.
@@ -47,10 +57,11 @@ function prepare(win, { title, from }) {
  * would not open one. Call it from the key press or click that asked, so a
  * pop-up blocker lets it through.
  * at: where on which screen it opens, for pop:… display 2 (C259 (e)); the browser places it there once it allows.
- * @param {{ what: 'bar'|'board', name: string, title: string, onTop?: boolean, at?: { left: number, top: number }|null, from?: Document, host?: Window }} options
+ * size: the inside of the window, for a board the size it had on the page (C280); a board not on the page opens at the usual size.
+ * @param {{ what: 'bar'|'board', name: string, title: string, onTop?: boolean, at?: { left: number, top: number }|null, size?: { width: number, height: number }|null, from?: Document, host?: Window }} options
  */
-export async function openPopout({ what, name, title, onTop = false, at = null, from = document, host = window }) {
-  const size = SIZES[what]
+export async function openPopout({ what, name, title, onTop = false, at = null, size: asked = null, from = document, host = window }) {
+  const size = fitSize(asked, SIZES[what])
   try {
     if (onTop && host.documentPictureInPicture?.requestWindow) {
       const win = await host.documentPictureInPicture.requestWindow(size)

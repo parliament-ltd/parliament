@@ -32,7 +32,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | --- | --- | --- | --- | --- |
 | `new:chat` | Make a chat, plan, room, collection, framework, branch, step, run or block | `new:chat`, `new:plan`, `new:plan "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:run`, `new:block` | everywhere | yes |
 | `open:207` | Open a board, or anything by its number or name | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Writing Studio"`, `open:library`, `open:records`, `open:settings keys` | everywhere | no |
-| `close:records` | Take a board off the screen. Nothing is lost | `close:records`, `close:204`, `close:welcome` | everywhere | yes |
+| `close:records` | Take a board off the screen, or close the letter. Nothing is lost | `close:records`, `close:204`, `close:welcome` | everywhere | yes |
 
 ## Run
 

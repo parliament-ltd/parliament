@@ -949,6 +949,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       viewAlso.push(...(p.also ?? []))
       continue
     }
+    // close:letter closes the letter under the bar, as Escape does (29 October).
+    if (step.verb === 'close' && step.match?.values?.[0]?.value === 'letter') return { answer, says: { message: 'letterClose' }, next: null, act: { kind: 'letterClose' } }
     // close:204 and width:204 40%: the room showing that chat (C146 (c)).
     const byRoom = (step.verb === 'close' || step.verb === 'width') ? roomByNumber(a, step, screens) : null
     if (byRoom?.bad) return { answer, says: byRoom.bad, next: null }

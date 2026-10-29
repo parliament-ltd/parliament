@@ -730,6 +730,11 @@ msgstr ""
 msgid "board.collection"
 msgstr ""
 
+#. Every command, as a board to keep open or pop out (open:commandmenu)
+#. js-lingui-explicit-id
+msgid "board.commands"
+msgstr ""
+
 #. Prompts set out in branches and steps, to run (C131)
 #. js-lingui-explicit-id
 msgid "board.docket"
@@ -3294,6 +3299,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
+msgstr ""
+
+#. close:letter, the same as Escape
+#. js-lingui-explicit-id
+msgid "enter.letterClose"
 msgstr ""
 
 #. letter:all stays English
@@ -9291,6 +9301,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.step.command"
+msgstr ""
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+K or ⌘K; {command} is >, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.commandHow"
 msgstr ""
 
 #. js-lingui-explicit-id

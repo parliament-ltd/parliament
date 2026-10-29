@@ -31,6 +31,10 @@ export const BOARDS = Object.freeze({
   // The Lab's boards (Lab v7, A2).
   canvas: { title: null, resting: 'search', can: [], closable: true, strip: null },
   blocks: { title: null, resting: 'search', can: [], closable: true, strip: null },
+  // The command menu (29 October; C280): the ? reference as a board, to keep
+  // beside the work or pop into a window. Off the strip; open:commandmenu or
+  // pop:commandmenu brings it.
+  commands: { title: null, resting: 'search', can: [], closable: true, strip: null },
   // The welcome page's card: not a board in the documents, but it sits in
   // the space like one. tour: brings it, close: takes it away (C125).
   welcome: { title: null, resting: 'search', can: [], closable: true, strip: null },
@@ -70,7 +74,8 @@ export const boardEntry = (key) => (Object.hasOwn(BOARDS, key) ? BOARDS[key] : M
 // The words commands take for boards, where they differ from the board's id
 // (C131): people read Records and Plan; inside the app, and in what is
 // stored, the boards keep their ids, so nothing kept changes.
-const WORDS = Object.freeze({ records: 'almanac', plan: 'docket' })
+// commandmenu, since command alone is the bar's own word (pop:command).
+const WORDS = Object.freeze({ records: 'almanac', plan: 'docket', commandmenu: 'commands' })
 
 /** The board a command's word names, or null. */
 export const boardFor = (word) => (word == null ? null : WORDS[word] ?? (boardEntry(word) ? word : null))

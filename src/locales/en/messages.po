@@ -730,6 +730,11 @@ msgstr "Canvas"
 msgid "board.collection"
 msgstr "Collection"
 
+#. Every command, as a board to keep open or pop out (open:commandmenu)
+#. js-lingui-explicit-id
+msgid "board.commands"
+msgstr "Command menu"
+
 #. Prompts set out in branches and steps, to run (C131)
 #. js-lingui-explicit-id
 msgid "board.docket"
@@ -3295,6 +3300,11 @@ msgstr "Escape goes back to search"
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
 msgstr "Enter lists every letter"
+
+#. close:letter, the same as Escape
+#. js-lingui-explicit-id
+msgid "enter.letterClose"
+msgstr "Enter closes the letter"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
@@ -8870,7 +8880,7 @@ msgstr "Empty the collection, remove every filter, or one kind of filter"
 
 #. js-lingui-explicit-id
 msgid "verb.close"
-msgstr "Take a board off the screen. Nothing is lost"
+msgstr "Take a board off the screen, or close the letter. Nothing is lost"
 
 #. js-lingui-explicit-id
 msgid "verb.cols"
@@ -9292,6 +9302,11 @@ msgstr "Move the bar to the bottom"
 #. js-lingui-explicit-id
 msgid "welcome.step.command"
 msgstr "Open the command line"
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+K or ⌘K; {command} is >, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.commandHow"
+msgstr "{keys} then {command}"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.key"

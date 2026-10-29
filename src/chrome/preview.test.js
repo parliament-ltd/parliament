@@ -105,6 +105,19 @@ describe('one space: records: and room: bring boards beside what is here (C125, 
     expect(at('>letter:').next).toBeNull()
   })
 
+  it('close:letter closes the letter, as Escape does', () => {
+    expect(at('>close:letter').text).toBe('Enter closes the letter')
+    expect(at('>close:letter').act).toEqual({ kind: 'letterClose' })
+    expect(at('>close:letter').next).toBeNull()
+  })
+
+  it('open:commandmenu and pop:commandmenu bring the command menu as a board (C280)', () => {
+    const opened = at('>open:commandmenu').next
+    expect(opened.columns.flat()).toContain('commands')
+    const popped = at('>pop:commandmenu').next
+    expect(popped.popped.map((p) => p.board)).toContain('commands')
+  })
+
   it('settings: opens Settings, and settings:data a section of it (C279)', () => {
     expect(at('>settings:').text).toBe('Enter opens Settings on the right')
     expect(at('>settings:data').text).toBe('Enter opens Settings at Data and backups')

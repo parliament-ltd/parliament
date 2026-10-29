@@ -26,9 +26,10 @@ import { useVoiceInput } from '../hooks/useVoiceInput'
 import { formatSize } from '../lib/fileUpload'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
-// board. The page has one, and so does every popped window (C6: each window
-// keeps its own bar). Its keys are listened for on the document it is drawn
-// in, so a popped window answers / and Cmd/Ctrl+K itself.
+// board. There is only ever one (C280, replacing C6's bar in every window):
+// on the page, or in its own window when the bar itself is popped. Popped
+// boards have none; its keys are listened for in every window, so / and
+// Cmd/Ctrl+K reach it from anywhere.
 //
 // While a reply on a board is being edited, the field folds into a circle
 // (C108). Hovering opens it without taking focus, after 140ms of intent, and
@@ -55,7 +56,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, letter = null, onLetterClose, alsoDocs = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -135,22 +136,28 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   }, [board, own, searched, onSearch])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
 
-  // `/` outside text fields, and Cmd/Ctrl+K from anywhere, in this document.
+  // `/` outside text fields, and Cmd/Ctrl+K from anywhere: in this document,
+  // and in every other window of the page, since this bar is the one point of
+  // control (C280). From another window it brings its own forward, where the
+  // browser lets it.
   useEffect(() => {
-    if (!doc) return undefined
+    const docs = [doc, ...(alsoDocs ?? [])].filter(Boolean)
+    if (!docs.length) return undefined
     function onKey(e) {
-      const active = doc.activeElement
+      const here = e.currentTarget
+      const active = here.activeElement
       const inBar = active === input.current
       const what = barKey(e, { inTextField: !inBar && isTextField(active), inBar })
       if (what === 'focus' || what === 'open') {
         e.preventDefault()
+        if (here !== doc) { try { doc.defaultView?.focus() } catch { /* the browser decides */ } }
         input.current?.focus()
         dispatch({ type: 'open' })
       }
     }
-    doc.addEventListener('keydown', onKey)
-    return () => doc.removeEventListener('keydown', onKey)
-  }, [doc])
+    for (const d of docs) d.addEventListener('keydown', onKey)
+    return () => { for (const d of docs) d.removeEventListener('keydown', onKey) }
+  }, [doc, alsoDocs])
 
   // Editing a reply on a board folds the field; leaving it opens the field.
   useEffect(() => {

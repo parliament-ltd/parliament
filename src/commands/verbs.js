@@ -43,7 +43,7 @@
 // so only open: takes its name.
 // The words for boards (C131): Records is the Almanac's board, Plan the
 // docket's (boards.js maps them to the boards' ids).
-export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'canvas', 'blocks'])
+export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'commandmenu', 'canvas', 'blocks'])
 const TABLES = ['almanac', 'collection']
 const EDITING = ['room', 'docket', 'reflection', 'collection']
 const BUILDING = ['lab', 'room']
@@ -123,8 +123,8 @@ export const VERBS = Object.freeze([
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']]], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   // close:204 closes the room showing chat 204; close:welcome the welcome card (C146 (c)).
-  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:welcome'], takes: [[], [[...BOARD_NAMES, 'welcome']], ['address']], stage: 3, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen. Nothing is lost' } }),
+  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:welcome'], takes: [[], [[...BOARD_NAMES, 'welcome', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen, or close the letter. Nothing is lost' } }),
 
   // Run
   v({ verb: 'run', group: 'run', example: 'run:201b', takes: [[], ['address']], on: ['docket', 'almanac'], stage: 10, spends: true,

@@ -36,6 +36,7 @@ export const COPY = {
     blocks: /*i18n*/ { id: 'board.blocks', message: 'Blocks', comment: 'The pieces a room is built from, beside the Canvas in the Lab' },
     room: /*i18n*/ { id: 'board.room', message: 'Rooms', comment: 'Every room, in a list of where a command works' },
     welcome: /*i18n*/ { id: 'board.welcome', message: 'Welcome page' },
+    commands: /*i18n*/ { id: 'board.commands', message: 'Command menu', comment: 'Every command, as a board to keep open or pop out (open:commandmenu)' },
   },
 
   // The kinds that take a number (C17, C56, A19).
@@ -186,6 +187,7 @@ export const COPY = {
     // letter: (C279 (c)).
     letterOpen: /*i18n*/ { id: 'enter.letterOpen', message: 'Enter opens letter {n}', comment: 'A letter from the maker of Parliament; {n} is its number' },
     letterAll: /*i18n*/ { id: 'enter.letterAll', message: 'Enter lists every letter' },
+    letterClose: /*i18n*/ { id: 'enter.letterClose', message: 'Enter closes the letter', comment: 'close:letter, the same as Escape' },
     letterNone: /*i18n*/ { id: 'enter.letterNone', message: 'There is no letter {n}. letter:all lists them', comment: 'letter:all stays English' },
     tourOffAlready: /*i18n*/ { id: 'enter.tourOffAlready', message: 'The steps are put away already' },
     // On the welcome page (W §2, §6): the one line at rest, and the next
@@ -1695,6 +1697,8 @@ export const COPY = {
     headingTo: /*i18n*/ { id: 'welcome.headingTo', message: 'to Parliament', comment: 'The heading finishes its sentence when the steps are done: Welcome / to Parliament' },
     steps: /*i18n*/ { id: 'welcome.steps', message: 'Things to try', comment: 'The name of the list of steps, read by screen readers' },
     stepCommand: /*i18n*/ { id: 'welcome.step.command', message: 'Open the command line' },
+    // The keys first, so no one types > into a page that is not listening (29 October).
+    stepCommandHow: /*i18n*/ { id: 'welcome.step.commandHow', message: '{keys} then {command}', comment: '{keys} is the shortcut as this computer writes it: Ctrl+K or ⌘K; {command} is >, which stays English' },
     stepBar: /*i18n*/ { id: 'welcome.step.bar', message: 'Move the bar to the bottom' },
     stepAsk: /*i18n*/ { id: 'welcome.step.ask', message: 'Ask a question' },
     stepAskHow: /*i18n*/ { id: 'welcome.step.askHow', message: '{command} and a question', comment: '{command} is p>, which stays English' },
