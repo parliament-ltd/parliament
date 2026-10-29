@@ -2974,6 +2974,11 @@ msgstr "这里没有名为“{heading}”的标题"
 msgid "enter.headingRm"
 msgstr "按 Enter 移除标题“{heading}”。其下的卡片会保留"
 
+#. On the Enter line while the prompt field holds a prompt edited in the chat
+#. js-lingui-explicit-id
+msgid "enter.heldPrompt"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "按 Enter 显示此处可用的所有命令"
@@ -5905,6 +5910,11 @@ msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
 msgid "field.held"
+msgstr ""
+
+#. Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words
+#. js-lingui-explicit-id
+msgid "field.heldPrompt"
 msgstr ""
 
 #. js-lingui-explicit-id

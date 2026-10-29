@@ -2974,6 +2974,11 @@ msgstr "Ingen rubrik här heter {heading}"
 msgid "enter.headingRm"
 msgstr "Enter tar bort rubriken {heading}. Korten under den ligger kvar"
 
+#. On the Enter line while the prompt field holds a prompt edited in the chat
+#. js-lingui-explicit-id
+msgid "enter.heldPrompt"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "Enter visar alla kommandon som fungerar här"
@@ -5905,6 +5910,11 @@ msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
 msgid "field.held"
+msgstr ""
+
+#. Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words
+#. js-lingui-explicit-id
+msgid "field.heldPrompt"
 msgstr ""
 
 #. js-lingui-explicit-id

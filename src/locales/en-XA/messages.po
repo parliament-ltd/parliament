@@ -2974,6 +2974,11 @@ msgstr ""
 msgid "enter.headingRm"
 msgstr ""
 
+#. On the Enter line while the prompt field holds a prompt edited in the chat
+#. js-lingui-explicit-id
+msgid "enter.heldPrompt"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr ""
@@ -5905,6 +5910,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "field.held"
+msgstr ""
+
+#. Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words
+#. js-lingui-explicit-id
+msgid "field.heldPrompt"
 msgstr ""
 
 #. js-lingui-explicit-id
