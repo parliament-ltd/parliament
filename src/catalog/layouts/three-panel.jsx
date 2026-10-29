@@ -6,17 +6,23 @@
 //
 // PR-16: under 768px the layout swaps to a narrow tree — left-rail
 // becomes a hamburger drawer, right-rail+extra fold into a panel
-// toggled from the in-layout NarrowChrome. The desktop tree is
-// untouched at ≥768px. Render is collapsed into a single inlined
-// function (matches single-column-with-sheet's pattern) so the file
-// has only one component-shaped declaration — keeps fast-refresh
-// happy.
+// toggled from the in-layout NarrowChrome. Render is collapsed into a
+// single inlined function (matches single-column-with-sheet's pattern)
+// so the file has only one component-shaped declaration — keeps
+// fast-refresh happy.
+//
+// C279 (b): on the shell the room's form decides (roomForm.js). Alone on
+// screen, the rails stand open beside the chat; sharing it, they are strips
+// with a button each, and the chat takes the room's width; the narrow tree
+// only when there is no room for a chat at all.
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useIsNarrow } from '../../lib/useViewportWidth'
+import { useRoomForm } from '../../lib/useViewportWidth'
 import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
+import RoomColumn from '../../components/layouts/RoomColumn'
+import { useColumns } from '../../components/layouts/useColumns'
+import { COPY } from '../../copy'
 
 // Narrow-drawer rail class. The desktop tree uses .layout-rail-card
 // (in index.css) for its card-shaped rails instead — see the desktop
@@ -30,20 +36,18 @@ const RAIL_BASE = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
 // The aside drops bg-base in PR-28e so the chat-room-frame's 64%-
 // transparent surface (and the dot texture beneath it) reads through
 // the rail's outer gutter.
-const RAIL_OUTER = 'shrink-0 p-3 flex flex-col'
+const RAIL_OUTER = 'p-3 flex flex-col'
 const RAIL_INNER = 'layout-rail-card flex-1 min-h-0 overflow-y-auto p-3 flex flex-col gap-3'
+// Each rail's width (w-72), open beside the chat or over it.
+const RAIL_WIDTH = 288
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
   return nodes
 }
 
-// PR-27: per-slot panel-toggle opt-in. The Layout section in the editor
-// flips mode.layoutConfig.panelButtons[slotId]; the runtime renders a
-// chevron handle on the matching aside and a click animates a collapse.
-function panelEnabled(mode, slotId) {
-  return mode?.layoutConfig?.panelButtons?.[slotId] === true
-}
+// PR-27's per-slot opt-in, mode.layoutConfig.panelButtons, is no longer
+// read: every rail with blocks has its button (C279 (b)). It stays stored.
 
 export default {
   name: 'three-panel',
@@ -58,7 +62,7 @@ export default {
     { id: 'right-rail-extra', capacity: 'stack'  },
   ],
 
-  render: function ThreePanelRender({ slotContents = {}, mode }) {
+  render: function ThreePanelRender({ slotContents = {} }) {
     const left       = slotContents['left-rail']
     const msgs       = slotContents['msg-area']
     const input      = slotContents['input-dock']
@@ -66,18 +70,13 @@ export default {
     const rightExtra = slotContents['right-rail-extra']
     const hasRight   = (right && right.length > 0) || (rightExtra && rightExtra.length > 0)
     const hasLeft    = left && left.length > 0
-    const isNarrow   = useIsNarrow(768)
+    const form       = useRoomForm()
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [panelOpen, setPanelOpen]   = useState(false)
-    // PR-27: desktop panel-collapse local state. Defaults to expanded.
-    // The chevron handle is only rendered when the user has opted into
-    // it for that slot via the editor's Layout section.
-    const [leftCollapsed,  setLeftCollapsed]  = useState(false)
-    const [rightCollapsed, setRightCollapsed] = useState(false)
-    const leftToggleEnabled  = panelEnabled(mode, 'left-rail')
-    const rightToggleEnabled = panelEnabled(mode, 'right-rail')
+    // The rails, open or closed: each room starts as its form says.
+    const columns = useColumns(form)
 
-    if (isNarrow) {
+    if (form === 'narrow') {
       // h-[100dvh] (dynamic viewport height) anchors the narrow tree to
       // the viewport so stacked sections (chrome / body / sheet / input)
       // stay within bounds when the chat route's parent chain has no
@@ -88,7 +87,7 @@ export default {
           <NarrowChrome
             onLeftClick={hasLeft ? () => setDrawerOpen(true) : undefined}
             onRightClick={hasRight ? () => setPanelOpen((v) => !v) : undefined}
-            rightLabel="Sheet"
+            rightWords={{ show: COPY.room.openRight, hide: COPY.room.closeRight }}
             rightActive={panelOpen}
           />
 
@@ -129,34 +128,20 @@ export default {
       // PR-28e: outer flex drops bg-base so .chat-room-frame's
       // 64%-transparent surface and the chat-page-bg dot texture
       // read through.
-      <div className="flex h-full min-h-[480px]">
+      <div className="flex h-full min-h-[480px]" ref={columns.root}>
         {/* Left rail */}
         {hasLeft && (
-          <aside
-            className={`layout-panel w-72 ${RAIL_OUTER} ${
-              leftToggleEnabled && leftCollapsed ? 'layout-panel-collapsed' : ''
-            }`}
+          <RoomColumn
+            side="left" form={form} open={columns.open.left} onToggle={() => columns.toggle('left')}
+            width={RAIL_WIDTH} className={RAIL_OUTER} contentClassName={RAIL_INNER}
           >
-            <div className={`layout-panel-content ${RAIL_INNER}`}>
-              {renderSlot(left)}
-            </div>
-            {leftToggleEnabled && (
-              <button
-                type="button"
-                className="layout-panel-toggle left"
-                onClick={() => setLeftCollapsed((v) => !v)}
-                aria-label={leftCollapsed ? 'Expand left rail' : 'Collapse left rail'}
-              >
-                {leftCollapsed
-                  ? <ChevronRight className="w-3 h-3" />
-                  : <ChevronLeft className="w-3 h-3" />}
-              </button>
-            )}
-          </aside>
+            {renderSlot(left)}
+          </RoomColumn>
         )}
 
-        {/* Center: messages + input */}
-        <main className="flex-1 flex flex-col min-w-0">
+        {/* Center: messages + input. A click on the chat closes a rail
+            open over it (C279 (b)). */}
+        <main className="flex-1 flex flex-col min-w-0" onPointerDown={columns.over ? columns.close : undefined}>
           <div className="flex-1 min-h-0">
             {renderSlot(msgs)}
           </div>
@@ -174,28 +159,13 @@ export default {
 
         {/* Right rail (stack) */}
         {hasRight && (
-          <aside
-            className={`layout-panel w-72 ${RAIL_OUTER} ${
-              rightToggleEnabled && rightCollapsed ? 'layout-panel-collapsed' : ''
-            }`}
+          <RoomColumn
+            side="right" form={form} open={columns.open.right} onToggle={() => columns.toggle('right')}
+            width={RAIL_WIDTH} className={RAIL_OUTER} contentClassName={RAIL_INNER}
           >
-            <div className={`layout-panel-content ${RAIL_INNER}`}>
-              {renderSlot(right)}
-              {renderSlot(rightExtra)}
-            </div>
-            {rightToggleEnabled && (
-              <button
-                type="button"
-                className="layout-panel-toggle right"
-                onClick={() => setRightCollapsed((v) => !v)}
-                aria-label={rightCollapsed ? 'Expand right rail' : 'Collapse right rail'}
-              >
-                {rightCollapsed
-                  ? <ChevronLeft className="w-3 h-3" />
-                  : <ChevronRight className="w-3 h-3" />}
-              </button>
-            )}
-          </aside>
+            {renderSlot(right)}
+            {renderSlot(rightExtra)}
+          </RoomColumn>
         )}
       </div>
     )

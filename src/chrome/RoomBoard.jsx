@@ -13,7 +13,8 @@ import { useConversations } from '../stores/ConversationContext'
 import { ConversationScope } from '../stores/ConversationScope'
 import { AnnotationsProvider } from '../stores/AnnotationsContext'
 import { RoomHost } from '../lib/useViewportWidth'
-import { useNarrower } from './useNarrower'
+import { ROOM_EDGES, bandWidth, roomForm } from '../lib/roomForm'
+import { useBand } from './useNarrower'
 
 // A room as a board on the shell (refactor-plan.md, stage 4). The room is
 // drawn as today's chat page draws it: its chat is found, given the
@@ -30,13 +31,16 @@ import { useNarrower } from './useNarrower'
 //
 // With no chat yet it is an empty room: the first prompt starts its chat.
 //
-// A room narrower than its two side panels and a conversation you can read
-// draws its layout's narrow form: the conversation, with the panels behind
-// the buttons at its top (C126). Its own width decides, not the window's.
-
-// Two side panels of 288px and a conversation of about 360px.
-const ROOM_WIDE = 940
-
+// Its side columns follow its form (roomForm.js; C279 (b)), from its own
+// width, not the window's, and whether it has the screen to itself:
+// - alone on screen (the only board, or popped into its own window) and
+//   wide enough, the columns stand open, as before;
+// - sharing the screen, or a focused room, they start closed, each a thin
+//   strip with a button, and the chat takes the room's width;
+// - too narrow for a chat at all (about 600px), or on a phone, its layout's
+//   narrow form: the conversation, with the columns behind the buttons at
+//   its top (C126).
+// Open or closed is not remembered: each room starts as its form says.
 
 const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]
@@ -79,15 +83,17 @@ function Card({ board, addressed, onAddress, title, aside, room, ripple, childre
  *   onReady: told once the chat's messages are loaded, so a prompt can go;
  *   onLeave: told when the board stops showing the chat; onName: told what
  *   the room is called (roomNames.js); rev: changes when the room was
- *   named, so it is read again
+ *   named, so it is read again; alone: no other board shares the screen
+ *   with it (C279 (b))
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, systemFor = null, small = false }) {
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, systemFor = null, small = false, alone = false }) {
   const { i18n } = useLingui()
   const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
   const [found, setFound] = useState({ forId: null, chat: null, mode: null, error: null })
   const [loadedFor, setLoadedFor] = useState(null)
-  const [roomRef, narrow] = useNarrower(ROOM_WIDE)
+  // Its width in steps, so it draws again only when it crosses one.
+  const [roomRef, band] = useBand(ROOM_EDGES)
 
   // The chat and its room, as ChatView finds them.
   useEffect(() => {
@@ -143,7 +149,8 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   const phone = found.forId === chatId && found.mode?.deviceClass === 'visual-touch-phone'
   // systemFor: the chat's frameworks and reply language, for Continue (C251 (d)).
   // On a phone, every room draws its narrow form, a tablet's width included (C261 (f)).
-  const host = useMemo(() => ({ narrow: narrow || phone || small, systemFor }), [narrow, phone, small, systemFor])
+  const form = roomForm({ width: bandWidth(band), alone, phone: phone || small })
+  const host = useMemo(() => ({ narrow: form === 'narrow', form, alone, systemFor }), [form, alone, systemFor])
   // What the room is called, for its header and the Enter line (C40, C90).
   const named = found.forId === chatId && found.mode ? roomName(found.mode) : null
   const namedKey = JSON.stringify(named)

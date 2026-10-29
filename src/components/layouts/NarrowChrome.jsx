@@ -12,6 +12,10 @@
 // provider mounted in ChatView (PR-19d). When the provider isn't in
 // scope (editor preview sheet, dev /catalog route) the wrench renders
 // as a hidden spacer, preserving alignment.
+//
+// Its words are the copy table's (C279 (b)): the left button opens the
+// left column, and the layout names what the right one shows and hides
+// (rightWords, two copy entries).
 
 import { useContext } from 'react'
 import { Menu, PanelRight, Wrench } from 'lucide-react'
@@ -26,7 +30,7 @@ import { COPY } from '../../copy'
 export default function NarrowChrome({
   onLeftClick,
   onRightClick,
-  rightLabel,
+  rightWords = { show: COPY.room.openRight, hide: COPY.room.closeRight },
   rightActive = false,
 }) {
   const navigate = useNavigate()
@@ -37,6 +41,9 @@ export default function NarrowChrome({
   const hosted = useContext(RoomHost) != null
   const { i18n } = useLingui()
   const homeLabel = i18n._(COPY.room.home)
+  const leftLabel = i18n._(COPY.room.openLeft)
+  const editorLabel = i18n._(COPY.room.openEditor)
+  const rightLabel = i18n._(rightActive ? rightWords.hide : rightWords.show)
 
   return (
     <div className="flex justify-evenly items-center h-10 bg-white shrink-0">
@@ -44,7 +51,7 @@ export default function NarrowChrome({
         <IconButton
           icon={Menu}
           onClick={onLeftClick}
-          title="Open menu"
+          title={leftLabel}
           size="sm"
         />
       ) : (
@@ -69,8 +76,8 @@ export default function NarrowChrome({
         <button
           type="button"
           onClick={() => navigate(wrenchTarget, { state: { fromChat: true } })}
-          aria-label="Open Editor"
-          title="Open Editor"
+          aria-label={editorLabel}
+          title={editorLabel}
           className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)] transition-colors"
         >
           <Wrench className="w-4 h-4" />
@@ -83,7 +90,7 @@ export default function NarrowChrome({
         <IconButton
           icon={PanelRight}
           onClick={onRightClick}
-          title={rightActive ? `Hide ${rightLabel}` : `Show ${rightLabel}`}
+          title={rightLabel}
           active={rightActive}
           size="sm"
         />
