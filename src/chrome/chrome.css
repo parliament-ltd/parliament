@@ -136,11 +136,22 @@
 .ch-enter .now { color: var(--ch-ink); }
 .ch-enter .sep { opacity: .45; margin: 0 4px; }
 
-/* ── the ? reference, under the field ── */
-.ch-ref { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 52vh; overflow: auto; padding: 6px 16px 14px; }
-.ch-ref h3 { font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink); margin: 14px 0 4px; }
-.ch-ref-row { display: flex; align-items: baseline; gap: 12px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); }
-.ch-ref-row:hover { background: var(--ch-wash); }
+/* ── the ? reference, under the field (C279 (f); Almanac v30's .cref) ──
+   Under the bar and as wide as the stage, not the bar's 720px: it sits
+   outside .ch-dock-in, and its edges meet the boards' (--ch-ref-edge, the
+   stage's padding, less the dock's 16px). Its groups flow into as many 318px
+   columns as fit, four at most (one on a phone), and a group never splits; a
+   hairline under the heading and each group's, the keys at the foot. The
+   words rise to the token sheet's smallest, 11.5px. */
+.ch-ref { --ch-ref-edge: clamp(16px, 4vw, 32px); container: ch-ref / inline-size; margin: 8px calc(var(--ch-ref-edge) - 16px) 0; padding: 13px 16px 12px; background: var(--ch-surface); border-radius: var(--ch-r-btn); box-shadow: 0 8px 28px rgba(40, 36, 28, .08); max-height: 64vh; overflow: auto; }
+.ch-ref-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding-bottom: 8px; margin-bottom: 11px; border-bottom: .5px solid var(--ch-border-2); }
+.ch-ref-head h2, .ch-ref h3 { font: 600 var(--ch-t-marg) var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink); margin: 0; }
+.ch-ref-cols { columns: 318px 4; column-gap: 28px; }
+.ch-ref-grp { break-inside: avoid; margin: 0 0 15px; }
+.ch-ref h3 { margin-bottom: 5px; padding-bottom: 4px; border-bottom: .5px solid var(--ch-border-2); }
+/* Two aligned columns, so the eye runs down the commands. */
+.ch-shell .ch-ref .ch-ref-row { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 9px; align-items: baseline; width: 100%; padding: 4px 6px; border-radius: var(--ch-r-md); text-align: start; color: var(--ch-ink-2); }
+.ch-shell .ch-ref .ch-ref-row:hover { color: var(--ch-ink); background: var(--ch-wash); }
 
 /* inspect: one thing in detail under the bar, drawn like the reference
    (stage 5, piece 3; Almanac v30's peek). */
@@ -299,11 +310,21 @@
 .ch-lsel { display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 16px 8px; margin: 0; min-height: 20px; }
 .ch-lsel.on { color: var(--ch-ink-2); }
 .ch-lsel b { font: 600 11px var(--ch-sans); font-style: normal; color: var(--ch-ink); }
-.ch-ref-row .ch-code { flex: 0 0 auto; min-width: 150px; }
-.ch-ref-row .gloss { font: 400 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink-2); }
-.ch-ref-head { display: flex; align-items: baseline; justify-content: flex-end; padding-top: 8px; }
-/* With the bar at the bottom, the reference opens above the field. */
-.ch-dock.bottom .ch-ref { position: absolute; inset-inline: 0; bottom: 100%; margin: 0 0 10px; max-height: 60vh; }
+.ch-ref-row .ch-code { font: 500 var(--ch-t-marg) var(--ch-mono); color: var(--ch-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-ref-row .gloss { font: italic 400 var(--ch-t-marg)/1.35 var(--ch-serif); }
+/* A command that works on another board: fainter, and it says where. */
+.ch-shell .ch-ref .ch-ref-row.away, .ch-ref-row.away .ch-code { color: var(--ch-ink-3); }
+.ch-shell .ch-ref .ch-ref-row.away:hover, .ch-ref-row.away:hover .ch-code { color: var(--ch-ink); }
+.ch-ref-row .on { color: var(--ch-marg); }
+.ch-ref-row .on .sep { margin: 0 5px; opacity: .6; }
+.ch-ref-foot { margin: 4px 0 0; padding-top: 9px; border-top: .5px solid var(--ch-border-2); font: italic 400 var(--ch-t-marg)/1.5 var(--ch-serif); color: var(--ch-marg); }
+/* A narrow panel (a phone): each command above what it does. */
+@container ch-ref (max-width: 420px) { .ch-shell .ch-ref .ch-ref-row { grid-template-columns: minmax(0, 1fr); gap: 1px; } }
+/* With the bar at the bottom, the reference opens above the field (v30's
+   58vh). In a window of its own, or in the welcome card, it keeps to them. */
+.ch-dock.bottom .ch-ref { position: absolute; inset-inline: var(--ch-ref-edge); bottom: calc(100% - 12px); margin: 0 0 10px; max-height: 58vh; }
+.ch-dock.window .ch-ref, .ch-dock.card .ch-ref { margin-inline: 0; }
+.ch-shell.size-phone .ch-ref { --ch-ref-edge: 10px; }
 
 /* ── windows of their own (pop:) ── */
 .ch-window { margin: 0; background: var(--ch-paper); }

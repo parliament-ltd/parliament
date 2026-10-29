@@ -244,7 +244,7 @@ describe('completion', () => {
 })
 
 describe('the reference', () => {
-  it('leads with the bar, then every group that has verbs here', () => {
+  it('leads with the bar, then every group', () => {
     const all = reference()
     expect(all[0].group).toBe('leaders')
     expect(all.slice(1).map((g) => g.group)).toEqual(GROUPS.map((g) => g.key))
@@ -263,11 +263,23 @@ describe('the reference', () => {
     expect(listed).toContain('new')
   })
 
-  it('shows on a board only what works there', () => {
-    const settings = reference('settings').flatMap((g) => g.rows.map((r) => r.verb)).filter(Boolean)
-    expect(settings).toContain('set')
-    expect(settings).toContain('bar')
-    expect(settings).not.toContain('type')
-    expect(settings).not.toContain('tell')
+  it('lists every command on every board, and says where each works (C279 (f))', () => {
+    const rows = (board) => reference(board).flatMap((g) => g.rows)
+    const every = rows(null).map((r) => r.example)
+    for (const board of ['settings', 'room', 'almanac', 'collection', 'docket', 'reflection', 'library', 'welcome']) {
+      expect(rows(board).map((r) => r.example), board).toEqual(every)
+    }
+    expect(rows(null).every((r) => r.here)).toBe(true)
+    const on = (board, verb) => rows(board).find((r) => r.verb === verb)
+    expect(on('settings', 'set')).toMatchObject({ here: true })
+    expect(on('settings', 'bar')).toMatchObject({ here: true, on: 'everywhere' })
+    expect(on('settings', 'type')).toMatchObject({ here: false, on: ['almanac', 'collection'] })
+    expect(on('settings', 'tell')).toMatchObject({ here: false, on: ['room'] })
+    expect(on('room', 'tell').here).toBe(true)
+    expect(rows('room').filter((r) => !r.here).every((r) => r.on !== 'everywhere' && !r.on.includes('room'))).toBe(true)
+    expect(rows('welcome').filter((r) => r.here).every((r) => r.on === 'everywhere')).toBe(true)
+    // While the Lab waits, the boards a command works on leave it out (C279 (a)).
+    expect(on('room', 'add').on).toEqual(['almanac', 'collection'])
+    expect(on('room', 'set').on).toEqual(['room', 'settings'])
   })
 })
