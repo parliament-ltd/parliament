@@ -1359,7 +1359,9 @@ export const COPY = {
   languagePicker: {
     title: /*i18n*/ { id: 'languagePicker.title', message: 'Languages' },
     draft: /*i18n*/ { id: 'languagePicker.draft', message: 'draft' },
-    foot: /*i18n*/ { id: 'languagePicker.foot', message: 'Replies and searches follow the page. reply: gives replies a language of their own' },
+    foot: /*i18n*/ { id: 'languagePicker.foot', message: 'Replies and searches follow the page. reply: gives replies a language of their own.' },
+    // Its keys at the foot, as the ? reference says its own (29 October).
+    keys: /*i18n*/ { id: 'languagePicker.keys', message: 'A click, or Enter on a row, turns the page to that language.', comment: 'The foot of the languages menu, before "Escape closes this"' },
     globe: /*i18n*/ { id: 'languagePicker.globe', message: 'Language: {language}' },
   },
 
@@ -1626,6 +1628,8 @@ export const COPY = {
     held: /*i18n*/ { id: 'replyPicker.held', message: 'Held until you change it. A new prompt to new sources: by: and their names.', comment: 'Commands stay English' },
     follows: /*i18n*/ { id: 'replyPicker.follows', message: 'Follows the reply you view until you tick one. A new prompt to new sources: by: and their names.', comment: 'Commands stay English' },
     footCarried: /*i18n*/ { id: 'replyPicker.footCarried', message: 'The chat carries one line on. Tick others to carry them on too, each in its own tab.' },
+    // Its keys at the foot, as the ? reference says its own (29 October).
+    keys: /*i18n*/ { id: 'replyPicker.keys', message: 'A click, or Enter on a row, ticks it or unticks it.', comment: 'The foot of the menu of where a reply goes, before "Escape closes this"' },
   },
 
   // The replies to a prompt sent to several, as tabs (stage 8; C173).
@@ -2302,6 +2306,13 @@ export const COPY = {
   // Who can answer: the picker under the field (stage 7, piece 1; A14,
   // C148, C149). Model and source names come from the list, never here.
   picker: {
+    // The menu's heading and its keys at the foot, as the ? reference has
+    // them (29 October). Each provider's group is headed by its name from
+    // the list of providers.
+    title: /*i18n*/ { id: 'picker.title', message: 'Who answers', comment: 'The heading of the menu of who answers, drawn in capitals' },
+    laterGroup: /*i18n*/ { id: 'picker.laterGroup', message: 'Later', comment: 'A group in the menu of who answers: providers not built yet, one row each' },
+    keys: /*i18n*/ { id: 'picker.keys', message: 'A click, or Enter on a row, ticks it or unticks it. A row that needs a key writes api: into the field instead.', comment: 'The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English' },
+    keysStep: /*i18n*/ { id: 'picker.keysStep', message: 'A click, or Enter on a row, chooses it for this step.', comment: 'The foot of the menu of who answers one step of a plan, before "Escape closes this"' },
     // One after another (branch slider v9; C201).
     order: /*i18n*/ { id: 'picker.order', message: 'Order' },
     together: /*i18n*/ { id: 'picker.together', message: 'All at once' },
@@ -2357,11 +2368,13 @@ export const COPY = {
   },
   // The frameworks' picker under the field (C164).
   frameworkPicker: {
+    title: /*i18n*/ { id: 'frameworkPicker.title', message: 'Frameworks', comment: 'The heading of the frameworks menu, drawn in capitals' },
     builtIn: /*i18n*/ { id: 'frameworkPicker.builtIn', message: 'Built in' },
     yours: /*i18n*/ { id: 'frameworkPicker.yours', message: 'Yours' },
     noneYet: /*i18n*/ { id: 'frameworkPicker.noneYet', message: 'None of your own yet. new:framework "name" "what it asks" writes one.', comment: 'Commands stay English' },
     unnamed: /*i18n*/ { id: 'frameworkPicker.unnamed', message: 'unnamed', comment: 'A framework of your own with no name, as a persona could be' },
     foot: /*i18n*/ { id: 'frameworkPicker.foot', message: 'They go with every prompt in this chat, in the order ticked, until turned off.' },
+    keys: /*i18n*/ { id: 'frameworkPicker.keys', message: 'A click, or Enter on a row, puts it on at the end or takes it off.', comment: 'The foot of the frameworks menu, before "Escape closes this"' },
   },
 
   // Sources in the picker by the kind of question they answer.
