@@ -6000,10 +6000,20 @@ msgstr "内置"
 msgid "frameworkPicker.foot"
 msgstr "它们会按勾选顺序随此对话中的每条提示词发送，直到关闭。"
 
+#. The foot of the frameworks menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "frameworkPicker.keys"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
 msgstr "你还没有自己的框架。new:framework \"名称\" \"要求\" 可写一个。"
+
+#. The heading of the frameworks menu, drawn in capitals
+#. js-lingui-explicit-id
+msgid "frameworkPicker.title"
+msgstr ""
 
 #. A framework of your own with no name, as a persona could be
 #. js-lingui-explicit-id
@@ -6522,6 +6532,11 @@ msgstr "回复和搜索跟随页面语言。reply: 可为回复单独设定语�
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
 msgstr "语言：{language}"
+
+#. The foot of the languages menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "languagePicker.keys"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
@@ -7215,6 +7230,16 @@ msgstr "留在本机"
 msgid "picker.keptUpTo30"
 msgstr "最多保存 30 天"
 
+#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. js-lingui-explicit-id
+msgid "picker.keys"
+msgstr ""
+
+#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "picker.keysStep"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr "网络与讨论"
@@ -7232,6 +7257,11 @@ msgstr "学术研究"
 #. js-lingui-explicit-id
 msgid "picker.later"
 msgstr "稍后推出"
+
+#. A group in the menu of who answers: providers not built yet, one row each
+#. js-lingui-explicit-id
+msgid "picker.laterGroup"
+msgstr ""
 
 #. Models that run on this computer (A14)
 #. js-lingui-explicit-id
@@ -7303,6 +7333,11 @@ msgstr "来源"
 #. js-lingui-explicit-id
 msgid "picker.thinks"
 msgstr "可思考"
+
+#. The heading of the menu of who answers, drawn in capitals
+#. js-lingui-explicit-id
+msgid "picker.title"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.together"
@@ -7656,6 +7691,11 @@ msgstr "对话只延续一条。勾选其他的，也可以让它们各自在单
 #. js-lingui-explicit-id
 msgid "replyPicker.held"
 msgstr "保持不变，直到你更改。要向新的来源发新提示词：by: 加上它们的名称。"
+
+#. The foot of the menu of where a reply goes, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "replyPicker.keys"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
@@ -8553,6 +8593,11 @@ msgstr "输入栏指向此处"
 #. js-lingui-explicit-id
 msgid "shell.barAway"
 msgstr "输入栏在独立窗口中。pop:back 命令可将它放回。"
+
+#. pop:command stays English
+#. js-lingui-explicit-id
+msgid "shell.barElsewhere"
+msgstr ""
 
 #. The popped bar's window title
 #. js-lingui-explicit-id

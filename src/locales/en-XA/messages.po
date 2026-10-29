@@ -6000,9 +6000,19 @@ msgstr ""
 msgid "frameworkPicker.foot"
 msgstr ""
 
+#. The foot of the frameworks menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "frameworkPicker.keys"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
+msgstr ""
+
+#. The heading of the frameworks menu, drawn in capitals
+#. js-lingui-explicit-id
+msgid "frameworkPicker.title"
 msgstr ""
 
 #. A framework of your own with no name, as a persona could be
@@ -6521,6 +6531,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
+msgstr ""
+
+#. The foot of the languages menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "languagePicker.keys"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7215,6 +7230,16 @@ msgstr ""
 msgid "picker.keptUpTo30"
 msgstr ""
 
+#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. js-lingui-explicit-id
+msgid "picker.keys"
+msgstr ""
+
+#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "picker.keysStep"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr ""
@@ -7231,6 +7256,11 @@ msgstr ""
 #. A row not built yet
 #. js-lingui-explicit-id
 msgid "picker.later"
+msgstr ""
+
+#. A group in the menu of who answers: providers not built yet, one row each
+#. js-lingui-explicit-id
+msgid "picker.laterGroup"
 msgstr ""
 
 #. Models that run on this computer (A14)
@@ -7302,6 +7332,11 @@ msgstr ""
 #. A model that can think before it answers, when thinking:on is set (C165)
 #. js-lingui-explicit-id
 msgid "picker.thinks"
+msgstr ""
+
+#. The heading of the menu of who answers, drawn in capitals
+#. js-lingui-explicit-id
+msgid "picker.title"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7655,6 +7690,11 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "replyPicker.held"
+msgstr ""
+
+#. The foot of the menu of where a reply goes, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "replyPicker.keys"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8552,6 +8592,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.barAway"
+msgstr ""
+
+#. pop:command stays English
+#. js-lingui-explicit-id
+msgid "shell.barElsewhere"
 msgstr ""
 
 #. The popped bar's window title

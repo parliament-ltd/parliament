@@ -3982,7 +3982,7 @@ export default function Shell() {
         // A popped board has no bar of its own: the one bar commands it, and
         // focusing its window points the bar at it (C280).
         <div className="ch-shell ch-in-window">
-          {awayIn === windows[p.board].win.document && <p className="ch-away ch-marg" role="status">{i18n._(COPY.shell.barAway)}</p>}
+          {awayIn === windows[p.board].win.document && <p className="ch-elsewhere ch-marg" role="status">{i18n._(COPY.shell.barElsewhere)}</p>}
           <main className="ch-stage">
             <div className="ch-col main">
               {drawBoard(p.board, true)}

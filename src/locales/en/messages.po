@@ -6000,10 +6000,20 @@ msgstr "Built in"
 msgid "frameworkPicker.foot"
 msgstr "They go with every prompt in this chat, in the order ticked, until turned off."
 
+#. The foot of the frameworks menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "frameworkPicker.keys"
+msgstr "A click, or Enter on a row, puts it on at the end or takes it off."
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
 msgstr "None of your own yet. new:framework \"name\" \"what it asks\" writes one."
+
+#. The heading of the frameworks menu, drawn in capitals
+#. js-lingui-explicit-id
+msgid "frameworkPicker.title"
+msgstr "Frameworks"
 
 #. A framework of your own with no name, as a persona could be
 #. js-lingui-explicit-id
@@ -6517,11 +6527,16 @@ msgstr "draft"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.foot"
-msgstr "Replies and searches follow the page. reply: gives replies a language of their own"
+msgstr "Replies and searches follow the page. reply: gives replies a language of their own."
 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
 msgstr "Language: {language}"
+
+#. The foot of the languages menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "languagePicker.keys"
+msgstr "A click, or Enter on a row, turns the page to that language."
 
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
@@ -7215,6 +7230,16 @@ msgstr "stays on this computer"
 msgid "picker.keptUpTo30"
 msgstr "kept up to 30 days"
 
+#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. js-lingui-explicit-id
+msgid "picker.keys"
+msgstr "A click, or Enter on a row, ticks it or unticks it. A row that needs a key writes api: into the field instead."
+
+#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "picker.keysStep"
+msgstr "A click, or Enter on a row, chooses it for this step."
+
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr "Web and discussion"
@@ -7232,6 +7257,11 @@ msgstr "Research"
 #. js-lingui-explicit-id
 msgid "picker.later"
 msgstr "later"
+
+#. A group in the menu of who answers: providers not built yet, one row each
+#. js-lingui-explicit-id
+msgid "picker.laterGroup"
+msgstr "Later"
 
 #. Models that run on this computer (A14)
 #. js-lingui-explicit-id
@@ -7303,6 +7333,11 @@ msgstr "Sources"
 #. js-lingui-explicit-id
 msgid "picker.thinks"
 msgstr "can think"
+
+#. The heading of the menu of who answers, drawn in capitals
+#. js-lingui-explicit-id
+msgid "picker.title"
+msgstr "Who answers"
 
 #. js-lingui-explicit-id
 msgid "picker.together"
@@ -7656,6 +7691,11 @@ msgstr "The chat carries one line on. Tick others to carry them on too, each in 
 #. js-lingui-explicit-id
 msgid "replyPicker.held"
 msgstr "Held until you change it. A new prompt to new sources: by: and their names."
+
+#. The foot of the menu of where a reply goes, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "replyPicker.keys"
+msgstr "A click, or Enter on a row, ticks it or unticks it."
 
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
@@ -8553,6 +8593,11 @@ msgstr "the bar points here"
 #. js-lingui-explicit-id
 msgid "shell.barAway"
 msgstr "The bar is in its own window. pop:back command brings it back."
+
+#. pop:command stays English
+#. js-lingui-explicit-id
+msgid "shell.barElsewhere"
+msgstr "The bar is in the main window. Switch to it to type, or pop:command keeps it over every window"
 
 #. The popped bar's window title
 #. js-lingui-explicit-id

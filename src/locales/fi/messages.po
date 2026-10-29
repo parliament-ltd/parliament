@@ -6000,10 +6000,20 @@ msgstr "Valmiit"
 msgid "frameworkPicker.foot"
 msgstr "Ne kulkevat tämän keskustelun jokaisen kehotteen mukana valintajärjestyksessä, kunnes poistat ne käytöstä."
 
+#. The foot of the frameworks menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "frameworkPicker.keys"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
 msgstr "Ei vielä omia. new:framework \"nimi\" \"mitä se pyytää\" kirjoittaa sellaisen."
+
+#. The heading of the frameworks menu, drawn in capitals
+#. js-lingui-explicit-id
+msgid "frameworkPicker.title"
+msgstr ""
 
 #. A framework of your own with no name, as a persona could be
 #. js-lingui-explicit-id
@@ -6522,6 +6532,11 @@ msgstr "Vastaukset ja haut noudattavat sivun kieltä. reply: antaa vastauksille 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
 msgstr "Kieli: {language}"
+
+#. The foot of the languages menu, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "languagePicker.keys"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
@@ -7215,6 +7230,16 @@ msgstr "pysyy tällä koneella"
 msgid "picker.keptUpTo30"
 msgstr "säilytetään enintään 30 päivää"
 
+#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. js-lingui-explicit-id
+msgid "picker.keys"
+msgstr ""
+
+#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "picker.keysStep"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr "Verkko ja keskustelupalstat"
@@ -7232,6 +7257,11 @@ msgstr "Tutkimus"
 #. js-lingui-explicit-id
 msgid "picker.later"
 msgstr "myöhemmin"
+
+#. A group in the menu of who answers: providers not built yet, one row each
+#. js-lingui-explicit-id
+msgid "picker.laterGroup"
+msgstr ""
 
 #. Models that run on this computer (A14)
 #. js-lingui-explicit-id
@@ -7303,6 +7333,11 @@ msgstr "Lähteet"
 #. js-lingui-explicit-id
 msgid "picker.thinks"
 msgstr "osaa miettiä"
+
+#. The heading of the menu of who answers, drawn in capitals
+#. js-lingui-explicit-id
+msgid "picker.title"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.together"
@@ -7656,6 +7691,11 @@ msgstr "Keskustelu jatkaa yhtä linjaa. Valitse muita jatkaaksesi myös niitä, 
 #. js-lingui-explicit-id
 msgid "replyPicker.held"
 msgstr "Pysyy, kunnes muutat sitä. Uusi kehote uusille lähteille: by: ja niiden nimet."
+
+#. The foot of the menu of where a reply goes, before "Escape closes this"
+#. js-lingui-explicit-id
+msgid "replyPicker.keys"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
@@ -8553,6 +8593,11 @@ msgstr "palkki kohdistuu tähän"
 #. js-lingui-explicit-id
 msgid "shell.barAway"
 msgstr "Palkki on omassa ikkunassaan. pop:back command tuo sen takaisin."
+
+#. pop:command stays English
+#. js-lingui-explicit-id
+msgid "shell.barElsewhere"
+msgstr ""
 
 #. The popped bar's window title
 #. js-lingui-explicit-id
