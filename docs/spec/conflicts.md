@@ -4444,6 +4444,21 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - `collection:`, `reflection:`, `almanac:` and `docket:` answer "No command called". `records:` brings the Collection; the last two are the old names. A word for each, if you want them.
   - In a second room and in the Lab, Tab does not complete the commands that work there (`tell:`, `place:` and the like), since it asks with the board's own name.
   - The narrow room's top line and the column buttons have English written into the code rather than the copy table; (b) moves them there.
+- **Ruled and built, 29 October** (on `claude/after-switch`; tests 1,388, lint 30 older warnings, the build passes; tried in the browser):
+  - **(a)** `src/lib/release.js` holds the switch, off. The Lab's commands and `new:room` say "comes in a later release" and leave `?` and Tab; `docs/verbs.md` lists them under "In a later release". The Library shows Writing Studio's template and no shelf for layouts, blocks or themes. A space left in the Lab, and the old `/edit` and `/build` addresses, open the start. Every room someone made still opens; nothing stored changed. The Lab's tests run with the switch on.
+  - **(b)** A room alone and at least 940px wide has its columns open, each with a button that folds it to a strip. Sharing the screen, or narrower, each column is a 24px strip with its button, and the chat takes the room's width; a column opens over the chat's edge and closes on Escape, its button or a click on the chat, one side at a time. The narrow form only under 600px or on a phone. Writing Studio, Data Workspace and Drafting Desk alike. Nothing remembered; the stored panel buttons are no longer read and stay stored. The column and narrow top-line labels are in the copy table.
+  - **(c)** `letter:`, `letter:1` and `letter:all` open a panel under the bar, as `inspect:` does; Escape closes it. Letter one is the welcome letter, word for word, dated 28 October. Which were read is a setting on this device, not backed up.
+  - **(d)** The welcome page is one column: the heading, nine steps, the bar, then the ending. Its screen-reader name for the steps reads "Things to try".
+  - **(e)** On the very first start only: one bird, then two, then three, about 1.2 seconds, then the page fades in. A key or a click skips it; with reduced motion the three show at once for 0.4 seconds. The welcome card's mark is unchanged to the pixel. 64px wide, a size no mockup draws.
+  - **(f)** `?` lists every command on every board, in v30's flowing columns across the stage: four at 1440px, under a "Commands" heading, keys at the foot. A command for another board is fainter, with where it works beside it. Text at 11.5px. On a phone each command sits above its description. In the welcome card it keeps to the card's column, one wide.
+  - **(g)** On a bar 560px wide or less, only who answers shows beside a prompt; in the welcome card the prompt now has 342px rather than 80.
+  - **Also asked on 29 October:** "Built for computer, phone later" is in the welcome page's foot with the other marginalia, on every screen; the language sits in the card's top corner.
+- **For you:**
+  - Letter one's third paragraph says rooms are built from blocks and that you can make layouts and themes. In this release that waits with the Lab. It is your words (C265), so it is unchanged.
+  - The welcome page's foot still says "MIT licensed. Source published at launch", which the launch has made untrue.
+  - Data Workspace and Drafting Desk keep their chat in the right column, so sharing the screen their chat is behind the right strip. Neither is offered to new people now.
+  - The birds' size and the reduced-motion pause, the `?` panel pushing the boards down rather than floating over them (v30 floats it), and its one column in the welcome card are first choices, easy to change.
+  - The four draft languages lack the new strings and still say "that works here" for `?`.
 
 ## Proposed CLAUDE.md rewrite
 
