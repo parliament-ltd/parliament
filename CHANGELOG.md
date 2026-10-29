@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.6.0, 29 October 2026
+
+- A room beside another board keeps its side columns folded, so the chat has the room's width. A button at each side opens one over the chat.
+- ? lists every command, in columns across the screen.
+- settings: opens Settings, and who answers is no longer hidden under the quill.
+- This release is built around the default room. The Lab and the other rooms come in a later release, and any room you made still opens.
+- The welcome page is its steps and the bar, and letter: opens a letter from the one who made Parliament.
+
 ## 0.5.1, 28 October 2026
 
 - The hashes published with the release now match the files the key vault serves, so anyone can check it. Those of 0.5.0 were made from a copy with Windows line ends.
