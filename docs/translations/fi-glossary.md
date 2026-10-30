@@ -147,3 +147,8 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - Runs {command} → Suorittaa komennon {command}; Ran {command} → Suoritettu: {command}.
 - {n} of {total} → {n}/{total}, as library.shown. A percentage written by hand → {n} %, with a space.
 - arrangement → järjestely (as before); arrange:save "review desk" → arrange:save "arviointipöytä". Example room and layout names are the Finnish ones the page shows: edit:"Kirjoitusstudio", layout:"Kolme paneelia".
+
+## Second round, 30 October 2026
+- the start card (shown before anything is open) → Aloitus, as group.start. One room, as a board's name in a sentence → Huone ("Enter siirtää taulun Huone vasemmalle").
+- key vault (keys.parliament.ltd) → avainsäilö, also in the privacy lines: "Avaimia säilyttää Parliamentin avainsäilö".
+- the welcome letter keeps the writer's voice: first person, his fragments and trailing dots, the reader as sinä. Signed Stef.
