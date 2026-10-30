@@ -99,3 +99,30 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - Keys stay as written: Enter, Escape, Tab. "Enter …" opens most Enter-line sentences: "Enter öppnar …".
 - Quotation marks ”…”; decimal comma in prose (1,1 gånger priset); typed values keep their ASCII form (>0.50).
 - Placeholders always stand in base form; adjectives that would agree with a {board} or {name} are avoided ("{board} visas inte", not "är inte öppen").
+
+## Editing, the Lab and screens (drafted 30 October 2026)
+- edit (a card: words struck or typed in a reply or prompt) → redigering (redigeringar), as kind.edit. "Struck as edit 242" → "Genomstruket som redigering 242".
+- ask (an instruction tied to a passage) → fråga (frågor), as kind.ask; its marker "ask 241" → "fråga 241"; the ask box → frågerutan; the box's label ASK → FRÅGA.
+- suggestion → förslag; accept → godta (godtaget for a suggestion, godtagen for an ask); reject, turn down → avvisa (avvisat); settle (accept: or reject:) → avgöra.
+- sweep → granskning; to sweep → granska, as verb.sweep; "sweep 201a as Editor" → "granska 201a enligt Editor", as chat.writtenUnder ("Skrivet enligt"). The marker "sweep 245" → "granskning 245".
+- review (the review bar over suggestions) → genomgång. Kept apart from granska, which is the sweep.
+- Ripple → Ripple, kept as a name, since its command is ripple: and the English capitalises it; its marker stays "ripple 244"; Ripple's suggestion → Ripples förslag, or förslag från Ripple. Its state is "på" or "av", so it needs no gender.
+- tell, told (to a model) → meddela, meddelad ("meddelad till {name}"). Told once → en enda gång; never "med en gång", which means at once. The Enter line's "With it, told once:" → "Följer med, en enda gång:".
+- hold back (an edit) → hålla kvar, as for plans and verb.hold; "held back: stays yours" → "hålls kvar: stannar hos dig"; let it go → släpp den.
+- strike, struck → stryka igenom, genomstruken (genomstruket), as compare.legend and verb.strikethrough.
+- select (words in a reply) → markera, as Swedish editors say it. Context keeps it apart from a highlight (markering); see doubts.
+- passage → textavsnitt, as enter.jumpOpen.
+- drop (an ask, web search) → ta bort.
+- markup · clean → ändringar · renskrivet. "Markering" is Word's word for markup, but it is taken by highlights; "renskrivet" is the clean copy. "Shows replies marked up" → "visar svaren med ändringarna"; "clean" → "renskrivna".
+- calm → lugn, lugna ("Enter lugnar skärmen"); focus → fokus (neuter: "det fokuset", "ett fokus").
+- The marginalia "calm: off", "focus: on", "ripple: off" keep the command word and translate the state: "calm: av", "focus: på", "ripple: av", as field.frameworkNone ("framework: inget").
+- display (a screen by number) → skärm ("Skärm 2"), as enter.popDisplay; popped windows → tavlor i egna fönster.
+- a room's slots → platser, as verb.place; each by its definite form, so a sentence needs no ending: vänsterspalten, högerspalten, nedre högerspalten, konversationen, inmatningsytan, arbetsytan, chattpanelen, inspektören, dispositionen, dokumentet, marginalen, bladet. A narrow room's left and right columns → vänster kolumn, höger kolumn.
+- built for computer, phone → byggt för dator, mobil; "a phone", "a computer" in the Library's details → en mobil, en dator.
+- the guide (the Lab's six questions) → guiden.
+- the key store (the key vault, when it does not open) → nyckelförrådet.
+- letter (from the maker of Parliament) → brev ("Brev 2", "inte läst än").
+- in beta → i beta; coming soon → kommer snart, as library.pillSoon.
+- Command menu (a board) → Kommandomenyn, a definite form like the other boards.
+- percent written by a block → "{n} %" with a no-break space, as Swedish writes a percentage and as {share, number, percent} already prints it.
+- Example names inside commands follow the reader's language, since the Lab matches the names it shows: edit:"Skrivstudio", duplicate:"Skrivstudio", layout:"Tre paneler", tell:"Håll det under en sida", arrange:save "granskningsbord". Names the code fixes stay English: the tag tried, and every keyword argument (desktop, mobile, on, off, right, left, middle, bottom, up, down, search, collection, framework, arrangement, pushback).
