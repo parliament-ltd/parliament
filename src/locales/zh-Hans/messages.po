@@ -495,220 +495,220 @@ msgstr "可显示整个计划"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.add"
-msgstr ""
+msgstr "添加"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.contextThreshold"
-msgstr ""
+msgstr "提醒阈值"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.defaultBranchMode"
-msgstr ""
+msgstr "新分支携带"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.defaultBranchMode.full"
-msgstr ""
+msgstr "完整历史"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.defaultBranchMode.summary"
-msgstr ""
+msgstr "一份摘要"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.showCompressButton"
-msgstr ""
+msgstr "压缩按钮"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.showParentLink"
-msgstr ""
+msgstr "上级分支链接"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.chars"
-msgstr ""
+msgstr "{n} 个字符"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.chart-canvas.chartType"
-msgstr ""
+msgstr "类型"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.close"
-msgstr ""
+msgstr "收起{block}"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.contextThreshold"
-msgstr ""
+msgstr "提醒阈值"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode"
-msgstr ""
+msgstr "显示方式"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode.ambient"
-msgstr ""
+msgstr "颜色提示"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode.compact"
-msgstr ""
+msgstr "紧凑"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode.meter"
-msgstr ""
+msgstr "仪表"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.count"
-msgstr ""
+msgstr "“{name}”中有 {count, plural, other {# 个模块}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "blocksBoard.empty"
-msgstr ""
+msgstr "工坊中没有房间，因此没有模块。edit:\"写作室\" 可把一个房间放到这里。"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.emptySlot"
-msgstr ""
+msgstr "空"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.input.files"
-msgstr ""
+msgstr "文件"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.input.voice"
-msgstr ""
+msgstr "语音"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.input.webSearch"
-msgstr ""
+msgstr "网页搜索"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.moveDown"
-msgstr ""
+msgstr "下移"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.moveUp"
-msgstr ""
+msgstr "上移"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.noLayout"
-msgstr ""
+msgstr "还没有布局，因此没有模块。"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.none"
-msgstr ""
+msgstr "无"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notBuilt"
-msgstr ""
+msgstr "{slot}（不适配）"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder"
-msgstr ""
+msgstr "顺序"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder.message"
-msgstr ""
+msgstr "按对话顺序"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder.newest"
-msgstr ""
+msgstr "最新在前"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder.oldest"
-msgstr ""
+msgstr "最早在前"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.nothingToSet"
-msgstr ""
+msgstr "没有可设置的项"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notIn"
-msgstr ""
+msgstr "不在房间中"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.off"
-msgstr ""
+msgstr "关"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.ofOne"
-msgstr ""
+msgstr "{count} / 1"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.on"
-msgstr ""
+msgstr "开"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.open"
-msgstr ""
+msgstr "展开{block}"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.other"
-msgstr ""
+msgstr "其他"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.percent"
-msgstr ""
+msgstr "{n}%"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.rm"
-msgstr ""
+msgstr "移除"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.settings"
-msgstr ""
+msgstr "设置"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.sitsIn"
-msgstr ""
+msgstr "位于"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.stays"
-msgstr ""
+msgstr "每个房间都有"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.follow"
-msgstr ""
+msgstr "跟随"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.follow.chat"
-msgstr ""
+msgstr "此对话"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.follow.plan"
-msgstr ""
+msgstr "固定显示的计划"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.plan"
-msgstr ""
+msgstr "固定显示的计划"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.show"
-msgstr ""
+msgstr "显示"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.show.all"
-msgstr ""
+msgstr "所有运行"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.show.run"
-msgstr ""
+msgstr "本次运行"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.maxItems"
-msgstr ""
+msgstr "最多"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.mode"
-msgstr ""
+msgstr "列出"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.mode.headings"
-msgstr ""
+msgstr "回复中的标题"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.mode.prompts"
-msgstr ""
+msgstr "你的提示词"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.truncateAt"
-msgstr ""
+msgstr "截断于"
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -733,7 +733,7 @@ msgstr "合集"
 #. Every command, as a board to keep open or pop out (open:commandmenu)
 #. js-lingui-explicit-id
 msgid "board.commands"
-msgstr ""
+msgstr "命令菜单"
 
 #. Prompts set out in branches and steps, to run (C131)
 #. js-lingui-explicit-id
@@ -843,100 +843,100 @@ msgstr "撰写中"
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.carryOnSummary"
-msgstr ""
+msgstr "从摘要延续"
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.carryOnWhole"
-msgstr ""
+msgstr "在分支中延续"
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.full"
-msgstr ""
+msgstr "上下文已用 {percent}%："
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.title"
-msgstr ""
+msgstr "分支"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "branchesBlock.writes"
-msgstr ""
+msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "canvas.anyone"
-msgstr ""
+msgstr "不限"
 
 #. js-lingui-explicit-id
 msgid "canvas.builtFor"
-msgstr ""
+msgstr "适用于"
 
 #. js-lingui-explicit-id
 msgid "canvas.desktop"
-msgstr ""
+msgstr "电脑"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.empty"
-msgstr ""
+msgstr "工坊中没有房间。edit:\"写作室\" 可把一个房间放到这里，new:room 可新建一个，new:room guided 会一步步引导你完成。"
 
 #. js-lingui-explicit-id
 msgid "canvas.emptySlot"
-msgstr ""
+msgstr "空"
 
 #. js-lingui-explicit-id
 msgid "canvas.full"
-msgstr ""
+msgstr "已满"
 
 #. js-lingui-explicit-id
 msgid "canvas.gone"
-msgstr ""
+msgstr "那个房间已不在这里。"
 
 #. js-lingui-explicit-id
 msgid "canvas.layout"
-msgstr ""
+msgstr "布局"
 
 #. js-lingui-explicit-id
 msgid "canvas.mobile"
-msgstr ""
+msgstr "手机"
 
 #. js-lingui-explicit-id
 msgid "canvas.name"
-msgstr ""
+msgstr "名称"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.noLayout"
-msgstr ""
+msgstr "此房间还没有布局。layout:\"三栏\" 可为它设定一个。"
 
 #. js-lingui-explicit-id
 msgid "canvas.roomForMore"
-msgstr ""
+msgstr "还可放更多"
 
 #. js-lingui-explicit-id
 msgid "canvas.roomForOne"
-msgstr ""
+msgstr "可放一个"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.runs"
-msgstr ""
+msgstr "执行 {command}；undo: 可撤销"
 
 #. js-lingui-explicit-id
 msgid "canvas.sendsTo"
-msgstr ""
+msgstr "发送给"
 
 #. js-lingui-explicit-id
 msgid "canvas.theme"
-msgstr ""
+msgstr "主题"
 
 #. js-lingui-explicit-id
 msgid "canvas.thisComputer"
-msgstr ""
+msgstr "仅限本机"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.writes"
-msgstr ""
+msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
@@ -948,16 +948,16 @@ msgstr "回答来自 {source}"
 
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
-msgstr ""
+msgstr "接受"
 
 #. js-lingui-explicit-id
 msgid "chat.askAgain"
-msgstr ""
+msgstr "再问一次"
 
 #. Writes again: into the bar; {next} is the new branch, like 201d
 #. js-lingui-explicit-id
 msgid "chat.askAgainAs"
-msgstr ""
+msgstr "以 {next} 再问一次"
 
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
@@ -966,20 +966,20 @@ msgstr "以{language}提问：“{text}”"
 #. The label of the box an ask is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr ""
+msgstr "提问"
 
 #. Before an ask number in the text: ask 241
 #. js-lingui-explicit-id
 msgid "chat.askMarker"
-msgstr ""
+msgstr "提问"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr ""
+msgstr "用你自己的话提问：比如“改短一些”，或“补上它开放的年份”"
 
 #. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr ""
+msgstr "撤销"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1007,7 +1007,7 @@ msgstr "开启：对话收到首个回答后，会向模型发一个简短请求
 
 #. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
-msgstr ""
+msgstr "{count, plural, other {# 处编辑等待随下一条提示词发给此分支}}"
 
 #. js-lingui-explicit-id
 msgid "chat.finishSetting"
@@ -1036,20 +1036,20 @@ msgstr "含有读起来像是给模型的指令的文字：{phrases}。仅作为
 
 #. js-lingui-explicit-id
 msgid "chat.joinedToBar"
-msgstr ""
+msgstr "你的提示词和这条回复已按现在的内容放入输入栏，作为你的下一条提示词"
 
 #. js-lingui-explicit-id
 msgid "chat.pairLabel"
-msgstr ""
+msgstr "你的提示词及其回复。每个字都可以编辑"
 
 #. Under a prompt edited in place; {address} is its branch, like 201a
 #. js-lingui-explicit-id
 msgid "chat.promptEdited"
-msgstr ""
+msgstr "你在 {address} 中的提示词，已编辑"
 
 #. js-lingui-explicit-id
 msgid "chat.promptEditedOthers"
-msgstr ""
+msgstr "其他分支保留各自的提示词"
 
 #. js-lingui-explicit-id
 msgid "chat.quote"
@@ -1137,25 +1137,25 @@ msgstr "你离开对话时已停止。已收到的内容会保留。"
 
 #. js-lingui-explicit-id
 msgid "chat.sugAccept"
-msgstr ""
+msgstr "接受"
 
 #. js-lingui-explicit-id
 msgid "chat.suggestionsWaitingTab"
-msgstr ""
+msgstr "{count, plural, other {此分支中有 # 条建议等你处理}}"
 
 #. js-lingui-explicit-id
 msgid "chat.sugReject"
-msgstr ""
+msgstr "拒绝"
 
 #. Before a Ripple suggestion number in the text: ripple 244
 #. js-lingui-explicit-id
 msgid "chat.sugRipple"
-msgstr ""
+msgstr "涟漪"
 
 #. Before a sweep suggestion number in the text: sweep 245
 #. js-lingui-explicit-id
 msgid "chat.sugSweep"
-msgstr ""
+msgstr "扫查"
 
 #. js-lingui-explicit-id
 msgid "chat.summaryBy"
@@ -1193,12 +1193,12 @@ msgstr "已先思考"
 #. A tell: note the prompt carried, in the words of the person (C225 (d))
 #. js-lingui-explicit-id
 msgid "chat.toldNote"
-msgstr ""
+msgstr "你的笔记，只告知一次：{note}"
 
 #. A prompt that sent only the edits of the person (C216 (e))
 #. js-lingui-explicit-id
 msgid "chat.toldOnly"
-msgstr ""
+msgstr "你的编辑，已告知 {name}"
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -1219,7 +1219,7 @@ msgstr "引用的来源"
 
 #. js-lingui-explicit-id
 msgid "collection.acceptAnswer"
-msgstr ""
+msgstr "接受"
 
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
@@ -1260,35 +1260,35 @@ msgstr "加标签"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
-msgstr ""
+msgstr "已接受"
 
 #. js-lingui-explicit-id
 msgid "collection.askAnswered"
-msgstr ""
+msgstr "已就地回答"
 
 #. js-lingui-explicit-id
 msgid "collection.askAnsweredBy"
-msgstr ""
+msgstr "由 {name} 回答"
 
 #. js-lingui-explicit-id
 msgid "collection.askAnsweredHere"
-msgstr ""
+msgstr "仅在此处回答：原文此后已改动"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr ""
+msgstr "已向 {name} 提问"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
-msgstr ""
+msgstr "位于回复中“{passage}”之后"
 
 #. js-lingui-explicit-id
 msgid "collection.askOn"
-msgstr ""
+msgstr "关于“{passage}”"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
-msgstr ""
+msgstr "已撤销"
 
 #. js-lingui-explicit-id
 msgid "collection.by"
@@ -1304,19 +1304,19 @@ msgstr "出自 {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.changeHeld"
-msgstr ""
+msgstr "已搁置：只留在你这里"
 
 #. js-lingui-explicit-id
 msgid "collection.changeInto"
-msgstr ""
+msgstr "已并入一条提示词"
 
 #. js-lingui-explicit-id
 msgid "collection.changeSent"
-msgstr ""
+msgstr "已发给 {name}，{day}"
 
 #. js-lingui-explicit-id
 msgid "collection.changeWaits"
-msgstr ""
+msgstr "随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "collection.chats"
@@ -1324,7 +1324,7 @@ msgstr "对话"
 
 #. js-lingui-explicit-id
 msgid "collection.cleanWord"
-msgstr ""
+msgstr "无标注"
 
 #. js-lingui-explicit-id
 msgid "collection.count"
@@ -1336,11 +1336,11 @@ msgstr "日期"
 
 #. js-lingui-explicit-id
 msgid "collection.dropAsk"
-msgstr ""
+msgstr "去掉"
 
 #. js-lingui-explicit-id
 msgid "collection.editWhere"
-msgstr ""
+msgstr "{part, select, prompt {你在 {address} 中的提示词} other {{address}}}"
 
 #. add: stays English
 #. js-lingui-explicit-id
@@ -1370,7 +1370,7 @@ msgstr "在所属对话中找到它"
 
 #. js-lingui-explicit-id
 msgid "collection.findHere"
-msgstr ""
+msgstr "在对话中找到它"
 
 #. js-lingui-explicit-id
 msgid "collection.from"
@@ -1390,7 +1390,7 @@ msgstr "逐个添加"
 
 #. js-lingui-explicit-id
 msgid "collection.groupBranch"
-msgstr ""
+msgstr "分支 {address}"
 
 #. js-lingui-explicit-id
 msgid "collection.groupChat"
@@ -1402,47 +1402,47 @@ msgstr "计划 {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.holdBack"
-msgstr ""
+msgstr "搁置"
 
 #. js-lingui-explicit-id
 msgid "collection.legendBlue"
-msgstr ""
+msgstr "蓝色"
 
 #. js-lingui-explicit-id
 msgid "collection.legendBlueIs"
-msgstr ""
+msgstr "你添加的"
 
 #. js-lingui-explicit-id
 msgid "collection.legendGreen"
-msgstr ""
+msgstr "绿色，点线"
 
 #. js-lingui-explicit-id
 msgid "collection.legendGreenIs"
-msgstr ""
+msgstr "回答"
 
 #. js-lingui-explicit-id
 msgid "collection.legendRust"
-msgstr ""
+msgstr "铁锈色，虚线"
 
 #. js-lingui-explicit-id
 msgid "collection.legendRustIs"
-msgstr ""
+msgstr "涟漪的建议"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruck"
-msgstr ""
+msgstr "删除线"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
-msgstr ""
+msgstr "你删去的"
 
 #. js-lingui-explicit-id
 msgid "collection.legendSweepIs"
-msgstr ""
+msgstr "回答或扫查"
 
 #. js-lingui-explicit-id
 msgid "collection.letGo"
-msgstr ""
+msgstr "取消搁置"
 
 #. js-lingui-explicit-id
 msgid "collection.line"
@@ -1450,7 +1450,7 @@ msgstr "合集"
 
 #. js-lingui-explicit-id
 msgid "collection.markupWord"
-msgstr ""
+msgstr "标注"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -1463,7 +1463,7 @@ msgstr "此合集中没有匹配项。"
 
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
-msgstr ""
+msgstr "房间中的对话 {num} 不在此合集中"
 
 #. open: stays English
 #. js-lingui-explicit-id
@@ -1491,41 +1491,41 @@ msgstr "{num}，已不在此处"
 #. An edit that only struck words, as it reads clean
 #. js-lingui-explicit-id
 msgid "collection.removed"
-msgstr ""
+msgstr "已删去"
 
 #. js-lingui-explicit-id
 msgid "collection.review"
-msgstr ""
+msgstr "审阅"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewAll"
-msgstr ""
+msgstr "全部接受"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewDone"
-msgstr ""
+msgstr "没有待审阅的内容"
 
 #. The keys a and r, lower case
 #. js-lingui-explicit-id
 msgid "collection.reviewKeys"
-msgstr ""
+msgstr "a 接受，r 拒绝，方向键切换"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewNext"
-msgstr ""
+msgstr "下一条"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewOf"
-msgstr ""
+msgstr "{at} / {count}"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewPrev"
-msgstr ""
+msgstr "上一条"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "collection.runs"
-msgstr ""
+msgstr "执行 {command}"
 
 #. js-lingui-explicit-id
 msgid "collection.select"
@@ -1554,48 +1554,48 @@ msgstr "来源"
 
 #. js-lingui-explicit-id
 msgid "collection.sugAccept"
-msgstr ""
+msgstr "接受"
 
 #. js-lingui-explicit-id
 msgid "collection.sugAccepted"
-msgstr ""
+msgstr "{made, select, sweep {已接受} other {已接受：现在是你的编辑}}"
 
 #. js-lingui-explicit-id
 msgid "collection.sugBy"
-msgstr ""
+msgstr "由 {name} 提出"
 
 #. A Ripple suggestion carries an edit of the person to another branch
 #. js-lingui-explicit-id
 msgid "collection.sugFromRipple"
-msgstr ""
+msgstr "与你在 {branch} 中的编辑 {edit} 相同"
 
 #. js-lingui-explicit-id
 msgid "collection.sugFromRippleBare"
-msgstr ""
+msgstr "由你的一处编辑带来"
 
 #. js-lingui-explicit-id
 msgid "collection.sugFromSweep"
-msgstr ""
+msgstr "framework: {name}，“{instruction}”"
 
 #. js-lingui-explicit-id
 msgid "collection.sugOpen"
-msgstr ""
+msgstr "等你处理"
 
 #. js-lingui-explicit-id
 msgid "collection.sugReject"
-msgstr ""
+msgstr "拒绝"
 
 #. js-lingui-explicit-id
 msgid "collection.sugRejected"
-msgstr ""
+msgstr "已拒绝"
 
 #. js-lingui-explicit-id
 msgid "collection.sugTold"
-msgstr ""
+msgstr "已接受，已告知 {name}，{day}"
 
 #. js-lingui-explicit-id
 msgid "collection.sugToTell"
-msgstr ""
+msgstr "已接受：将随你的下一条提示词告知"
 
 #. js-lingui-explicit-id
 msgid "collection.summaryOf"
@@ -1607,11 +1607,11 @@ msgstr "全部"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr ""
+msgstr "提问"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
-msgstr ""
+msgstr "编辑"
 
 #. js-lingui-explicit-id
 msgid "collection.tabHighlight"
@@ -1631,7 +1631,7 @@ msgstr "摘录"
 
 #. js-lingui-explicit-id
 msgid "collection.tabSuggestion"
-msgstr ""
+msgstr "建议"
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
@@ -1643,11 +1643,11 @@ msgstr "位于“{heading}”下"
 
 #. js-lingui-explicit-id
 msgid "collection.undoAnswer"
-msgstr ""
+msgstr "撤销"
 
 #. js-lingui-explicit-id
 msgid "collection.undoEdit"
-msgstr ""
+msgstr "撤销"
 
 #. js-lingui-explicit-id
 msgid "collection.untitled"
@@ -1663,7 +1663,7 @@ msgstr "自定顺序"
 
 #. js-lingui-explicit-id
 msgid "collections.coloursFold"
-msgstr ""
+msgstr "颜色 ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
@@ -1750,36 +1750,36 @@ msgstr "{count, plural, other {# 个步骤}}"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
-msgstr ""
+msgstr "这些都已经在房间中了"
 
 #. js-lingui-explicit-id
 msgid "enter.addLayout"
-msgstr ""
+msgstr "它将采用“{name}”布局"
 
 #. js-lingui-explicit-id
 msgid "enter.addNone"
-msgstr ""
+msgstr "资源库中没有名为 {said} 的内容"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.addNotForRoom"
-msgstr ""
+msgstr "{said} 是一个房间。只有模块、布局和主题可以放进房间；edit: 可打开房间"
 
 #. js-lingui-explicit-id
 msgid "enter.addTheme"
-msgstr ""
+msgstr "它将使用“{name}”主题"
 
 #. js-lingui-explicit-id
 msgid "enter.addToRoom"
-msgstr ""
+msgstr "按 Enter 修改“{room}”"
 
 #. js-lingui-explicit-id
 msgid "enter.addTwoLayouts"
-msgstr ""
+msgstr "一个房间只能有一种布局。请取消勾选{names}中的一个"
 
 #. js-lingui-explicit-id
 msgid "enter.addTwoThemes"
-msgstr ""
+msgstr "一个房间只能有一个主题。请取消勾选{names}中的一个"
 
 #. js-lingui-explicit-id
 msgid "enter.again"
@@ -1920,127 +1920,127 @@ msgstr "按 Enter 归档 {nums}。不会删除任何内容，in:archive 可显�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeForget"
-msgstr ""
+msgstr "按 Enter 移除排布“{name}”。undo: 可恢复"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeGo"
-msgstr ""
+msgstr "按 Enter 切换到“{name}”。undo: 可恢复屏幕现在的样子"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeGoFocus"
-msgstr ""
+msgstr "按 Enter 切换到“{name}”，并退出专注。undo: 可恢复屏幕现在的样子"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeInLab"
-msgstr ""
+msgstr "arrange: 只能在工坊外使用。请先用 done: 离开工坊"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeLong"
-msgstr ""
+msgstr "名称最多 {max} 个字符"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMany"
-msgstr ""
+msgstr "哪个排布：{names}？"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr ""
+msgstr "按 Enter 保持此视图打开。pop:library display 2 可把一个面板放到另一块屏幕上"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
-msgstr ""
+msgstr "按 Enter 保持此视图打开。浏览器会询问一次，是否允许 Parliament 在你的屏幕上放置窗口"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapOne"
-msgstr ""
+msgstr "按 Enter 保持此视图打开。按 Escape 返回"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeName"
-msgstr ""
+msgstr "按 Enter 将“{name}”重命名为“{to}”。undo: 可改回原名"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeNameSame"
-msgstr ""
+msgstr "它已经叫“{to}”了"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeNameTaken"
-msgstr ""
+msgstr "已有另一个排布叫“{to}”。请先移除它，或另选一个名称"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeNone"
-msgstr ""
+msgstr "还没有保存任何排布。arrange:save \"名称\" 可保存屏幕上现在的内容"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeNotFound"
-msgstr ""
+msgstr "没有名为 {said} 的排布。你的排布有：{names}"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeReplace"
-msgstr ""
+msgstr "按 Enter 将屏幕上现在的内容保存为“{name}”，替换以此名称保存的那一个"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeSave"
-msgstr ""
+msgstr "按 Enter 将屏幕上现在的内容保存为“{name}”，包括各窗口及其所在的屏幕。房间中的对话不会保存"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeSaveName"
-msgstr ""
+msgstr "请为它命名：arrange:save \"审阅台\""
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr ""
+msgstr "按 Enter 将这条提问留在回复中你选中的文字处，或光标所在的位置。它会随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr ""
+msgstr "已保存为提问。它会随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr ""
+msgstr "一条提问最多 {max} 个字符"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr ""
+msgstr "请先点击进入一条回复，或选中要提问的文字，然后再次输入 ask:"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr ""
+msgstr "提问只用于回复。在你的提示词中，可以加删除线或直接改写"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr ""
+msgstr "按 Enter 在回复中你选中的文字处，或光标所在的位置，打开提问框"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
-msgstr ""
+msgstr "下一条提示词已附带 {most} 个文件，已达上限"
 
 #. js-lingui-explicit-id
 msgid "enter.attachGo"
-msgstr ""
+msgstr "按 Enter 打开文件选择器。这些文件只随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "enter.attachHeld"
-msgstr ""
+msgstr "{count, plural, other {# 个文件会随你的下一条提示词发送}}：{files}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.attachNotHere"
-msgstr ""
+msgstr "“{room}”中已关闭文件功能。set:input files on 可开启"
 
 #. js-lingui-explicit-id
 msgid "enter.attachPicking"
-msgstr ""
+msgstr "请在选择器中选择文件"
 
 #. js-lingui-explicit-id
 msgid "enter.attachRefused"
-msgstr ""
+msgstr "{name}：{why}"
 
 #. js-lingui-explicit-id
 msgid "enter.backupDoneLocked"
@@ -2072,54 +2072,54 @@ msgstr "{place, select, top {输入栏已经在顶部} bottom {输入栏已经�
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
-msgstr ""
+msgstr "按 Enter 将{block}放入{toSlot}"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAddMany"
-msgstr ""
+msgstr "按 Enter 将{blocks}放入房间"
 
 #. js-lingui-explicit-id
 msgid "enter.blockGoesTo"
-msgstr ""
+msgstr "{block}会放入{toSlot}"
 
 #. js-lingui-explicit-id
 msgid "enter.blockMany"
-msgstr ""
+msgstr "哪个模块：{names}？"
 
 #. js-lingui-explicit-id
 msgid "enter.blockNone"
-msgstr ""
+msgstr "没有名为 {said} 的模块。资源库中列有全部模块"
 
 #. js-lingui-explicit-id
 msgid "enter.blockNoPlace"
-msgstr ""
+msgstr "{block}在“{name}”中没有空位"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.blockNotThere"
-msgstr ""
+msgstr "{block}不在房间中。add: 可将它放入"
 
 #. js-lingui-explicit-id
 msgid "enter.blockRm"
-msgstr ""
+msgstr "按 Enter 将{block}移出房间。资源库中仍保留它"
 
 #. js-lingui-explicit-id
 msgid "enter.blockRmMany"
-msgstr ""
+msgstr "按 Enter 将{blocks}移出房间。资源库中仍保留它们"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.blocksNoLayout"
-msgstr ""
+msgstr "房间还没有布局。layout:\"三栏\" 可为它设定一个"
 
 #. js-lingui-explicit-id
 msgid "enter.blockStays"
-msgstr ""
+msgstr "{block}会保留：每个房间都有它"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.blockThere"
-msgstr ""
+msgstr "{block}已经在房间中。place: 可移动它"
 
 #. {boards} lists board names
 #. js-lingui-explicit-id
@@ -2199,30 +2199,30 @@ msgstr "{word} 可能是 {names}。请指明是哪个，例如 {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOff"
-msgstr ""
+msgstr "按 Enter 重新显示所有细节"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr ""
+msgstr "按 Enter 让屏幕更简洁：细节等你靠近时再显示"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr ""
+msgstr "所有细节都已显示。calm: 可让屏幕更简洁"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOn"
-msgstr ""
+msgstr "屏幕已经处于简洁状态。calm:off 可显示所有细节"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
-msgstr ""
+msgstr "{num} 已不在原来的位置，因此没有任何改动"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr ""
+msgstr "{num} 是一处编辑或一条提问。请用它自己的命令操作：hold:、undo:、accept:、reject:、jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2492,12 +2492,12 @@ msgstr "尚未发送的内容请单独用一行删除"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr ""
+msgstr "按 Enter 去掉{count, plural, other {提问}} {nums}。undo: 可恢复{count, plural, =1 {它} other {它们}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr ""
+msgstr "提问 {num} 已发给模型，因此会保留。accept: 或 reject: 可处理它的回答"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2522,7 +2522,7 @@ msgstr "{address} 的第 {index} 步已删除。undo: 可恢复"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteEditUse"
-msgstr ""
+msgstr "编辑要用 undo:{num} 撤销"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
@@ -2549,20 +2549,20 @@ msgstr "{address} 的第 {index} 步已开始，因此会随其对话保留"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteSugUse"
-msgstr ""
+msgstr "建议要用 reject:{num} 拒绝，并会作为记录保留"
 
 #. js-lingui-explicit-id
 msgid "enter.deviceGo"
-msgstr ""
+msgstr "按 Enter 让“{room}”{device, select, mobile {适配手机：侧栏会收进底部抽屉} other {适配电脑}}"
 
 #. js-lingui-explicit-id
 msgid "enter.deviceSame"
-msgstr ""
+msgstr "它已经{device, select, mobile {适配手机} other {适配电脑}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deviceWhich"
-msgstr ""
+msgstr "device: 可接 desktop 或 mobile"
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -2597,59 +2597,59 @@ msgstr "这就是第 {run} 次运行，已经在面板上。diff: 加上另一�
 
 #. js-lingui-explicit-id
 msgid "enter.doneGo"
-msgstr ""
+msgstr "按 Enter 离开工坊，回到之前的内容。每处更改在你做出时就已保存"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.doneNotLab"
-msgstr ""
+msgstr "done: 用于离开工坊，但工坊没有打开"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateGo"
-msgstr ""
+msgstr "按 Enter 将“{name}”复制为“{copy}”，并在工坊中打开副本。原房间的对话仍留在原房间中"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateGone"
-msgstr ""
+msgstr "那个房间已不在这里"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateNone"
-msgstr ""
+msgstr "没有名为 {said} 的房间或模板"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateSoon"
-msgstr ""
+msgstr "“{name}”即将推出，目前还没有可复制的内容"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateTemplate"
-msgstr ""
+msgstr "按 Enter 将模板“{name}”复制为“{copy}”，并在工坊中打开"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.duplicateWhich"
-msgstr ""
+msgstr "请指明要复制的房间，例如 duplicate:\"写作室\""
 
 #. js-lingui-explicit-id
 msgid "enter.editHere"
-msgstr ""
+msgstr "“{name}”已经在工坊中"
 
 #. js-lingui-explicit-id
 msgid "enter.editMany"
-msgstr ""
+msgstr "有多个房间叫这个名称：{names}"
 
 #. js-lingui-explicit-id
 msgid "enter.editNone"
-msgstr ""
+msgstr "没有名为 {said} 的房间"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.editNotRoom"
-msgstr ""
+msgstr "{said} 是一个编号。edit: 需要按名称指定房间"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.editWhich"
-msgstr ""
+msgstr "请指明要修改的房间，例如 edit:\"写作室\""
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -2770,16 +2770,16 @@ msgstr "按 Enter 让屏幕上只留下对话，并关闭{boards}。不会丢失
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusInLab"
-msgstr ""
+msgstr "focus: 只能在工坊外使用。请先用 done: 离开工坊"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusKept"
-msgstr ""
+msgstr "它已保存为“{room}”的专注设置：单独输入 focus: 即可恢复"
 
 #. js-lingui-explicit-id
 msgid "enter.focusKeptSame"
-msgstr ""
+msgstr "它已经是“{room}”的专注设置"
 
 #. js-lingui-explicit-id
 msgid "enter.focusNothing"
@@ -2787,7 +2787,7 @@ msgstr "还没有可专注的内容。p> 可开始一个对话"
 
 #. js-lingui-explicit-id
 msgid "enter.focusNotKept"
-msgstr ""
+msgstr "屏幕上没有房间，因此不会保存为专注设置"
 
 #. js-lingui-explicit-id
 msgid "enter.focusOff"
@@ -2796,7 +2796,7 @@ msgstr "按 Enter 恢复{boards}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusOffFor"
-msgstr ""
+msgstr "已退出专注，以显示{board}。focus: 可恢复"
 
 #. js-lingui-explicit-id
 msgid "enter.focusOffNot"
@@ -2808,44 +2808,44 @@ msgstr "按 Enter 将屏幕恢复原样"
 
 #. js-lingui-explicit-id
 msgid "enter.focusSave"
-msgstr ""
+msgstr "按 Enter 将屏幕上现在的内容保存为“{room}”的专注设置：{focusBoards}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusSaveNoRoom"
-msgstr ""
+msgstr "专注设置随房间保存。请先打开一个房间：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.focusSaveNothing"
-msgstr ""
+msgstr "屏幕上没有可以保存为专注设置的内容"
 
 #. js-lingui-explicit-id
 msgid "enter.focusSaveSame"
-msgstr ""
+msgstr "{focusBoards}已经是“{room}”的专注设置"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusSetAlready"
-msgstr ""
+msgstr "这组专注面板已经在屏幕上。focus:off 可恢复原来的内容"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusSetGo"
-msgstr ""
+msgstr "按 Enter 专注于{focusBoards}，按此顺序排列。不会丢失任何内容，focus:off 可恢复原来的内容"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusStripHeld"
-msgstr ""
+msgstr "屏幕处于专注状态。用 focus:off 退出后可自由排布"
 
 #. js-lingui-explicit-id
 msgid "enter.focusTheChat"
-msgstr ""
+msgstr "对话"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusWhich"
-msgstr ""
+msgstr "focus: 需要按名称指定面板：{choices}。{said} 不是其中之一"
 
 #. js-lingui-explicit-id
 msgid "enter.forgetNone"
@@ -2977,7 +2977,7 @@ msgstr "按 Enter 移除标题“{heading}”。其下的卡片会保留"
 #. On the Enter line while the prompt field holds a prompt edited in the chat
 #. js-lingui-explicit-id
 msgid "enter.heldPrompt"
-msgstr ""
+msgstr "输入新内容会替换它。按 Escape 清除"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
@@ -3034,28 +3034,28 @@ msgstr "按 Enter 查看 {verb} 的用法"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditAlready"
-msgstr ""
+msgstr "已搁置：{nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditNot"
-msgstr ""
+msgstr "未搁置：{nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditNotHere"
-msgstr ""
+msgstr "{num} 不是此处对话中的编辑"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditOff"
-msgstr ""
+msgstr "按 Enter 让 {nums} 随你的下一条提示词发送"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.holdEditOn"
-msgstr ""
+msgstr "按 Enter 搁置 {nums}：在 hold:off 之前只留在你这里，不会发送"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditTold"
-msgstr ""
+msgstr "{num} 已经告知过模型，因此无法搁置"
 
 #. js-lingui-explicit-id
 msgid "enter.importOpen"
@@ -3191,38 +3191,38 @@ msgstr "密钥被拒绝。请在{board}中更新，然后重新发送"
 
 #. js-lingui-explicit-id
 msgid "enter.labAlready"
-msgstr ""
+msgstr "工坊已经打开"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.labEmpty"
-msgstr ""
+msgstr "按 Enter 打开工坊，其中没有房间。之后可用 edit:\"某个房间\" 或 new:room"
 
 #. js-lingui-explicit-id
 msgid "enter.labLeft"
-msgstr ""
+msgstr "按 Enter 离开工坊"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.labNoRoom"
-msgstr ""
+msgstr "请先把一个房间放进工坊：edit:\"写作室\" 或 new:room"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.labOpen"
-msgstr ""
+msgstr "按 Enter 在工坊中打开“{name}”。在那里的每处更改都会即时保存，undo: 可撤销"
 
 #. js-lingui-explicit-id
 msgid "enter.labOpened"
-msgstr ""
+msgstr "按 Enter 打开工坊"
 
 #. js-lingui-explicit-id
 msgid "enter.labRoom"
-msgstr ""
+msgstr "按 Enter 把房间放到画布上"
 
 #. js-lingui-explicit-id
 msgid "enter.languageBeta"
-msgstr ""
+msgstr "此译文尚处于测试阶段：部分措辞可能仍不够自然"
 
 #. js-lingui-explicit-id
 msgid "enter.languageBrowser"
@@ -3235,7 +3235,7 @@ msgstr "页面已经跟随浏览器的语言"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.languageComing"
-msgstr ""
+msgstr "{language}即将推出。language: 可接 {names}"
 
 #. js-lingui-explicit-id
 msgid "enter.languageDraft"
@@ -3276,32 +3276,32 @@ msgstr "{verb} 尚未实现"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
-msgstr ""
+msgstr "按 Enter 让“{room}”采用“{name}”布局"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutMany"
-msgstr ""
+msgstr "哪种布局：{names}？"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutMoves"
-msgstr ""
+msgstr "{block}从{fromSlot}移到{toSlot}"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutNoMessages"
-msgstr ""
+msgstr "“{name}”中没有放对话的位置"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutNone"
-msgstr ""
+msgstr "没有名为 {said} 的布局。可用的布局有：{choices}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.layoutOut"
-msgstr ""
+msgstr "{block}在其中没有位置，会被移出房间；undo: 可放回"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutSame"
-msgstr ""
+msgstr "它已经是“{name}”布局"
 
 #. js-lingui-explicit-id
 msgid "enter.leavePrompt"
@@ -3313,49 +3313,49 @@ msgstr "按 Escape 返回搜索"
 
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
-msgstr ""
+msgstr "按 Enter 列出所有信"
 
 #. close:letter, the same as Escape
 #. js-lingui-explicit-id
 msgid "enter.letterClose"
-msgstr ""
+msgstr "按 Enter 关闭这封信"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
 msgid "enter.letterNone"
-msgstr ""
+msgstr "没有第 {n} 封信。letter:all 可列出所有信"
 
 #. A letter from the maker of Parliament; {n} is its number
 #. js-lingui-explicit-id
 msgid "enter.letterOpen"
-msgstr ""
+msgstr "按 Enter 打开第 {n} 封信"
 
 #. js-lingui-explicit-id
 msgid "enter.localGo"
-msgstr ""
+msgstr "{on, select, on {按 Enter 让“{room}”只发送给本机上的模型} other {按 Enter 让“{room}”重新可以发送给任何模型或来源}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.localOnlyHelper"
-msgstr ""
+msgstr "“{room}”只发送给本机上的模型，而辅助模型 {name} 不在本机上。请先用 helper: 指定一个本机模型"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.localOnlyNoHelper"
-msgstr ""
+msgstr "“{room}”只发送给本机上的模型，而本机上没有辅助模型。请先用 helper: 指定一个本机模型"
 
 #. js-lingui-explicit-id
 msgid "enter.localOnlyStopped"
-msgstr ""
+msgstr "未发送任何内容：此房间只发送给本机上的模型"
 
 #. js-lingui-explicit-id
 msgid "enter.localSame"
-msgstr ""
+msgstr "{on, select, on {它已经只发送给本机上的模型} other {它本来就可以发送给任何模型或来源}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.localWhich"
-msgstr ""
+msgstr "local: 可接 on 或 off"
 
 #. js-lingui-explicit-id
 msgid "enter.manyFailed"
@@ -3372,27 +3372,27 @@ msgstr "{cond, select, nothing {前面没有找到内容时运行} failed {前�
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
-msgstr ""
+msgstr "按 Enter 以无标注方式显示卡片：每处编辑只显示现在的样子，每个回答单独显示"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOn"
-msgstr ""
+msgstr "按 Enter 以标注方式显示卡片：删去的文字加删除线，你的文字为蓝色，回答为绿色"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColSame"
-msgstr ""
+msgstr "{on, select, on {卡片已经带标注} other {卡片已经是无标注的}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupOff"
-msgstr ""
+msgstr "按 Enter 以无标注方式显示回复：只显示结果，在 markup:on 之前为只读"
 
 #. js-lingui-explicit-id
 msgid "enter.markupOn"
-msgstr ""
+msgstr "按 Enter 以标注方式显示回复：删去的文字加删除线，你的文字为蓝色，可编辑"
 
 #. js-lingui-explicit-id
 msgid "enter.markupSame"
-msgstr ""
+msgstr "{on, select, on {回复已经带标注} other {回复已经是无标注的}}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -3472,7 +3472,7 @@ msgstr "“{name}”既是保存的搜索也是合集。请在后面加上 searc
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.nameWhichKindAll"
-msgstr ""
+msgstr "“{name}”对应不止一项内容。请在后面加上 search、collection、framework 或 arrangement"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranch"
@@ -3509,11 +3509,11 @@ msgstr "{count, plural, =0 {{address} 还没有步骤} other {{address} 有 # �
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGo"
-msgstr ""
+msgstr "按 Enter 新建一个只含对话的三栏房间，并在工坊中打开"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGuided"
-msgstr ""
+msgstr "按 Enter 新建一个只含对话的三栏房间，并在工坊中打开，同时启动引导"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -3567,7 +3567,7 @@ msgstr "笔记需要文字，例如 {example}"
 #. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
 #. js-lingui-explicit-id
 msgid "enter.notOffered"
-msgstr ""
+msgstr "{verb} 将在后续版本中推出"
 
 #. js-lingui-explicit-id
 msgid "enter.numNone"
@@ -3747,53 +3747,53 @@ msgstr "按 Enter 将 {nums} 置顶"
 
 #. js-lingui-explicit-id
 msgid "enter.placeCramped"
-msgstr ""
+msgstr "按 Enter 将{block}从{fromSlot}移到{toSlot}。它不是为那里设计的，可能会显得局促"
 
 #. js-lingui-explicit-id
 msgid "enter.placeDown"
-msgstr ""
+msgstr "按 Enter 将{block}在所在模块位中下移"
 
 #. js-lingui-explicit-id
 msgid "enter.placeFirst"
-msgstr ""
+msgstr "{block}已经是所在模块位中的第一个"
 
 #. js-lingui-explicit-id
 msgid "enter.placeFull"
-msgstr ""
+msgstr "{toSlot}只能放一个模块，而且已经有一个了。请先把它移走"
 
 #. js-lingui-explicit-id
 msgid "enter.placeGo"
-msgstr ""
+msgstr "按 Enter 将{block}从{fromSlot}移到{toSlot}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.placeInLab"
-msgstr ""
+msgstr "place: 用于在工坊中移动模块。edit: 可在工坊中打开房间"
 
 #. js-lingui-explicit-id
 msgid "enter.placeLast"
-msgstr ""
+msgstr "{block}已经是所在模块位中的最后一个"
 
 #. js-lingui-explicit-id
 msgid "enter.placeNoSlot"
-msgstr ""
+msgstr "“{name}”中没有名为 {where} 的位置。它的位置有：{choices}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.placeOne"
-msgstr ""
+msgstr "place: 一次只能移动一个模块"
 
 #. js-lingui-explicit-id
 msgid "enter.placeSame"
-msgstr ""
+msgstr "{block}已经在{toSlot}中"
 
 #. js-lingui-explicit-id
 msgid "enter.placeUp"
-msgstr ""
+msgstr "按 Enter 将{block}在所在模块位中上移"
 
 #. js-lingui-explicit-id
 msgid "enter.placeWhere"
-msgstr ""
+msgstr "请说明{block}放在哪里：right、left、extra、middle、bottom，或在所在模块位中 up 或 down"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchDone"
@@ -3981,19 +3981,19 @@ msgstr "按 Enter 将{board}放到屏幕 {display} 上的独立窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayAsk"
-msgstr ""
+msgstr "按 Enter 将{board}放到屏幕 {display} 上的独立窗口中。浏览器会询问一次，是否允许 Parliament 在你的屏幕上放置窗口"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayCannot"
-msgstr ""
+msgstr "此浏览器无法在其他屏幕上放置窗口。按 Enter 在这里以独立窗口打开{board}"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayNone"
-msgstr ""
+msgstr "屏幕 {display} 未连接。按 Enter 在这里以独立窗口打开{board}"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayRefused"
-msgstr ""
+msgstr "浏览器已设置为不允许 Parliament 放置窗口。按 Enter 在这里以独立窗口打开{board}"
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -4120,24 +4120,24 @@ msgstr "来自其{language}版本；若那里找不到，则用英文版"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr ""
+msgstr "随提示词附带，只告知一次：{edits, plural, =0 {} other {# 处编辑}}{both, select, yes {和 } other {}}{asks, plural, =0 {} other {# 条提问}} · {name} 会读取它们"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr ""
+msgstr "未输入新内容：只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}告知 {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr ""
+msgstr "按 Enter 只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}发给 {name}，约 {tokens} 个 token · {source} 不会读取任何一项"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr ""
+msgstr "你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}{total, plural, other {会}}同时发给 {name}，约 {tokens} 个 token · {source} 不会读取任何一项"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr ""
+msgstr "{source} 不会读取你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}。有了密钥后，模型会读取它们：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -4145,19 +4145,19 @@ msgstr "提示词未能发出。请重试"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesGo"
-msgstr ""
+msgstr "{count, plural, other {# 个文件随附}}：{files}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesOut"
-msgstr ""
+msgstr "{files} {count, plural, other {不会附带}}：这里不会把图片或 PDF 发给 {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesPrivacy"
-msgstr ""
+msgstr "隐私过滤只读取文本文件，不读取图片或 PDF"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesSource"
-msgstr ""
+msgstr "只把文字发给 {name}；文件会留给模型"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFrameworks"
@@ -4205,11 +4205,11 @@ msgstr "此对话约有 {tokens, number} 个 token。{name} 可能只读取最�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptLocalOnly"
-msgstr ""
+msgstr "“{room}”只发送给本机上的模型，而 {name} 不在本机上。请用 by: 指定本机模型，或使用 local:off"
 
 #. js-lingui-explicit-id
 msgid "enter.promptLocalRipple"
-msgstr ""
+msgstr "涟漪不会在这里检查：它的辅助模型不在本机上"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4359,20 +4359,20 @@ msgstr "{tokens, plural, other {按 Enter 以非流式方式重新发送，约 #
 
 #. js-lingui-explicit-id
 msgid "enter.promptRipple"
-msgstr ""
+msgstr "涟漪会检查 {nums}：调用 {name} {count, plural, other {共 # 次}}，约 {cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptRippleCheap"
-msgstr ""
+msgstr "涟漪会检查 {nums}：调用 {name} {count, plural, other {共 # 次}}，不到 {cost}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptRippleNoKey"
-msgstr ""
+msgstr "涟漪已开启，但检查 {nums} 需要一个有密钥的模型：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptRippleUnpriced"
-msgstr ""
+msgstr "涟漪会检查 {nums}：调用 {name} {count, plural, other {共 # 次}}，约 {tokens} 个 token"
 
 #. A source answers a search; a leading question phrase is left out (C168)
 #. js-lingui-explicit-id
@@ -4413,20 +4413,20 @@ msgstr "回复停滞了。有些网络会把流式回复积压起来，就会出
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"
-msgstr ""
+msgstr "随提示词附带，只告知一次：你从扫查中接受的 {count, plural, other {# 处更改}} · {name} 会读取{count, plural, =1 {它} other {它们}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptTellGo"
-msgstr ""
+msgstr "随提示词附带，只告知一次：{count, plural, =1 {你的笔记} other {你的 # 条笔记}} · {name} 会读取{count, plural, =1 {它} other {它们}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptTellToReader"
-msgstr ""
+msgstr "{count, plural, =1 {你的笔记} other {你的 # 条笔记}}会同时发给 {name} · {source} 不会读取"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptTellWait"
-msgstr ""
+msgstr "{source} 不读取笔记。{count, plural, =1 {你的笔记} other {你的 # 条笔记}}会等待一个有密钥的模型：api:"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4460,15 +4460,15 @@ msgstr "它的回答是英文的。之后可用 translate: 译为{language}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptVaultUnreached"
-msgstr ""
+msgstr "这里由 {name} 回答，但密钥库没有打开，因此无法使用任何密钥。请重新加载后再试；本机上的模型和来源仍可使用"
 
 #. js-lingui-explicit-id
 msgid "enter.promptWebGo"
-msgstr ""
+msgstr "它可能会搜索网页：最多 {most} 次，每次约 {cost}，另计 token 费用"
 
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
-msgstr ""
+msgstr "{whos} 无法搜索网页，{count, plural, other {会在不搜索的情况下回答}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4482,77 +4482,77 @@ msgstr "按 Enter 运行 {verb}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.reflectChanged"
-msgstr ""
+msgstr "房间现在显示的是另一个对话。再次输入 reflect: 即可读取它"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectCut"
-msgstr ""
+msgstr "内容较长：最早的几轮会被略去"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectDone"
-msgstr ""
+msgstr "已对 {head} 完成反思。其中的内容没有任何改动"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectFailed"
-msgstr ""
+msgstr "反思结果没有返回。没有任何改动"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGo"
-msgstr ""
+msgstr "按 Enter 对 {head} {count, plural, =1 {} other {及其分支}}进行反思：调用 {model} 一次，约 {cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGoCheap"
-msgstr ""
+msgstr "按 Enter 对 {head} {count, plural, =1 {} other {及其分支}}进行反思：调用 {model} 一次，不到 {cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGoing"
-msgstr ""
+msgstr "{model} 正在读取 {head}。其中的内容不会有任何改动"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGoUnpriced"
-msgstr ""
+msgstr "按 Enter 对 {head} {count, plural, =1 {} other {及其分支}}进行反思：调用 {model} 一次，约 {tokens} 个 token"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.reflectNoKey"
-msgstr ""
+msgstr "对 {head} 进行反思需要一个有密钥的模型：api:"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.reflectNoRoom"
-msgstr ""
+msgstr "反思读取的是房间中的对话。请先打开一个房间：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectNothingBack"
-msgstr ""
+msgstr "这里说的任何内容都不会写回 {head}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkBusy"
-msgstr ""
+msgstr "反思仍在撰写中。请等它完成后再提问"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkFailed"
-msgstr ""
+msgstr "没有收到回答。没有任何改动"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkGo"
-msgstr ""
+msgstr "按 Enter 向 {model} 询问关于 {head} 的问题：一次调用，约 {cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkGoCheap"
-msgstr ""
+msgstr "按 Enter 向 {model} 询问关于 {head} 的问题：一次调用，不到 {cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkGoUnpriced"
-msgstr ""
+msgstr "按 Enter 向 {model} 询问关于 {head} 的问题：一次调用，约 {tokens} 个 token"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkRest"
-msgstr ""
+msgstr "可以在这里谈谈 {head}。说的任何内容都不会写回其中"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectUnder"
-msgstr ""
+msgstr "所用框架：{names}"
 
 #. Enter puts the new verb in the field; it does not run it
 #. js-lingui-explicit-id
@@ -4662,46 +4662,46 @@ msgstr "{verb} 已不再是命令。请改用 {instead}"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleDone"
-msgstr ""
+msgstr "涟漪：{count, plural, =0 {在{checked, plural, =1 {它检查的分支} other {它检查的 # 个分支}}中没有需要带过去的内容} other {{nums} 中有 # 条建议}}"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleFailed"
-msgstr ""
+msgstr "涟漪无法检查 {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleMissed"
-msgstr ""
+msgstr "{count, plural, =1 {另有 # 条无法放置：它的文字} other {另有 # 条无法放置：它们的文字}}没有恰好出现一次，因此未标出"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleNoRoom"
-msgstr ""
+msgstr "涟漪作用于房间中的对话。请先打开一个房间：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleNothing"
-msgstr ""
+msgstr "涟漪会把编辑带到计划的其他分支，但此对话还没有分支"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOff"
-msgstr ""
+msgstr "按 Enter 为计划 {num} 关闭涟漪：编辑只留在各自的分支中"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOffAlready"
-msgstr ""
+msgstr "计划 {num} 的涟漪已经关闭"
 
 #. {nums} are the other branches, as 201b and 201c
 #. js-lingui-explicit-id
 msgid "enter.rippleOn"
-msgstr ""
+msgstr "按 Enter 为计划 {num} 开启涟漪：编辑随提示词发送时，{name} 会检查 {nums} 中是否有相同的改动，每个分支调用一次"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOnAlready"
-msgstr ""
+msgstr "计划 {num} 的涟漪已经开启"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleOnNoKey"
-msgstr ""
+msgstr "按 Enter 为计划 {num} 开启涟漪。检查 {nums} 需要一个有密钥的模型：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -4719,7 +4719,7 @@ msgstr "这里没有显示 {num} 的房间。open:{num} 可显示它"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.roomRan"
-msgstr ""
+msgstr "已执行 {command}。undo: 可撤销"
 
 #. js-lingui-explicit-id
 msgid "enter.roomThere"
@@ -4908,7 +4908,7 @@ msgstr "{count, plural, =0 {没有匹配的卡片} other {# 张卡片匹配}}"
 
 #. js-lingui-explicit-id
 msgid "enter.searchLibrary"
-msgstr ""
+msgstr "{count, plural, =0 {资源库中没有匹配项} other {有 # 项匹配}}"
 
 #. In search mode on a board search does not reach yet; {first} and {second} are board names
 #. js-lingui-explicit-id
@@ -4930,31 +4930,31 @@ msgstr "{count, plural, =1 {按 Enter 运行 # 条命令：{verbs}} other {按 E
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockChoice"
-msgstr ""
+msgstr "{word} 可接 {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockGo"
-msgstr ""
+msgstr "按 Enter 将{block}的 {word} 设为 {value}"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockNone"
-msgstr ""
+msgstr "{block}没有可更改的设置"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockNumber"
-msgstr ""
+msgstr "{word} 需要 {min} 到 {max} 之间的整数"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockSame"
-msgstr ""
+msgstr "{block}的 {word} 已经是 {value}"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockSwitch"
-msgstr ""
+msgstr "{word} 可接 on 或 off"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockWhich"
-msgstr ""
+msgstr "{block}的哪项设置：{words}？"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5059,46 +5059,46 @@ msgstr "按 Enter 开启新对话命名：对话收到首个回答后，会发�
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr ""
+msgstr "按 Enter 将{count, plural, other {提问}} {nums} 的回答保留在回复中，原文随之删去"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr ""
+msgstr "提问 {num} 所针对的原文在提问后已改动，因此它的回答只显示在卡片上。reject:{num} 可将其放弃"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr ""
+msgstr "此处对话中没有待处理的回答或建议"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr ""
+msgstr "提问 {num} 还没有回答"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr ""
+msgstr "{num} 不是提问或建议。accept: 和 reject: 用于处理提问的回答或建议"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr ""
+msgstr "按 Enter 撤销{count, plural, other {提问}} {nums} 的回答，原文保持不变"
 
 #. {state} is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr ""
+msgstr "建议 {num} 已经{state, select, accepted {接受} rejected {拒绝} other {处理}}过了"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
-msgstr ""
+msgstr "按 Enter 拒绝{count, plural, other {建议}} {nums}：回复保持原样"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugRipple"
-msgstr ""
+msgstr "按 Enter 接受涟漪的{count, plural, other {建议}} {nums}：每条都会成为你在其分支中的编辑，并随你在那里的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugSweep"
-msgstr ""
+msgstr "按 Enter 接受扫查的{count, plural, other {建议}} {nums}：建议的文字成为回复的一部分，加删除线的文字随之删去"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5121,22 +5121,22 @@ msgstr "按 Enter 在这里显示上一个房间"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallBar"
-msgstr ""
+msgstr "在手机上，输入栏固定在底部。bar:top 可在更宽的屏幕上使用"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallFocus"
-msgstr ""
+msgstr "在手机上一次只显示一个面板，因此不需要 focus:"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr ""
+msgstr "pop: 可在更宽的屏幕上使用。在手机上一次只显示一个面板"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallWidth"
-msgstr ""
+msgstr "width: 可在更宽的窗口中使用"
 
 #. The words stay English
 #. js-lingui-explicit-id
@@ -5196,30 +5196,30 @@ msgstr "按 Enter 停止 {num} 中正在传来的回复。已收到的内容会�
 
 #. js-lingui-explicit-id
 msgid "enter.strikeDone"
-msgstr ""
+msgstr "已加删除线。它会作为一处编辑随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "enter.strikeGo"
-msgstr ""
+msgstr "按 Enter 给你在回复中选中的文字加删除线。这些文字会保留并显示删除线，作为一处编辑随你的下一条提示词发送"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.strikeNoReply"
-msgstr ""
+msgstr "请点击进入一条回复并选中要加删除线的文字，然后再次输入 strikethrough:"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.strikeNothing"
-msgstr ""
+msgstr "请先在回复中选中要加删除线的文字，然后再次输入 strikethrough:"
 
 #. js-lingui-explicit-id
 msgid "enter.strikeNotNow"
-msgstr ""
+msgstr "这条回复正在撰写中，暂时无法编辑"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.strikeNumbered"
-msgstr ""
+msgstr "已作为编辑 {num} 加上删除线。undo:{num} 可撤销"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -5283,68 +5283,68 @@ msgstr "swap: 需要两个不同的面板"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepDone"
-msgstr ""
+msgstr "扫查：{address} 中{count, plural, =0 {没有可放置的建议} other {有 # 条建议}}"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepFailed"
-msgstr ""
+msgstr "对 {address} 的扫查没有返回结果。没有任何改动"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGo"
-msgstr ""
+msgstr "按 Enter 以“{name}”扫查 {address} 的最新回复：调用 {model} 一次，约 {cost}。每句最多一条建议"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGoCheap"
-msgstr ""
+msgstr "按 Enter 以“{name}”扫查 {address} 的最新回复：调用 {model} 一次，不到 {cost}。每句最多一条建议"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGoing"
-msgstr ""
+msgstr "正在扫查 {address}。建议会以绿色出现在回复中"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGoUnpriced"
-msgstr ""
+msgstr "按 Enter 以“{name}”扫查 {address} 的最新回复：调用 {model} 一次，约 {tokens} 个 token。每句最多一条建议"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepNoKey"
-msgstr ""
+msgstr "以“{name}”扫查 {address} 需要一个有密钥的模型：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepNone"
-msgstr ""
+msgstr "扫查：“{name}”不会改动 {address} 中的任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepNoReply"
-msgstr ""
+msgstr "{address} 中没有可扫查的模型回复"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepNoRoom"
-msgstr ""
+msgstr "请指明要扫查的分支，例如 sweep:201a pushback，或打开它所在的房间"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepNotChat"
-msgstr ""
+msgstr "{address} 不是可扫查的对话或分支"
 
 #. The chat’s frameworks
 #. js-lingui-explicit-id
 msgid "enter.sweepPick"
-msgstr ""
+msgstr "用哪个框架扫查 {address}？请在后面写上一个：{names}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepPickAny"
-msgstr ""
+msgstr "请在 {address} 后面写上一个框架，例如 sweep:{address} pushback"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepSource"
-msgstr ""
+msgstr "{address} 由来源回答，来源的文字不会被扫查"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepWhichBranch"
-msgstr ""
+msgstr "计划 {num} 有多个分支：请指明一个，例如 sweep:{num}a"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"
@@ -5409,54 +5409,54 @@ msgstr "→ 新房间"
 #. tried is the tag, as typed in tag:tried
 #. js-lingui-explicit-id
 msgid "enter.targetTrying"
-msgstr ""
+msgstr "→ “{room}”中的新对话，带有标签 tried"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
-msgstr ""
+msgstr "请把笔记写在引号中：tell:\"控制在一页以内\""
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellHeld"
-msgstr ""
+msgstr "已留给你在此处的下一条提示词{count, plural, =1 {} other {，共 # 条笔记}}。undo: 可撤销"
 
 #. js-lingui-explicit-id
 msgid "enter.tellHold"
-msgstr ""
+msgstr "按 Enter 将这条笔记留给你在此处的下一条提示词。模型会随那条提示词读取一次{count, plural, =1 {} other {，共 # 条笔记}}"
 
 #. js-lingui-explicit-id
 msgid "enter.tellLong"
-msgstr ""
+msgstr "一条笔记最多 {max} 个字符"
 
 #. js-lingui-explicit-id
 msgid "enter.tellMany"
-msgstr ""
+msgstr "一条提示词最多附带 {most} 条笔记"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellNoRoom"
-msgstr ""
+msgstr "笔记要随房间中的提示词发送。请先打开一个房间：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.tellSame"
-msgstr ""
+msgstr "这条笔记已经在等待发送"
 
 #. js-lingui-explicit-id
 msgid "enter.themeGo"
-msgstr ""
+msgstr "按 Enter 为“{room}”换上“{name}”主题"
 
 #. js-lingui-explicit-id
 msgid "enter.themeMany"
-msgstr ""
+msgstr "哪个主题：{names}？"
 
 #. js-lingui-explicit-id
 msgid "enter.themeNone"
-msgstr ""
+msgstr "没有名为 {said} 的主题。可用的主题有：{choices}"
 
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
-msgstr ""
+msgstr "它已经是“{name}”主题"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -5623,12 +5623,12 @@ msgstr "在{board}上，type: 可接 keyword、quote、note 或 highlight 之一
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr ""
+msgstr "提问 {num} 已有回答：accept:{num} 保留回答，reject:{num} 撤销回答"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr ""
+msgstr "等待发送的提问要用 delete:{num} 去掉"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5642,11 +5642,11 @@ msgstr "{nums} 此后有了变化，因此 undo: 到此为止"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoEditOne"
-msgstr ""
+msgstr "按 Enter 撤去编辑 {num}：被删去的文字恢复原样，你添加的文字随之移除。undo: 可恢复"
 
 #. js-lingui-explicit-id
 msgid "enter.undoEditTold"
-msgstr ""
+msgstr "编辑 {num} 已告知模型，因此会保留。再次修改文字，就会作为一处新编辑发送"
 
 #. js-lingui-explicit-id
 msgid "enter.undoFailed"
@@ -5663,7 +5663,7 @@ msgstr "已撤销 {line}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoNotEdit"
-msgstr ""
+msgstr "undo: 加编号用于撤销一处编辑，而 {num} 不是编辑"
 
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"
@@ -5672,7 +5672,7 @@ msgstr "此标签页中没有可撤销的操作"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoSugUse"
-msgstr ""
+msgstr "建议要用 accept:{num} 或 reject:{num} 处理"
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"
@@ -5693,29 +5693,29 @@ msgstr "{count, plural, =1 {按 Enter 去掉标签“{tag}”，只有一项带�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
-msgstr ""
+msgstr "下一条提示词已经开启网页搜索。web:off 可取消"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webCannot"
-msgstr ""
+msgstr "{name} 在这里无法搜索网页。请用 by: 指定一个可以搜索的模型"
 
 #. js-lingui-explicit-id
 msgid "enter.webDrop"
-msgstr ""
+msgstr "按 Enter 取消下一条提示词的网页搜索"
 
 #. js-lingui-explicit-id
 msgid "enter.webHoldGo"
-msgstr ""
+msgstr "按 Enter 让 {name} 只为你的下一条提示词搜索网页"
 
 #. js-lingui-explicit-id
 msgid "enter.webNoneHeld"
-msgstr ""
+msgstr "下一条提示词没有开启网页搜索"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webNotHere"
-msgstr ""
+msgstr "“{room}”中已关闭网页搜索。set:input web on 可开启"
 
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"
@@ -5870,7 +5870,7 @@ msgstr "由 {model} 回答"
 #. In the prompt field, when several models, or models and sources, are ticked to answer
 #. js-lingui-explicit-id
 msgid "field.answeredByMany"
-msgstr ""
+msgstr "由多个回答者回答"
 
 #. js-lingui-explicit-id
 msgid "field.answeredFrom"
@@ -5879,7 +5879,7 @@ msgstr "回答来自 {source}"
 #. In the prompt field, when several sources are ticked to answer
 #. js-lingui-explicit-id
 msgid "field.answeredFromMany"
-msgstr ""
+msgstr "回答来自多个来源"
 
 #. Shown on hover over who answers, in the prompt field
 #. js-lingui-explicit-id
@@ -5888,20 +5888,20 @@ msgstr "选择此处由谁回答（by:）"
 
 #. js-lingui-explicit-id
 msgid "field.attach"
-msgstr ""
+msgstr "附件"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "field.attachHelp"
-msgstr ""
+msgstr "为你的下一条提示词附加文件（attach:）"
 
 #. js-lingui-explicit-id
 msgid "field.fileDrop"
-msgstr ""
+msgstr "移除 {name}"
 
 #. js-lingui-explicit-id
 msgid "field.fileKind"
-msgstr ""
+msgstr "不支持这种文件。请试试图片、PDF，或文本、代码文件"
 
 #. js-lingui-explicit-id
 msgid "field.frameworkHelp"
@@ -5919,16 +5919,16 @@ msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
 msgid "field.held"
-msgstr ""
+msgstr "随下一条提示词发送"
 
 #. Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words
 #. js-lingui-explicit-id
 msgid "field.heldPrompt"
-msgstr ""
+msgstr "你编辑过的提示词"
 
 #. js-lingui-explicit-id
 msgid "field.listening"
-msgstr ""
+msgstr "正在聆听"
 
 #. js-lingui-explicit-id
 msgid "field.toAll"
@@ -5944,32 +5944,32 @@ msgstr "发给 {nums}"
 
 #. js-lingui-explicit-id
 msgid "field.voice"
-msgstr ""
+msgstr "语音"
 
 #. js-lingui-explicit-id
 msgid "field.voiceDownload"
-msgstr ""
+msgstr "设置语音：浏览器会下载一次语言包，之后语音只留在本设备上。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr ""
+msgstr "说出你的提示词。语音会在本设备上转为文字，不会有任何音频离开本设备。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceOff"
-msgstr ""
+msgstr "语音已关闭"
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
-msgstr ""
+msgstr "此浏览器无法在本设备上把语音转为文字。在这里使用语音意味着要把你的音频发送给浏览器的开发商，因此保持关闭。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "field.webHelp"
-msgstr ""
+msgstr "只为你的下一条提示词让模型搜索网页（web:）"
 
 #. js-lingui-explicit-id
 msgid "field.webSearch"
-msgstr ""
+msgstr "网页搜索"
 
 #. js-lingui-explicit-id
 msgid "framework.about.alts"
@@ -6022,7 +6022,7 @@ msgstr "它们会按勾选顺序随此对话中的每条提示词发送，直到
 #. The foot of the frameworks menu, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "frameworkPicker.keys"
-msgstr ""
+msgstr "点击某一行或在该行按 Enter，可将它加到末尾，或将它取消。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6032,7 +6032,7 @@ msgstr "你还没有自己的框架。new:framework \"名称\" \"要求\" 可写
 #. The heading of the frameworks menu, drawn in capitals
 #. js-lingui-explicit-id
 msgid "frameworkPicker.title"
-msgstr ""
+msgstr "框架"
 
 #. A framework of your own with no name, as a persona could be
 #. js-lingui-explicit-id
@@ -6094,157 +6094,157 @@ msgstr "标签"
 
 #. js-lingui-explicit-id
 msgid "guide.asItIs"
-msgstr ""
+msgstr "已是如此"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "guide.back"
-msgstr ""
+msgstr "new:room guided 可重新开始一次引导"
 
 #. js-lingui-explicit-id
 msgid "guide.built"
-msgstr ""
+msgstr "房间已搭建完成。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "guide.builtWhy"
-msgstr ""
+msgstr "每一步都是一条命令。undo: 可撤销其中一步，其余的可在画布和模块面板中修改。"
 
 #. js-lingui-explicit-id
 msgid "guide.done"
-msgstr ""
+msgstr "完成"
 
 #. js-lingui-explicit-id
 msgid "guide.how"
-msgstr ""
+msgstr "每个回答都会在输入栏中写入一条命令；按 Enter 执行。"
 
 #. js-lingui-explicit-id
 msgid "guide.label"
-msgstr ""
+msgstr "引导"
 
 #. js-lingui-explicit-id
 msgid "guide.o.branches"
-msgstr ""
+msgstr "分支"
 
 #. js-lingui-explicit-id
 msgid "guide.o.context"
-msgstr ""
+msgstr "上下文状况"
 
 #. js-lingui-explicit-id
 msgid "guide.o.data"
-msgstr ""
+msgstr "表格与数据"
 
 #. js-lingui-explicit-id
 msgid "guide.o.dataDesk"
-msgstr ""
+msgstr "数据台"
 
 #. js-lingui-explicit-id
 msgid "guide.o.desk"
-msgstr ""
+msgstr "在电脑前"
 
 #. js-lingui-explicit-id
 msgid "guide.o.essay"
-msgstr ""
+msgstr "随笔室"
 
 #. js-lingui-explicit-id
 msgid "guide.o.keywordsNotes"
-msgstr ""
+msgstr "关键词和笔记"
 
 #. js-lingui-explicit-id
 msgid "guide.o.own"
-msgstr ""
+msgstr "自己起名"
 
 #. js-lingui-explicit-id
 msgid "guide.o.phone"
-msgstr ""
+msgstr "在手机上"
 
 #. js-lingui-explicit-id
 msgid "guide.o.quick"
-msgstr ""
+msgstr "快问快答"
 
 #. js-lingui-explicit-id
 msgid "guide.o.steps"
-msgstr ""
+msgstr "步骤列表"
 
 #. js-lingui-explicit-id
 msgid "guide.o.talking"
-msgstr ""
+msgstr "把事情聊透"
 
 #. js-lingui-explicit-id
 msgid "guide.o.thinking"
-msgstr ""
+msgstr "思考室"
 
 #. js-lingui-explicit-id
 msgid "guide.o.webNo"
-msgstr ""
+msgstr "不需要"
 
 #. js-lingui-explicit-id
 msgid "guide.o.webYes"
-msgstr ""
+msgstr "需要，在我要求时"
 
 #. js-lingui-explicit-id
 msgid "guide.o.writing"
-msgstr ""
+msgstr "撰写长文"
 
 #. js-lingui-explicit-id
 msgid "guide.off"
-msgstr ""
+msgstr "收起引导"
 
 #. js-lingui-explicit-id
 msgid "guide.q.feel"
-msgstr ""
+msgstr "它应该给人什么感觉？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.for"
-msgstr ""
+msgstr "这个房间用来做什么？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.name"
-msgstr ""
+msgstr "它叫什么名字？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.reach"
-msgstr ""
+msgstr "哪些东西要触手可及？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.web"
-msgstr ""
+msgstr "它要搜索网页吗？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.where"
-msgstr ""
+msgstr "你会在哪里使用它？"
 
 #. js-lingui-explicit-id
 msgid "guide.skip"
-msgstr ""
+msgstr "跳过这一步"
 
 #. js-lingui-explicit-id
 msgid "guide.step"
-msgstr ""
+msgstr "{n} / {total}"
 
 #. js-lingui-explicit-id
 msgid "guide.why.feel"
-msgstr ""
+msgstr "主题决定房间内部的配色。周围的工坊保持不变。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.for"
-msgstr ""
+msgstr "这一步选择布局：对话和侧栏放在哪里。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.name"
-msgstr ""
+msgstr "从中选一个，或自己写一个。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.reach"
-msgstr ""
+msgstr "模块是房间的组成部分。资源库中还有更多，随时可以添加。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.web"
-msgstr ""
+msgstr "网页搜索是房间输入区的一项功能。你要求时，模型可能会搜索网页，费用会稍高一些。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.where"
-msgstr ""
+msgstr "为手机设计的房间会把侧栏收进底部抽屉。"
 
 #. js-lingui-explicit-id
 msgid "hint.kOnly"
@@ -6457,7 +6457,7 @@ msgstr "保存"
 #. The key vault, at its own address, could not be reached (stage 15)
 #. js-lingui-explicit-id
 msgid "keys.vaultUnreached"
-msgstr ""
+msgstr "密钥库没有打开；请重新加载后再试"
 
 #. js-lingui-explicit-id
 msgid "keysData.cannotSee"
@@ -6543,12 +6543,12 @@ msgstr "关键词"
 #. Beside a language still being worked on
 #. js-lingui-explicit-id
 msgid "languagePicker.beta"
-msgstr ""
+msgstr "测试版"
 
 #. Beside a language listed but not offered yet
 #. js-lingui-explicit-id
 msgid "languagePicker.coming"
-msgstr ""
+msgstr "即将推出"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.draft"
@@ -6565,7 +6565,7 @@ msgstr "语言：{language}"
 #. The foot of the languages menu, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "languagePicker.keys"
-msgstr ""
+msgstr "点击某一行或在该行按 Enter，即可将页面切换为该语言。"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
@@ -6638,17 +6638,17 @@ msgstr "搜索"
 #. A letter from the maker of Parliament; {n} is its number
 #. js-lingui-explicit-id
 msgid "letter.heading"
-msgstr ""
+msgstr "第 {n} 封信"
 
 #. The heading over the list letter:all opens
 #. js-lingui-explicit-id
 msgid "letter.list"
-msgstr ""
+msgstr "信件"
 
 #. Beside a letter in the list that this browser has not opened
 #. js-lingui-explicit-id
 msgid "letter.unread"
-msgstr ""
+msgstr "未读"
 
 #. js-lingui-explicit-id
 msgid "library.aboutAlmanac"
@@ -6676,7 +6676,7 @@ msgstr "密钥、语言、你的数据，以及各项功能的行为。"
 
 #. js-lingui-explicit-id
 msgid "library.addToRoom"
-msgstr ""
+msgstr "添加到房间"
 
 #. js-lingui-explicit-id
 msgid "library.blocks"
@@ -6684,79 +6684,79 @@ msgstr "{count, plural, other {# 个模块}}"
 
 #. js-lingui-explicit-id
 msgid "library.clear"
-msgstr ""
+msgstr "清除"
 
 #. js-lingui-explicit-id
 msgid "library.close"
-msgstr ""
+msgstr "关闭"
 
 #. js-lingui-explicit-id
 msgid "library.dAnyone"
-msgstr ""
+msgstr "不限"
 
 #. js-lingui-explicit-id
 msgid "library.dBlocks"
-msgstr ""
+msgstr "模块"
 
 #. js-lingui-explicit-id
 msgid "library.dBuiltFor"
-msgstr ""
+msgstr "适用于"
 
 #. js-lingui-explicit-id
 msgid "library.dComputer"
-msgstr ""
+msgstr "电脑"
 
 #. js-lingui-explicit-id
 msgid "library.dFits"
-msgstr ""
+msgstr "可放入"
 
 #. js-lingui-explicit-id
 msgid "library.dLayout"
-msgstr ""
+msgstr "布局"
 
 #. js-lingui-explicit-id
 msgid "library.dNone"
-msgstr ""
+msgstr "无"
 
 #. js-lingui-explicit-id
 msgid "library.dNoRoom"
-msgstr ""
+msgstr "暂无房间"
 
 #. js-lingui-explicit-id
 msgid "library.dPhone"
-msgstr ""
+msgstr "手机"
 
 #. js-lingui-explicit-id
 msgid "library.dPlaces"
-msgstr ""
+msgstr "位置"
 
 #. js-lingui-explicit-id
 msgid "library.dSendsTo"
-msgstr ""
+msgstr "发送给"
 
 #. js-lingui-explicit-id
 msgid "library.dSettings"
-msgstr ""
+msgstr "设置"
 
 #. js-lingui-explicit-id
 msgid "library.dTheme"
-msgstr ""
+msgstr "主题"
 
 #. js-lingui-explicit-id
 msgid "library.dThisComputer"
-msgstr ""
+msgstr "仅限本机"
 
 #. js-lingui-explicit-id
 msgid "library.duplicate"
-msgstr ""
+msgstr "复制"
 
 #. js-lingui-explicit-id
 msgid "library.dUsedIn"
-msgstr ""
+msgstr "用于"
 
 #. js-lingui-explicit-id
 msgid "library.editHere"
-msgstr ""
+msgstr "在这里编辑"
 
 #. js-lingui-explicit-id
 msgid "library.emptyShelf"
@@ -6788,7 +6788,7 @@ msgstr "放在房间中"
 
 #. js-lingui-explicit-id
 msgid "library.inThisRoom"
-msgstr ""
+msgstr "已在此房间中"
 
 #. js-lingui-explicit-id
 msgid "library.loading"
@@ -6796,11 +6796,11 @@ msgstr "正在读取书架"
 
 #. js-lingui-explicit-id
 msgid "library.noMatch"
-msgstr ""
+msgstr "资源库中没有匹配项。试试更短的词，或清空输入栏。"
 
 #. js-lingui-explicit-id
 msgid "library.onCanvas"
-msgstr ""
+msgstr "在画布上"
 
 #. js-lingui-explicit-id
 msgid "library.onScreen"
@@ -6875,20 +6875,20 @@ msgstr "房间内部的配色和字体"
 
 #. js-lingui-explicit-id
 msgid "library.tick"
-msgstr ""
+msgstr "勾选{name}"
 
 #. js-lingui-explicit-id
 msgid "library.ticked"
-msgstr ""
+msgstr "已勾选 {count} 项：{names}"
 
 #. js-lingui-explicit-id
 msgid "library.tickHow"
-msgstr ""
+msgstr "勾选模块、布局或主题，然后一起添加到房间"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "library.writes"
-msgstr ""
+msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -7262,12 +7262,12 @@ msgstr "最多保存 30 天"
 #. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr ""
+msgstr "点击某个名称或按 Enter，从现在起只由它回答。点击它的复选框，或按住 Shift 点击，可把它加进来。需要密钥的行则会在输入栏中写入 api:。"
 
 #. The foot of the menu of who answers one step of a plan, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "picker.keysStep"
-msgstr ""
+msgstr "点击某一行或在该行按 Enter，即可选它来回答这一步。"
 
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
@@ -7290,7 +7290,7 @@ msgstr "稍后推出"
 #. A group in the menu of who answers: providers not built yet, one row each
 #. js-lingui-explicit-id
 msgid "picker.laterGroup"
-msgstr ""
+msgstr "稍后推出"
 
 #. Models that run on this computer (A14)
 #. js-lingui-explicit-id
@@ -7366,7 +7366,7 @@ msgstr "可思考"
 #. The heading of the menu of who answers, drawn in capitals
 #. js-lingui-explicit-id
 msgid "picker.title"
-msgstr ""
+msgstr "由谁回答"
 
 #. js-lingui-explicit-id
 msgid "picker.together"
@@ -7568,136 +7568,136 @@ msgstr "{count, plural, other {# 个电话号码}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.again"
-msgstr ""
+msgstr "重新反思"
 
 #. js-lingui-explicit-id
 msgid "reflection.by"
-msgstr ""
+msgstr "由 {name} 撰写"
 
 #. js-lingui-explicit-id
 msgid "reflection.costUnknown"
-msgstr ""
+msgstr "费用未知"
 
 #. js-lingui-explicit-id
 msgid "reflection.from"
-msgstr ""
+msgstr "出自 {head}"
 
 #. js-lingui-explicit-id
 msgid "reflection.keepNote"
-msgstr ""
+msgstr "保存为笔记"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr ""
+msgstr "{count, plural, other {# 条提问}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
-msgstr ""
+msgstr "目前的标记"
 
 #. js-lingui-explicit-id
 msgid "reflection.markedIn"
-msgstr ""
+msgstr "{list}，分布在 {branches}。"
 
 #. js-lingui-explicit-id
 msgid "reflection.markEdits"
-msgstr ""
+msgstr "{count, plural, other {# 处编辑}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markedNothing"
-msgstr ""
+msgstr "还没有任何标记。"
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr ""
+msgstr "{count, plural, other {# 条笔记}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
-msgstr ""
+msgstr "{count, plural, other {# 条摘录}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markSuggestions"
-msgstr ""
+msgstr "{count, plural, other {# 条建议}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markTerms"
-msgstr ""
+msgstr "{count, plural, other {# 个关键词}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.noCall"
-msgstr ""
+msgstr "不调用模型"
 
 #. js-lingui-explicit-id
 msgid "reflection.noRoom"
-msgstr ""
+msgstr "反思读取房间中的对话。打开一个房间后，它会读取其中的对话及其分支。"
 
 #. js-lingui-explicit-id
 msgid "reflection.proposal"
-msgstr ""
+msgstr "一项提议"
 
 #. js-lingui-explicit-id
 msgid "reflection.questionHelp"
-msgstr ""
+msgstr "写入输入栏，以便讨论"
 
 #. js-lingui-explicit-id
 msgid "reflection.questions"
-msgstr ""
+msgstr "供反思的提示词"
 
 #. js-lingui-explicit-id
 msgid "reflection.readsOnly"
-msgstr ""
+msgstr "只读，绝不写入"
 
 #. js-lingui-explicit-id
 msgid "reflection.reflect"
-msgstr ""
+msgstr "反思"
 
 #. js-lingui-explicit-id
 msgid "reflection.reflectAbout"
-msgstr ""
+msgstr "读取 {head} 及其中的所有标记，然后写出一份综合梳理，并根据你自己的标记提出几个问题。只调用一次，按 Enter 之前会写明所用模型。"
 
 #. js-lingui-explicit-id
 msgid "reflection.reflecting"
-msgstr ""
+msgstr "正在反思…"
 
 #. js-lingui-explicit-id
 msgid "reflection.session"
-msgstr ""
+msgstr "会话"
 
 #. js-lingui-explicit-id
 msgid "reflection.sessionIs"
-msgstr ""
+msgstr "{messages, plural, other {# 条消息}} · {tokens, plural, =0 {未报告 token 用量} other {约 # 个 token}} · {cost}"
 
 #. js-lingui-explicit-id
 msgid "reflection.sessionReading"
-msgstr ""
+msgstr "正在读取…"
 
 #. js-lingui-explicit-id
 msgid "reflection.sweepAs"
-msgstr ""
+msgstr "以“{name}”扫查 {branch}"
 
 #. js-lingui-explicit-id
 msgid "reflection.synthesis"
-msgstr ""
+msgstr "综合梳理"
 
 #. js-lingui-explicit-id
 msgid "reflection.talk"
-msgstr ""
+msgstr "谈谈这个对话"
 
 #. js-lingui-explicit-id
 msgid "reflection.talkFailed"
-msgstr ""
+msgstr "没有收到回答。"
 
 #. js-lingui-explicit-id
 msgid "reflection.talkHow"
-msgstr ""
+msgstr "输入栏指向此面板时，就是在谈论 {head}。这里说的任何内容都不会写回其中。"
 
 #. js-lingui-explicit-id
 msgid "reflection.talkWaiting"
-msgstr ""
+msgstr "正在撰写…"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "reflection.writes"
-msgstr ""
+msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "replyPicker.all"
@@ -7724,7 +7724,7 @@ msgstr "保持不变，直到你更改。要向新的来源发新提示词：by:
 #. The foot of the menu of where a reply goes, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "replyPicker.keys"
-msgstr ""
+msgstr "点击某一行或在该行按 Enter，即可勾选或取消勾选。"
 
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
@@ -7745,32 +7745,32 @@ msgstr "你正在查看的回复。你在各条回复间切换时，提示词会
 #. The handle of the sheet that holds the chat in a narrow data or drafting room
 #. js-lingui-explicit-id
 msgid "room.chatSheet"
-msgstr ""
+msgstr "对话"
 
 #. Show replies as they read now, without marks
 #. js-lingui-explicit-id
 msgid "room.cleanWord"
-msgstr ""
+msgstr "无标注"
 
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
-msgstr ""
+msgstr "收起左栏"
 
 #. The button on a room's right column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeRight"
-msgstr ""
+msgstr "收起右栏"
 
 #. A room's left column, read aloud
 #. js-lingui-explicit-id
 msgid "room.columnLeft"
-msgstr ""
+msgstr "左栏"
 
 #. A room's right column, read aloud
 #. js-lingui-explicit-id
 msgid "room.columnRight"
-msgstr ""
+msgstr "右栏"
 
 #. js-lingui-explicit-id
 msgid "room.empty"
@@ -7779,27 +7779,27 @@ msgstr "空房间。在输入栏中写下第一条提示词，即可开启它的
 #. A narrow data room's button for its column inspector, while it shows
 #. js-lingui-explicit-id
 msgid "room.hideInspector"
-msgstr ""
+msgstr "隐藏检查器"
 
 #. A narrow drafting room's button for its margin notes, while they show
 #. js-lingui-explicit-id
 msgid "room.hideMargin"
-msgstr ""
+msgstr "隐藏边注栏"
 
 #. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
 #. js-lingui-explicit-id
 msgid "room.home"
-msgstr ""
+msgstr "前往 Parliament 首页"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "room.markupRuns"
-msgstr ""
+msgstr "执行 {command}"
 
 #. Show replies with their edits marked up
 #. js-lingui-explicit-id
 msgid "room.markupWord"
-msgstr ""
+msgstr "标注"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -7812,40 +7812,40 @@ msgstr "找不到这个对话。它可能已被移除。"
 #. The wrench at the top of a narrow room, outside the shell: it opens the room's editor
 #. js-lingui-explicit-id
 msgid "room.openEditor"
-msgstr ""
+msgstr "打开编辑器"
 
 #. The button on a room's left column, while it is closed
 #. js-lingui-explicit-id
 msgid "room.openLeft"
-msgstr ""
+msgstr "展开左栏"
 
 #. The button on a room's right column, while it is closed
 #. js-lingui-explicit-id
 msgid "room.openRight"
-msgstr ""
+msgstr "展开右栏"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "room.rippleHelp"
-msgstr ""
+msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "room.rippleOff"
-msgstr ""
+msgstr "ripple: off"
 
 #. js-lingui-explicit-id
 msgid "room.rippleOn"
-msgstr ""
+msgstr "ripple: on"
 
 #. A narrow data room's button for its column inspector, while it is hidden
 #. js-lingui-explicit-id
 msgid "room.showInspector"
-msgstr ""
+msgstr "显示检查器"
 
 #. A narrow drafting room's button for its margin notes, while they are hidden
 #. js-lingui-explicit-id
 msgid "room.showMargin"
-msgstr ""
+msgstr "显示边注栏"
 
 #. js-lingui-explicit-id
 msgid "room.unavailable"
@@ -7858,140 +7858,140 @@ msgstr "未命名房间"
 
 #. js-lingui-explicit-id
 msgid "screensMap.back"
-msgstr ""
+msgstr "按 Escape 返回"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotBody"
-msgstr ""
+msgstr "其他功能都可以正常使用。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotHead"
-msgstr ""
+msgstr "此浏览器无法把面板放到其他屏幕上。"
 
 #. A screen, by its number: pop:library display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
-msgstr ""
+msgstr "屏幕 {n}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.empty"
-msgstr ""
+msgstr "这里还没有内容"
 
 #. js-lingui-explicit-id
 msgid "screensMap.extra"
-msgstr ""
+msgstr "检测到另一块屏幕"
 
 #. js-lingui-explicit-id
 msgid "screensMap.extraGo"
-msgstr ""
+msgstr "跨屏幕排布"
 
 #. js-lingui-explicit-id
 msgid "screensMap.ghost"
-msgstr ""
+msgstr "将出现在这里"
 
 #. js-lingui-explicit-id
 msgid "screensMap.here"
-msgstr ""
+msgstr "此屏幕"
 
 #. js-lingui-explicit-id
 msgid "screensMap.hereSub"
-msgstr ""
+msgstr "此窗口"
 
 #. js-lingui-explicit-id
 msgid "screensMap.label"
-msgstr ""
+msgstr "你的屏幕"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingGone"
-msgstr ""
+msgstr "即将关闭"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingHere"
-msgstr ""
+msgstr "即将回到此窗口"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingOther"
-msgstr ""
+msgstr "即将移到另一块屏幕"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingTo"
-msgstr ""
+msgstr "即将移到屏幕 {n}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingWindow"
-msgstr ""
+msgstr "即将移到独立窗口"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "screensMap.move"
-msgstr ""
+msgstr "写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.oneBody"
-msgstr ""
+msgstr "连接一块外接屏幕后，就可以把面板放上去。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.oneHead"
-msgstr ""
+msgstr "未检测到外接屏幕。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.onScreen"
-msgstr ""
+msgstr "{boards}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.onScreenLab"
-msgstr ""
+msgstr "工坊、{boards}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.onScreenNamed"
-msgstr ""
+msgstr "“{name}”：{boards}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.other"
-msgstr ""
+msgstr "另一块屏幕"
 
 #. js-lingui-explicit-id
 msgid "screensMap.otherSub"
-msgstr ""
+msgstr "浏览器允许 Parliament 放置窗口后，会显示它的尺寸"
 
 #. js-lingui-explicit-id
 msgid "screensMap.refusedBody"
-msgstr ""
+msgstr "可以在浏览器的网站设置中更改。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.refusedHead"
-msgstr ""
+msgstr "浏览器已设置为不允许 Parliament 放置窗口。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "screensMap.reset"
-msgstr ""
+msgstr "reset: 可恢复默认"
 
 #. A room, as a box on the map
 #. js-lingui-explicit-id
 msgid "screensMap.room"
-msgstr ""
+msgstr "房间"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "screensMap.save"
-msgstr ""
+msgstr "arrange:save \"…\" 可保存它"
 
 #. js-lingui-explicit-id
 msgid "screensMap.saved"
-msgstr ""
+msgstr "已保存"
 
 #. js-lingui-explicit-id
 msgid "screensMap.wide"
-msgstr ""
+msgstr "宽 {width}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.wideHere"
-msgstr ""
+msgstr "宽 {width}，此窗口"
 
 #. js-lingui-explicit-id
 msgid "screensMap.window"
-msgstr ""
+msgstr "独立窗口"
 
 #. js-lingui-explicit-id
 msgid "settings.aboutDesc"
@@ -8038,79 +8038,79 @@ msgstr "备份与恢复"
 
 #. js-lingui-explicit-id
 msgid "settings.browserCompression"
-msgstr ""
+msgstr "更小的备份"
 
 #. js-lingui-explicit-id
 msgid "settings.browserCompressionNot"
-msgstr ""
+msgstr "备份不经压缩写入，因此体积更大。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserHelp"
-msgstr ""
+msgstr "Parliament 用到的功能，以及它们在你当前使用的浏览器中能否正常工作。每一项都是实际试过才得出的。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserHtml"
-msgstr ""
+msgstr "把文本转为 HTML 时的检查"
 
 #. js-lingui-explicit-id
 msgid "settings.browserHtmlNot"
-msgstr ""
+msgstr "此浏览器不提供这项检查；Parliament 仍只把外部文本作为纯文本显示。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserLabel"
-msgstr ""
+msgstr "此浏览器"
 
 #. js-lingui-explicit-id
 msgid "settings.browserOnTop"
-msgstr ""
+msgstr "始终显示在最前面的窗口"
 
 #. js-lingui-explicit-id
 msgid "settings.browserOnTopNot"
-msgstr ""
+msgstr "独立窗口会以普通窗口打开，可能会被其他窗口遮住。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPasskeys"
-msgstr ""
+msgstr "用于锁定的通行密钥"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPasskeysNot"
-msgstr ""
+msgstr "锁定将只使用密码短语和恢复码。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPersist"
-msgstr ""
+msgstr "请求长期保存你的数据"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPersistNot"
-msgstr ""
+msgstr "浏览器可能会为节省空间而清除你在这里创建的内容，因此请不时备份。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserScreens"
-msgstr ""
+msgstr "把面板放到其他屏幕上"
 
 #. js-lingui-explicit-id
 msgid "settings.browserScreensNot"
-msgstr ""
+msgstr "独立窗口会在此屏幕上打开。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserTabs"
-msgstr ""
+msgstr "标签页之间互相通知更改"
 
 #. js-lingui-explicit-id
 msgid "settings.browserTabsNot"
-msgstr ""
+msgstr "其他标签页要重新加载后才会显示更改。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserVoice"
-msgstr ""
+msgstr "在本设备上把语音转为文字"
 
 #. js-lingui-explicit-id
 msgid "settings.browserVoiceNot"
-msgstr ""
+msgstr "语音已关闭：在这里使用它意味着要把你的音频发送出去。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserWorks"
-msgstr ""
+msgstr "可以正常使用。"
 
 #. js-lingui-explicit-id
 msgid "settings.contextDesc"
@@ -8641,7 +8641,7 @@ msgstr "输入栏在独立窗口中。pop:back 命令可将它放回。"
 #. pop:command stays English
 #. js-lingui-explicit-id
 msgid "shell.barElsewhere"
-msgstr ""
+msgstr "输入栏在主窗口中。请切换到主窗口输入，或用 pop:command 让它浮在所有窗口之上"
 
 #. The popped bar's window title
 #. js-lingui-explicit-id
@@ -8655,12 +8655,12 @@ msgstr "此面板将在后续阶段实现。"
 #. calm is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.calmOff"
-msgstr ""
+msgstr "calm: off"
 
 #. calm is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.calmOn"
-msgstr ""
+msgstr "calm: on"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -8689,25 +8689,25 @@ msgstr "搜索、命令或提示词"
 #. focus is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.focusOff"
-msgstr ""
+msgstr "focus: off"
 
 #. focus is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.focusOn"
-msgstr ""
+msgstr "focus: on"
 
 #. js-lingui-explicit-id
 msgid "shell.focusPick"
-msgstr ""
+msgstr "选择要专注的面板"
 
 #. js-lingui-explicit-id
 msgid "shell.focusPickHead"
-msgstr ""
+msgstr "从左到右："
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"
-msgstr ""
+msgstr "执行 {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"
@@ -8716,12 +8716,12 @@ msgstr "按 Escape 关闭"
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
 msgid "shell.referenceFainter"
-msgstr ""
+msgstr "颜色较浅的命令作用于其他面板，面板名称写在旁边"
 
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
 msgid "shell.referenceKeys"
-msgstr ""
+msgstr "点击会把命令写入输入栏，按 Enter 即可执行。{example} 可列出一个命令的各种写法。"
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -8731,12 +8731,12 @@ msgstr "全部命令"
 #. Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection
 #. js-lingui-explicit-id
 msgid "shell.referenceOn"
-msgstr ""
+msgstr "可用于{boards}"
 
 #. The heading of the ? reference, drawn in capitals
 #. js-lingui-explicit-id
 msgid "shell.referenceTitle"
-msgstr ""
+msgstr "命令"
 
 #. Editable text on a placeholder board; nothing typed here is kept
 #. js-lingui-explicit-id
@@ -8755,51 +8755,51 @@ msgstr "{board} · Parliament"
 
 #. js-lingui-explicit-id
 msgid "slot.canvas"
-msgstr ""
+msgstr "画布区"
 
 #. js-lingui-explicit-id
 msgid "slot.chat-panel"
-msgstr ""
+msgstr "对话栏"
 
 #. js-lingui-explicit-id
 msgid "slot.document"
-msgstr ""
+msgstr "文档区"
 
 #. js-lingui-explicit-id
 msgid "slot.input-dock"
-msgstr ""
+msgstr "输入停靠区"
 
 #. js-lingui-explicit-id
 msgid "slot.inspector"
-msgstr ""
+msgstr "检查器"
 
 #. js-lingui-explicit-id
 msgid "slot.left-rail"
-msgstr ""
+msgstr "左侧栏"
 
 #. js-lingui-explicit-id
 msgid "slot.margin"
-msgstr ""
+msgstr "边注栏"
 
 #. js-lingui-explicit-id
 msgid "slot.msg-area"
-msgstr ""
+msgstr "对话区"
 
 #. js-lingui-explicit-id
 msgid "slot.outline"
-msgstr ""
+msgstr "大纲栏"
 
 #. js-lingui-explicit-id
 msgid "slot.right-rail"
-msgstr ""
+msgstr "右侧栏"
 
 #. js-lingui-explicit-id
 msgid "slot.right-rail-extra"
-msgstr ""
+msgstr "右侧下方栏"
 
 #. js-lingui-explicit-id
 msgid "slot.sheet"
-msgstr ""
+msgstr "底部抽屉"
 
 #. js-lingui-explicit-id
 msgid "storage.ask"
@@ -8947,11 +8947,11 @@ msgstr "切换到或保存一整套排布，包括窗口"
 
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr ""
+msgstr "用你自己的话，就回复中选中的文字提问。它会随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
-msgstr ""
+msgstr "为你的下一条提示词附加文件"
 
 #. js-lingui-explicit-id
 msgid "verb.backup"
@@ -9091,7 +9091,7 @@ msgstr "选择房间的布局"
 
 #. js-lingui-explicit-id
 msgid "verb.letter"
-msgstr ""
+msgstr "阅读 Parliament 作者的最新一封信、按编号指定的一封，或信件列表"
 
 #. js-lingui-explicit-id
 msgid "verb.library"
@@ -9099,7 +9099,7 @@ msgstr "把资源库或其中一个书架放到当前屏幕内容旁边"
 
 #. js-lingui-explicit-id
 msgid "verb.local"
-msgstr ""
+msgstr "设定房间是否只发送给本机上的模型"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
@@ -9211,7 +9211,7 @@ msgstr "更改模块或 Parliament 的设置。Enter 提示行会完整写明更
 
 #. js-lingui-explicit-id
 msgid "verb.settings"
-msgstr ""
+msgstr "把设置或其中一个分区放到当前屏幕内容旁边"
 
 #. js-lingui-explicit-id
 msgid "verb.since"
@@ -9291,7 +9291,7 @@ msgstr "显示截至某个日期创建的内容"
 
 #. js-lingui-explicit-id
 msgid "verb.web"
-msgstr ""
+msgstr "只为你的下一条提示词让模型搜索网页"
 
 #. js-lingui-explicit-id
 msgid "verb.width"
@@ -9300,7 +9300,7 @@ msgstr "选择面板所占的宽度，或将所有宽度恢复默认"
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
-msgstr ""
+msgstr "祝一切顺利，"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
@@ -9359,7 +9359,7 @@ msgstr "大多数 AI 应用是为被动接收而设计的：你提问，它回�
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
-msgstr ""
+msgstr "目前 Parliament 是为笔记本电脑设计的，希望很快也能支持手机。"
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
@@ -9392,7 +9392,7 @@ msgstr "{command} 加上一个问题"
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.askHowFree"
-msgstr ""
+msgstr "{command} 加上一个问题，由 Wikipedia 回答，不经过 AI"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
@@ -9405,7 +9405,7 @@ msgstr "打开命令行"
 #. {keys} is the shortcut as this computer writes it: Ctrl+K or ⌘K; {command} is >, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.commandHow"
-msgstr ""
+msgstr "按 {keys}，再输入 {command}"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
@@ -9413,7 +9413,7 @@ msgstr "添加 AI API 密钥"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.lab"
-msgstr ""
+msgstr "打开搭建房间的工坊"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.name"
@@ -9425,21 +9425,21 @@ msgstr "把它移到另一台显示器上"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
-msgstr ""
+msgstr "随下一条提示词发送它"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.sendHow"
-msgstr ""
+msgstr "{command} 加上一条提示词，同时有一处编辑等待发送"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.strike"
-msgstr ""
+msgstr "给一行文字加删除线"
 
 #. {keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
-msgstr ""
+msgstr "在回复中选中文字，然后按 {keys}"
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
