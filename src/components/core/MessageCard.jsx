@@ -801,12 +801,17 @@ function SourceLine({ source }) {
   if (source.found === false) {
     return <p className="p-msg-empty">{i18n._(COPY.chat.sourceNothing, { source: name })}</p>
   }
-  const link = (href, text) => (href && /^https:\/\//.test(href)
-    ? <a href={href} target="_blank" rel="noopener noreferrer">{text}</a>
+  const link = (href, text, credit = false) => (href && /^https:\/\//.test(href)
+    ? (credit
+      // The page itself: the visit carries parliament.ltd as its referrer,
+      // the address alone, so the source can see readers came from here;
+      // noopener still keeps the page from reaching back (C282).
+      ? <a href={href} target="_blank" rel="noopener" referrerPolicy="origin">{text}</a>
+      : <a href={href} target="_blank" rel="noopener noreferrer">{text}</a>)
     : <span>{text}</span>)
   const parts = [
     <span key="from">{i18n._(COPY.chat.answeredFrom, { source: name })}</span>,
-    source.title && <span key="title">{link(source.url, source.title)}</span>,
+    source.title && <span key="title">{link(source.url, source.title, true)}</span>,
     source.revision && <span key="rev">{i18n._(COPY.chat.sourceRevision, { revision: source.revision })}</span>,
     source.licence?.name && <span key="lic">{link(source.licence.url, source.licence.name)}</span>,
   ].filter(Boolean)

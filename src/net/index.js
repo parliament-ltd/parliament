@@ -17,6 +17,7 @@ import { createSource } from './sources'
 import wikipediaManifest from './sources/wikipedia.json'
 import hackernewsManifest from './sources/hackernews.json'
 import openalexManifest from './sources/openalex.json'
+import { version } from '../../package.json'
 
 export { Refused } from './gateway'
 export { destination, shipped, DESTINATIONS } from './list'
@@ -85,8 +86,9 @@ export async function keepKeys(save) {
 // sources are manifests read by one runner (sources.js), each allowed only
 // the origins the list gives it.
 // How Parliament names itself to a source that asks automated clients to
-// (Wikimedia's User-Agent policy: name, version, contact; C160).
-export const IDENTITY = 'Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)'
+// (Wikimedia's User-Agent policy: name, version, contact; C160). The
+// version is the release's own, so it never goes stale (C282).
+export const IDENTITY = `Parliament/${version} (https://parliament.ltd; support@parliament.ltd)`
 const MANIFESTS = { wikipedia: wikipediaManifest, hackernews: hackernewsManifest, openalex: openalexManifest }
 const sources = new Map()
 function implementation(id) {

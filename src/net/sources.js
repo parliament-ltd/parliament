@@ -156,7 +156,9 @@ export function createSource(manifest, { origins, fetch: request, identity = nul
 
       let res
       try {
-        res = await request(url.toString(), { credentials: 'omit', referrerPolicy: 'no-referrer', signal, headers: { Accept: 'application/json', ...identify } })
+        // Parliament only reads from a source: a GET with no body, ever.
+        // Nothing made here, edits included, is sent back (C282).
+        res = await request(url.toString(), { method: 'GET', credentials: 'omit', referrerPolicy: 'no-referrer', signal, headers: { Accept: 'application/json', ...identify } })
       } catch (err) {
         if (err?.name === 'AbortError') throw err
         throw new SourceError('unreachable')

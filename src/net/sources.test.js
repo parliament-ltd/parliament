@@ -158,6 +158,13 @@ describe('naming Parliament where a source asks (C160)', () => {
     await createSource(wikipedia, { origins, fetch, identity: 'Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)' }).answer('barn owl')
     expect(fetch.mock.calls[0][1].headers).toEqual({ Accept: 'application/json', 'Api-User-Agent': 'Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)' })
   })
+  it('only ever reads: a GET with no body, no credentials and no referrer (C282)', async () => {
+    const fetch = vi.fn(async () => reply({ query: { pages: [page] } }))
+    await createSource(wikipedia, { origins, fetch, identity: 'x' }).answer('barn owl')
+    const init = fetch.mock.calls[0][1]
+    expect(Object.keys(init).sort()).toEqual(['credentials', 'headers', 'method', 'referrerPolicy', 'signal'])
+    expect(init).toMatchObject({ method: 'GET', credentials: 'omit', referrerPolicy: 'no-referrer' })
+  })
   it('sends no other header a manifest names, and none where it asks for none', async () => {
     const fetch = vi.fn(async () => reply({ query: { pages: [page] } }))
     await createSource({ ...wikipedia, identifyWith: 'Authorization' }, { origins, fetch, identity: 'x' }).answer('barn owl')
