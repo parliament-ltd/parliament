@@ -200,3 +200,86 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
     - EN: Delete what has not been sent on a line of its own
     - ZH: 尚未发送的内容请单独用一行删除
     - Why: read, from C199 (b), as "give delete: of unsent things a line of its own, without sent things beside them". The English can also be read as "delete what has not been sent on its own line".
+
+## Lines added since, drafted 30 October 2026
+
+38. **enter.settleSugDone** (a change of form, not only of words)
+    - EN: Suggestion {num} was {state} already
+    - ZH: 建议 {num} 已经{state, select, accepted {接受} rejected {拒绝} other {处理}}过了
+    - Why: the code passes {state} as the raw word `accepted` or `rejected` (editVerbs.js), so a plain {state} would show English mid-sentence. The draft adds a select on it, which no other line does; the check reports it as allowed. The cleaner fix is in the code: pass a translated word, or split the line in two.
+
+39. **ask → 提问** (chat.askPlaceholder, chat.askLabel, enter.ask*, collection.tabAsk and others)
+    - EN: Ask in your own words: make it shorter, or add the year it opened
+    - ZH: 用你自己的话提问：比如“改短一些”，或“补上它开放的年份”
+    - Why: an ask is often an instruction rather than a question, and 请求 or 要求 would say that better. I kept 提问 because kind.ask already names the type 提问 in Records. If it changes, kind.ask changes with it.
+
+40. **Ripple → 涟漪, sweep → 扫查** (enter.ripple*, enter.sweep*, chat.sugRipple, chat.sugSweep, the legend)
+    - EN: Ripple checks {nums}… / Enter sweeps {address}’s last reply as {name}…
+    - ZH: 涟漪会检查 {nums}… / 按 Enter 以“{name}”扫查 {address} 的最新回复…
+    - Why: 涟漪 follows block.ripple-analysis (涟漪分析). Ripple is a feature's name, and keeping it in Latin letters like a product name is the other choice. 扫查 is coined; I found no settled word for applying a rule sentence by sentence.
+
+41. **collection.sugFromSweep**
+    - EN: framework: {name}, “{instruction}”
+    - ZH: framework: {name}，“{instruction}”
+    - Why: kept `framework:` in English, as field.frameworkNone and field.frameworkSome keep it, reading it as the command's own marginalia. If it is only a label on the card, it should be 框架：“{name}”，“{instruction}”.
+
+42. **calm → 简洁** (enter.calm*)
+    - EN: Enter calms the screen: details wait until you are near them / The screen is calm already
+    - ZH: 按 Enter 让屏幕更简洁：细节等你靠近时再显示 / 屏幕已经处于简洁状态
+    - Why: 安静 is the literal word and keeps the feeling, but 简洁 says what changes (less detail). Worth a reviewer's ear.
+
+43. **enter.rippleMissed** (also shown after a sweep)
+    - EN: # more could not be placed: its words were not found once, unmarked
+    - ZH: 另有 # 条无法放置：它的文字没有恰好出现一次，因此未标出
+    - Why: read "not found once" as "not found exactly once" (missing, or found in more than one place). If it means "not found at all", it should be 没有找到.
+
+44. **enter.rippleNothing**
+    - EN: Ripple carries edits to the other branches of a plan, and this chat has none yet
+    - ZH: 涟漪会把编辑带到计划的其他分支，但此对话还没有分支
+    - Why: read "none" as branches, from the code (it fires when the chat has no plan or no branches), not as edits.
+
+45. **blocksBoard.context.displayMode.ambient**
+    - EN: ambient
+    - ZH: 颜色提示
+    - Why: in this mode the meter draws nothing and the context shows only as a colour elsewhere (ContextMeter.jsx), so I named what it does. 环境式 is the literal word and says little.
+
+46. **guide.o.essay, guide.o.thinking, guide.o.dataDesk, guide.o.quick** (names and answers the guide offers)
+    - EN: Essay room, Thinking room, Data desk, Quick questions
+    - ZH: 随笔室, 思考室, 数据台, 快问快答
+    - Why: the first three become the room's name when picked (name:"随笔室"), so they should sound like names, as 写作室 and 静室 do. 随笔 is a personal essay; 论文室 would read as academic.
+
+47. **enter.promptSweepsGo**
+    - EN: With it, told once: # changes you accepted from a sweep · {name} reads them
+    - ZH: 随提示词附带，只告知一次：你从扫查中接受的 # 处更改 · {name} 会读取它们
+    - Why: translated as written. editing-in-place-spec.md says an accepted sweep suggestion needs no telling, since the model wrote it; the line says it is told. Not mine to settle.
+
+48. **screensMap.cannotHead with cannotBody, and the other screen notes**
+    - EN: This browser cannot place boards on other screens. Everything else works here.
+    - ZH: 此浏览器无法把面板放到其他屏幕上。 其他功能都可以正常使用。
+    - Why: the code joins the two entries with a space, which in Chinese falls after 。. Like doubt 14, it is a code point, not a wording one.
+
+49. **settings.browserPasskeysNot**
+    - EN: The lock uses a passphrase and the recovery code.
+    - ZH: 锁定将只使用密码短语和恢复码。
+    - Why: it is shown when passkeys do not work here, so I added 只 (only). Without it the line reads as news rather than as the fallback.
+
+50. **welcome.letter.5 and welcome.closing**
+    - EN: Right now, Parliament is built for laptops, and hopefully phones soon too. / All the best,
+    - ZH: 目前 Parliament 是为笔记本电脑设计的，希望很快也能支持手机。 / 祝一切顺利，
+    - Why: these two are fine alone, but they join a letter whose Chinese (welcome.letter.1 to 4, and the signature, still “So Lov”) was drafted for an earlier English letter. The Chinese letter is a different letter until those are drafted again. See the list below.
+
+## Older lines whose English has changed since they were drafted (found 30 October 2026, not changed)
+
+These have a Chinese line, so they were left exactly as they are, but the English changed after the Chinese was written (found by comparing each line with the English at the commit where its Chinese was set). They read as an older version of the page.
+
+Wrong now, worth drafting again:
+
+- **The welcome letter:** welcome.letter.1, welcome.letter.2, welcome.letter.3, welcome.letter.4 (each now a different paragraph), welcome.signature (So Lov, now Stef), welcome.steps (可以试试的八件事, eight things, where the English no longer gives a number), welcome.step.pop (still "move it to another monitor", now "pop a board into its own window").
+- **The key vault:** settings.private2, settings.private2Head, keys.promise, keys.checkThenKeep, settings.leaveApp (now also keys.parliament.ltd). The Chinese still says keys are encrypted on this device, with no vault.
+- **Commands that do more now:** verb.close (or close the letter), verb.duplicate (now copies a room or template into the Lab; the Chinese still says rooms, collections or plans), verb.name (now also renames an arrangement), verb.strikethrough (now says it is in a reply and names undo: with its number), enter.help and leader.help (no longer "that works here"; the Chinese still says 此处可用).
+- **About Parliament:** settings.aboutWhat (now "an attempt to rethink how we interact with AI").
+
+Changed in English but still right in Chinese:
+
+- **erased became deleted:** almanac.erasedFrom, collection.erased, collection.erasedFrom, copy.fromErased, enter.erased, enter.eraseFailed, enter.eraseMarksStay. The Chinese already says 删除.
+- **Reworded only:** welcome.small, welcome.step.ask, enter.popDisplay (screen became display; 屏幕 fits both), languagePicker.foot (a full stop added in English; the Chinese ends without one).

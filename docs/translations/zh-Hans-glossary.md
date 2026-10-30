@@ -122,3 +122,45 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - Lists of command words or names keep 、 between Chinese items. Plurals collapse to the other case, keeping any =0 case. Chinese plural rules never pick `one`, so where the singular needs different words (此框架 / 这些框架), the case is written `=1` instead of `one`: enter.frameworkSet, enter.frameworkSetNext, enter.frameworkShow, enter.includeOff, enter.promptFrameworks, enter.promptIncluded, enter.sequence, enter.untagAll.
 - The privacy filter's counts (privacy.card and the like) always begin with a number (# 个电子邮件地址), so {found} gets a space before it or follows a colon.
 - Commands stay character for character in ASCII: the verb, the form and the ASCII double quotes. The words inside the quotes are the person's own text and are translated, as Stefan ruled: name:"仓鸮", heading:"原因", save:"本周的猫头鹰", new:framework "简短" "每个回答都要简短".
+
+## Editing in place (drafted 30 October 2026)
+- edit (n., a change you make in a reply or a prompt) → 编辑, counted 处 (# 处编辑, as 3 处修改 in a document); edit 238 → 编辑 238. verb.undo's older 一次编辑 reads the same
+- ask (n., your words tied to a passage of a reply) → 提问, as kind.ask; counted 条 (# 条提问); ask 241 → 提问 241; the ask box → 提问框; its answer → 回答
+- suggestion → 建议, counted 条
+- Ripple (carries your edits to the other branches) → 涟漪, as block.ripple-analysis 涟漪分析. The switch ripple: on / ripple: off stays as typed
+- sweep (n. and v., a framework's rule applied sentence by sentence) → 扫查; sweep 245 → 扫查 245; sweep 201a as “反驳我” → 以“反驳我”扫查 201a (hard choice: a coined pair, scan plus check. 审校 is a proofreader's word and 检查 is taken by check:)
+- tell / told (what the model is told of your edits, asks and notes) → 告知; told once → 只告知一次; told to {name} → 已告知 {name}
+- hold back (an edit) → 搁置, as hold: for plans; held back: stays yours → 已搁置：只留在你这里; let it go → 取消搁置
+- drop (an ask not yet sent) → 去掉
+- settle (an answer or a suggestion) → 处理; accept / reject → 接受 / 拒绝, as verb.accept and verb.reject; take back (an ask's answer) → 撤销
+- passage (the words an ask is on) → 原文, or 那段文字
+- strike / struck → 加删除线 / 删除线; struck words → 删去的文字; yours, removed → 你删去的; yours, added → 你添加的
+- markup / clean → 标注 / 无标注 (标注 as verb.markup, never 标记, which is the markings); markup · clean → 标注 · 无标注
+- review (going through answers and suggestions one at a time) → 审阅 (the Review block stays 回顾)
+- the legend's colours → 蓝色, 绿色，点线, 铁锈色，虚线, 删除线
+
+## The Lab, the screens and the rest (drafted 30 October 2026)
+- calm (less detail until you come near it) → 简洁: 让屏幕更简洁, 简洁状态. calm: on stays as typed
+- focus → 专注, as the older focus lines; a room's saved focus → 专注设置
+- the Blocks board → 模块面板 (board.blocks 模块); the Canvas → 画布; the Lab → 工坊
+- slot (a place in a layout that holds blocks) → 模块位, as verb.place and library.places; a layout's places → 位置
+- the slots by name: the canvas → 画布区, the chat panel → 对话栏, the document → 文档区, the input dock → 输入停靠区 (not 输入栏, the bar), the inspector → 检查器, the left rail → 左侧栏, the right rail → 右侧栏, the lower right rail → 右侧下方栏, the margin → 边注栏, the conversation → 对话区, the outline → 大纲栏, the sheet → 底部抽屉 (as layout.single-column-with-sheet)
+- side panels → 侧栏; left / right column → 左栏 / 右栏; open / close a column → 展开 / 收起
+- built for (a phone, a computer) → 适配手机 / 适配电脑; the label Built for → 适用于
+- Sends to: anyone / this computer only → 发送给：不限 / 仅限本机
+- the guide (new:room guided) → 引导
+- display N → 屏幕 N, as enter.popDisplay; external screen → 外接屏幕; Your screens → 你的屏幕
+- letter (from the maker of Parliament) → 信, 第 N 封信; Letters → 信件; not read yet → 未读
+- the key store, the key vault → 密钥库
+- in beta → 测试版; This translation is in beta → 此译文尚处于测试阶段
+- attach (files) → 附件 / 附加文件; voice → 语音; web search → 网页搜索, as library.featureWebSearch
+- Command menu → 命令菜单; the ? reference's heading Commands → 命令; the menu Who answers → 由谁回答
+- a window that stays on top → 始终显示在最前面的窗口 (not 置顶, kept for pins)
+- Runs {command} (a button) → 执行 {command}; Writes {command} in the bar → 在输入栏中写入 {command}
+
+## Conventions added 30 October 2026
+- Room, layout and theme names in example commands are written as the reader's language names them, because the code matches those names in the page's language: edit:"写作室", duplicate:"写作室", layout:"三栏". Quoted names of the person's own stay translated as before: arrange:save "审阅台", tell:"控制在一页以内". Unquoted words the code reads stay as typed: sweep:201a pushback, tag tried, device: desktop or mobile, place: right, left, extra, middle, bottom, up, down.
+- Layout and theme names mid-sentence go in “” like the names people give: 采用“三栏”布局, 换上“深沉静谧”主题. Framework names do too, as before: 以“反驳我”扫查 201a.
+- Block and slot names arrive in Chinese (the code looks them up), so they take no spaces: 将{block}放入{toSlot}.
+- More plurals written `=1` because the singular needs other words: enter.deleteAsks, enter.promptSweepsGo, enter.promptTellGo, enter.promptTellToReader, enter.promptTellWait, enter.reflectGo (and Cheap, Unpriced), enter.rippleDone, enter.rippleMissed, enter.tellHeld, enter.tellHold.
+- The counts of edits and asks in one line ({edits}{both}{asks}) carry their own leading space after a Chinese character (你的 2 处编辑和 1 条提问), and none after a colon (：2 处编辑和 1 条提问).
