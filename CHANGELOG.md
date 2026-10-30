@@ -3,6 +3,15 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.8.0, 30 October 2026
+
+- Parliament speaks Chinese, Japanese, Swedish and Finnish, in beta. Pick one with the globe or language:. Spanish is coming soon.
+- close: works on every board, close:room among them. Closing the welcome page leaves the bar in the middle of the screen, with how to open a room.
+- In the menu of who answers, a click on a name switches to it for the rest of the chat; its box adds it beside the others.
+- An edited prompt waits in the bar as "Your edited prompt" instead of filling it, and calm marks an edited reply with a quiet line, not a tick.
+- The tab shows the three birds, a room shows markup · clean once it holds edits, and the welcome page's step 9 needs no key.
+- Answers from Wikipedia are only ever read, and the link to an article tells Wikipedia the visit came from Parliament.
+
 ## 0.7.0, 29 October 2026
 
 - One bar commands every board. A board popped into a window of its own has none, and opens at the size it had on the page.
