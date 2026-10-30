@@ -753,7 +753,7 @@ msgstr "Biblioteket"
 #. One room, as a board in a sentence: Enter moves Room to the left
 #. js-lingui-explicit-id
 msgid "board.oneRoom"
-msgstr ""
+msgstr "Rummet"
 
 #. Reads a chat and its markings
 #. js-lingui-explicit-id
@@ -772,7 +772,7 @@ msgstr "Inställningar"
 #. The card with the bar, shown before anything is open
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr ""
+msgstr "Start"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -2338,7 +2338,7 @@ msgstr "Den sista tavlan ligger kvar"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNoRoom"
-msgstr ""
+msgstr "Inget rum är öppet"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNotHere"
@@ -2995,7 +2995,7 @@ msgstr "Det du skriver ersätter den. Escape rensar den"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "Enter visar alla kommandon som fungerar här"
+msgstr "Enter visar alla kommandon"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3597,7 +3597,7 @@ msgstr "Enter öppnar {board} till höger"
 
 #. js-lingui-explicit-id
 msgid "enter.openBoardAlone"
-msgstr ""
+msgstr "Enter öppnar {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openBranch"
@@ -5104,7 +5104,7 @@ msgstr "Enter tar tillbaka {count, plural, one {svaret på fråga} other {svaren
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr "Förslag {num} är redan {state}"
+msgstr "{state, select, accepted {Förslag {num} har redan godtagits} other {Förslag {num} har redan avvisats}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
@@ -6311,7 +6311,7 @@ msgstr "”Spara” kontrollerar först nyckeln hos {provider} med en kort förf
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "”Spara” kontrollerar först nyckeln hos {provider} med en kort förfrågan, och lagrar den sedan krypterad i den här webbläsaren."
+msgstr "”Spara” kontrollerar först nyckeln hos {provider} med en kort förfrågan, och sedan förvarar nyckelvalvet den, krypterad, i den här webbläsaren."
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6441,7 +6441,7 @@ msgstr "Kontrollen nådde inte {provider}. Inget sparades."
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "Krypterade i den här webbläsaren. Var och en skickas bara till sin egen leverantör."
+msgstr "Förvaras i nyckelvalvet, krypterade, i den här webbläsaren. Var och en skickas bara till sin egen leverantör."
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -6574,7 +6574,7 @@ msgstr "utkast"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.foot"
-msgstr "Svar och sökningar följer sidan. reply: ger svaren ett eget språk"
+msgstr "Svar och sökningar följer sidan. reply: ger svaren ett eget språk."
 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
@@ -6643,7 +6643,7 @@ msgstr "Skriv ett kommando. > står kvar i fältet"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "Alla kommandon som fungerar här, eller hur ett av dem fungerar"
+msgstr "Alla kommandon, eller hur ett av dem fungerar"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -8027,7 +8027,7 @@ msgstr "Om och säkerhet"
 #. The first sentence is from the welcome letter (C272 (a))
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "En plats där du arbetar med AI på dina egna villkor. MIT-licens. Källkoden publiceras vid lanseringen."
+msgstr "Parliament är ett försök att tänka om hur vi interagerar med AI. MIT-licens. Källkoden publiceras vid lanseringen."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -8268,7 +8268,7 @@ msgstr "{day}."
 
 #. js-lingui-explicit-id
 msgid "settings.leaveApp"
-msgstr "Din webbläsare hämtar Parliaments filer från parliament.ltd, som ligger hos Netlify. Som alla webbhotell ser Netlify din IP-adress och typ av webbläsare. Det får aldrig dina chattar eller nycklar."
+msgstr "Din webbläsare hämtar Parliaments filer från parliament.ltd och keys.parliament.ltd, som ligger hos Netlify. Som alla webbhotell ser Netlify din IP-adress och typ av webbläsare. Det får aldrig dina chattar eller nycklar."
 
 #. js-lingui-explicit-id
 msgid "settings.leaveAppHead"
@@ -8441,11 +8441,11 @@ msgstr "Inga servrar, inga konton"
 
 #. js-lingui-explicit-id
 msgid "settings.private2"
-msgstr "Varje nyckel krypteras innan den sparas, skickas bara till sin egen leverantör och läggs aldrig i en säkerhetskopia. Krypteringen skyddar en nyckel på disken. Den kan inte skydda mot kod som körs i själva sidan, så Parliament läser inte in någon kod från något annat ställe."
+msgstr "Varje nyckel förvaras krypterad i Parliaments nyckelvalv, en liten egen sida på keys.parliament.ltd. Den skickas bara till sin egen leverantör och läggs aldrig i en säkerhetskopia. Kod som körs på Parliaments sida kan inte läsa en nyckel; den kan bara be valvet skicka till en leverantör på valvets lista. Parliament läser inte in någon kod från något annat ställe."
 
 #. js-lingui-explicit-id
 msgid "settings.private2Head"
-msgstr "Nycklarna är krypterade på den här enheten"
+msgstr "Nycklarna förvaras i Parliaments nyckelvalv"
 
 #. js-lingui-explicit-id
 msgid "settings.private3"
@@ -8997,7 +8997,7 @@ msgstr "Töm samlingen, ta bort alla filter, eller en sorts filter"
 
 #. js-lingui-explicit-id
 msgid "verb.close"
-msgstr "Ta bort en tavla från skärmen. Inget går förlorat"
+msgstr "Ta bort en tavla från skärmen, eller stäng brevet. Inget går förlorat"
 
 #. js-lingui-explicit-id
 msgid "verb.cols"
@@ -9033,7 +9033,7 @@ msgstr "Lämna Labbet med dina ändringar"
 
 #. js-lingui-explicit-id
 msgid "verb.duplicate"
-msgstr "Kopiera ett rum, en samling eller en plan under ett nytt namn"
+msgstr "Kopiera ett rum, ett eget eller en mall, och öppna kopian i Labbet"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
@@ -9121,7 +9121,7 @@ msgstr "Ange om ett rum bara skickar till modeller på den här datorn"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Visa svar med formatering, eller utan"
+msgstr "Visa svaren med ändringar, eller renskrivna"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9133,7 +9133,7 @@ msgstr "Flytta en tavla till vänster, höger eller mitten, eller en gren i sin 
 
 #. js-lingui-explicit-id
 msgid "verb.name"
-msgstr "Namnge det fältet pekar på: ett rum, en samling eller en chatt"
+msgstr "Namnge det fältet pekar på: ett rum, en samling eller en chatt. Med två namn byter du namn på en sparad uppställning"
 
 #. js-lingui-explicit-id
 msgid "verb.new"
@@ -9245,7 +9245,7 @@ msgstr "Stoppa en körning, eller alla körningar i alla fönster"
 
 #. js-lingui-explicit-id
 msgid "verb.strikethrough"
-msgstr "Stryk igenom det markerade stycket"
+msgstr "Stryk igenom de markerade orden i ett svar. Redigeringens nummer med undo: ångrar den"
 
 #. js-lingui-explicit-id
 msgid "verb.summarize"
@@ -9361,19 +9361,19 @@ msgstr "Den här webbläsaren har inte lovat att behålla det du skapar här, s�
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"
-msgstr "Parliament är en plats där du arbetar med AI på dina egna villkor. Det är i ett tidigt skede och byggs fortfarande."
+msgstr "Parliament är ett försök att tänka om hur vi interagerar med AI. Att vara mer delaktig i arbetet och samtalet. Jag ville inte att en handfull företag skulle bestämma hur det blir. Och ja, jag ser ironin i att bygga det här med Claude."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "Det körs i din webbläsare, utan servrar och utan konton. Dina chattar och nycklar stannar på den här datorn, och varje förfrågan går direkt till den leverantör du väljer, till en modell som körs på din egen dator, eller till en offentlig källa som Wikipedia. Det finns ingen reklam."
+msgstr "Jag är också rädd för AI. Det är ett under som jag inte vet vad jag ska känna inför. Men jag ville inte bara sitta och göra ingenting. Så efter månader av chattande och läsande har jag försökt sätta ihop en app som du kan använda offline. En app där du kan söka i källor utan AI först. En app som hoppas ge egenmakt genom aktivt deltagande. Det kanske är för djärvt av mig... jag har visserligen kodat ett par webbappar i Ruby, men jag skulle ändå kalla mig ”designer”. Att bygga är svårt, särskilt när man lär sig under tiden och tempot känns som att dricka ur en brandslang. Koden är öppen, jag har gjort säkerhetskontroller med Claude Code och planerar fler säkerhetskontroller av tredje part. Jag ska göra mitt bästa för att hålla dig uppdaterad. Jag har funderat på hur jag skulle kunna göra koden mer lättillgänglig... jag kanske kan göra en roman av den."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "Målet är att tänka om hur vi interagerar med AI, och det är ditt att forma. Rum byggs av block, layouter och teman. Du skapar rummet, du väljer hur du interagerar."
+msgstr "Så vad är Parliament? I Parliament kan du skapa rum, ett utrymme där du kan chatta med en AI-modell, flera eller ingen alls. Rum byggs av block som du kan redigera och ändra, och du kan göra egna layouter, teman och uppställningar."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "De flesta AI-appar är byggda för passiv konsumtion. Du frågar något, du får ett svar. Här styr du från en kommandorad: förgrena chattar, markera, lägg till och kombinera anteckningar mellan chattar, planera en serie promptar och mycket mer. Nu tar vi tillbaka kontrollen."
+msgstr "Allt ligger på tavlor. Alla tavlor kan läggas i egna fönster och flyttas till en annan skärm, så arbetsutrymmet är ditt."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9387,27 +9387,27 @@ msgstr "Nu kör vi {command}"
 #. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
-msgstr "So Lov"
+msgstr "Stef"
 
 #. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
-msgstr "byggt för datorn än så länge; mobilen kommer senare"
+msgstr "Byggt för dator, mobil kommer senare"
 
 #. {command} is open:records, which stays English, as does open:
 #. js-lingui-explicit-id
 msgid "welcome.start.open"
-msgstr ""
+msgstr "{command} listar det du har skapat, och open: med numret öppnar något av det igen"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.room"
-msgstr ""
+msgstr "{command} och en fråga öppnar ett rum"
 
 #. {command} is tour:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.tour"
-msgstr ""
+msgstr "{command} tar fram stegen igen"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"
@@ -9415,7 +9415,7 @@ msgstr "Se vad du har skapat"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.ask"
-msgstr "Fråga något"
+msgstr "Ställ en fråga"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
@@ -9454,7 +9454,7 @@ msgstr "Namnge rummet"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
-msgstr "Flytta den till en annan skärm"
+msgstr "Lägg en tavla i ett eget fönster"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
@@ -9477,4 +9477,4 @@ msgstr "markera ord i ett svar och tryck sedan {keys}"
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
 msgid "welcome.steps"
-msgstr "Åtta saker att prova"
+msgstr "Saker att prova"
