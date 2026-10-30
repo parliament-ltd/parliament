@@ -495,220 +495,220 @@ msgstr "でプラン全体を表示します"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.add"
-msgstr ""
+msgstr "追加"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.contextThreshold"
-msgstr ""
+msgstr "警告のしきい値"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.defaultBranchMode"
-msgstr ""
+msgstr "新しいブランチに含めるもの"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.defaultBranchMode.full"
-msgstr ""
+msgstr "履歴全体"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.defaultBranchMode.summary"
-msgstr ""
+msgstr "要約"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.showCompressButton"
-msgstr ""
+msgstr "圧縮ボタン"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.branches.showParentLink"
-msgstr ""
+msgstr "親ブランチへのリンク"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.chars"
-msgstr ""
+msgstr "{n}文字"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.chart-canvas.chartType"
-msgstr ""
+msgstr "種類"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.close"
-msgstr ""
+msgstr "{block}を閉じる"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.contextThreshold"
-msgstr ""
+msgstr "警告のしきい値"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode"
-msgstr ""
+msgstr "表示方法"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode.ambient"
-msgstr ""
+msgstr "控えめ"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode.compact"
-msgstr ""
+msgstr "コンパクト"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.context.displayMode.meter"
-msgstr ""
+msgstr "メーター"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.count"
-msgstr ""
+msgstr "{name}の{count, plural, other {ブロック#個}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "blocksBoard.empty"
-msgstr ""
+msgstr "ラボにルームがないため、ブロックもありません。edit:\"執筆スタジオ\" でルームをここに置けます。"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.emptySlot"
-msgstr ""
+msgstr "空"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.input.files"
-msgstr ""
+msgstr "ファイル"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.input.voice"
-msgstr ""
+msgstr "音声"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.input.webSearch"
-msgstr ""
+msgstr "ウェブ検索"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.moveDown"
-msgstr ""
+msgstr "下へ移動"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.moveUp"
-msgstr ""
+msgstr "上へ移動"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.noLayout"
-msgstr ""
+msgstr "まだレイアウトがないため、ブロックもありません。"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.none"
-msgstr ""
+msgstr "なし"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notBuilt"
-msgstr ""
+msgstr "{slot}（非対応）"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder"
-msgstr ""
+msgstr "順序"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder.message"
-msgstr ""
+msgstr "チャットの順"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder.newest"
-msgstr ""
+msgstr "新しい順"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notes.sortOrder.oldest"
-msgstr ""
+msgstr "古い順"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.nothingToSet"
-msgstr ""
+msgstr "設定項目なし"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.notIn"
-msgstr ""
+msgstr "ルームにないもの"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.off"
-msgstr ""
+msgstr "オフ"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.ofOne"
-msgstr ""
+msgstr "{count}/1"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.on"
-msgstr ""
+msgstr "オン"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.open"
-msgstr ""
+msgstr "{block}を開く"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.other"
-msgstr ""
+msgstr "その他"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.percent"
-msgstr ""
+msgstr "{n}%"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.rm"
-msgstr ""
+msgstr "rm"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.settings"
-msgstr ""
+msgstr "設定"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.sitsIn"
-msgstr ""
+msgstr "置き場所"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.stays"
-msgstr ""
+msgstr "どのルームにもあります"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.follow"
-msgstr ""
+msgstr "連動先"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.follow.chat"
-msgstr ""
+msgstr "このチャット"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.follow.plan"
-msgstr ""
+msgstr "ピン留めしたプラン"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.plan"
-msgstr ""
+msgstr "ピン留めしたプラン"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.show"
-msgstr ""
+msgstr "表示"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.show.all"
-msgstr ""
+msgstr "すべての実行"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.steps.show.run"
-msgstr ""
+msgstr "この実行"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.maxItems"
-msgstr ""
+msgstr "最大件数"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.mode"
-msgstr ""
+msgstr "一覧にするもの"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.mode.headings"
-msgstr ""
+msgstr "返答の見出し"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.mode.prompts"
-msgstr ""
+msgstr "自分のプロンプト"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.toc.truncateAt"
-msgstr ""
+msgstr "切り詰める長さ"
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -733,7 +733,7 @@ msgstr "コレクション"
 #. Every command, as a board to keep open or pop out (open:commandmenu)
 #. js-lingui-explicit-id
 msgid "board.commands"
-msgstr ""
+msgstr "コマンドメニュー"
 
 #. Prompts set out in branches and steps, to run (C131)
 #. js-lingui-explicit-id
@@ -853,100 +853,100 @@ msgstr "作成中"
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.carryOnSummary"
-msgstr ""
+msgstr "要約から続ける"
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.carryOnWhole"
-msgstr ""
+msgstr "ブランチで続ける"
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.full"
-msgstr ""
+msgstr "コンテキスト使用率{percent}%："
 
 #. js-lingui-explicit-id
 msgid "branchesBlock.title"
-msgstr ""
+msgstr "ブランチ"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "branchesBlock.writes"
-msgstr ""
+msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "canvas.anyone"
-msgstr ""
+msgstr "制限なし"
 
 #. js-lingui-explicit-id
 msgid "canvas.builtFor"
-msgstr ""
+msgstr "対象"
 
 #. js-lingui-explicit-id
 msgid "canvas.desktop"
-msgstr ""
+msgstr "コンピュータ"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.empty"
-msgstr ""
+msgstr "ラボにルームがありません。edit:\"執筆スタジオ\" でここに置くか、new:room で作るか、new:room guided で手順に沿って作れます。"
 
 #. js-lingui-explicit-id
 msgid "canvas.emptySlot"
-msgstr ""
+msgstr "空"
 
 #. js-lingui-explicit-id
 msgid "canvas.full"
-msgstr ""
+msgstr "空きなし"
 
 #. js-lingui-explicit-id
 msgid "canvas.gone"
-msgstr ""
+msgstr "そのルームはもうありません。"
 
 #. js-lingui-explicit-id
 msgid "canvas.layout"
-msgstr ""
+msgstr "レイアウト"
 
 #. js-lingui-explicit-id
 msgid "canvas.mobile"
-msgstr ""
+msgstr "スマートフォン"
 
 #. js-lingui-explicit-id
 msgid "canvas.name"
-msgstr ""
+msgstr "名前"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.noLayout"
-msgstr ""
+msgstr "このルームにはまだレイアウトがありません。layout:\"3パネル\" で設定できます。"
 
 #. js-lingui-explicit-id
 msgid "canvas.roomForMore"
-msgstr ""
+msgstr "まだ置けます"
 
 #. js-lingui-explicit-id
 msgid "canvas.roomForOne"
-msgstr ""
+msgstr "1つ置けます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.runs"
-msgstr ""
+msgstr "{command} を実行します。undo: で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "canvas.sendsTo"
-msgstr ""
+msgstr "送信先"
 
 #. js-lingui-explicit-id
 msgid "canvas.theme"
-msgstr ""
+msgstr "テーマ"
 
 #. js-lingui-explicit-id
 msgid "canvas.thisComputer"
-msgstr ""
+msgstr "このコンピュータのみ"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.writes"
-msgstr ""
+msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
@@ -958,16 +958,16 @@ msgstr "{source}からの回答"
 
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
-msgstr ""
+msgstr "受け入れる"
 
 #. js-lingui-explicit-id
 msgid "chat.askAgain"
-msgstr ""
+msgstr "もう一度尋ねる"
 
 #. Writes again: into the bar; {next} is the new branch, like 201d
 #. js-lingui-explicit-id
 msgid "chat.askAgainAs"
-msgstr ""
+msgstr "{next}としてもう一度尋ねる"
 
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
@@ -976,20 +976,20 @@ msgstr "{language}で「{text}」と質問"
 #. The label of the box an ask is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr ""
+msgstr "依頼"
 
 #. Before an ask number in the text: ask 241
 #. js-lingui-explicit-id
 msgid "chat.askMarker"
-msgstr ""
+msgstr "依頼"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr ""
+msgstr "自分の言葉で依頼：もっと短く、開業した年を加えて、など"
 
 #. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr ""
+msgstr "取り消す"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1017,7 +1017,7 @@ msgstr "オン：チャットの最初の回答のあと、短いリクエスト
 
 #. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
-msgstr ""
+msgstr "{count, plural, other {編集#件}}が、このブランチへの次のプロンプトを待っています"
 
 #. js-lingui-explicit-id
 msgid "chat.finishSetting"
@@ -1046,20 +1046,20 @@ msgstr "モデルへの指示のように読める言葉を含みます：{phras
 
 #. js-lingui-explicit-id
 msgid "chat.joinedToBar"
-msgstr ""
+msgstr "今の内容のプロンプトとこの返答が、次のプロンプトとしてバーに入っています"
 
 #. js-lingui-explicit-id
 msgid "chat.pairLabel"
-msgstr ""
+msgstr "自分のプロンプトとその返答。どの言葉も編集できます"
 
 #. Under a prompt edited in place; {address} is its branch, like 201a
 #. js-lingui-explicit-id
 msgid "chat.promptEdited"
-msgstr ""
+msgstr "{address}のプロンプト、編集済み"
 
 #. js-lingui-explicit-id
 msgid "chat.promptEditedOthers"
-msgstr ""
+msgstr "ほかのブランチは元のまま"
 
 #. js-lingui-explicit-id
 msgid "chat.quote"
@@ -1147,25 +1147,25 @@ msgstr "チャットを離れたため止まりました。届いた分は残し
 
 #. js-lingui-explicit-id
 msgid "chat.sugAccept"
-msgstr ""
+msgstr "受け入れる"
 
 #. js-lingui-explicit-id
 msgid "chat.suggestionsWaitingTab"
-msgstr ""
+msgstr "このブランチで{count, plural, other {提案#件}}が確認を待っています"
 
 #. js-lingui-explicit-id
 msgid "chat.sugReject"
-msgstr ""
+msgstr "却下する"
 
 #. Before a Ripple suggestion number in the text: ripple 244
 #. js-lingui-explicit-id
 msgid "chat.sugRipple"
-msgstr ""
+msgstr "Ripple"
 
 #. Before a sweep suggestion number in the text: sweep 245
 #. js-lingui-explicit-id
 msgid "chat.sugSweep"
-msgstr ""
+msgstr "照合"
 
 #. js-lingui-explicit-id
 msgid "chat.summaryBy"
@@ -1203,12 +1203,12 @@ msgstr "回答前に思考"
 #. A tell: note the prompt carried, in the words of the person (C225 (d))
 #. js-lingui-explicit-id
 msgid "chat.toldNote"
-msgstr ""
+msgstr "1回だけ伝えたメモ：{note}"
 
 #. A prompt that sent only the edits of the person (C216 (e))
 #. js-lingui-explicit-id
 msgid "chat.toldOnly"
-msgstr ""
+msgstr "{name}に伝えた編集"
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -1229,7 +1229,7 @@ msgstr "参照した情報源"
 
 #. js-lingui-explicit-id
 msgid "collection.acceptAnswer"
-msgstr ""
+msgstr "受け入れる"
 
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
@@ -1270,35 +1270,35 @@ msgstr "タグ"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
-msgstr ""
+msgstr "受け入れ済み"
 
 #. js-lingui-explicit-id
 msgid "collection.askAnswered"
-msgstr ""
+msgstr "その場で回答済み"
 
 #. js-lingui-explicit-id
 msgid "collection.askAnsweredBy"
-msgstr ""
+msgstr "{name}が回答"
 
 #. js-lingui-explicit-id
 msgid "collection.askAnsweredHere"
-msgstr ""
+msgstr "回答はここだけ：その後、該当箇所が変わりました"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr ""
+msgstr "{name}に依頼"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
-msgstr ""
+msgstr "返答の「{passage}」の後の位置"
 
 #. js-lingui-explicit-id
 msgid "collection.askOn"
-msgstr ""
+msgstr "「{passage}」について"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
-msgstr ""
+msgstr "取り消し済み"
 
 #. js-lingui-explicit-id
 msgid "collection.by"
@@ -1314,19 +1314,19 @@ msgstr "{num}より"
 
 #. js-lingui-explicit-id
 msgid "collection.changeHeld"
-msgstr ""
+msgstr "保留中：自分の手元に残ります"
 
 #. js-lingui-explicit-id
 msgid "collection.changeInto"
-msgstr ""
+msgstr "プロンプトに組み込み済み"
 
 #. js-lingui-explicit-id
 msgid "collection.changeSent"
-msgstr ""
+msgstr "{day}に{name}へ送信"
 
 #. js-lingui-explicit-id
 msgid "collection.changeWaits"
-msgstr ""
+msgstr "次のプロンプトと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "collection.chats"
@@ -1334,7 +1334,7 @@ msgstr "チャット"
 
 #. js-lingui-explicit-id
 msgid "collection.cleanWord"
-msgstr ""
+msgstr "清書"
 
 #. js-lingui-explicit-id
 msgid "collection.count"
@@ -1346,11 +1346,11 @@ msgstr "日付"
 
 #. js-lingui-explicit-id
 msgid "collection.dropAsk"
-msgstr ""
+msgstr "取り下げる"
 
 #. js-lingui-explicit-id
 msgid "collection.editWhere"
-msgstr ""
+msgstr "{part, select, prompt {{address}のプロンプト} other {{address}}}"
 
 #. add: stays English
 #. js-lingui-explicit-id
@@ -1380,7 +1380,7 @@ msgstr "チャット内で探します"
 
 #. js-lingui-explicit-id
 msgid "collection.findHere"
-msgstr ""
+msgstr "チャット内で探す"
 
 #. js-lingui-explicit-id
 msgid "collection.from"
@@ -1400,7 +1400,7 @@ msgstr "個別に追加"
 
 #. js-lingui-explicit-id
 msgid "collection.groupBranch"
-msgstr ""
+msgstr "ブランチ{address}"
 
 #. js-lingui-explicit-id
 msgid "collection.groupChat"
@@ -1412,47 +1412,47 @@ msgstr "プラン{num}"
 
 #. js-lingui-explicit-id
 msgid "collection.holdBack"
-msgstr ""
+msgstr "保留にする"
 
 #. js-lingui-explicit-id
 msgid "collection.legendBlue"
-msgstr ""
+msgstr "青"
 
 #. js-lingui-explicit-id
 msgid "collection.legendBlueIs"
-msgstr ""
+msgstr "自分が追加"
 
 #. js-lingui-explicit-id
 msgid "collection.legendGreen"
-msgstr ""
+msgstr "緑の点線"
 
 #. js-lingui-explicit-id
 msgid "collection.legendGreenIs"
-msgstr ""
+msgstr "回答"
 
 #. js-lingui-explicit-id
 msgid "collection.legendRust"
-msgstr ""
+msgstr "赤茶の破線"
 
 #. js-lingui-explicit-id
 msgid "collection.legendRustIs"
-msgstr ""
+msgstr "Rippleの提案"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruck"
-msgstr ""
+msgstr "取り消し線"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
-msgstr ""
+msgstr "自分が削除"
 
 #. js-lingui-explicit-id
 msgid "collection.legendSweepIs"
-msgstr ""
+msgstr "回答または照合"
 
 #. js-lingui-explicit-id
 msgid "collection.letGo"
-msgstr ""
+msgstr "保留を解除"
 
 #. js-lingui-explicit-id
 msgid "collection.line"
@@ -1460,7 +1460,7 @@ msgstr "コレクション"
 
 #. js-lingui-explicit-id
 msgid "collection.markupWord"
-msgstr ""
+msgstr "変更表示"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -1473,7 +1473,7 @@ msgstr "このコレクションに一致するものはありません。"
 
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
-msgstr ""
+msgstr "ルームのチャット{num}は、このコレクションに入っていません"
 
 #. open: stays English
 #. js-lingui-explicit-id
@@ -1501,41 +1501,41 @@ msgstr "{num}（もうありません）"
 #. An edit that only struck words, as it reads clean
 #. js-lingui-explicit-id
 msgid "collection.removed"
-msgstr ""
+msgstr "削除"
 
 #. js-lingui-explicit-id
 msgid "collection.review"
-msgstr ""
+msgstr "レビュー"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewAll"
-msgstr ""
+msgstr "すべて受け入れる"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewDone"
-msgstr ""
+msgstr "レビューを待っているものはありません"
 
 #. The keys a and r, lower case
 #. js-lingui-explicit-id
 msgid "collection.reviewKeys"
-msgstr ""
+msgstr "aで受け入れ、rで却下、矢印キーで移動"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewNext"
-msgstr ""
+msgstr "次のもの"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewOf"
-msgstr ""
+msgstr "{at}/{count}"
 
 #. js-lingui-explicit-id
 msgid "collection.reviewPrev"
-msgstr ""
+msgstr "前のもの"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "collection.runs"
-msgstr ""
+msgstr "{command} を実行します"
 
 #. js-lingui-explicit-id
 msgid "collection.select"
@@ -1564,48 +1564,48 @@ msgstr "出典"
 
 #. js-lingui-explicit-id
 msgid "collection.sugAccept"
-msgstr ""
+msgstr "受け入れる"
 
 #. js-lingui-explicit-id
 msgid "collection.sugAccepted"
-msgstr ""
+msgstr "{made, select, sweep {受け入れ済み} other {受け入れ済み：自分の編集になりました}}"
 
 #. js-lingui-explicit-id
 msgid "collection.sugBy"
-msgstr ""
+msgstr "{name}による"
 
 #. A Ripple suggestion carries an edit of the person to another branch
 #. js-lingui-explicit-id
 msgid "collection.sugFromRipple"
-msgstr ""
+msgstr "{branch}での自分の編集{edit}と同じ変更"
 
 #. js-lingui-explicit-id
 msgid "collection.sugFromRippleBare"
-msgstr ""
+msgstr "自分の編集から引き継いだ変更"
 
 #. js-lingui-explicit-id
 msgid "collection.sugFromSweep"
-msgstr ""
+msgstr "framework: {name}、「{instruction}」"
 
 #. js-lingui-explicit-id
 msgid "collection.sugOpen"
-msgstr ""
+msgstr "確認待ち"
 
 #. js-lingui-explicit-id
 msgid "collection.sugReject"
-msgstr ""
+msgstr "却下する"
 
 #. js-lingui-explicit-id
 msgid "collection.sugRejected"
-msgstr ""
+msgstr "却下済み"
 
 #. js-lingui-explicit-id
 msgid "collection.sugTold"
-msgstr ""
+msgstr "受け入れ済み（{day}に{name}へ伝達）"
 
 #. js-lingui-explicit-id
 msgid "collection.sugToTell"
-msgstr ""
+msgstr "受け入れ済み：次のプロンプトで伝えます"
 
 #. js-lingui-explicit-id
 msgid "collection.summaryOf"
@@ -1617,11 +1617,11 @@ msgstr "すべて"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr ""
+msgstr "依頼"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
-msgstr ""
+msgstr "編集"
 
 #. js-lingui-explicit-id
 msgid "collection.tabHighlight"
@@ -1641,7 +1641,7 @@ msgstr "引用"
 
 #. js-lingui-explicit-id
 msgid "collection.tabSuggestion"
-msgstr ""
+msgstr "提案"
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
@@ -1653,11 +1653,11 @@ msgstr "{heading}の下"
 
 #. js-lingui-explicit-id
 msgid "collection.undoAnswer"
-msgstr ""
+msgstr "取り消す"
 
 #. js-lingui-explicit-id
 msgid "collection.undoEdit"
-msgstr ""
+msgstr "取り消す"
 
 #. js-lingui-explicit-id
 msgid "collection.untitled"
@@ -1673,7 +1673,7 @@ msgstr "自分の並び順"
 
 #. js-lingui-explicit-id
 msgid "collections.coloursFold"
-msgstr ""
+msgstr "色 ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
@@ -1760,36 +1760,36 @@ msgstr "{count, plural, other {#ステップ}}"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
-msgstr ""
+msgstr "それはすべて、すでにルームにあります"
 
 #. js-lingui-explicit-id
 msgid "enter.addLayout"
-msgstr ""
+msgstr "レイアウトは{name}になります"
 
 #. js-lingui-explicit-id
 msgid "enter.addNone"
-msgstr ""
+msgstr "ライブラリに {said} という名前のものはありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.addNotForRoom"
-msgstr ""
+msgstr "{said} はルームです。ルームに入れられるのはブロック、レイアウト、テーマだけです。ルームを開くには edit: を使います"
 
 #. js-lingui-explicit-id
 msgid "enter.addTheme"
-msgstr ""
+msgstr "テーマは{name}になります"
 
 #. js-lingui-explicit-id
 msgid "enter.addToRoom"
-msgstr ""
+msgstr "Enterで{room}を変更します"
 
 #. js-lingui-explicit-id
 msgid "enter.addTwoLayouts"
-msgstr ""
+msgstr "ルームのレイアウトは1つだけです。{names}のどれかのチェックを外してください"
 
 #. js-lingui-explicit-id
 msgid "enter.addTwoThemes"
-msgstr ""
+msgstr "ルームのテーマは1つだけです。{names}のどれかのチェックを外してください"
 
 #. js-lingui-explicit-id
 msgid "enter.again"
@@ -1930,127 +1930,127 @@ msgstr "Enterで{nums}をアーカイブします。何も削除されず、in:a
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeForget"
-msgstr ""
+msgstr "Enterで配置{name}を削除します。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeGo"
-msgstr ""
+msgstr "Enterで{name}に切り替えます。undo: で今の画面に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeGoFocus"
-msgstr ""
+msgstr "Enterで集中表示を終えて{name}に切り替えます。undo: で今の画面に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeInLab"
-msgstr ""
+msgstr "arrange: はラボの外で使えます。先に done: でラボを出てください"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeLong"
-msgstr ""
+msgstr "名前は{max}文字まで"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMany"
-msgstr ""
+msgstr "どの配置ですか：{names}？"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr ""
+msgstr "Enterでこの表示を開いたままにします。pop:library display 2 でボードをもう1つのディスプレイに出せます"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
-msgstr ""
+msgstr "Enterでこの表示を開いたままにします。Parliamentがディスプレイにウインドウを配置してよいか、ブラウザが一度だけ尋ねます"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapOne"
-msgstr ""
+msgstr "Enterでこの表示を開いたままにします。Escapeで戻ります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeName"
-msgstr ""
+msgstr "Enterで{name}の名前を{to}に変えます。undo: で元の名前に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeNameSame"
-msgstr ""
+msgstr "すでに{to}という名前です"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeNameTaken"
-msgstr ""
+msgstr "{to}という名前の配置がほかにあります。先にそれを削除するか、別の名前を選んでください"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeNone"
-msgstr ""
+msgstr "保存した配置はまだありません。arrange:save \"名前\" で今の画面を保存できます"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeNotFound"
-msgstr ""
+msgstr "{said} という配置はありません。保存した配置は{names}です"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeReplace"
-msgstr ""
+msgstr "Enterで、同じ名前で保存されている配置に代えて、今の画面を{name}として保存します"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeSave"
-msgstr ""
+msgstr "Enterで、ウインドウとそのディスプレイも含めて、今の画面を{name}として保存します。ルームのチャットは保存しません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeSaveName"
-msgstr ""
+msgstr "名前を付けてください：arrange:save \"レビュー用デスク\""
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr ""
+msgstr "Enterで、返答で選択した言葉、またはカーソルの位置に、この依頼を残します。次のプロンプトと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr ""
+msgstr "依頼として残しました。次のプロンプトと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr ""
+msgstr "依頼は{max}文字までです"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr ""
+msgstr "先に返答をクリックするか、依頼する言葉を選択してから、もう一度 ask: を使ってください"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr ""
+msgstr "依頼は返答に付けるものです。プロンプトでは、取り消し線を引くか上書きしてください"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr ""
+msgstr "Enterで、返答で選択した言葉、またはカーソルの位置に依頼欄を開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
-msgstr ""
+msgstr "次のプロンプトには、すでに上限の{most}件のファイルが付いています"
 
 #. js-lingui-explicit-id
 msgid "enter.attachGo"
-msgstr ""
+msgstr "Enterでファイルの選択画面を開きます。ファイルは次のプロンプトにだけ付きます"
 
 #. js-lingui-explicit-id
 msgid "enter.attachHeld"
-msgstr ""
+msgstr "{count, plural, other {ファイル#件}}を次のプロンプトに付けます：{files}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.attachNotHere"
-msgstr ""
+msgstr "{room}ではファイル添付がオフです。set:input files on でオンにできます"
 
 #. js-lingui-explicit-id
 msgid "enter.attachPicking"
-msgstr ""
+msgstr "選択画面でファイルを選んでください"
 
 #. js-lingui-explicit-id
 msgid "enter.attachRefused"
-msgstr ""
+msgstr "{name}：{why}"
 
 #. js-lingui-explicit-id
 msgid "enter.backupDoneLocked"
@@ -2082,54 +2082,54 @@ msgstr "{place, select, top {バーはすでに上にあります} bottom {バ�
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
-msgstr ""
+msgstr "Enterで{block}を{toSlot}に置きます"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAddMany"
-msgstr ""
+msgstr "Enterで{blocks}をルームに置きます"
 
 #. js-lingui-explicit-id
 msgid "enter.blockGoesTo"
-msgstr ""
+msgstr "{block}は{toSlot}に入ります"
 
 #. js-lingui-explicit-id
 msgid "enter.blockMany"
-msgstr ""
+msgstr "どのブロックですか：{names}？"
 
 #. js-lingui-explicit-id
 msgid "enter.blockNone"
-msgstr ""
+msgstr "{said} というブロックはありません。ライブラリに一覧があります"
 
 #. js-lingui-explicit-id
 msgid "enter.blockNoPlace"
-msgstr ""
+msgstr "{name}には{block}を置ける空きがありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.blockNotThere"
-msgstr ""
+msgstr "{block}はルームにありません。add: で置けます"
 
 #. js-lingui-explicit-id
 msgid "enter.blockRm"
-msgstr ""
+msgstr "Enterで{block}をルームから取り出します。ライブラリには残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.blockRmMany"
-msgstr ""
+msgstr "Enterで{blocks}をルームから取り出します。ライブラリには残ります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.blocksNoLayout"
-msgstr ""
+msgstr "このルームにはまだレイアウトがありません。layout:\"3パネル\" で設定できます"
 
 #. js-lingui-explicit-id
 msgid "enter.blockStays"
-msgstr ""
+msgstr "{block}は残ります。どのルームにもあるブロックです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.blockThere"
-msgstr ""
+msgstr "{block}はすでにルームにあります。place: で移動できます"
 
 #. {boards} lists board names
 #. js-lingui-explicit-id
@@ -2209,30 +2209,30 @@ msgstr "{word} は{names}のいずれかを指します。{example} のように
 
 #. js-lingui-explicit-id
 msgid "enter.calmOff"
-msgstr ""
+msgstr "Enterで、すべての詳細を再び表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr ""
+msgstr "Enterで画面を控えめにします：詳細は近づいたときに表示します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr ""
+msgstr "すでにすべての詳細を表示しています。calm: で画面を控えめにできます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOn"
-msgstr ""
+msgstr "画面はすでに控えめです。calm:off ですべての詳細を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
-msgstr ""
+msgstr "{num}はもう元の場所にないため、何も変わっていません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr ""
+msgstr "{num}は編集か依頼です。専用のコマンドで操作します：hold:、undo:、accept:、reject:、jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2506,12 +2506,12 @@ msgstr "まだ送信していないものは、単独の行で削除してくだ
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr ""
+msgstr "{count, plural, other {Enterで依頼{nums}を取り下げます。undo: で元に戻せます}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr ""
+msgstr "依頼{num}はモデルに送られたため、残ります。回答は accept: か reject: で確定します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2536,7 +2536,7 @@ msgstr "{address}のステップ{index}を削除しました。undo: で元に�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteEditUse"
-msgstr ""
+msgstr "編集は undo:{num} で取り消します"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
@@ -2563,20 +2563,20 @@ msgstr "{address}のステップ{index}は開始済みのため、チャット�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteSugUse"
-msgstr ""
+msgstr "提案は reject:{num} で却下します。却下した記録として残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.deviceGo"
-msgstr ""
+msgstr "{device, select, mobile {Enterで{room}をスマートフォン向けにします：サイドパネルはシートにたたまれます} other {Enterで{room}をコンピュータ向けにします}}"
 
 #. js-lingui-explicit-id
 msgid "enter.deviceSame"
-msgstr ""
+msgstr "すでに{device, select, mobile {スマートフォン} other {コンピュータ}}向けです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deviceWhich"
-msgstr ""
+msgstr "device: には desktop か mobile を指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -2611,59 +2611,59 @@ msgstr "それはボードに表示中の実行{run}です。diff: と別の実�
 
 #. js-lingui-explicit-id
 msgid "enter.doneGo"
-msgstr ""
+msgstr "Enterでラボを出て、前の画面に戻ります。変更はすべて、そのつど保存されています"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.doneNotLab"
-msgstr ""
+msgstr "done: はラボを出るコマンドですが、ラボは開いていません"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateGo"
-msgstr ""
+msgstr "Enterで{name}を{copy}として複製し、複製をラボで開きます。チャットは元のルームに残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateGone"
-msgstr ""
+msgstr "そのルームはもうありません"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateNone"
-msgstr ""
+msgstr "{said} というルームやテンプレートはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateSoon"
-msgstr ""
+msgstr "{name}は近日公開のため、まだ複製できるものがありません"
 
 #. js-lingui-explicit-id
 msgid "enter.duplicateTemplate"
-msgstr ""
+msgstr "Enterでテンプレート{name}を{copy}として複製し、ラボで開きます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.duplicateWhich"
-msgstr ""
+msgstr "duplicate:\"執筆スタジオ\" のように、複製するルームを指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.editHere"
-msgstr ""
+msgstr "{name}はすでにラボにあります"
 
 #. js-lingui-explicit-id
 msgid "enter.editMany"
-msgstr ""
+msgstr "その名前のルームが複数あります：{names}"
 
 #. js-lingui-explicit-id
 msgid "enter.editNone"
-msgstr ""
+msgstr "{said} というルームはありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.editNotRoom"
-msgstr ""
+msgstr "{said} は番号です。edit: にはルームを名前で指定します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.editWhich"
-msgstr ""
+msgstr "edit:\"執筆スタジオ\" のように、変更するルームを指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -2784,16 +2784,16 @@ msgstr "Enterで{boards}を閉じ、画面をチャットだけにします。�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusInLab"
-msgstr ""
+msgstr "focus: はラボの外で使えます。先に done: でラボを出てください"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusKept"
-msgstr ""
+msgstr "{room}の集中表示として残ります。focus: だけで呼び戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.focusKeptSame"
-msgstr ""
+msgstr "すでに{room}の集中表示です"
 
 #. js-lingui-explicit-id
 msgid "enter.focusNothing"
@@ -2801,7 +2801,7 @@ msgstr "集中する対象がまだありません。p> でチャットを始め
 
 #. js-lingui-explicit-id
 msgid "enter.focusNotKept"
-msgstr ""
+msgstr "画面にルームがないため、集中表示としては残りません"
 
 #. js-lingui-explicit-id
 msgid "enter.focusOff"
@@ -2810,7 +2810,7 @@ msgstr "Enterで{boards}を戻します"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusOffFor"
-msgstr ""
+msgstr "{board}を表示するため、集中表示はオフです。focus: で戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.focusOffNot"
@@ -2822,44 +2822,44 @@ msgstr "Enterで画面を元に戻します"
 
 #. js-lingui-explicit-id
 msgid "enter.focusSave"
-msgstr ""
+msgstr "Enterで、今の画面を{room}の集中表示として保存します：{focusBoards}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusSaveNoRoom"
-msgstr ""
+msgstr "集中表示はルームと一緒に保存します。先にルームを開いてください：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.focusSaveNothing"
-msgstr ""
+msgstr "画面には、集中表示として保存できるものがありません"
 
 #. js-lingui-explicit-id
 msgid "enter.focusSaveSame"
-msgstr ""
+msgstr "{focusBoards}はすでに{room}の集中表示です"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusSetAlready"
-msgstr ""
+msgstr "その集中表示はすでに画面にあります。focus:off で元の画面に戻ります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusSetGo"
-msgstr ""
+msgstr "Enterで、{focusBoards}をこの順に並べて集中表示にします。何も失われず、focus:off で元の画面に戻ります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusStripHeld"
-msgstr ""
+msgstr "画面は集中表示中です。自由に並べるには focus:off を使います"
 
 #. js-lingui-explicit-id
 msgid "enter.focusTheChat"
-msgstr ""
+msgstr "チャット"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.focusWhich"
-msgstr ""
+msgstr "focus: にはボードを名前で指定します：{choices}。{said} はボードではありません"
 
 #. js-lingui-explicit-id
 msgid "enter.forgetNone"
@@ -2991,7 +2991,7 @@ msgstr "Enterで、{heading}という見出しを取り除きます。その下�
 #. On the Enter line while the prompt field holds a prompt edited in the chat
 #. js-lingui-explicit-id
 msgid "enter.heldPrompt"
-msgstr ""
+msgstr "入力すると置き換わります。Escapeで消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
@@ -3048,28 +3048,28 @@ msgstr "Enterで {verb} の使い方を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditAlready"
-msgstr ""
+msgstr "すでに保留中：{nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditNot"
-msgstr ""
+msgstr "保留中ではありません：{nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditNotHere"
-msgstr ""
+msgstr "{num}は、ここのチャットの編集ではありません"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditOff"
-msgstr ""
+msgstr "Enterで{nums}の保留を解除し、次のプロンプトと一緒に送るようにします"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.holdEditOn"
-msgstr ""
+msgstr "Enterで{nums}を保留にします。hold:off まで送らずに手元に残します"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditTold"
-msgstr ""
+msgstr "{num}はすでに伝えたため、保留にはできません"
 
 #. js-lingui-explicit-id
 msgid "enter.importOpen"
@@ -3205,38 +3205,38 @@ msgstr "キーが拒否されました。{board}で更新してから、もう�
 
 #. js-lingui-explicit-id
 msgid "enter.labAlready"
-msgstr ""
+msgstr "ラボはすでに開いています"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.labEmpty"
-msgstr ""
+msgstr "Enterで、ルームのない状態でラボを開きます。続けて edit:\"ルーム名\" か new:room を使います"
 
 #. js-lingui-explicit-id
 msgid "enter.labLeft"
-msgstr ""
+msgstr "Enterでラボを出ます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.labNoRoom"
-msgstr ""
+msgstr "先にラボにルームを置いてください：edit:\"執筆スタジオ\" または new:room"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.labOpen"
-msgstr ""
+msgstr "Enterで{name}をラボで開きます。変更はそのつど保存され、undo: で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.labOpened"
-msgstr ""
+msgstr "Enterでラボを開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.labRoom"
-msgstr ""
+msgstr "Enterでルームをキャンバスに置きます"
 
 #. js-lingui-explicit-id
 msgid "enter.languageBeta"
-msgstr ""
+msgstr "この翻訳はベータ版です。まだ不自然な言葉があるかもしれません"
 
 #. js-lingui-explicit-id
 msgid "enter.languageBrowser"
@@ -3249,7 +3249,7 @@ msgstr "ページはすでにブラウザの言語に従っています"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.languageComing"
-msgstr ""
+msgstr "{language}は近日公開です。language: で指定できるのは{names}です"
 
 #. js-lingui-explicit-id
 msgid "enter.languageDraft"
@@ -3290,32 +3290,32 @@ msgstr "{verb} はまだ準備中です"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
-msgstr ""
+msgstr "Enterで{room}のレイアウトを{name}にします"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutMany"
-msgstr ""
+msgstr "どのレイアウトですか：{names}？"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutMoves"
-msgstr ""
+msgstr "{block}は{fromSlot}から{toSlot}に移ります"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutNoMessages"
-msgstr ""
+msgstr "{name}には会話を置く場所がありません"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutNone"
-msgstr ""
+msgstr "{said} というレイアウトはありません。レイアウトは{choices}です"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.layoutOut"
-msgstr ""
+msgstr "{block}は置く場所がないため、ルームから外れます。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutSame"
-msgstr ""
+msgstr "レイアウトはすでに{name}です"
 
 #. js-lingui-explicit-id
 msgid "enter.leavePrompt"
@@ -3327,49 +3327,49 @@ msgstr "Escapeで検索に戻ります"
 
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
-msgstr ""
+msgstr "Enterで手紙をすべて一覧表示します"
 
 #. close:letter, the same as Escape
 #. js-lingui-explicit-id
 msgid "enter.letterClose"
-msgstr ""
+msgstr "Enterで手紙を閉じます"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
 msgid "enter.letterNone"
-msgstr ""
+msgstr "手紙{n}はありません。letter:all で一覧を表示します"
 
 #. A letter from the maker of Parliament; {n} is its number
 #. js-lingui-explicit-id
 msgid "enter.letterOpen"
-msgstr ""
+msgstr "Enterで手紙{n}を開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.localGo"
-msgstr ""
+msgstr "{on, select, on {Enterで、{room}の送信先をこのコンピュータ上のモデルだけにします} other {Enterで、{room}が再びどのモデルや情報源にも送れるようにします}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.localOnlyHelper"
-msgstr ""
+msgstr "{room}はこのコンピュータ上のモデルにしか送りませんが、補助モデルの{name}はこのコンピュータ上にありません。先に helper: でこのコンピュータ上のモデルを選んでください"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.localOnlyNoHelper"
-msgstr ""
+msgstr "{room}はこのコンピュータ上のモデルにしか送りませんが、このコンピュータには補助モデルがありません。先に helper: でこのコンピュータ上のモデルを選んでください"
 
 #. js-lingui-explicit-id
 msgid "enter.localOnlyStopped"
-msgstr ""
+msgstr "何も送信していません：このルームはこのコンピュータ上のモデルにしか送りません"
 
 #. js-lingui-explicit-id
 msgid "enter.localSame"
-msgstr ""
+msgstr "{on, select, on {すでにこのコンピュータ上のモデルにしか送りません} other {すでにどのモデルや情報源にも送れます}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.localWhich"
-msgstr ""
+msgstr "local: には on か off を指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.manyFailed"
@@ -3386,27 +3386,27 @@ msgstr "{cond, select, nothing {何も見つからなければ} failed {前の�
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
-msgstr ""
+msgstr "Enterで、カードを清書で表示します：編集は今の内容だけ、回答はそれだけを表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOn"
-msgstr ""
+msgstr "Enterで、カードを変更表示にします：取り消し線の言葉、青で自分の言葉、緑で回答"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColSame"
-msgstr ""
+msgstr "{on, select, on {カードはすでに変更表示です} other {カードはすでに清書です}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupOff"
-msgstr ""
+msgstr "Enterで、返答を清書で表示します：結果だけを表示し、markup:on まで編集できません"
 
 #. js-lingui-explicit-id
 msgid "enter.markupOn"
-msgstr ""
+msgstr "Enterで、返答を変更表示にします：取り消し線の言葉と青の自分の言葉を表示し、編集できます"
 
 #. js-lingui-explicit-id
 msgid "enter.markupSame"
-msgstr ""
+msgstr "{on, select, on {返答はすでに変更表示です} other {返答はすでに清書です}}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -3486,7 +3486,7 @@ msgstr "{name}は保存した検索とコレクションの両方の名前です
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.nameWhichKindAll"
-msgstr ""
+msgstr "{name}は複数のものの名前です。後に search、collection、framework、arrangement のいずれかを付けてください"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranch"
@@ -3523,11 +3523,11 @@ msgstr "{count, plural, =0 {{address}にはまだステップがありません}
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGo"
-msgstr ""
+msgstr "Enterで、会話を3パネルに置いた新しいルームを作り、ラボで開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGuided"
-msgstr ""
+msgstr "Enterで、会話を3パネルに置いた新しいルームを作り、ガイド付きでラボで開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -3581,7 +3581,7 @@ msgstr "メモには言葉が必要です。例：{example}"
 #. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
 #. js-lingui-explicit-id
 msgid "enter.notOffered"
-msgstr ""
+msgstr "{verb} は今後のリリースで追加します"
 
 #. js-lingui-explicit-id
 msgid "enter.numNone"
@@ -3765,53 +3765,53 @@ msgstr "Enterで{nums}を一番上にピン留めします"
 
 #. js-lingui-explicit-id
 msgid "enter.placeCramped"
-msgstr ""
+msgstr "Enterで{block}を{fromSlot}から{toSlot}に移動します。その場所向けではないため、窮屈になるかもしれません"
 
 #. js-lingui-explicit-id
 msgid "enter.placeDown"
-msgstr ""
+msgstr "Enterで{block}を枠内で下に移動します"
 
 #. js-lingui-explicit-id
 msgid "enter.placeFirst"
-msgstr ""
+msgstr "{block}はすでに枠内の先頭にあります"
 
 #. js-lingui-explicit-id
 msgid "enter.placeFull"
-msgstr ""
+msgstr "{toSlot}に置けるブロックは1つだけで、すでに置かれています。先にそれを移動してください"
 
 #. js-lingui-explicit-id
 msgid "enter.placeGo"
-msgstr ""
+msgstr "Enterで{block}を{fromSlot}から{toSlot}に移動します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.placeInLab"
-msgstr ""
+msgstr "place: はラボでブロックを移動します。edit: でルームをラボで開けます"
 
 #. js-lingui-explicit-id
 msgid "enter.placeLast"
-msgstr ""
+msgstr "{block}はすでに枠内の最後にあります"
 
 #. js-lingui-explicit-id
 msgid "enter.placeNoSlot"
-msgstr ""
+msgstr "{name}に {where} という場所はありません。場所は{choices}です"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.placeOne"
-msgstr ""
+msgstr "place: で移動できるのは、一度に1つのブロックです"
 
 #. js-lingui-explicit-id
 msgid "enter.placeSame"
-msgstr ""
+msgstr "{block}はすでに{toSlot}にあります"
 
 #. js-lingui-explicit-id
 msgid "enter.placeUp"
-msgstr ""
+msgstr "Enterで{block}を枠内で上に移動します"
 
 #. js-lingui-explicit-id
 msgid "enter.placeWhere"
-msgstr ""
+msgstr "{block}の置き場所を指定してください：right、left、extra、middle、bottom、または枠内での up か down"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchDone"
@@ -3999,19 +3999,19 @@ msgstr "Enterで{board}を、ディスプレイ{display}の別ウインドウに
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayAsk"
-msgstr ""
+msgstr "Enterで{board}を、ディスプレイ{display}の別ウインドウに出します。Parliamentがディスプレイにウインドウを配置してよいか、ブラウザが一度だけ尋ねます"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayCannot"
-msgstr ""
+msgstr "このブラウザは、ほかのディスプレイにウインドウを配置できません。Enterで、{board}をここで別ウインドウに出します"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayNone"
-msgstr ""
+msgstr "ディスプレイ{display}は接続されていません。Enterで、{board}をここで別ウインドウに出します"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayRefused"
-msgstr ""
+msgstr "ブラウザは、Parliamentにウインドウの配置を許可しない設定になっています。Enterで、{board}をここで別ウインドウに出します"
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -4138,24 +4138,24 @@ msgstr "{language}版から。見つからなければ英語版から"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr ""
+msgstr "一緒に1回だけ伝えるもの：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}・{name}が読みます"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr ""
+msgstr "入力なし：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}だけを{name}に伝えます"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr ""
+msgstr "Enterで、{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}だけを{name}に送ります（約{tokens}トークン）・{source}はどれも読みません"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr ""
+msgstr "{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}は同時に{name}に{total, plural, other {送られます}}（約{tokens}トークン）・{source}はどれも読みません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr ""
+msgstr "{source}は{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}を読みません。キーがあればモデルが読みます：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -4163,19 +4163,19 @@ msgstr "プロンプトを送信できませんでした。もう一度お試し
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesGo"
-msgstr ""
+msgstr "{count, plural, other {ファイル#件}}も一緒に送ります：{files}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesOut"
-msgstr ""
+msgstr "{files}は{count, plural, other {含めません}}：ここでは{name}に画像やPDFを渡さないためです"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesPrivacy"
-msgstr ""
+msgstr "プライバシーフィルタが読むのはテキストファイルだけで、画像やPDFは読みません"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFilesSource"
-msgstr ""
+msgstr "{name}には言葉だけを送ります。ファイルはモデルへのプロンプトまで待ちます"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFrameworks"
@@ -4223,11 +4223,11 @@ msgstr "このチャットは約{tokens, number}トークンあります。{prov
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptLocalOnly"
-msgstr ""
+msgstr "{room}はこのコンピュータ上のモデルにしか送りませんが、{name}はこのコンピュータ上にありません。by: でこのコンピュータ上のモデルを選ぶか、local:off を使ってください"
 
 #. js-lingui-explicit-id
 msgid "enter.promptLocalRipple"
-msgstr ""
+msgstr "ここからはRippleは確認しません：補助モデルがこのコンピュータ上にないためです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4377,20 +4377,20 @@ msgstr "{tokens, plural, other {Enterで、ストリーミングなしでもう�
 
 #. js-lingui-explicit-id
 msgid "enter.promptRipple"
-msgstr ""
+msgstr "Rippleが{nums}を確認します：{name}を{count, plural, other {#回}}呼び出し、約{cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptRippleCheap"
-msgstr ""
+msgstr "Rippleが{nums}を確認します：{name}を{count, plural, other {#回}}呼び出し、{cost}未満"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptRippleNoKey"
-msgstr ""
+msgstr "Rippleはオンですが、{nums}を確認するにはキーのあるモデルが必要です：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptRippleUnpriced"
-msgstr ""
+msgstr "Rippleが{nums}を確認します：{name}を{count, plural, other {#回}}呼び出し、約{tokens}トークン"
 
 #. A source answers a search; a leading question phrase is left out (C168)
 #. js-lingui-explicit-id
@@ -4431,20 +4431,20 @@ msgstr "返答が止まりました。ストリーミングの返答を溜めて
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"
-msgstr ""
+msgstr "一緒に1回だけ伝えるもの：照合から受け入れた{count, plural, other {変更#件}}・{name}が{count, plural, other {読みます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptTellGo"
-msgstr ""
+msgstr "一緒に1回だけ伝えるもの：{count, plural, other {メモ#件}}・{name}が{count, plural, other {読みます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptTellToReader"
-msgstr ""
+msgstr "{count, plural, other {メモ#件}}は同時に{name}に送られます・{source}はどれも読みません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptTellWait"
-msgstr ""
+msgstr "{source}はメモを読みません。{count, plural, other {メモ#件}}は、キーのあるモデルへのプロンプトまで待ちます：api:"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4478,15 +4478,15 @@ msgstr "回答は英語で届きます。あとで translate: を使うと{langu
 
 #. js-lingui-explicit-id
 msgid "enter.promptVaultUnreached"
-msgstr ""
+msgstr "ここでは{name}が答えますが、キー保管庫が開かなかったため、キーを使えません。再読み込みしてもう一度お試しください。このコンピュータ上のモデルと情報源は引き続き使えます"
 
 #. js-lingui-explicit-id
 msgid "enter.promptWebGo"
-msgstr ""
+msgstr "ウェブを検索することがあります：最大{most}回、1回あたり約{cost}で、トークンの費用とは別にかかります"
 
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
-msgstr ""
+msgstr "{whos}はウェブを検索できないため、{count, plural, other {検索なしで送ります}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4500,77 +4500,77 @@ msgstr "Enterで {verb} を実行します"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.reflectChanged"
-msgstr ""
+msgstr "ルームには今、別のチャットが表示されています。もう一度 reflect: を使うと、そのチャットを読みます"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectCut"
-msgstr ""
+msgstr "長いため、最も古いやり取りは含めません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectDone"
-msgstr ""
+msgstr "{head}を振り返りました。中身は何も変わっていません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectFailed"
-msgstr ""
+msgstr "振り返りの結果が返ってきませんでした。何も変わっていません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGo"
-msgstr ""
+msgstr "Enterで、{head}{count, plural, =1 {} other {とそのブランチ}}を振り返ります：{model}を1回呼び出し、約{cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGoCheap"
-msgstr ""
+msgstr "Enterで、{head}{count, plural, =1 {} other {とそのブランチ}}を振り返ります：{model}を1回呼び出し、{cost}未満"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGoing"
-msgstr ""
+msgstr "{model}が{head}を読んでいます。中身は何も変わりません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectGoUnpriced"
-msgstr ""
+msgstr "Enterで、{head}{count, plural, =1 {} other {とそのブランチ}}を振り返ります：{model}を1回呼び出し、約{tokens}トークン"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.reflectNoKey"
-msgstr ""
+msgstr "{head}を振り返るには、キーのあるモデルが必要です：api:"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.reflectNoRoom"
-msgstr ""
+msgstr "振り返りはルームのチャットを読みます。先にルームを開いてください：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectNothingBack"
-msgstr ""
+msgstr "ここで話したことは、{head}には戻りません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkBusy"
-msgstr ""
+msgstr "振り返りはまだ書いている途中です。終わるのを待ってから尋ねてください"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkFailed"
-msgstr ""
+msgstr "回答が返ってきませんでした。何も変わっていません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkGo"
-msgstr ""
+msgstr "Enterで、{head}について{model}に尋ねます：呼び出し1回、約{cost}"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkGoCheap"
-msgstr ""
+msgstr "Enterで、{head}について{model}に尋ねます：呼び出し1回、{cost}未満"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkGoUnpriced"
-msgstr ""
+msgstr "Enterで、{head}について{model}に尋ねます：呼び出し1回、約{tokens}トークン"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectTalkRest"
-msgstr ""
+msgstr "ここで{head}について話せます。話したことが元のチャットに戻ることはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.reflectUnder"
-msgstr ""
+msgstr "方針：{names}"
 
 #. Enter puts the new verb in the field; it does not run it
 #. js-lingui-explicit-id
@@ -4680,46 +4680,46 @@ msgstr "{verb} はもうコマンドではありません。{instead} を使っ�
 
 #. js-lingui-explicit-id
 msgid "enter.rippleDone"
-msgstr ""
+msgstr "Ripple：{count, plural, =0 {確認した{checked, plural, other {#件のブランチ}}に、引き継ぐ変更はありません} other {{nums}に提案#件}}"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleFailed"
-msgstr ""
+msgstr "Rippleは{nums}を確認できませんでした"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleMissed"
-msgstr ""
+msgstr "{count, plural, other {ほかの#件は配置できませんでした：その言葉が、印のない部分にちょうど1回は見つからなかったためです}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleNoRoom"
-msgstr ""
+msgstr "Rippleはルームのチャットに使えます。先にルームを開いてください：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleNothing"
-msgstr ""
+msgstr "Rippleは編集をプランのほかのブランチに広げますが、このチャットにはまだほかのブランチがありません"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOff"
-msgstr ""
+msgstr "Enterで、プラン{num}のRippleをオフにします：編集はそのブランチだけに残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOffAlready"
-msgstr ""
+msgstr "プラン{num}のRippleはすでにオフです"
 
 #. {nums} are the other branches, as 201b and 201c
 #. js-lingui-explicit-id
 msgid "enter.rippleOn"
-msgstr ""
+msgstr "Enterで、プラン{num}のRippleをオンにします：編集をプロンプトと一緒に送るとき、{name}が{nums}に同じ変更がないか確認します。ブランチごとに1回呼び出します"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOnAlready"
-msgstr ""
+msgstr "プラン{num}のRippleはすでにオンです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleOnNoKey"
-msgstr ""
+msgstr "Enterで、プラン{num}のRippleをオンにします。{nums}を確認するには、キーのあるモデルが必要です：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -4737,7 +4737,7 @@ msgstr "ここには{num}を表示しているルームはありません。open
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.roomRan"
-msgstr ""
+msgstr "{command} を実行しました。undo: で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.roomThere"
@@ -4926,7 +4926,7 @@ msgstr "{count, plural, =0 {一致するカードはありません} other {カ�
 
 #. js-lingui-explicit-id
 msgid "enter.searchLibrary"
-msgstr ""
+msgstr "{count, plural, =0 {ライブラリに一致するものはありません} other {#件が一致します}}"
 
 #. In search mode on a board search does not reach yet; {first} and {second} are board names
 #. js-lingui-explicit-id
@@ -4948,31 +4948,31 @@ msgstr "{count, plural, =1 {Enterで#件のコマンドを実行します：{ver
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockChoice"
-msgstr ""
+msgstr "{word} には {words} を指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockGo"
-msgstr ""
+msgstr "Enterで、{block}の {word} を {value} にします"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockNone"
-msgstr ""
+msgstr "{block}には変更できる設定がありません"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockNumber"
-msgstr ""
+msgstr "{word} には{min}から{max}までの整数を指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockSame"
-msgstr ""
+msgstr "{block}の {word} はすでに {value} です"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockSwitch"
-msgstr ""
+msgstr "{word} には on か off を指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.setBlockWhich"
-msgstr ""
+msgstr "{block}のどの設定ですか：{words}？"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5077,46 +5077,46 @@ msgstr "Enterで、新しいチャットの名前付けをオンにします。�
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr ""
+msgstr "{count, plural, other {Enterで、依頼{nums}への回答を返答に残し、元の箇所を消します}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr ""
+msgstr "依頼{num}の箇所は依頼のあとに変わったため、回答はカードにだけあります。reject:{num} で破棄できます"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr ""
+msgstr "ここのチャットには、確認待ちの回答も提案もありません"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr ""
+msgstr "依頼{num}にはまだ回答がありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr ""
+msgstr "{num}は依頼でも提案でもありません。accept: と reject: は、依頼への回答か提案を確定するコマンドです"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr ""
+msgstr "{count, plural, other {Enterで、依頼{nums}への回答を取り消し、元の箇所を残します}}"
 
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr ""
+msgstr "{state, select, accepted {提案{num}はすでに受け入れ済みです} rejected {提案{num}はすでに却下済みです} other {提案{num}はすでに{state}です}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
-msgstr ""
+msgstr "{count, plural, other {Enterで提案{nums}を却下します：返答はそのままです}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugRipple"
-msgstr ""
+msgstr "{count, plural, other {Enterで、Rippleの提案{nums}を受け入れます：それぞれ、そのブランチでの自分の編集になり、そこへの次のプロンプトと一緒に送られます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugSweep"
-msgstr ""
+msgstr "{count, plural, other {Enterで、照合の提案{nums}を受け入れます：提案された言葉が返答の言葉になり、取り消し線の言葉は消えます}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5139,22 +5139,22 @@ msgstr "Enterで、最後に使ったルームをここに表示します"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallBar"
-msgstr ""
+msgstr "スマートフォンでは、バーは下に固定されます。bar:top は、もっと幅の広い画面で使えます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallFocus"
-msgstr ""
+msgstr "スマートフォンでは一度に1つのボードしか表示されないため、focus: は必要ありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr ""
+msgstr "pop: は、もっと幅の広い画面で使えます。スマートフォンでは一度に1つのボードを表示します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.smallWidth"
-msgstr ""
+msgstr "width: は、もっと幅の広いウインドウで使えます"
 
 #. The words stay English
 #. js-lingui-explicit-id
@@ -5214,30 +5214,30 @@ msgstr "Enterで、{num}に届いている途中の返答を止めます。届�
 
 #. js-lingui-explicit-id
 msgid "enter.strikeDone"
-msgstr ""
+msgstr "取り消し線を引きました。編集として次のプロンプトと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "enter.strikeGo"
-msgstr ""
+msgstr "Enterで、返答で選択した言葉に取り消し線を引きます。言葉は取り消し線付きで残り、編集として次のプロンプトと一緒に送られます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.strikeNoReply"
-msgstr ""
+msgstr "返答をクリックして取り消し線を引く言葉を選択してから、もう一度 strikethrough: を使ってください"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.strikeNothing"
-msgstr ""
+msgstr "先に返答で取り消し線を引く言葉を選択してから、もう一度 strikethrough: を使ってください"
 
 #. js-lingui-explicit-id
 msgid "enter.strikeNotNow"
-msgstr ""
+msgstr "その返答は、書かれている途中は編集できません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.strikeNumbered"
-msgstr ""
+msgstr "編集{num}として取り消し線を引きました。undo:{num} で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -5301,68 +5301,68 @@ msgstr "swap: には異なる2つのボードを指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepDone"
-msgstr ""
+msgstr "照合：{address}に{count, plural, =0 {配置できる提案はありませんでした} other {提案#件}}"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepFailed"
-msgstr ""
+msgstr "{address}の照合結果が返ってきませんでした。何も変わっていません"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGo"
-msgstr ""
+msgstr "Enterで、{address}の最新の返答を{name}で照合します：{model}を1回呼び出し、約{cost}。提案は1文につき1つまでです"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGoCheap"
-msgstr ""
+msgstr "Enterで、{address}の最新の返答を{name}で照合します：{model}を1回呼び出し、{cost}未満。提案は1文につき1つまでです"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGoing"
-msgstr ""
+msgstr "{address}を照合しています。提案は緑で返答の中に入ります"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepGoUnpriced"
-msgstr ""
+msgstr "Enterで、{address}の最新の返答を{name}で照合します：{model}を1回呼び出し、約{tokens}トークン。提案は1文につき1つまでです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepNoKey"
-msgstr ""
+msgstr "{address}を{name}で照合するには、キーのあるモデルが必要です：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepNone"
-msgstr ""
+msgstr "照合：{name}では、{address}に変えるところはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepNoReply"
-msgstr ""
+msgstr "{address}には、照合するモデルの返答がありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepNoRoom"
-msgstr ""
+msgstr "sweep:201a pushback のように照合するブランチを指定するか、そのルームを開いてください"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepNotChat"
-msgstr ""
+msgstr "{address}は、照合できるチャットやブランチではありません"
 
 #. The chat’s frameworks
 #. js-lingui-explicit-id
 msgid "enter.sweepPick"
-msgstr ""
+msgstr "どの方針で{address}を照合しますか？後に方針の名前を付けてください：{names}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepPickAny"
-msgstr ""
+msgstr "sweep:{address} pushback のように、{address}の後に方針を付けてください"
 
 #. js-lingui-explicit-id
 msgid "enter.sweepSource"
-msgstr ""
+msgstr "{address}は情報源が答えたもので、情報源の言葉は照合しません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepWhichBranch"
-msgstr ""
+msgstr "プラン{num}にはブランチがあります。sweep:{num}a のように1つ指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"
@@ -5427,54 +5427,54 @@ msgstr "→ 新しいルーム"
 #. tried is the tag, as typed in tag:tried
 #. js-lingui-explicit-id
 msgid "enter.targetTrying"
-msgstr ""
+msgstr "→ 新しいチャット（{room}、triedタグ付き）"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
-msgstr ""
+msgstr "メモは引用符で囲んで書きます：tell:\"1ページ以内にまとめて\""
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellHeld"
-msgstr ""
+msgstr "ここでの次のプロンプト用に保留しました{count, plural, =1 {} other {（メモは全部で#件）}}。undo: で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.tellHold"
-msgstr ""
+msgstr "Enterで、このメモをここでの次のプロンプト用に保留します。モデルはそのプロンプトと一緒に1回だけ読みます{count, plural, =1 {} other {（メモは全部で#件）}}"
 
 #. js-lingui-explicit-id
 msgid "enter.tellLong"
-msgstr ""
+msgstr "メモは{max}文字までです"
 
 #. js-lingui-explicit-id
 msgid "enter.tellMany"
-msgstr ""
+msgstr "1つのプロンプトに付けられるメモは{most}件までです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellNoRoom"
-msgstr ""
+msgstr "メモはルームのプロンプトと一緒に送られます。先にルームを開いてください：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.tellSame"
-msgstr ""
+msgstr "そのメモはすでに保留中です"
 
 #. js-lingui-explicit-id
 msgid "enter.themeGo"
-msgstr ""
+msgstr "Enterで{room}のテーマを{name}にします"
 
 #. js-lingui-explicit-id
 msgid "enter.themeMany"
-msgstr ""
+msgstr "どのテーマですか：{names}？"
 
 #. js-lingui-explicit-id
 msgid "enter.themeNone"
-msgstr ""
+msgstr "{said} というテーマはありません。テーマは{choices}です"
 
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
-msgstr ""
+msgstr "テーマはすでに{name}です"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -5641,12 +5641,12 @@ msgstr "{board}では、type: に keyword、quote、note、highlight のいず�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr ""
+msgstr "依頼{num}には回答があります：accept:{num} で回答を残し、reject:{num} で取り消せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr ""
+msgstr "送信待ちの依頼は delete:{num} で取り下げます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5660,11 +5660,11 @@ msgstr "その後{nums}が変わったため、undo: はここで止まります
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoEditOne"
-msgstr ""
+msgstr "Enterで編集{num}を取り除きます：取り消し線の言葉が元に戻り、自分の言葉は消えます。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.undoEditTold"
-msgstr ""
+msgstr "編集{num}はすでにモデルに伝えたため、残ります。テキストをもう一度変えると、それが新しい編集として送られます"
 
 #. js-lingui-explicit-id
 msgid "enter.undoFailed"
@@ -5681,7 +5681,7 @@ msgstr "{line} を取り消しました"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoNotEdit"
-msgstr ""
+msgstr "番号付きの undo: は1つの編集を取り消しますが、{num}は編集ではありません"
 
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"
@@ -5690,7 +5690,7 @@ msgstr "このタブには取り消せるものがありません"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoSugUse"
-msgstr ""
+msgstr "提案は accept:{num} か reject:{num} で確定します"
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"
@@ -5711,29 +5711,29 @@ msgstr "{count, plural, =1 {Enterで、{tag}タグが付いている1件から�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
-msgstr ""
+msgstr "ウェブ検索はすでに次のプロンプト用に設定されています。web:off で外せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webCannot"
-msgstr ""
+msgstr "ここでは{name}はウェブを検索できません。by: で検索できるモデルを選んでください"
 
 #. js-lingui-explicit-id
 msgid "enter.webDrop"
-msgstr ""
+msgstr "Enterで、次のプロンプトからウェブ検索を外します"
 
 #. js-lingui-explicit-id
 msgid "enter.webHoldGo"
-msgstr ""
+msgstr "Enterで、次のプロンプトに限り、{name}がウェブを検索できるようにします"
 
 #. js-lingui-explicit-id
 msgid "enter.webNoneHeld"
-msgstr ""
+msgstr "次のプロンプト用のウェブ検索は設定されていません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webNotHere"
-msgstr ""
+msgstr "{room}ではウェブ検索がオフです。set:input web on でオンにできます"
 
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"
@@ -5888,7 +5888,7 @@ msgstr "{model}が回答"
 #. In the prompt field, when several models, or models and sources, are ticked to answer
 #. js-lingui-explicit-id
 msgid "field.answeredByMany"
-msgstr ""
+msgstr "複数が回答"
 
 #. js-lingui-explicit-id
 msgid "field.answeredFrom"
@@ -5897,7 +5897,7 @@ msgstr "{source}から回答"
 #. In the prompt field, when several sources are ticked to answer
 #. js-lingui-explicit-id
 msgid "field.answeredFromMany"
-msgstr ""
+msgstr "複数から回答"
 
 #. Shown on hover over who answers, in the prompt field
 #. js-lingui-explicit-id
@@ -5906,20 +5906,20 @@ msgstr "ここで答えるものを選ぶ（by:）"
 
 #. js-lingui-explicit-id
 msgid "field.attach"
-msgstr ""
+msgstr "添付"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "field.attachHelp"
-msgstr ""
+msgstr "次のプロンプトにファイルを添付する（attach:）"
 
 #. js-lingui-explicit-id
 msgid "field.fileDrop"
-msgstr ""
+msgstr "{name}を外す"
 
 #. js-lingui-explicit-id
 msgid "field.fileKind"
-msgstr ""
+msgstr "この種類のファイルは添付できません。画像、PDF、テキストやコードのファイルを試してください"
 
 #. js-lingui-explicit-id
 msgid "field.frameworkHelp"
@@ -5937,16 +5937,16 @@ msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
 msgid "field.held"
-msgstr ""
+msgstr "次のプロンプトと一緒に"
 
 #. Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words
 #. js-lingui-explicit-id
 msgid "field.heldPrompt"
-msgstr ""
+msgstr "編集したプロンプト"
 
 #. js-lingui-explicit-id
 msgid "field.listening"
-msgstr ""
+msgstr "聞き取り中"
 
 #. js-lingui-explicit-id
 msgid "field.toAll"
@@ -5962,32 +5962,32 @@ msgstr "{nums}へ"
 
 #. js-lingui-explicit-id
 msgid "field.voice"
-msgstr ""
+msgstr "音声"
 
 #. js-lingui-explicit-id
 msgid "field.voiceDownload"
-msgstr ""
+msgstr "音声入力を設定します：ブラウザが言語パックを一度だけダウンロードし、その後は音声がこのデバイスの外に出ません。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr ""
+msgstr "プロンプトを話して入力します。このデバイス上で文字に変換され、音声が外に出ることはありません。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceOff"
-msgstr ""
+msgstr "音声オフ"
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
-msgstr ""
+msgstr "このブラウザは、このデバイス上で音声を文字に変換できません。ここで音声入力を使うと音声をブラウザの開発元に送ることになるため、オフのままにしています。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "field.webHelp"
-msgstr ""
+msgstr "次のプロンプトに限り、モデルにウェブを検索させる（web:）"
 
 #. js-lingui-explicit-id
 msgid "field.webSearch"
-msgstr ""
+msgstr "ウェブ検索"
 
 #. js-lingui-explicit-id
 msgid "framework.about.alts"
@@ -6040,7 +6040,7 @@ msgstr "オフにするまで、チェックした順に、このチャットの
 #. The foot of the frameworks menu, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "frameworkPicker.keys"
-msgstr ""
+msgstr "行をクリックするか、行でEnterを押すと、その方針を最後に加えるか、外します。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6050,7 +6050,7 @@ msgstr "自分の方針はまだありません。new:framework \"名前\" \"指
 #. The heading of the frameworks menu, drawn in capitals
 #. js-lingui-explicit-id
 msgid "frameworkPicker.title"
-msgstr ""
+msgstr "方針"
 
 #. A framework of your own with no name, as a persona could be
 #. js-lingui-explicit-id
@@ -6112,157 +6112,157 @@ msgstr "タグ"
 
 #. js-lingui-explicit-id
 msgid "guide.asItIs"
-msgstr ""
+msgstr "現在のまま"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "guide.back"
-msgstr ""
+msgstr "new:room guided で別のルームを始められます"
 
 #. js-lingui-explicit-id
 msgid "guide.built"
-msgstr ""
+msgstr "ルームができました。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "guide.builtWhy"
-msgstr ""
+msgstr "どのステップもコマンドでした。undo: で1つずつ取り消せます。ほかの変更はキャンバスとブロックボードで行えます。"
 
 #. js-lingui-explicit-id
 msgid "guide.done"
-msgstr ""
+msgstr "完了"
 
 #. js-lingui-explicit-id
 msgid "guide.how"
-msgstr ""
+msgstr "答えを選ぶたびに入力欄にコマンドが書き込まれ、Enterで実行します。"
 
 #. js-lingui-explicit-id
 msgid "guide.label"
-msgstr ""
+msgstr "ガイド"
 
 #. js-lingui-explicit-id
 msgid "guide.o.branches"
-msgstr ""
+msgstr "ブランチ"
 
 #. js-lingui-explicit-id
 msgid "guide.o.context"
-msgstr ""
+msgstr "コンテキストの状態"
 
 #. js-lingui-explicit-id
 msgid "guide.o.data"
-msgstr ""
+msgstr "表とデータ"
 
 #. js-lingui-explicit-id
 msgid "guide.o.dataDesk"
-msgstr ""
+msgstr "データデスク"
 
 #. js-lingui-explicit-id
 msgid "guide.o.desk"
-msgstr ""
+msgstr "デスクで"
 
 #. js-lingui-explicit-id
 msgid "guide.o.essay"
-msgstr ""
+msgstr "エッセイルーム"
 
 #. js-lingui-explicit-id
 msgid "guide.o.keywordsNotes"
-msgstr ""
+msgstr "キーワードとメモ"
 
 #. js-lingui-explicit-id
 msgid "guide.o.own"
-msgstr ""
+msgstr "自分で決める"
 
 #. js-lingui-explicit-id
 msgid "guide.o.phone"
-msgstr ""
+msgstr "スマートフォンで"
 
 #. js-lingui-explicit-id
 msgid "guide.o.quick"
-msgstr ""
+msgstr "ちょっとした質問"
 
 #. js-lingui-explicit-id
 msgid "guide.o.steps"
-msgstr ""
+msgstr "ステップ一覧"
 
 #. js-lingui-explicit-id
 msgid "guide.o.talking"
-msgstr ""
+msgstr "じっくり話し合う"
 
 #. js-lingui-explicit-id
 msgid "guide.o.thinking"
-msgstr ""
+msgstr "思索ルーム"
 
 #. js-lingui-explicit-id
 msgid "guide.o.webNo"
-msgstr ""
+msgstr "いいえ"
 
 #. js-lingui-explicit-id
 msgid "guide.o.webYes"
-msgstr ""
+msgstr "はい、頼んだときに"
 
 #. js-lingui-explicit-id
 msgid "guide.o.writing"
-msgstr ""
+msgstr "長い文章を書く"
 
 #. js-lingui-explicit-id
 msgid "guide.off"
-msgstr ""
+msgstr "ガイドをしまう"
 
 #. js-lingui-explicit-id
 msgid "guide.q.feel"
-msgstr ""
+msgstr "どんな雰囲気にしますか？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.for"
-msgstr ""
+msgstr "このルームは何に使いますか？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.name"
-msgstr ""
+msgstr "名前は何にしますか？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.reach"
-msgstr ""
+msgstr "何をすぐ手に取れるようにしますか？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.web"
-msgstr ""
+msgstr "ウェブを検索しますか？"
 
 #. js-lingui-explicit-id
 msgid "guide.q.where"
-msgstr ""
+msgstr "どこで使いますか？"
 
 #. js-lingui-explicit-id
 msgid "guide.skip"
-msgstr ""
+msgstr "この質問を飛ばす"
 
 #. js-lingui-explicit-id
 msgid "guide.step"
-msgstr ""
+msgstr "{n}/{total}"
 
 #. js-lingui-explicit-id
 msgid "guide.why.feel"
-msgstr ""
+msgstr "テーマはルームの中に色を付けます。周りのラボはそのままです。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.for"
-msgstr ""
+msgstr "ここでレイアウトが決まります：会話とサイドパネルをどこに置くかです。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.name"
-msgstr ""
+msgstr "ここから選ぶか、自分で書いてください。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.reach"
-msgstr ""
+msgstr "ブロックはルームを組み立てる部品です。ライブラリにはほかにもあり、いつでも追加できます。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.web"
-msgstr ""
+msgstr "ウェブ検索は、ルームの入力欄の機能です。頼んだときにモデルが検索することがあり、その分少し費用がかかります。"
 
 #. js-lingui-explicit-id
 msgid "guide.why.where"
-msgstr ""
+msgstr "スマートフォン向けのルームでは、サイドパネルがシートにたたまれます。"
 
 #. js-lingui-explicit-id
 msgid "hint.kOnly"
@@ -6475,7 +6475,7 @@ msgstr "保存"
 #. The key vault, at its own address, could not be reached (stage 15)
 #. js-lingui-explicit-id
 msgid "keys.vaultUnreached"
-msgstr ""
+msgstr "キー保管庫が開きませんでした。再読み込みしてもう一度お試しください"
 
 #. js-lingui-explicit-id
 msgid "keysData.cannotSee"
@@ -6561,12 +6561,12 @@ msgstr "キーワード"
 #. Beside a language still being worked on
 #. js-lingui-explicit-id
 msgid "languagePicker.beta"
-msgstr ""
+msgstr "ベータ版"
 
 #. Beside a language listed but not offered yet
 #. js-lingui-explicit-id
 msgid "languagePicker.coming"
-msgstr ""
+msgstr "近日公開"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.draft"
@@ -6583,7 +6583,7 @@ msgstr "言語：{language}"
 #. The foot of the languages menu, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "languagePicker.keys"
-msgstr ""
+msgstr "行をクリックするか、行でEnterを押すと、ページがその言語に切り替わります。"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
@@ -6656,17 +6656,17 @@ msgstr "検索"
 #. A letter from the maker of Parliament; {n} is its number
 #. js-lingui-explicit-id
 msgid "letter.heading"
-msgstr ""
+msgstr "手紙{n}"
 
 #. The heading over the list letter:all opens
 #. js-lingui-explicit-id
 msgid "letter.list"
-msgstr ""
+msgstr "手紙"
 
 #. Beside a letter in the list that this browser has not opened
 #. js-lingui-explicit-id
 msgid "letter.unread"
-msgstr ""
+msgstr "未読"
 
 #. js-lingui-explicit-id
 msgid "library.aboutAlmanac"
@@ -6694,7 +6694,7 @@ msgstr "キー、言語、データ、各種の動作。"
 
 #. js-lingui-explicit-id
 msgid "library.addToRoom"
-msgstr ""
+msgstr "ルームに追加"
 
 #. js-lingui-explicit-id
 msgid "library.blocks"
@@ -6702,79 +6702,79 @@ msgstr "{count, plural, other {ブロック#個}}"
 
 #. js-lingui-explicit-id
 msgid "library.clear"
-msgstr ""
+msgstr "解除"
 
 #. js-lingui-explicit-id
 msgid "library.close"
-msgstr ""
+msgstr "閉じる"
 
 #. js-lingui-explicit-id
 msgid "library.dAnyone"
-msgstr ""
+msgstr "制限なし"
 
 #. js-lingui-explicit-id
 msgid "library.dBlocks"
-msgstr ""
+msgstr "ブロック"
 
 #. js-lingui-explicit-id
 msgid "library.dBuiltFor"
-msgstr ""
+msgstr "対象"
 
 #. js-lingui-explicit-id
 msgid "library.dComputer"
-msgstr ""
+msgstr "コンピュータ"
 
 #. js-lingui-explicit-id
 msgid "library.dFits"
-msgstr ""
+msgstr "置ける場所"
 
 #. js-lingui-explicit-id
 msgid "library.dLayout"
-msgstr ""
+msgstr "レイアウト"
 
 #. js-lingui-explicit-id
 msgid "library.dNone"
-msgstr ""
+msgstr "なし"
 
 #. js-lingui-explicit-id
 msgid "library.dNoRoom"
-msgstr ""
+msgstr "まだルームなし"
 
 #. js-lingui-explicit-id
 msgid "library.dPhone"
-msgstr ""
+msgstr "スマートフォン"
 
 #. js-lingui-explicit-id
 msgid "library.dPlaces"
-msgstr ""
+msgstr "場所"
 
 #. js-lingui-explicit-id
 msgid "library.dSendsTo"
-msgstr ""
+msgstr "送信先"
 
 #. js-lingui-explicit-id
 msgid "library.dSettings"
-msgstr ""
+msgstr "設定"
 
 #. js-lingui-explicit-id
 msgid "library.dTheme"
-msgstr ""
+msgstr "テーマ"
 
 #. js-lingui-explicit-id
 msgid "library.dThisComputer"
-msgstr ""
+msgstr "このコンピュータのみ"
 
 #. js-lingui-explicit-id
 msgid "library.duplicate"
-msgstr ""
+msgstr "複製"
 
 #. js-lingui-explicit-id
 msgid "library.dUsedIn"
-msgstr ""
+msgstr "使われているルーム"
 
 #. js-lingui-explicit-id
 msgid "library.editHere"
-msgstr ""
+msgstr "ここで編集"
 
 #. js-lingui-explicit-id
 msgid "library.emptyShelf"
@@ -6806,7 +6806,7 @@ msgstr "ルーム内に配置"
 
 #. js-lingui-explicit-id
 msgid "library.inThisRoom"
-msgstr ""
+msgstr "このルームにあり"
 
 #. js-lingui-explicit-id
 msgid "library.loading"
@@ -6814,11 +6814,11 @@ msgstr "棚を読み込んでいます"
 
 #. js-lingui-explicit-id
 msgid "library.noMatch"
-msgstr ""
+msgstr "ライブラリに一致するものはありません。短い言葉で試すか、入力欄を空にしてください。"
 
 #. js-lingui-explicit-id
 msgid "library.onCanvas"
-msgstr ""
+msgstr "キャンバス上"
 
 #. js-lingui-explicit-id
 msgid "library.onScreen"
@@ -6893,20 +6893,20 @@ msgstr "ルーム内の色と書体"
 
 #. js-lingui-explicit-id
 msgid "library.tick"
-msgstr ""
+msgstr "{name}にチェックを入れる"
 
 #. js-lingui-explicit-id
 msgid "library.ticked"
-msgstr ""
+msgstr "{count}件にチェック：{names}"
 
 #. js-lingui-explicit-id
 msgid "library.tickHow"
-msgstr ""
+msgstr "ブロック、レイアウト、テーマにチェックを入れてから、まとめてルームに追加します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "library.writes"
-msgstr ""
+msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -7280,12 +7280,12 @@ msgstr "最長30日間保持"
 #. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr ""
+msgstr "名前をクリックするかEnterを押すと、今後はそれだけが答えます。チェックボックスか、Shiftを押しながらクリックすると、答えるものに加えます。キーが必要な行では、代わりに入力欄に api: が書き込まれます。"
 
 #. The foot of the menu of who answers one step of a plan, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "picker.keysStep"
-msgstr ""
+msgstr "行をクリックするか、行でEnterを押すと、このステップに答えるものとして選びます。"
 
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
@@ -7308,7 +7308,7 @@ msgstr "後日"
 #. A group in the menu of who answers: providers not built yet, one row each
 #. js-lingui-explicit-id
 msgid "picker.laterGroup"
-msgstr ""
+msgstr "後日"
 
 #. Models that run on this computer (A14)
 #. js-lingui-explicit-id
@@ -7384,7 +7384,7 @@ msgstr "思考できる"
 #. The heading of the menu of who answers, drawn in capitals
 #. js-lingui-explicit-id
 msgid "picker.title"
-msgstr ""
+msgstr "答えるもの"
 
 #. js-lingui-explicit-id
 msgid "picker.together"
@@ -7586,136 +7586,136 @@ msgstr "{count, plural, other {電話番号#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.again"
-msgstr ""
+msgstr "もう一度振り返る"
 
 #. js-lingui-explicit-id
 msgid "reflection.by"
-msgstr ""
+msgstr "{name}による"
 
 #. js-lingui-explicit-id
 msgid "reflection.costUnknown"
-msgstr ""
+msgstr "費用不明"
 
 #. js-lingui-explicit-id
 msgid "reflection.from"
-msgstr ""
+msgstr "{head}から"
 
 #. js-lingui-explicit-id
 msgid "reflection.keepNote"
-msgstr ""
+msgstr "メモとして残す"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr ""
+msgstr "{count, plural, other {依頼#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
-msgstr ""
+msgstr "これまでのマーキング"
 
 #. js-lingui-explicit-id
 msgid "reflection.markedIn"
-msgstr ""
+msgstr "{branches}にわたり、{list}。"
 
 #. js-lingui-explicit-id
 msgid "reflection.markEdits"
-msgstr ""
+msgstr "{count, plural, other {編集#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markedNothing"
-msgstr ""
+msgstr "まだ何もマーキングしていません。"
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr ""
+msgstr "{count, plural, other {メモ#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
-msgstr ""
+msgstr "{count, plural, other {引用#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markSuggestions"
-msgstr ""
+msgstr "{count, plural, other {提案#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markTerms"
-msgstr ""
+msgstr "{count, plural, other {キーワード#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.noCall"
-msgstr ""
+msgstr "呼び出しなし"
 
 #. js-lingui-explicit-id
 msgid "reflection.noRoom"
-msgstr ""
+msgstr "振り返りはルームのチャットを読みます。ルームを開くと、そのチャットとブランチを読みます。"
 
 #. js-lingui-explicit-id
 msgid "reflection.proposal"
-msgstr ""
+msgstr "ひとつの案"
 
 #. js-lingui-explicit-id
 msgid "reflection.questionHelp"
-msgstr ""
+msgstr "話し合うために、バーに書き込みます"
 
 #. js-lingui-explicit-id
 msgid "reflection.questions"
-msgstr ""
+msgstr "振り返りの問いかけ"
 
 #. js-lingui-explicit-id
 msgid "reflection.readsOnly"
-msgstr ""
+msgstr "読むだけで、書き込みません"
 
 #. js-lingui-explicit-id
 msgid "reflection.reflect"
-msgstr ""
+msgstr "振り返る"
 
 #. js-lingui-explicit-id
 msgid "reflection.reflectAbout"
-msgstr ""
+msgstr "{head}とその中のマーキングをすべて読み、総括と、自分のマーキングから引き出したいくつかの問いかけを書きます。呼び出しは1回で、Enterの前に示します。"
 
 #. js-lingui-explicit-id
 msgid "reflection.reflecting"
-msgstr ""
+msgstr "振り返っています…"
 
 #. js-lingui-explicit-id
 msgid "reflection.session"
-msgstr ""
+msgstr "セッション"
 
 #. js-lingui-explicit-id
 msgid "reflection.sessionIs"
-msgstr ""
+msgstr "{messages, plural, other {メッセージ#件}}・{tokens, plural, =0 {トークン数の報告なし} other {約#トークン}}・{cost}"
 
 #. js-lingui-explicit-id
 msgid "reflection.sessionReading"
-msgstr ""
+msgstr "読み込んでいます…"
 
 #. js-lingui-explicit-id
 msgid "reflection.sweepAs"
-msgstr ""
+msgstr "{branch}を{name}で照合"
 
 #. js-lingui-explicit-id
 msgid "reflection.synthesis"
-msgstr ""
+msgstr "総括"
 
 #. js-lingui-explicit-id
 msgid "reflection.talk"
-msgstr ""
+msgstr "チャットについて話す"
 
 #. js-lingui-explicit-id
 msgid "reflection.talkFailed"
-msgstr ""
+msgstr "回答が返ってきませんでした。"
 
 #. js-lingui-explicit-id
 msgid "reflection.talkHow"
-msgstr ""
+msgstr "このボードがバーの対象のときは、バーで{head}について話せます。ここで話したことは、{head}には戻りません。"
 
 #. js-lingui-explicit-id
 msgid "reflection.talkWaiting"
-msgstr ""
+msgstr "書いています…"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "reflection.writes"
-msgstr ""
+msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "replyPicker.all"
@@ -7742,7 +7742,7 @@ msgstr "変更するまでこのままです。新しい情報源に新しいプ
 #. The foot of the menu of where a reply goes, before "Escape closes this"
 #. js-lingui-explicit-id
 msgid "replyPicker.keys"
-msgstr ""
+msgstr "行をクリックするか、行でEnterを押すと、チェックを入れたり外したりします。"
 
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
@@ -7763,32 +7763,32 @@ msgstr "表示中の返答。返答を切り替えると、プロンプトもそ
 #. The handle of the sheet that holds the chat in a narrow data or drafting room
 #. js-lingui-explicit-id
 msgid "room.chatSheet"
-msgstr ""
+msgstr "チャット"
 
 #. Show replies as they read now, without marks
 #. js-lingui-explicit-id
 msgid "room.cleanWord"
-msgstr ""
+msgstr "清書"
 
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
-msgstr ""
+msgstr "左の列を閉じる"
 
 #. The button on a room's right column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeRight"
-msgstr ""
+msgstr "右の列を閉じる"
 
 #. A room's left column, read aloud
 #. js-lingui-explicit-id
 msgid "room.columnLeft"
-msgstr ""
+msgstr "左の列"
 
 #. A room's right column, read aloud
 #. js-lingui-explicit-id
 msgid "room.columnRight"
-msgstr ""
+msgstr "右の列"
 
 #. js-lingui-explicit-id
 msgid "room.empty"
@@ -7797,27 +7797,27 @@ msgstr "空のルームです。バーに最初のプロンプトを書くと、
 #. A narrow data room's button for its column inspector, while it shows
 #. js-lingui-explicit-id
 msgid "room.hideInspector"
-msgstr ""
+msgstr "インスペクタを隠す"
 
 #. A narrow drafting room's button for its margin notes, while they show
 #. js-lingui-explicit-id
 msgid "room.hideMargin"
-msgstr ""
+msgstr "余白を隠す"
 
 #. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
 #. js-lingui-explicit-id
 msgid "room.home"
-msgstr ""
+msgstr "Parliamentの最初の画面へ"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "room.markupRuns"
-msgstr ""
+msgstr "{command} を実行します"
 
 #. Show replies with their edits marked up
 #. js-lingui-explicit-id
 msgid "room.markupWord"
-msgstr ""
+msgstr "変更表示"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -7830,40 +7830,40 @@ msgstr "このチャットが見つかりませんでした。削除された可
 #. The wrench at the top of a narrow room, outside the shell: it opens the room's editor
 #. js-lingui-explicit-id
 msgid "room.openEditor"
-msgstr ""
+msgstr "エディタを開く"
 
 #. The button on a room's left column, while it is closed
 #. js-lingui-explicit-id
 msgid "room.openLeft"
-msgstr ""
+msgstr "左の列を開く"
 
 #. The button on a room's right column, while it is closed
 #. js-lingui-explicit-id
 msgid "room.openRight"
-msgstr ""
+msgstr "右の列を開く"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "room.rippleHelp"
-msgstr ""
+msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "room.rippleOff"
-msgstr ""
+msgstr "ripple: オフ"
 
 #. js-lingui-explicit-id
 msgid "room.rippleOn"
-msgstr ""
+msgstr "ripple: オン"
 
 #. A narrow data room's button for its column inspector, while it is hidden
 #. js-lingui-explicit-id
 msgid "room.showInspector"
-msgstr ""
+msgstr "インスペクタを表示"
 
 #. A narrow drafting room's button for its margin notes, while they are hidden
 #. js-lingui-explicit-id
 msgid "room.showMargin"
-msgstr ""
+msgstr "余白を表示"
 
 #. js-lingui-explicit-id
 msgid "room.unavailable"
@@ -7876,140 +7876,140 @@ msgstr "名前のないルーム"
 
 #. js-lingui-explicit-id
 msgid "screensMap.back"
-msgstr ""
+msgstr "Escapeで戻ります"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotBody"
-msgstr ""
+msgstr "ほかの機能はすべてここで使えます。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotHead"
-msgstr ""
+msgstr "このブラウザは、ほかのディスプレイにボードを配置できません。"
 
 #. A screen, by its number: pop:library display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
-msgstr ""
+msgstr "ディスプレイ{n}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.empty"
-msgstr ""
+msgstr "まだ何もありません"
 
 #. js-lingui-explicit-id
 msgid "screensMap.extra"
-msgstr ""
+msgstr "追加のディスプレイを検出"
 
 #. js-lingui-explicit-id
 msgid "screensMap.extraGo"
-msgstr ""
+msgstr "複数のディスプレイに配置"
 
 #. js-lingui-explicit-id
 msgid "screensMap.ghost"
-msgstr ""
+msgstr "ここに移ります"
 
 #. js-lingui-explicit-id
 msgid "screensMap.here"
-msgstr ""
+msgstr "このディスプレイ"
 
 #. js-lingui-explicit-id
 msgid "screensMap.hereSub"
-msgstr ""
+msgstr "このウインドウ"
 
 #. js-lingui-explicit-id
 msgid "screensMap.label"
-msgstr ""
+msgstr "お使いのディスプレイ"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingGone"
-msgstr ""
+msgstr "閉じます"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingHere"
-msgstr ""
+msgstr "このウインドウに戻ります"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingOther"
-msgstr ""
+msgstr "もう1つのディスプレイに移ります"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingTo"
-msgstr ""
+msgstr "ディスプレイ{n}に移ります"
 
 #. js-lingui-explicit-id
 msgid "screensMap.leavingWindow"
-msgstr ""
+msgstr "別ウインドウに移ります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "screensMap.move"
-msgstr ""
+msgstr "{command} と入力"
 
 #. js-lingui-explicit-id
 msgid "screensMap.oneBody"
-msgstr ""
+msgstr "接続すると、そこにボードを置けます。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.oneHead"
-msgstr ""
+msgstr "外部ディスプレイが見つかりません。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.onScreen"
-msgstr ""
+msgstr "{boards}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.onScreenLab"
-msgstr ""
+msgstr "ラボ、{boards}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.onScreenNamed"
-msgstr ""
+msgstr "{name}、{boards}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.other"
-msgstr ""
+msgstr "別のディスプレイ"
 
 #. js-lingui-explicit-id
 msgid "screensMap.otherSub"
-msgstr ""
+msgstr "ブラウザがParliamentにウインドウの配置を許可すると、大きさが表示されます"
 
 #. js-lingui-explicit-id
 msgid "screensMap.refusedBody"
-msgstr ""
+msgstr "サイトの設定で変更できます。"
 
 #. js-lingui-explicit-id
 msgid "screensMap.refusedHead"
-msgstr ""
+msgstr "ブラウザは、Parliamentにウインドウの配置を許可しない設定になっています。"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "screensMap.reset"
-msgstr ""
+msgstr "reset: で初期状態に戻ります"
 
 #. A room, as a box on the map
 #. js-lingui-explicit-id
 msgid "screensMap.room"
-msgstr ""
+msgstr "ルーム"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "screensMap.save"
-msgstr ""
+msgstr "arrange:save \"…\" で保存できます"
 
 #. js-lingui-explicit-id
 msgid "screensMap.saved"
-msgstr ""
+msgstr "保存済み"
 
 #. js-lingui-explicit-id
 msgid "screensMap.wide"
-msgstr ""
+msgstr "幅{width}"
 
 #. js-lingui-explicit-id
 msgid "screensMap.wideHere"
-msgstr ""
+msgstr "幅{width}、このウインドウ"
 
 #. js-lingui-explicit-id
 msgid "screensMap.window"
-msgstr ""
+msgstr "別ウインドウ"
 
 #. js-lingui-explicit-id
 msgid "settings.aboutDesc"
@@ -8056,79 +8056,79 @@ msgstr "バックアップと復元"
 
 #. js-lingui-explicit-id
 msgid "settings.browserCompression"
-msgstr ""
+msgstr "バックアップの圧縮"
 
 #. js-lingui-explicit-id
 msgid "settings.browserCompressionNot"
-msgstr ""
+msgstr "バックアップは圧縮されずに書き出されるため、大きくなります。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserHelp"
-msgstr ""
+msgstr "Parliamentが使う機能と、それが今使っているブラウザで動くかどうか。どれも実際に試して確かめています。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserHtml"
-msgstr ""
+msgstr "テキストをHTMLにするときの検査"
 
 #. js-lingui-explicit-id
 msgid "settings.browserHtmlNot"
-msgstr ""
+msgstr "このブラウザはこの検査を行いませんが、Parliamentは外部からのテキストを引き続きテキストとしてだけ表示します。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserLabel"
-msgstr ""
+msgstr "このブラウザ"
 
 #. js-lingui-explicit-id
 msgid "settings.browserOnTop"
-msgstr ""
+msgstr "最前面に固定できるウインドウ"
 
 #. js-lingui-explicit-id
 msgid "settings.browserOnTopNot"
-msgstr ""
+msgstr "別ウインドウは通常のウインドウとして開くため、ほかのウインドウの後ろに隠れることがあります。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPasskeys"
-msgstr ""
+msgstr "ロック用のパスキー"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPasskeysNot"
-msgstr ""
+msgstr "ロックにはパスフレーズと復旧コードを使います。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPersist"
-msgstr ""
+msgstr "データの保持を求める"
 
 #. js-lingui-explicit-id
 msgid "settings.browserPersistNot"
-msgstr ""
+msgstr "容量を空けるため、ここで作ったものをブラウザが消去することがあります。ときどきバックアップしてください。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserScreens"
-msgstr ""
+msgstr "ほかのディスプレイへのボードの配置"
 
 #. js-lingui-explicit-id
 msgid "settings.browserScreensNot"
-msgstr ""
+msgstr "別ウインドウはこのディスプレイで開きます。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserTabs"
-msgstr ""
+msgstr "タブどうしでの変更の通知"
 
 #. js-lingui-explicit-id
 msgid "settings.browserTabsNot"
-msgstr ""
+msgstr "ほかのタブには、再読み込みしたときに変更が表示されます。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserVoice"
-msgstr ""
+msgstr "このデバイス上での音声の文字変換"
 
 #. js-lingui-explicit-id
 msgid "settings.browserVoiceNot"
-msgstr ""
+msgstr "音声入力はオフです：ここでは音声を外部に送ることになるためです。"
 
 #. js-lingui-explicit-id
 msgid "settings.browserWorks"
-msgstr ""
+msgstr "使えます。"
 
 #. js-lingui-explicit-id
 msgid "settings.contextDesc"
@@ -8659,7 +8659,7 @@ msgstr "バーは別ウインドウにあります。pop:back コマンドで戻
 #. pop:command stays English
 #. js-lingui-explicit-id
 msgid "shell.barElsewhere"
-msgstr ""
+msgstr "バーはメインウインドウにあります。入力するにはそちらに切り替えるか、pop:command でバーをすべてのウインドウの前面に置いてください"
 
 #. The popped bar's window title
 #. js-lingui-explicit-id
@@ -8673,12 +8673,12 @@ msgstr "このボードは、後の段階で作ります。"
 #. calm is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.calmOff"
-msgstr ""
+msgstr "calm: オフ"
 
 #. calm is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.calmOn"
-msgstr ""
+msgstr "calm: オン"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -8707,25 +8707,25 @@ msgstr "検索、コマンド、プロンプト"
 #. focus is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.focusOff"
-msgstr ""
+msgstr "focus: オフ"
 
 #. focus is the command word, kept English
 #. js-lingui-explicit-id
 msgid "shell.focusOn"
-msgstr ""
+msgstr "focus: オン"
 
 #. js-lingui-explicit-id
 msgid "shell.focusPick"
-msgstr ""
+msgstr "集中表示にするボードを選ぶ"
 
 #. js-lingui-explicit-id
 msgid "shell.focusPickHead"
-msgstr ""
+msgstr "左から順に："
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"
-msgstr ""
+msgstr "{command} を実行します"
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"
@@ -8734,12 +8734,12 @@ msgstr "Escapeで閉じます"
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
 msgid "shell.referenceFainter"
-msgstr ""
+msgstr "薄く表示されたコマンドは別のボードで使えます。そのボードの名前を横に示します"
 
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
 msgid "shell.referenceKeys"
-msgstr ""
+msgstr "クリックすると入力欄にコマンドが書き込まれ、Enterで実行します。{example} で1つのコマンドの書き方を表示します。"
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -8749,12 +8749,12 @@ msgstr "すべてのコマンド"
 #. Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection
 #. js-lingui-explicit-id
 msgid "shell.referenceOn"
-msgstr ""
+msgstr "{boards}で使えます"
 
 #. The heading of the ? reference, drawn in capitals
 #. js-lingui-explicit-id
 msgid "shell.referenceTitle"
-msgstr ""
+msgstr "コマンド"
 
 #. Editable text on a placeholder board; nothing typed here is kept
 #. js-lingui-explicit-id
@@ -8773,51 +8773,51 @@ msgstr "{board}・Parliament"
 
 #. js-lingui-explicit-id
 msgid "slot.canvas"
-msgstr ""
+msgstr "キャンバス"
 
 #. js-lingui-explicit-id
 msgid "slot.chat-panel"
-msgstr ""
+msgstr "チャットパネル"
 
 #. js-lingui-explicit-id
 msgid "slot.document"
-msgstr ""
+msgstr "ドキュメント"
 
 #. js-lingui-explicit-id
 msgid "slot.input-dock"
-msgstr ""
+msgstr "入力ドック"
 
 #. js-lingui-explicit-id
 msgid "slot.inspector"
-msgstr ""
+msgstr "インスペクタ"
 
 #. js-lingui-explicit-id
 msgid "slot.left-rail"
-msgstr ""
+msgstr "左レール"
 
 #. js-lingui-explicit-id
 msgid "slot.margin"
-msgstr ""
+msgstr "余白"
 
 #. js-lingui-explicit-id
 msgid "slot.msg-area"
-msgstr ""
+msgstr "会話"
 
 #. js-lingui-explicit-id
 msgid "slot.outline"
-msgstr ""
+msgstr "アウトライン"
 
 #. js-lingui-explicit-id
 msgid "slot.right-rail"
-msgstr ""
+msgstr "右レール"
 
 #. js-lingui-explicit-id
 msgid "slot.right-rail-extra"
-msgstr ""
+msgstr "右下のレール"
 
 #. js-lingui-explicit-id
 msgid "slot.sheet"
-msgstr ""
+msgstr "シート"
 
 #. js-lingui-explicit-id
 msgid "storage.ask"
@@ -8965,11 +8965,11 @@ msgstr "ウインドウも含めた画面全体の配置を切り替える、ま
 
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr ""
+msgstr "返答で選択した言葉について、自分の言葉で依頼する。次のプロンプトと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
-msgstr ""
+msgstr "次のプロンプトにファイルを添付する"
 
 #. js-lingui-explicit-id
 msgid "verb.backup"
@@ -9109,7 +9109,7 @@ msgstr "ルームの形を選ぶ"
 
 #. js-lingui-explicit-id
 msgid "verb.letter"
-msgstr ""
+msgstr "Parliamentの作り手からの最新の手紙、番号で指定した手紙、または手紙の一覧を読む"
 
 #. js-lingui-explicit-id
 msgid "verb.library"
@@ -9117,7 +9117,7 @@ msgstr "画面の横にライブラリ、またはその棚の1つを出す"
 
 #. js-lingui-explicit-id
 msgid "verb.local"
-msgstr ""
+msgstr "ルームの送信先を、このコンピュータ上のモデルだけにするかどうかを指定する"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
@@ -9229,7 +9229,7 @@ msgstr "ブロックやParliamentの設定を変える。変更の内容はEnter
 
 #. js-lingui-explicit-id
 msgid "verb.settings"
-msgstr ""
+msgstr "画面の横に設定、またはそのセクションの1つを出す"
 
 #. js-lingui-explicit-id
 msgid "verb.since"
@@ -9309,7 +9309,7 @@ msgstr "ある日付までに作ったものを表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.web"
-msgstr ""
+msgstr "次のプロンプトに限り、モデルにウェブを検索させる"
 
 #. js-lingui-explicit-id
 msgid "verb.width"
@@ -9318,7 +9318,7 @@ msgstr "ボードが使う幅を選ぶ、またはすべての幅を元に戻す
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
-msgstr ""
+msgstr "それでは、また"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
@@ -9377,7 +9377,7 @@ msgstr "多くのAIアプリは、受け身で使うように作られていま�
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
-msgstr ""
+msgstr "今のところ、Parliamentはノートパソコン向けに作られています。近いうちにスマートフォンにも対応できればと思っています。"
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
@@ -9425,7 +9425,7 @@ msgstr "{command} と質問を入力"
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.askHowFree"
-msgstr ""
+msgstr "{command} と質問を入力。AIを使わず、Wikipediaから回答します"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
@@ -9438,7 +9438,7 @@ msgstr "コマンドラインを開く"
 #. {keys} is the shortcut as this computer writes it: Ctrl+K or ⌘K; {command} is >, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.commandHow"
-msgstr ""
+msgstr "{keys}、続けて {command}"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
@@ -9446,7 +9446,7 @@ msgstr "AIのAPIキーを追加する"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.lab"
-msgstr ""
+msgstr "ルームを組み立てるラボを開く"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.name"
@@ -9458,21 +9458,21 @@ msgstr "別のディスプレイに移す"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
-msgstr ""
+msgstr "次のプロンプトと一緒に送る"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.sendHow"
-msgstr ""
+msgstr "編集が待っている状態で、{command} とプロンプトを入力"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.strike"
-msgstr ""
+msgstr "1行に取り消し線を引く"
 
 #. {keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
-msgstr ""
+msgstr "返答の言葉を選択して、{keys}を押す"
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
