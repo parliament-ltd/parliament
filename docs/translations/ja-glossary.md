@@ -153,3 +153,4 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - "{a} of {b}" for a position (1 of 3) → {a}/{b}
 - Example words in commands follow the 23 October ruling: names shown in Japanese are written in Japanese, since the commands match them (edit:"執筆スタジオ", layout:"3パネル", arrange:save "レビュー用デスク", tell:"1ページ以内にまとめて"). Typed words the code reads stay English: on, off, desktop, mobile, right, left, extra, middle, bottom, up, down, pushback, tried, set:input files on.
 - Toggle labels with a command word ("calm: on", "ripple: off", "focus: on") keep the command and translate the state: calm: オン, ripple: オフ, as field.frameworkNone has framework: なし.
+- Start (the card with the bar, shown before anything is open) → スタート; one room as a board in a sentence → ルーム

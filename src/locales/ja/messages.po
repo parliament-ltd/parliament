@@ -753,7 +753,7 @@ msgstr "ライブラリ"
 #. One room, as a board in a sentence: Enter moves Room to the left
 #. js-lingui-explicit-id
 msgid "board.oneRoom"
-msgstr ""
+msgstr "ルーム"
 
 #. Reads a chat and its markings
 #. js-lingui-explicit-id
@@ -772,7 +772,7 @@ msgstr "設定"
 #. The card with the bar, shown before anything is open
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr ""
+msgstr "スタート"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -2338,7 +2338,7 @@ msgstr "最後のボードは開いたままになります"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNoRoom"
-msgstr ""
+msgstr "開いているルームはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNotHere"
@@ -2995,7 +2995,7 @@ msgstr "入力すると置き換わります。Escapeで消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "Enterで、ここで使えるすべてのコマンドを表示します"
+msgstr "Enterで、すべてのコマンドを表示します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3597,7 +3597,7 @@ msgstr "Enterで{board}を右側に開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.openBoardAlone"
-msgstr ""
+msgstr "Enterで{board}を開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.openBranch"
@@ -5104,7 +5104,7 @@ msgstr "{count, plural, other {Enterで、依頼{nums}への回答を取り消�
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr "{state, select, accepted {提案{num}はすでに受け入れ済みです} rejected {提案{num}はすでに却下済みです} other {提案{num}はすでに{state}です}}"
+msgstr "{state, select, accepted {提案{num}はすでに受け入れ済みです} other {提案{num}はすでに却下済みです}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
@@ -6311,7 +6311,7 @@ msgstr "保存すると、まず短いリクエストを1回送って{provider}�
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "保存すると、まず短いリクエストを1回送って{provider}で確認し、このブラウザに暗号化して保存します。"
+msgstr "保存すると、まず短いリクエストを1回送って{provider}で確認し、キー保管庫がこのブラウザに暗号化して保管します。"
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6441,7 +6441,7 @@ msgstr "確認が{provider}に届きませんでした。何も保存してい�
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "このブラウザで暗号化されます。各キーは、それぞれのプロバイダにだけ送られます。"
+msgstr "キー保管庫が、このブラウザに暗号化して保管します。各キーは、それぞれのプロバイダにだけ送られます。"
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -6574,7 +6574,7 @@ msgstr "下書き"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.foot"
-msgstr "返答と検索はページの言語に従います。reply: で返答だけ別の言語にできます"
+msgstr "返答と検索はページの言語に従います。reply: で返答だけ別の言語にできます。"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
@@ -6643,7 +6643,7 @@ msgstr "コマンドを入力します。> は入力欄に残ります"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "ここで使えるすべてのコマンド、または1つのコマンドの使い方"
+msgstr "すべてのコマンド、または1つのコマンドの使い方"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -8027,7 +8027,7 @@ msgstr "概要とセキュリティ"
 #. The first sentence is from the welcome letter (C272 (a))
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "自分のやり方でAIと仕事をするための場所。MITライセンス。ソースコードはリリース時に公開します。"
+msgstr "Parliamentは、AIとの関わり方を考え直す試みです。MITライセンス。ソースコードはリリース時に公開します。"
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -8268,7 +8268,7 @@ msgstr "{day}。"
 
 #. js-lingui-explicit-id
 msgid "settings.leaveApp"
-msgstr "ブラウザは、Netlifyがホストするparliament.ltdから、Parliamentのファイルを取得します。ほかのウェブホストと同じく、ホストにはIPアドレスとブラウザの種類が見えます。チャットやキーをホストが受け取ることは決してありません。"
+msgstr "ブラウザは、Netlifyがホストするparliament.ltdとkeys.parliament.ltdから、Parliamentのファイルを取得します。ほかのウェブホストと同じく、ホストにはIPアドレスとブラウザの種類が見えます。チャットやキーをホストが受け取ることは決してありません。"
 
 #. js-lingui-explicit-id
 msgid "settings.leaveAppHead"
@@ -8441,11 +8441,11 @@ msgstr "サーバもアカウントもなし"
 
 #. js-lingui-explicit-id
 msgid "settings.private2"
-msgstr "各キーは保存される前に暗号化され、それぞれのプロバイダにだけ送られ、バックアップに入れられることは決してありません。暗号化は、ディスク上のキーを守ります。ページ内で動くコードからは守れないため、Parliamentはほかの場所からコードを読み込みません。"
+msgstr "各キーは、Parliamentのキー保管庫（keys.parliament.ltdにある独立した小さなページ）が暗号化して保管し、それぞれのプロバイダにだけ送られ、バックアップに入れられることは決してありません。Parliamentのページで動くコードはキーを読めず、保管庫の一覧にあるプロバイダへ送るよう、保管庫に頼むことしかできません。Parliamentはほかの場所からコードを読み込みません。"
 
 #. js-lingui-explicit-id
 msgid "settings.private2Head"
-msgstr "キーはこのデバイスで暗号化されます"
+msgstr "キーはParliamentのキー保管庫に保管されます"
 
 #. js-lingui-explicit-id
 msgid "settings.private3"
@@ -8997,7 +8997,7 @@ msgstr "コレクションを空にする、すべてのフィルタを外す、
 
 #. js-lingui-explicit-id
 msgid "verb.close"
-msgstr "ボードを画面から外す。何も失われません"
+msgstr "ボードを画面から外す、または手紙を閉じる。何も失われません"
 
 #. js-lingui-explicit-id
 msgid "verb.cols"
@@ -9033,7 +9033,7 @@ msgstr "変更を保ってラボを出る"
 
 #. js-lingui-explicit-id
 msgid "verb.duplicate"
-msgstr "ルーム、コレクション、プランを新しい名前で複製する"
+msgstr "自分のルームかテンプレートを複製し、複製をラボで開く"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
@@ -9121,7 +9121,7 @@ msgstr "ルームの送信先を、このコンピュータ上のモデルだけ
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "返答を書式付きで表示する、または書式なしで表示する"
+msgstr "返答を変更表示か清書で表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9133,7 +9133,7 @@ msgstr "ボードを左、右、中央に移動する。プランの中のブラ
 
 #. js-lingui-explicit-id
 msgid "verb.name"
-msgstr "バーの対象に名前を付ける：ルーム、コレクション、チャット"
+msgstr "バーの対象に名前を付ける：ルーム、コレクション、チャット。名前を2つ指定すると、保存した配置の名前を変えます"
 
 #. js-lingui-explicit-id
 msgid "verb.new"
@@ -9245,7 +9245,7 @@ msgstr "実行を止める。すべてのウインドウのすべての実行も
 
 #. js-lingui-explicit-id
 msgid "verb.strikethrough"
-msgstr "選択した箇所に取り消し線を引く"
+msgstr "返答で選択した言葉に取り消し線を引く。undo: とその番号で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "verb.summarize"
@@ -9361,19 +9361,19 @@ msgstr "このブラウザは、ここで作ったものの保持に同意して
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"
-msgstr "Parliamentは、自分のやり方でAIと仕事をするための場所です。まだ始まったばかりで、作っている途中です。"
+msgstr "Parliamentは、AIとの付き合い方を考え直してみる試みです。仕事にも会話にも、もっと自分から加われるように。その行方を、ひと握りの企業に決めてほしくなかったんです。そう、これをClaudeで作っているという皮肉にも、ちゃんと気づいています。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "Parliamentはブラウザの中で動き、サーバもアカウントもありません。チャットとキーはこのコンピュータに残り、リクエストはどれも、選んだプロバイダ、お使いのコンピュータで動くモデル、またはWikipediaのような公開の情報源へ直接送られます。広告もありません。"
+msgstr "私もAIが怖いんです。すごいものだけど、どう受け止めればいいのか分からない。それでも、ただ座って何もしないのは嫌でした。だから何か月もチャットしたり読んだりしたあとで、オフラインでも使えるアプリを形にしようとしてきました。まずAIを使わずに情報源を検索できるアプリ。自分から関わることで、力を得られるようにと願うアプリ。ちょっと大それた話かもしれませんね……Rubyでウェブアプリをいくつか書いたことはあるけれど、自分ではやっぱり「デザイナー」だと思っています。作るのは大変です。とくに、学びながら進めていて、そのペースが消火ホースから水を飲むように感じられるときは。コードは公開していて、Claude Codeのセキュリティチェックも通しました。第三者によるセキュリティチェックも、これからもっと受けるつもりです。できるだけ近況をお知らせしますね。コードをもっと身近なものにする方法をずっと考えていて……いっそ小説にしてみようかな。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "AIとの付き合い方を考え直すために、Parliamentはあなたが自由に形づくれるようになっています。ルームはブロック、レイアウト、テーマで組み立てます。空間を作るのも、どう関わるかを決めるのも、あなたです。"
+msgstr "では、Parliamentって何でしょう？Parliamentでは、ルームを作れます。1つのAIモデルとも、いくつものモデルとも、モデルなしでもチャットできる場所です。ルームは編集したり入れ替えたりできるブロックでできていて、レイアウトもテーマも配置も、自分で作れます。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "多くのAIアプリは、受け身で使うように作られています。何かを尋ね、答えを受け取るだけです。ここでは、コマンドラインから舵を取ります。チャットを分岐させたり、ハイライトしたり、チャットをまたいでメモを足したり組み合わせたり、一連のプロンプトを計画して実行したりと、さまざまなことができます。主導権を取り戻しましょう。"
+msgstr "すべてはボードの上にあります。どのボードも別ウインドウに出して、別のディスプレイに移せます。だから、作業の場はあなたのものです。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9387,27 +9387,27 @@ msgstr "では、{command} で集中しましょう"
 #. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
-msgstr "So Lov"
+msgstr "Stef"
 
 #. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
-msgstr "今のところコンピュータ向けです。スマートフォンへの対応はこれからです"
+msgstr "コンピュータ向け。スマートフォンはこれから"
 
 #. {command} is open:records, which stays English, as does open:
 #. js-lingui-explicit-id
 msgid "welcome.start.open"
-msgstr ""
+msgstr "{command} で作ったものの一覧を表示し、open: と番号でもう一度開けます"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.room"
-msgstr ""
+msgstr "{command} と質問を入力すると、ルームが開きます"
 
 #. {command} is tour:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.tour"
-msgstr ""
+msgstr "{command} でステップを再び表示できます"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"
@@ -9415,7 +9415,7 @@ msgstr "作ったものを見る"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.ask"
-msgstr "何か尋ねる"
+msgstr "質問する"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
@@ -9454,7 +9454,7 @@ msgstr "ルームに名前を付ける"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
-msgstr "別のディスプレイに移す"
+msgstr "ボードを別ウインドウに出す"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
@@ -9477,4 +9477,4 @@ msgstr "返答の言葉を選択して、{keys}を押す"
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
 msgid "welcome.steps"
-msgstr "試してみる8つのこと"
+msgstr "試してみること"
