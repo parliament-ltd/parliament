@@ -164,3 +164,10 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - Block and slot names arrive in Chinese (the code looks them up), so they take no spaces: 将{block}放入{toSlot}.
 - More plurals written `=1` because the singular needs other words: enter.deleteAsks, enter.promptSweepsGo, enter.promptTellGo, enter.promptTellToReader, enter.promptTellWait, enter.reflectGo (and Cheap, Unpriced), enter.rippleDone, enter.rippleMissed, enter.tellHeld, enter.tellHold.
 - The counts of edits and asks in one line ({edits}{both}{asks}) carry their own leading space after a Chinese character (你的 2 处编辑和 1 条提问), and none after a colon (：2 处编辑和 1 条提问).
+
+## The start card (drafted 30 October 2026)
+- Start (the card with the birds and the bar, before anything is open) → 起始页, as a board's name in sentences
+- Room (one room, as a board in a sentence: 按 Enter 将房间移到左侧) → 房间
+- No room is open → 没有打开的房间
+- the steps (the welcome page's things to try) → 欢迎步骤
+- the key vault (keys.parliament.ltd) → 密钥库, named in every key line: 由密钥库加密保存在此浏览器中

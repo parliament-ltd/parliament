@@ -753,7 +753,7 @@ msgstr "资源库"
 #. One room, as a board in a sentence: Enter moves Room to the left
 #. js-lingui-explicit-id
 msgid "board.oneRoom"
-msgstr ""
+msgstr "房间"
 
 #. Reads a chat and its markings
 #. js-lingui-explicit-id
@@ -772,7 +772,7 @@ msgstr "设置"
 #. The card with the bar, shown before anything is open
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr ""
+msgstr "起始页"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -2338,7 +2338,7 @@ msgstr "最后一个面板会保持打开"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNoRoom"
-msgstr ""
+msgstr "没有打开的房间"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNotHere"
@@ -2995,7 +2995,7 @@ msgstr "输入新内容会替换它。按 Escape 清除"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "按 Enter 显示此处可用的所有命令"
+msgstr "按 Enter 显示所有命令"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3597,7 +3597,7 @@ msgstr "按 Enter 在右侧打开{board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openBoardAlone"
-msgstr ""
+msgstr "按 Enter 打开{board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openBranch"
@@ -5104,7 +5104,7 @@ msgstr "按 Enter 撤销{count, plural, other {提问}} {nums} 的回答，原�
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr "建议 {num} 已经{state, select, accepted {接受} rejected {拒绝} other {处理}}过了"
+msgstr "{state, select, accepted {建议 {num} 已经接受过了} other {建议 {num} 已经拒绝过了}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
@@ -6311,7 +6311,7 @@ msgstr "点击“保存”后，会先向 {provider} 发一个简短请求验证
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "点击“保存”后，会先向 {provider} 发一个简短请求验证密钥，然后加密保存在此浏览器中。"
+msgstr "点击“保存”后，会先向 {provider} 发一个简短请求验证密钥，然后由密钥库将它加密保存在此浏览器中。"
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6441,7 +6441,7 @@ msgstr "检查请求未能到达 {provider}。未保存任何内容。"
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "在此浏览器中加密保存。每个密钥只会发给它自己的服务商。"
+msgstr "加密保存在此浏览器的密钥库中。每个密钥只会发给它自己的服务商。"
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -6574,7 +6574,7 @@ msgstr "草稿"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.foot"
-msgstr "回复和搜索跟随页面语言。reply: 可为回复单独设定语言"
+msgstr "回复和搜索跟随页面语言。reply: 可为回复单独设定语言。"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
@@ -6643,7 +6643,7 @@ msgstr "输入命令。> 会保留在输入栏中"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "此处可用的所有命令，或某条命令的用法"
+msgstr "所有命令，或某条命令的用法"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -8027,7 +8027,7 @@ msgstr "关于与安全"
 #. The first sentence is from the welcome letter (C272 (a))
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "一个让你按自己的方式与 AI 协作的地方。MIT 许可证。源代码将在正式发布时公开。"
+msgstr "Parliament 是一次尝试，重新思考我们与 AI 互动的方式。MIT 许可证。源代码将在正式发布时公开。"
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -8268,7 +8268,7 @@ msgstr "{day}。"
 
 #. js-lingui-explicit-id
 msgid "settings.leaveApp"
-msgstr "你的浏览器从 parliament.ltd 获取 Parliament 的文件，该网站由 Netlify 托管。和任何网站托管方一样，它能看到你的 IP 地址和浏览器类型。它从不会收到你的对话或密钥。"
+msgstr "你的浏览器从 parliament.ltd 和 keys.parliament.ltd 获取 Parliament 的文件，两者都由 Netlify 托管。和任何网站托管方一样，Netlify 能看到你的 IP 地址和浏览器类型。它从不会收到你的对话或密钥。"
 
 #. js-lingui-explicit-id
 msgid "settings.leaveAppHead"
@@ -8441,11 +8441,11 @@ msgstr "没有服务器，没有账户"
 
 #. js-lingui-explicit-id
 msgid "settings.private2"
-msgstr "每个密钥在保存前都会加密，只会发给它自己的服务商，并且绝不会写入备份。加密能保护磁盘上的密钥。加密无法防范在页面内部运行的代码，因此 Parliament 不从其他任何地方加载代码。"
+msgstr "每个密钥都加密保存在 Parliament 的密钥库中，密钥库是位于 keys.parliament.ltd 的一个独立小页面。每个密钥只会发给它自己的服务商，绝不会写入备份。在 Parliament 页面上运行的代码无法读取密钥，只能请密钥库向其列表中的服务商发送请求。Parliament 不从其他任何地方加载代码。"
 
 #. js-lingui-explicit-id
 msgid "settings.private2Head"
-msgstr "密钥在本设备上加密"
+msgstr "密钥保存在 Parliament 的密钥库中"
 
 #. js-lingui-explicit-id
 msgid "settings.private3"
@@ -8997,7 +8997,7 @@ msgstr "清空合集，移除所有筛选条件，或移除某一类筛选条件
 
 #. js-lingui-explicit-id
 msgid "verb.close"
-msgstr "把面板从屏幕上移走。不会丢失任何内容"
+msgstr "把面板从屏幕上移走，或关闭信件。不会丢失任何内容"
 
 #. js-lingui-explicit-id
 msgid "verb.cols"
@@ -9033,7 +9033,7 @@ msgstr "保存更改并离开工坊"
 
 #. js-lingui-explicit-id
 msgid "verb.duplicate"
-msgstr "以新名称复制房间、合集或计划"
+msgstr "复制你的房间或房间模板，并在工坊中打开副本"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
@@ -9121,7 +9121,7 @@ msgstr "设定房间是否只发送给本机上的模型"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "显示带标注的回复，或不带标注的"
+msgstr "以标注或无标注方式显示回复"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9133,7 +9133,7 @@ msgstr "将面板移到左侧、右侧或中间，或在计划中移动分支"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
-msgstr "为输入栏指向的对象命名：房间、合集或对话"
+msgstr "为输入栏指向的对象命名：房间、合集或对话。给出两个名称时，可重命名保存的排布"
 
 #. js-lingui-explicit-id
 msgid "verb.new"
@@ -9245,7 +9245,7 @@ msgstr "停止一次运行，或停止所有窗口中的所有运行"
 
 #. js-lingui-explicit-id
 msgid "verb.strikethrough"
-msgstr "给所选段落加删除线"
+msgstr "给回复中选中的文字加删除线。undo: 加上它的编号可撤销"
 
 #. js-lingui-explicit-id
 msgid "verb.summarize"
@@ -9361,19 +9361,19 @@ msgstr "此浏览器尚未同意长期保存你在这里创建的内容，因此
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"
-msgstr "Parliament 是一个让你按自己的方式与 AI 协作的地方。它还处于早期，仍在建设中。"
+msgstr "Parliament 是一次尝试，重新思考我们与 AI 互动的方式。让我们在工作和对话中多参与一些。我不想让少数几家公司来决定这一切怎么走。没错，用 Claude 来做这个，其中的讽刺我也看到了。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "它在你的浏览器中运行，没有服务器，也没有账户。你的对话和密钥都留在这台电脑上，每个请求都直接发往你选择的服务商、在你自己电脑上运行的模型，或 Wikipedia 这样的公共来源。这里没有广告。"
+msgstr "我也害怕 AI。它是个奇迹，可我不知道该怎么看待它。但我不想干坐着什么都不做。所以，在几个月的聊天和阅读之后，我试着拼出了一个可以离线使用的应用。一个可以先不经过 AI、直接搜索来源的应用。一个希望通过主动参与给人力量的应用。也许我太大胆了……虽然我用 Ruby 写过几个网页应用，但我还是会把自己归为“设计师”。动手做东西很难，尤其是边做边学，节奏快得像拿消防水管喝水。代码是开源的，我已经跑过 Claude Code 的安全检查，也打算再做更多第三方安全检查。我会尽量随时跟你说进展。我一直在想怎么让代码更容易读懂……也许我可以把它写成一部小说。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "它的目标是重新思考我们与 AI 的互动方式，而它的样子由你来塑造。房间由模块、布局和主题搭建而成。空间由你创造，互动方式由你决定。"
+msgstr "那 Parliament 到底是什么？在 Parliament 里，你可以创建房间：在这个空间里，你可以和一个 AI 模型对话，也可以和好几个对话，或者一个都不用。房间由你可以编辑、修改的模块搭建而成，你还可以做自己的布局、主题和排布。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "大多数 AI 应用是为被动接收而设计的：你提问，它回答。在这里，你从命令行掌舵：为对话开分支、高亮、跨对话添加和组合笔记、规划一系列提示词的运行，等等。让我们把主动权拿回来。"
+msgstr "所有内容都放在面板上。每个面板都可以弹出来，移到另一台显示器上，工作区由你做主。"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9387,7 +9387,7 @@ msgstr "现在，来试试 {command}"
 #. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
-msgstr "So Lov"
+msgstr "Stef"
 
 #. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
@@ -9397,17 +9397,17 @@ msgstr "目前为电脑设计，手机版稍后推出"
 #. {command} is open:records, which stays English, as does open:
 #. js-lingui-explicit-id
 msgid "welcome.start.open"
-msgstr ""
+msgstr "{command} 可列出你创建的内容，open: 加上编号可再次打开其中一项"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.room"
-msgstr ""
+msgstr "{command} 加上一个问题，即可打开一个房间"
 
 #. {command} is tour:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.tour"
-msgstr ""
+msgstr "{command} 可重新显示欢迎步骤"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"
@@ -9454,7 +9454,7 @@ msgstr "为房间命名"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
-msgstr "把它移到另一台显示器上"
+msgstr "把一个面板放到独立窗口中"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
@@ -9477,4 +9477,4 @@ msgstr "在回复中选中文字，然后按 {keys}"
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
 msgid "welcome.steps"
-msgstr "可以试试的八件事"
+msgstr "可以试试的几件事"

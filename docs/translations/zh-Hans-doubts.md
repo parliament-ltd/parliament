@@ -203,10 +203,10 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
 
 ## Lines added since, drafted 30 October 2026
 
-38. **enter.settleSugDone** (a change of form, not only of words)
-    - EN: Suggestion {num} was {state} already
-    - ZH: 建议 {num} 已经{state, select, accepted {接受} rejected {拒绝} other {处理}}过了
-    - Why: the code passes {state} as the raw word `accepted` or `rejected` (editVerbs.js), so a plain {state} would show English mid-sentence. The draft adds a select on it, which no other line does; the check reports it as allowed. The cleaner fix is in the code: pass a translated word, or split the line in two.
+38. **enter.settleSugDone** (settled)
+    - EN: {state, select, accepted {Suggestion {num} was accepted already} other {Suggestion {num} was rejected already}}
+    - ZH: {state, select, accepted {建议 {num} 已经接受过了} other {建议 {num} 已经拒绝过了}}
+    - Why: the code passed {state} as the raw word `accepted` or `rejected`, so the first draft added a select of its own. The English is now that select (C282), and the Chinese follows it with the same cases, each a whole sentence.
 
 39. **ask → 提问** (chat.askPlaceholder, chat.askLabel, enter.ask*, collection.tabAsk and others)
     - EN: Ask in your own words: make it shorter, or add the year it opened
@@ -263,23 +263,58 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
     - ZH: 锁定将只使用密码短语和恢复码。
     - Why: it is shown when passkeys do not work here, so I added 只 (only). Without it the line reads as news rather than as the fallback.
 
-50. **welcome.letter.5 and welcome.closing**
+50. **welcome.letter.5 and welcome.closing** (settled)
     - EN: Right now, Parliament is built for laptops, and hopefully phones soon too. / All the best,
     - ZH: 目前 Parliament 是为笔记本电脑设计的，希望很快也能支持手机。 / 祝一切顺利，
-    - Why: these two are fine alone, but they join a letter whose Chinese (welcome.letter.1 to 4, and the signature, still “So Lov”) was drafted for an earlier English letter. The Chinese letter is a different letter until those are drafted again. See the list below.
+    - Why: they joined a letter whose Chinese had been drafted for an earlier English letter. The letter is now drafted again, signed Stef (doubts 51 to 53).
 
-## Older lines whose English has changed since they were drafted (found 30 October 2026, not changed)
+## Older lines whose English had changed, redrafted 30 October 2026
 
-These have a Chinese line, so they were left exactly as they are, but the English changed after the Chinese was written (found by comparing each line with the English at the commit where its Chinese was set). They read as an older version of the page.
+The English of 30 lines changed after their Chinese was written (found by comparing each line with the English at the commit where its Chinese was set). Each was read against the English as it is now.
 
-Wrong now, worth drafting again:
+Redrafted (20):
 
-- **The welcome letter:** welcome.letter.1, welcome.letter.2, welcome.letter.3, welcome.letter.4 (each now a different paragraph), welcome.signature (So Lov, now Stef), welcome.steps (可以试试的八件事, eight things, where the English no longer gives a number), welcome.step.pop (still "move it to another monitor", now "pop a board into its own window").
-- **The key vault:** settings.private2, settings.private2Head, keys.promise, keys.checkThenKeep, settings.leaveApp (now also keys.parliament.ltd). The Chinese still says keys are encrypted on this device, with no vault.
-- **Commands that do more now:** verb.close (or close the letter), verb.duplicate (now copies a room or template into the Lab; the Chinese still says rooms, collections or plans), verb.name (now also renames an arrangement), verb.strikethrough (now says it is in a reply and names undo: with its number), enter.help and leader.help (no longer "that works here"; the Chinese still says 此处可用).
-- **About Parliament:** settings.aboutWhat (now "an attempt to rethink how we interact with AI").
+- **The welcome letter:** welcome.letter.1 to welcome.letter.4, in Stefan's own voice; welcome.signature (Stef); welcome.steps (可以试试的几件事, no longer eight); welcome.step.pop (把一个面板放到独立窗口中).
+- **The key vault:** settings.private2, settings.private2Head, keys.promise, keys.checkThenKeep and settings.leaveApp now name the vault (密钥库) and, where the English does, keys.parliament.ltd.
+- **Commands that do more now:** verb.close (or close the letter), verb.duplicate (a room of yours or a template, opened in the Lab), verb.name (with two names, renames an arrangement), verb.strikethrough (in a reply, and undo: with its number), enter.help and leader.help (every command, no longer 此处可用).
+- **About Parliament:** settings.aboutWhat, whose first sentence is the letter's first sentence, word for word.
+- **languagePicker.foot:** a closing 。 as the English now has one.
 
-Changed in English but still right in Chinese:
+Read again and kept, since the Chinese already says the new English (10):
 
-- **erased became deleted:** almanac.erasedFrom, collection.erased, collection.erasedFrom, copy.fromErased, enter.erased, enter.eraseFailed, enter.eraseMarksStay. The Chinese already says 删除.
-- **Reworded only:** welcome.small, welcome.step.ask, enter.popDisplay (screen became display; 屏幕 fits both), languagePicker.foot (a full stop added in English; the Chinese ends without one).
+- **erased became deleted:** almanac.erasedFrom, collection.erased, collection.erasedFrom, copy.fromErased, enter.erased, enter.eraseFailed, enter.eraseMarksStay. The Chinese already said 删除.
+- **Reworded only:** welcome.small, welcome.step.ask, enter.popDisplay (screen became display; 屏幕 fits both, as in screensMap.display).
+
+Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注的 to 以标注或无标注方式显示回复, the words of enter.markupOn and enter.markupOff.
+
+## The start card and the redrafts, 30 October 2026
+
+51. **welcome.letter.1**
+    - EN: … To take part more in the work and conversation. …
+    - ZH: … 让我们在工作和对话中多参与一些。…
+    - Why: the English sentence has no subject. I gave it 我们 (us, the people using AI), which carries on from the first sentence; a fragment without a subject reads as broken in Chinese.
+
+52. **welcome.letter.2**
+    - EN: … the pace feels like drinking from a fire hose. … maybe I could turn it into a novel.
+    - ZH: … 节奏快得像拿消防水管喝水。… 也许我可以把它写成一部小说。
+    - Why: I kept the fire hose, since the image carries the voice and reads plainly in Chinese. 应接不暇 is the settled idiom if a plainer line is wanted. The English "..." became ……, the Chinese ellipsis.
+
+53. **welcome.letter.3 and welcome.letter.4**
+    - EN: Rooms are built from blocks you can edit and change … so the workspace is yours.
+    - ZH: 房间由你可以编辑、修改的模块搭建而成 … 工作区由你做主。
+    - Why: "the workspace is yours" as 由你做主 (yours to run), which says what the line means; 是你的 is literal and flat.
+
+54. **settings.leaveApp**
+    - EN: … hosted by Netlify. Like any web host it sees your IP address …
+    - ZH: … 两者都由 Netlify 托管。和任何网站托管方一样，Netlify 能看到你的 IP 地址 …
+    - Why: with two addresses, 它 could be read as either site, so the host is named.
+
+55. **board.start**
+    - EN: Start (the card with the bar, before anything is open)
+    - ZH: 起始页
+    - Why: it is a board's name and goes into sentences (按 Enter 关闭起始页), where a bare 开始 reads as the verb "begin". room.home ("Go to Parliament's start", which opens the main screen) stays 前往 Parliament 首页; if it means this card, it should say 起始页 too.
+
+56. **verb.close**
+    - EN: Take a board off the screen, or close the letter. Nothing is lost
+    - ZH: 把面板从屏幕上移走，或关闭信件。不会丢失任何内容
+    - Why: "the letter" is the one open, from letter:. 信件 is the general word, as in letter.list; 这封信 would need a letter in view.
