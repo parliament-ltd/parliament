@@ -126,3 +126,6 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - Command menu (a board) → Kommandomenyn, a definite form like the other boards.
 - percent written by a block → "{n} %" with a no-break space, as Swedish writes a percentage and as {share, number, percent} already prints it.
 - Example names inside commands follow the reader's language, since the Lab matches the names it shows: edit:"Skrivstudio", duplicate:"Skrivstudio", layout:"Tre paneler", tell:"Håll det under en sida", arrange:save "granskningsbord". Names the code fixes stay English: the tag tried, and every keyword argument (desktop, mobile, on, off, right, left, middle, bottom, up, down, search, collection, framework, arrangement, pushback).
+- the key vault → nyckelvalvet (Parliaments nyckelvalv, valvet); keys are kept there → förvaras. The error lines' "key store" stays nyckelförrådet, as the English has two words (see doubts).
+- the start card (before anything is open) → Start; one room as a board in a sentence → Rummet.
+- the welcome letter is Stefan's own voice: first person, informal, "du", signed "Stef".

@@ -188,11 +188,13 @@ Each: id, the English, the draft, and why I was unsure.
     English: Suggestion {num} was {state} already
     Draft: Förslag {num} är redan {state}
     Why: {state} arrives as the code's own word (accepted, rejected), not through the copy table, so Swedish shows "Förslag 244 är redan accepted". It needs a select in the English ({state, select, accepted {…} other {…}}) or two entries; the translation cannot fix it.
+    Settled: the English is now a select; the draft is "{state, select, accepted {Förslag {num} har redan godtagits} other {Förslag {num} har redan avvisats}}".
 
 37. **markup · clean** (room.markupWord, room.cleanWord, collection.markupWord, collection.cleanWord, enter.markupOn and five others)
     English: markup · clean; Enter shows replies marked up / clean
     Draft: ändringar · renskrivet; Enter visar svaren med ändringarna / renskrivna
     Why: Word's Swedish word for markup is "markering", which is taken by highlights. "ändringar" says what is shown, and "renskrivet" is the clean copy. This also settles doubt 7: the older verb.markup draft ("Visa svar med formatering, eller utan") reads wrong now, and should become "Visa svaren med ändringar, eller renskrivna". I left it, as an existing line.
+    Settled: verb.markup is now "Visa svaren med ändringar, eller renskrivna".
 
 38. **"told once"** (enter.promptEditsGo, enter.promptTellGo, enter.promptSweepsGo, chat.toldNote)
     English: With it, told once: 2 edits and 1 ask · Sonnet reads them
@@ -246,3 +248,26 @@ Each: id, the English, the draft, and why I was unsure.
 
 48. **Existing lines whose English has changed since they were drafted** (not touched in this pass)
     Why: the brief was to fill only empty lines, so these still show the older meaning. Most noticeable: welcome.letter.1 to welcome.letter.4 (the old letter), welcome.signature ("So Lov", now "Stef"), welcome.steps ("Åtta saker att prova", now "Things to try"), welcome.step.pop (another screen, now its own window), the key vault lines (settings.private2, settings.private2Head, keys.promise, keys.checkThenKeep, settings.leaveApp, which now name keys.parliament.ltd), verb.duplicate, verb.close, verb.name, verb.strikethrough (its undo: is missing), enter.help and leader.help ("som fungerar här" is gone from the English), settings.aboutWhat, welcome.small. Smaller: enter.popDisplay, languagePicker.foot (a full stop), welcome.step.ask.
+    Settled: all 23 redrafted from the English as it is now, on 30 October. enter.popDisplay already read right ("på skärm {display}") and is unchanged.
+
+## The redrafted lines and the start card, 30 October 2026
+
+49. **board.start**
+    English: Start
+    Draft: Start
+    Why: boards are named in their definite forms, but "Starten" reads as the start of a race, and "Startkortet" is clumsy. "Start" is the established Swedish label, as "Inställningar" is the exception for Settings. board.oneRoom follows the rule: "Rummet".
+
+50. **Key vault and key store** (keys.promise, keys.checkThenKeep, settings.private2, settings.private2Head; keys.vaultUnreached, enter.promptVaultUnreached)
+    English: the key vault; the key store did not open
+    Draft: nyckelvalvet; nyckelförrådet öppnades inte
+    Why: the English uses two words for the one thing, so the Swedish does too. If they should read as one, "nyckelvalvet" can replace "nyckelförrådet" in the two error lines.
+
+51. **The letter** (welcome.letter.1 to welcome.letter.4)
+    English: an app that hopes to empower through active participation; drinking from a fire hose; make the code accessible… turn it into a novel
+    Draft: en app som hoppas ge egenmakt genom aktivt deltagande; dricka ur en brandslang; göra koden mer lättillgänglig… göra en roman av den
+    Why: kept in Stefan's own informal voice, signed "Stef". "egenmakt" is the Swedish word for empowerment, but it reads a little formal. The fire hose is a calque that Swedish tech people say, not a native idiom. "lättillgänglig" keeps the joke, since it means both easy to reach and easy to read.
+
+52. **welcome.letter.4 and the workspace**
+    English: so the workspace is yours
+    Draft: så arbetsutrymmet är ditt
+    Why: "arbetsytan" would be the natural word, but it is the Lab's Canvas board (Arbetsytan).
