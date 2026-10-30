@@ -3221,11 +3221,20 @@ msgid "enter.labRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.languageBeta"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.languageBrowser"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.languageBrowserSame"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.languageComing"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6531,6 +6540,16 @@ msgstr ""
 msgid "kind.term"
 msgstr ""
 
+#. Beside a language still being worked on
+#. js-lingui-explicit-id
+msgid "languagePicker.beta"
+msgstr ""
+
+#. Beside a language listed but not offered yet
+#. js-lingui-explicit-id
+msgid "languagePicker.coming"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "languagePicker.draft"
 msgstr ""
@@ -9417,7 +9436,7 @@ msgstr ""
 msgid "welcome.step.strike"
 msgstr ""
 
-#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. {keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr ""

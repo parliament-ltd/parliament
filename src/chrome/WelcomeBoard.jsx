@@ -36,7 +36,8 @@ const TITLES = {
 function howOf(i18n, s, keyed) {
   if (s.id === 'command') return i18n._(COPY.welcome.stepCommandHow, { keys: modKey() === '⌘' ? '⌘K' : 'Ctrl+K', command: s.shows })
   if (s.id === 'ask') return i18n._(keyed ? COPY.welcome.stepAskHow : COPY.welcome.stepAskHowFree, { command: s.shows })
-  if (s.id === 'strike') return i18n._(COPY.welcome.stepStrikeHow, { keys: modKey() === '⌘' ? '⌘⇧X' : 'Ctrl+Shift+X' })
+  // Backspace over selected words strikes them (30 October): the key people already know.
+  if (s.id === 'strike') return i18n._(COPY.welcome.stepStrikeHow, { keys: modKey() === '⌘' ? '⌫' : 'Backspace' })
   if (s.id === 'send') return i18n._(COPY.welcome.stepSendHow, { command: s.shows })
   return s.shows
 }

@@ -3221,12 +3221,21 @@ msgid "enter.labRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.languageBeta"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.languageBrowser"
 msgstr "按 Enter 让页面重新跟随浏览器的语言：{language}"
 
 #. js-lingui-explicit-id
 msgid "enter.languageBrowserSame"
 msgstr "页面已经跟随浏览器的语言"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.languageComing"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.languageDraft"
@@ -6531,6 +6540,16 @@ msgstr "建议"
 msgid "kind.term"
 msgstr "关键词"
 
+#. Beside a language still being worked on
+#. js-lingui-explicit-id
+msgid "languagePicker.beta"
+msgstr ""
+
+#. Beside a language listed but not offered yet
+#. js-lingui-explicit-id
+msgid "languagePicker.coming"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "languagePicker.draft"
 msgstr "草稿"
@@ -9417,7 +9436,7 @@ msgstr ""
 msgid "welcome.step.strike"
 msgstr ""
 
-#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. {keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr ""

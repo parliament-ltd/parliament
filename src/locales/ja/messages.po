@@ -3221,12 +3221,21 @@ msgid "enter.labRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.languageBeta"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.languageBrowser"
 msgstr "Enterで、ページの言語をブラウザの設定に戻します：{language}"
 
 #. js-lingui-explicit-id
 msgid "enter.languageBrowserSame"
 msgstr "ページはすでにブラウザの言語に従っています"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.languageComing"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.languageDraft"
@@ -6531,6 +6540,16 @@ msgstr "提案"
 msgid "kind.term"
 msgstr "キーワード"
 
+#. Beside a language still being worked on
+#. js-lingui-explicit-id
+msgid "languagePicker.beta"
+msgstr ""
+
+#. Beside a language listed but not offered yet
+#. js-lingui-explicit-id
+msgid "languagePicker.coming"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "languagePicker.draft"
 msgstr "下書き"
@@ -9417,7 +9436,7 @@ msgstr ""
 msgid "welcome.step.strike"
 msgstr ""
 
-#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. {keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr ""

@@ -567,6 +567,10 @@ export const COPY = {
     languageOnly: /*i18n*/ { id: 'enter.languageOnly', message: 'Only {language} so far. Other languages come once they are translated and read' },
     languageSet: /*i18n*/ { id: 'enter.languageSet', message: 'Enter puts the page in {language}, and your replies and searches follow it' },
     languageDraft: /*i18n*/ { id: 'enter.languageDraft', message: 'This translation is a draft, waiting to be read' },
+    // A language shipped in beta (30 October): offered, still being worked on.
+    languageBeta: /*i18n*/ { id: 'enter.languageBeta', message: 'This translation is in beta: some words may still read oddly' },
+    // A language listed as coming, not offered yet (30 October).
+    languageComing: /*i18n*/ { id: 'enter.languageComing', message: '{language} is coming soon. language: takes {names}', comment: 'Commands stay English' },
     languageEndsReply: /*i18n*/ { id: 'enter.languageEndsReply', message: 'Replies stop keeping a language of their own' },
     languageSame: /*i18n*/ { id: 'enter.languageSame', message: 'The page is in {language} already' },
     languageBrowser: /*i18n*/ { id: 'enter.languageBrowser', message: 'Enter has the page follow your browser again: {language}' },
@@ -1361,6 +1365,8 @@ export const COPY = {
   languagePicker: {
     title: /*i18n*/ { id: 'languagePicker.title', message: 'Languages' },
     draft: /*i18n*/ { id: 'languagePicker.draft', message: 'draft' },
+    beta: /*i18n*/ { id: 'languagePicker.beta', message: 'in beta', comment: 'Beside a language still being worked on' },
+    coming: /*i18n*/ { id: 'languagePicker.coming', message: 'coming soon', comment: 'Beside a language listed but not offered yet' },
     foot: /*i18n*/ { id: 'languagePicker.foot', message: 'Replies and searches follow the page. reply: gives replies a language of their own.' },
     // Its keys at the foot, as the ? reference says its own (29 October).
     keys: /*i18n*/ { id: 'languagePicker.keys', message: 'A click, or Enter on a row, turns the page to that language.', comment: 'The foot of the languages menu, before "Escape closes this"' },
@@ -1720,7 +1726,7 @@ export const COPY = {
     stepLab: /*i18n*/ { id: 'welcome.step.lab', message: 'Open the Lab, where rooms are built' },
     stepKey: /*i18n*/ { id: 'welcome.step.key', message: 'Add an AI API key' },
     stepStrike: /*i18n*/ { id: 'welcome.step.strike', message: 'Strike through a line' },
-    stepStrikeHow: /*i18n*/ { id: 'welcome.step.strikeHow', message: 'select words in a reply, then {keys}', comment: '{keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X' },
+    stepStrikeHow: /*i18n*/ { id: 'welcome.step.strikeHow', message: 'select words in a reply, then {keys}', comment: '{keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac' },
     stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
     stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
     // The letter, in Stefan's own words, as he wrote it (C265): not edited.
