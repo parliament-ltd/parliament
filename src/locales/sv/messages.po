@@ -3596,6 +3596,10 @@ msgid "enter.openBoard"
 msgstr "Enter öppnar {board} till höger"
 
 #. js-lingui-explicit-id
+msgid "enter.openBoardAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openBranch"
 msgstr "Enter öppnar {address} i ett rum bredvid det som visas, med hela sin historik. Inget anrop, och den behåller sin bokstav"
 

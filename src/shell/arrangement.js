@@ -209,7 +209,8 @@ export function planOpen(a, board) {
   const next = copy(a)
   place(next, board)
   next.addressed = board
-  return go(next, 'openBoard', { board })
+  // From the start card the board takes the screen, not the right (C282).
+  return go(next, onPage(a).includes(START) ? 'openBoardAlone' : 'openBoard', { board })
 }
 
 /**

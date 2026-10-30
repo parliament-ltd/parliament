@@ -101,6 +101,7 @@ export const COPY = {
     openHere: /*i18n*/ { id: 'enter.openHere', message: '{board} is here. Enter points the bar at it' },
     openPopped: /*i18n*/ { id: 'enter.openPopped', message: '{board} is in its own window. Enter brings it forward' },
     openBoard: /*i18n*/ { id: 'enter.openBoard', message: 'Enter opens {board} on the right' },
+    openBoardAlone: /*i18n*/ { id: 'enter.openBoardAlone', message: 'Enter opens {board}' },
     closeNotHere: /*i18n*/ { id: 'enter.closeNotHere', message: '{board} is not open' },
     roomNumberNotHere: /*i18n*/ { id: 'enter.roomNumberNotHere', message: 'No room here shows {num}. open:{num} shows it', comment: 'open: stays English' },
     roomNumberNotChat: /*i18n*/ { id: 'enter.roomNumberNotChat', message: '{num} is not a chat, so no room shows it' },

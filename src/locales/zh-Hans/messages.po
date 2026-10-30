@@ -3596,6 +3596,10 @@ msgid "enter.openBoard"
 msgstr "按 Enter 在右侧打开{board}"
 
 #. js-lingui-explicit-id
+msgid "enter.openBoardAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openBranch"
 msgstr "按 Enter 在当前内容旁边的房间中打开 {address}，带有其全部历史。不调用模型，分支字母保持不变"
 

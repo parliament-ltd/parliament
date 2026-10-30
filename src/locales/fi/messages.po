@@ -3596,6 +3596,10 @@ msgid "enter.openBoard"
 msgstr "Enter avaa taulun {board} oikealle"
 
 #. js-lingui-explicit-id
+msgid "enter.openBoardAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openBranch"
 msgstr "Enter avaa haaran {address} koko historioineen huoneeseen näkyvien rinnalle. Ei kutsua, ja haara säilyttää kirjaimensa"
 

@@ -3596,6 +3596,10 @@ msgid "enter.openBoard"
 msgstr "Enterで{board}を右側に開きます"
 
 #. js-lingui-explicit-id
+msgid "enter.openBoardAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openBranch"
 msgstr "Enterで、今の画面の横のルームに{address}を履歴ごと開きます。モデルは呼び出さず、末尾の文字も変わりません"
 
