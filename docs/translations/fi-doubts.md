@@ -262,3 +262,7 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
     English: Things to try
     Draft: Kokeiltavia asioita
     Why: read only by screen readers. The earlier draft counted the steps ("Kahdeksan…"), which the English no longer does.
+
+## Step 9, drafted 30 October 2026 (C282)
+
+- `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.

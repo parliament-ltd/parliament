@@ -9440,6 +9440,15 @@ msgstr "Öppna kommandoraden"
 msgid "welcome.step.commandHow"
 msgstr "{keys} och sedan {command}"
 
+#. {board} is the Collection board
+#. js-lingui-explicit-id
+msgid "welcome.step.highlight"
+msgstr "Håll ordning på anteckningar, markeringar och mer i {board}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.highlightHow"
+msgstr "markera ord i ett svar och välj sedan en färg"
+
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
 msgstr "Lägg till en API-nyckel för AI"

@@ -36,8 +36,10 @@ export const STEPS = Object.freeze([
   { id: 'key', shows: 'api:', writes: '>api:' }, // A1; crosses off on seeing the panel (C120)
   // Crossed off when an edit that strikes words is saved, however made (C225 (a)).
   { id: 'strike', shows: 'strikethrough:', writes: '>strikethrough:' },
-  // Crossed off when a prompt goes out carrying an edit (C225 (b)).
-  { id: 'send', shows: 'p>', writes: 'p>' },
+  // Crossed off when a highlight is saved (30 October; C282): a step with no
+  // key needed, where "send it with your next prompt" needed a model. No
+  // command makes a highlight yet, so the line writes nothing in the bar.
+  { id: 'highlight', shows: null, writes: null },
 // The Lab's step waits with the Lab (C279 (a)).
 ].filter((s) => LAB || s.id !== 'lab').map((s) => Object.freeze(s)))
 
@@ -83,8 +85,9 @@ export function tick(w, id) {
 export const showSteps = (w, on) => (w.off === !on ? w : { ...w, off: !on })
 
 /**
- * Which of steps 9 and 10 the numbered rows show as done (C225): an edit
- * that strikes words (9), an edit or ask that went with a prompt (10).
+ * Which steps the numbered rows show as done (C225): an edit that strikes
+ * words (8), a highlight (9; C282). An edit or ask that went with a prompt
+ * is still read as send, which is no longer a step and ticks nothing.
  * @param {Array<{ kind: string, change?: { struck?: string, sent?: object|null } }>} rows
  */
 export function stepsMade(rows) {
@@ -92,6 +95,11 @@ export function stepsMade(rows) {
   const changes = (rows ?? []).filter((r) => (r?.kind === 'edit' || r?.kind === 'ask') && r.change)
   if (changes.some((r) => r.kind === 'edit' && r.change.struck)) out.push('strike')
   if (changes.some((r) => r.change.sent && (r.change.sent.to || r.change.sent.into))) out.push('send')
+  // A passage marked in a colour shows as a mark on its chat's row
+  // (almanacRows.js): a term, as today's highlight is named (C57, C78), or
+  // a highlight once those are built.
+  const marked = (r) => ['highlight', 'term'].includes(r?.kind) || (r?.kind === 'chat' && Array.isArray(r.marks) && r.marks.some((m) => m === 'highlight' || m === 'term'))
+  if ((rows ?? []).some(marked)) out.push('highlight')
   return out
 }
 

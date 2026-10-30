@@ -9440,6 +9440,15 @@ msgstr "Open the command line"
 msgid "welcome.step.commandHow"
 msgstr "{keys} then {command}"
 
+#. {board} is the Collection board
+#. js-lingui-explicit-id
+msgid "welcome.step.highlight"
+msgstr "Keep track of notes, highlights and more in {board}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.highlightHow"
+msgstr "select words in a reply, then pick a colour"
+
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
 msgstr "Add an AI API key"

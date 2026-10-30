@@ -30,6 +30,7 @@ const TITLES = {
   key: COPY.welcome.stepKey,
   strike: COPY.welcome.stepStrike,
   send: COPY.welcome.stepSend,
+  highlight: COPY.welcome.stepHighlight,
 }
 
 // What a step's command line says, where it is more than its command.
@@ -39,6 +40,7 @@ function howOf(i18n, s, keyed) {
   // Backspace over selected words strikes them (30 October): the key people already know.
   if (s.id === 'strike') return i18n._(COPY.welcome.stepStrikeHow, { keys: modKey() === '⌘' ? '⌫' : 'Backspace' })
   if (s.id === 'send') return i18n._(COPY.welcome.stepSendHow, { command: s.shows })
+  if (s.id === 'highlight') return i18n._(COPY.welcome.stepHighlightHow)
   return s.shows
 }
 
@@ -95,8 +97,11 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
                   <li key={s.id} className={done ? 'done' : next?.id === s.id ? 'next' : undefined}>
                     <span className="n">{i + 1}</span>
                     <span>
-                      <span className="t">{i18n._(TITLES[s.id])}</span>
-                      <button type="button" className="c" dir="ltr" onClick={() => onWrite(s.writes)}>{how}</button>
+                      <span className="t">{i18n._(TITLES[s.id], { board: i18n._(COPY.boards.collection) })}</span>
+                      {/* A step no command does yet says what to do, and writes nothing (C282). */}
+                      {s.writes
+                        ? <button type="button" className="c" dir="ltr" onClick={() => onWrite(s.writes)}>{how}</button>
+                        : <span className="c">{how}</span>}
                     </span>
                   </li>
                 )

@@ -318,3 +318,7 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
     - EN: Take a board off the screen, or close the letter. Nothing is lost
     - ZH: 把面板从屏幕上移走，或关闭信件。不会丢失任何内容
     - Why: "the letter" is the one open, from letter:. 信件 is the general word, as in letter.list; 这封信 would need a letter in view.
+
+## Step 9, drafted 30 October 2026 (C282)
+
+- `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.

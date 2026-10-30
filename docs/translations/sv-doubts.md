@@ -271,3 +271,7 @@ Each: id, the English, the draft, and why I was unsure.
     English: so the workspace is yours
     Draft: så arbetsutrymmet är ditt
     Why: "arbetsytan" would be the natural word, but it is the Lab's Canvas board (Arbetsytan).
+
+## Step 9, drafted 30 October 2026 (C282)
+
+- `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.

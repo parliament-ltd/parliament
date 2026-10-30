@@ -9440,6 +9440,15 @@ msgstr "Avaa komentorivi"
 msgid "welcome.step.commandHow"
 msgstr "{keys} ja sitten {command}"
 
+#. {board} is the Collection board
+#. js-lingui-explicit-id
+msgid "welcome.step.highlight"
+msgstr "{board}: muistiinpanot, korostukset ja muut tallessa"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.highlightHow"
+msgstr "valitse sanoja vastauksesta ja poimi sitten väri"
+
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
 msgstr "Lisää tekoälyn API-avain"

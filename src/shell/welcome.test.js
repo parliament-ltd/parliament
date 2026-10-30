@@ -3,8 +3,9 @@ import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, w
 import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
-  it('are the nine as ruled, the Lab step waiting with the Lab: bar:bottom second, pop:records sixth, api: seventh, then strike and send (C131 names, C225, C279 (a))', () => {
-    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'api:', 'strikethrough:', 'p>'])
+  it('are the nine as ruled, the Lab step waiting with the Lab: bar:bottom second, pop:records sixth, api: seventh, then strike and a highlight (C131 names, C225, C279 (a), C282)', () => {
+    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'api:', 'strikethrough:', null])
+    expect(STEPS.at(-1)).toMatchObject({ id: 'highlight', writes: null })
     expect(STEPS.find((s) => s.id === 'strike').writes).toBe('>strikethrough:')
     expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>records:')
   })
@@ -61,6 +62,11 @@ describe('steps 9 and 10 (stage 11, piece 7; C225)', () => {
     expect(stepsMade([edit({ struck: 'eleven', sent: { to: 'haiku', at: 'x', into: null } })])).toEqual(['strike', 'send'])
     expect(stepsMade([{ kind: 'ask', num: 203, change: { sent: { to: 'haiku' } } }])).toEqual(['send'])
     expect(stepsMade([{ kind: 'chat', num: 202 }])).toEqual([])
+    // A highlight crosses off step 9 (C282).
+    expect(stepsMade([{ kind: 'highlight', num: 205 }])).toEqual(['highlight'])
+    expect(stepsMade([{ kind: 'chat', num: 202, marks: ['highlight'] }])).toEqual(['highlight'])
+    expect(stepsMade([{ kind: 'chat', num: 202, marks: ['term'] }])).toEqual(['highlight'])
+    expect(stepsMade([{ kind: 'chat', num: 202, marks: ['note'] }])).toEqual([])
   })
   it('leave someone who finished the eight finished, and show two more to someone part way', () => {
     const was = cleanWelcome({ done: ['command', 'bar', 'ask', 'almanac', 'name', 'pop', 'library', 'key'], finished: true })
@@ -68,7 +74,7 @@ describe('steps 9 and 10 (stage 11, piece 7; C225)', () => {
     const part = cleanWelcome({ done: ['command', 'bar', 'ask', 'almanac', 'name', 'pop', 'library'] })
     expect(part.finished).toBe(false)
     expect(nextStep(tick(part, 'key')).id).toBe('strike')
-    expect(tick(tick(tick(part, 'key'), 'strike'), 'send').finished).toBe(true)
+    expect(tick(tick(tick(part, 'key'), 'strike'), 'highlight').finished).toBe(true)
   })
 })
 
@@ -93,11 +99,12 @@ describe('step 9 crosses off at once when a prompt goes out carrying an edit (C2
     expect(carriesEdit()).toBe(false)
   })
 
-  it('and the step it crosses off is the last one, so the page finishes with it', () => {
+  it('ticks nothing since send is no longer a step (C282)', () => {
     let w = freshWelcome()
-    for (const st of STEPS.filter((x) => x.id !== 'send')) w = tick(w, st.id)
+    for (const st of STEPS.filter((x) => x.id !== 'highlight')) w = tick(w, st.id)
     expect(w.finished).toBe(false)
     if (carriesEdit({ edits: null, joined: 1 })) w = tick(w, 'send')
-    expect([isDone(w, 'send'), w.finished]).toEqual([true, true])
+    expect([isDone(w, 'send'), w.finished]).toEqual([false, false])
+    expect(tick(w, 'highlight').finished).toBe(true)
   })
 })

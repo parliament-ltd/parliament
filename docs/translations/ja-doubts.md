@@ -284,3 +284,7 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
     - en: {command} and a question opens a room / {command} lists what you have made, and open: with its number opens one again / {command} brings the steps back
     - ja: {command} と質問を入力すると、ルームが開きます / {command} で作ったものの一覧を表示し、open: と番号でもう一度開けます / {command} でステップを再び表示できます
     - Written as the welcome steps' "How" lines are ({command} と質問を入力). The second is long for a card line; 作ったものの一覧。open: と番号で再び開けます is the shorter form.
+
+## Step 9, drafted 30 October 2026 (C282)
+
+- `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.

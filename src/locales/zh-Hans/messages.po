@@ -9440,6 +9440,15 @@ msgstr "打开命令行"
 msgid "welcome.step.commandHow"
 msgstr "按 {keys}，再输入 {command}"
 
+#. {board} is the Collection board
+#. js-lingui-explicit-id
+msgid "welcome.step.highlight"
+msgstr "在{board}中整理笔记、高亮等内容"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.highlightHow"
+msgstr "在回复中选中文字，然后选一种颜色"
+
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
 msgstr "添加 AI API 密钥"

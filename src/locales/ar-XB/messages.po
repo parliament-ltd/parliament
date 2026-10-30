@@ -9440,6 +9440,15 @@ msgstr ""
 msgid "welcome.step.commandHow"
 msgstr ""
 
+#. {board} is the Collection board
+#. js-lingui-explicit-id
+msgid "welcome.step.highlight"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.highlightHow"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
 msgstr ""

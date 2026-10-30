@@ -1734,6 +1734,9 @@ export const COPY = {
     stepKey: /*i18n*/ { id: 'welcome.step.key', message: 'Add an AI API key' },
     stepStrike: /*i18n*/ { id: 'welcome.step.strike', message: 'Strike through a line' },
     stepStrikeHow: /*i18n*/ { id: 'welcome.step.strikeHow', message: 'select words in a reply, then {keys}', comment: '{keys} is the key as this computer writes it: Backspace, or ⌫ on a Mac' },
+    // Step 9 since 30 October (C282): keyless, where sending an edit needed a model.
+    stepHighlight: /*i18n*/ { id: 'welcome.step.highlight', message: 'Keep track of notes, highlights and more in {board}', comment: '{board} is the Collection board' },
+    stepHighlightHow: /*i18n*/ { id: 'welcome.step.highlightHow', message: 'select words in a reply, then pick a colour' },
     stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
     stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
     // The letter, in Stefan's own words, as he wrote it (C265): not edited.

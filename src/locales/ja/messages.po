@@ -9440,6 +9440,15 @@ msgstr "コマンドラインを開く"
 msgid "welcome.step.commandHow"
 msgstr "{keys}、続けて {command}"
 
+#. {board} is the Collection board
+#. js-lingui-explicit-id
+msgid "welcome.step.highlight"
+msgstr "メモやハイライトなどを{board}で管理する"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.highlightHow"
+msgstr "返答の言葉を選択して、色を選ぶ"
+
 #. js-lingui-explicit-id
 msgid "welcome.step.key"
 msgstr "AIのAPIキーを追加する"
