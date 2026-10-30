@@ -865,6 +865,18 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(at('>close:tour', both).text).toBe('Enter closes the welcome page. tour: brings it back')
     expect(at('>close:tour', both).next.columns.flat()).not.toContain('welcome')
   })
+
+  it('closes the welcome page alone into a room, and close:room the room here (30 October)', () => {
+    for (const v of ['>close:welcome', '>close:tour']) {
+      const p = at(v, shipped('welcome'))
+      expect(p.text).toBe('Enter closes the welcome page and opens a room in its place. tour: brings it back')
+      expect(p.next.columns).toEqual([['room']])
+    }
+    expect(at('>close:room', shipped(SPACE)).text).toBe('No room is open')
+    expect(at('>close:room', room).text).toBe('Enter closes this room. Nothing is lost')
+    expect(at('>close:room', room).next.columns.flat()).not.toContain('room')
+    expect(at('>move:room left', room).text).toBe('Enter moves Room to the left')
+  })
 })
 
 describe('by: and who answers (stage 7, piece 1; C149, C150)', () => {

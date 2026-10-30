@@ -44,6 +44,10 @@
 // The words for boards (C131): Records is the Almanac's board, Plan the
 // docket's (boards.js maps them to the boards' ids).
 export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'commandmenu', 'canvas', 'blocks'])
+// The boards, and room: the room the bar points at, or the one last used
+// (arrangement.js, currentRoom). For the verbs that act on a board on
+// screen (30 October); open: and new: make rooms their own way.
+const ON_SCREEN = Object.freeze([...BOARD_NAMES, 'room'])
 const TABLES = ['almanac', 'collection']
 const EDITING = ['room', 'docket', 'reflection', 'collection']
 const BUILDING = ['lab', 'room']
@@ -123,7 +127,7 @@ export const VERBS = Object.freeze([
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']]], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   // close:204 closes the room showing chat 204; close:welcome the welcome card (C146 (c)).
-  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:welcome'], takes: [[], [[...BOARD_NAMES, 'welcome', 'tour', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
+  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:room', 'close:welcome'], takes: [[], [[...ON_SCREEN, 'welcome', 'tour', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen, or close the letter. Nothing is lost' } }),
 
   // Run
@@ -310,18 +314,18 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.bar', message: 'Move the bar on the page' } }),
   v({ verb: 'pop', group: 'layout', example: 'pop:records',
     forms: ['pop:records', 'pop:201b', 'pop:settings keys', 'pop:library display 2', 'pop:command', 'pop:back', 'pop:back library', 'pop:left'],
-    takes: [[BOARD_NAMES, ['display'], 'number'], [BOARD_NAMES, { opt: 'word' }], ['address'], [['command']], [['back'], { opt: [...BOARD_NAMES, 'command'] }], [['left', 'right']]],
+    takes: [[ON_SCREEN, ['display'], 'number'], [ON_SCREEN, { opt: 'word' }], ['address'], [['command']], [['back'], { opt: [...ON_SCREEN, 'command'] }], [['left', 'right']]],
     stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.pop', message: 'Put a board or the bar in its own window, place it, or bring it back' } }),
   v({ verb: 'move', group: 'layout', example: 'move:library left', forms: ['move:library left', 'move:201c after 201a'],
-    takes: [[BOARD_NAMES, ['left', 'right', 'middle']], ['address', ['after', 'before'], 'address']], stage: 3, undoable: true, click: 'apply',
+    takes: [[ON_SCREEN, ['left', 'right', 'middle']], ['address', ['after', 'before'], 'address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.move', message: 'Move a board to the left, right or middle, or a branch in its plan' } }),
-  v({ verb: 'swap', group: 'layout', example: 'swap:records collection', takes: [[BOARD_NAMES, BOARD_NAMES]], stage: 3, undoable: true, click: 'apply',
+  v({ verb: 'swap', group: 'layout', example: 'swap:records collection', takes: [[ON_SCREEN, ON_SCREEN]], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.swap', message: 'Swap two boards' } }),
   v({ verb: 'reset', group: 'layout', example: 'reset:', takes: [[]], stage: 3, undoable: true,
     gloss: /*i18n*/ { id: 'verb.reset', message: 'Put the boards back as shipped and close the windows' } }),
   v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:library 30%', 'width:204 40%', 'width:even'],
-    takes: [['percent'], [BOARD_NAMES, 'percent'], ['address', 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
+    takes: [['percent'], [ON_SCREEN, 'percent'], ['address', 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.width', message: 'Choose how much of the width a board takes, or put every width back' } }),
   v({ verb: 'cols', group: 'layout', example: 'cols:-room +created', forms: ['cols:-room +created', 'cols:'], takes: [[], [{ many: 'word' }]], on: ['almanac'], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cols', message: 'Hide or show columns of the table' } }),

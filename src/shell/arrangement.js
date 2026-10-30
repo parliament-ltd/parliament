@@ -289,9 +289,21 @@ export function planShowInRoom(a, chat) {
 /** close: or close:<board>. Takes it off the screen, window included; nothing is lost. */
 export function planClose(a, board = a.addressed) {
   const entry = boardEntry(board)
-  if (!isOnPage(a, board) && !isPopped(a, board)) return refuse('closeNotHere', { board })
+  if (!isOnPage(a, board) && !isPopped(a, board)) return refuse(isRoom(board) ? 'closeNoRoom' : 'closeNotHere', { board })
   if (entry && !entry.closable) return refuse('closeFixed', { board })
-  if (isOnPage(a, board) && onPage(a).length === 1) return refuse('closeLast', { board })
+  if (isOnPage(a, board) && onPage(a).length === 1) {
+    // The welcome page alone, as on a first start: a room takes its place,
+    // ready for a prompt, rather than the page staying (30 October).
+    if (board === 'welcome') {
+      const next = copy(a)
+      const room = freeRoom(a)
+      next.columns = [[room]]
+      delete next.context[room]
+      next.addressed = room
+      return go2(next, 'closeWelcomeAlone', { board })
+    }
+    return refuse('closeLast', { board })
+  }
   const oldColumn = columnOf(a, board)
   const next = copy(a)
   next.columns = without(next.columns, board)

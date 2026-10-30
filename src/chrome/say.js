@@ -75,7 +75,8 @@ export function say(i18n, message, values = {}) {
   if (!descriptor) return ''
   const words = {}
   for (const [key, value] of Object.entries(values ?? {})) {
-    if (BOARD_VALUES.has(key)) words[key] = boardName(i18n, value)
+    // A room on screen is Room, as the strip names it; Rooms names them all (30 October).
+    if (BOARD_VALUES.has(key)) words[key] = /^room(-d+)?$/.test(String(value)) ? i18n._(COPY.boards.oneRoom) : boardName(i18n, value)
     // A block and a slot of a room, by their ids (the Lab, stage 13; C238).
     else if (key === 'block') words[key] = COPY.blocks[value] ? i18n._(COPY.blocks[value]) : String(value)
     else if (key === 'blocks') words[key] = joined(i18n, value.map((b) => (COPY.blocks[b] ? i18n._(COPY.blocks[b]) : String(b))), 'conjunction')

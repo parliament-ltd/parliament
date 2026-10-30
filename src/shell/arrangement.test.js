@@ -180,8 +180,9 @@ describe('close:', () => {
   it('keeps the last board open, and boards an arrangement cannot do without', () => {
     const one = keep(planClose(almanac(), 'collection'))
     expect(planClose(one)).toMatchObject({ next: null, says: { message: 'closeLast' } })
-    // The welcome card can be closed in the space (C125), but not when it is the last board.
-    expect(planClose(shipped('welcome'))).toMatchObject({ next: null, says: { message: 'closeLast' } })
+    // The welcome card can be closed in the space (C125); alone, a room
+    // takes its place (30 October), so close:tour always closes it.
+    expect(planClose(shipped('welcome'))).toMatchObject({ next: { columns: [['room']], addressed: 'room' }, says: { message: 'closeWelcomeAlone' } })
     expect(keep(planClose({ ...shipped('welcome'), columns: [['welcome'], ['almanac']] }, 'welcome')).columns).toEqual([['almanac']])
     expect(planClose(almanac(), 'library')).toMatchObject({ next: null, says: { message: 'closeNotHere' } })
   })

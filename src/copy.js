@@ -35,6 +35,8 @@ export const COPY = {
     canvas: /*i18n*/ { id: 'board.canvas', message: 'Canvas', comment: 'The room being built, in the middle of the Lab' },
     blocks: /*i18n*/ { id: 'board.blocks', message: 'Blocks', comment: 'The pieces a room is built from, beside the Canvas in the Lab' },
     room: /*i18n*/ { id: 'board.room', message: 'Rooms', comment: 'Every room, in a list of where a command works' },
+    // One room named in a sentence, as the strip names it (30 October).
+    oneRoom: /*i18n*/ { id: 'board.oneRoom', message: 'Room', comment: 'One room, as a board in a sentence: Enter moves Room to the left' },
     welcome: /*i18n*/ { id: 'board.welcome', message: 'Welcome page' },
     commands: /*i18n*/ { id: 'board.commands', message: 'Command menu', comment: 'Every command, as a board to keep open or pop out (open:commandmenu)' },
   },
@@ -120,7 +122,10 @@ export const COPY = {
     widthStacked: /*i18n*/ { id: 'enter.widthStacked', message: 'In a window this narrow the boards are stacked, each the whole width' },
     widthEven: /*i18n*/ { id: 'enter.widthEven', message: 'Enter puts every board back to its usual width' },
     widthEvenAlready: /*i18n*/ { id: 'enter.widthEvenAlready', message: 'Every board has its usual width already' },
+    closeNoRoom: /*i18n*/ { id: 'enter.closeNoRoom', message: 'No room is open' },
     closeWelcome: /*i18n*/ { id: 'enter.closeWelcome', message: 'Enter closes the welcome page. tour: brings it back' },
+    // The welcome page alone on screen: a room opens in its place (30 October).
+    closeWelcomeAlone: /*i18n*/ { id: 'enter.closeWelcomeAlone', message: 'Enter closes the welcome page and opens a room in its place. tour: brings it back', comment: 'Commands stay English' },
     moveIsPopped: /*i18n*/ { id: 'enter.moveIsPopped', message: '{board} is in its own window. pop:back brings it back first' },
     moveThere: /*i18n*/ {
       id: 'enter.moveThere',

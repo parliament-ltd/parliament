@@ -750,6 +750,11 @@ msgstr "Paja"
 msgid "board.library"
 msgstr "Kirjasto"
 
+#. One room, as a board in a sentence: Enter moves Room to the left
+#. js-lingui-explicit-id
+msgid "board.oneRoom"
+msgstr ""
+
 #. Reads a chat and its markings
 #. js-lingui-explicit-id
 msgid "board.reflection"
@@ -2327,6 +2332,10 @@ msgid "enter.closeLast"
 msgstr "Viimeinen taulu pysyy auki"
 
 #. js-lingui-explicit-id
+msgid "enter.closeNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.closeNotHere"
 msgstr "{board} ei ole auki"
 
@@ -2341,6 +2350,11 @@ msgstr "Enter sulkee huoneen, jossa näkyy {num}. Mitään ei menetetä"
 #. js-lingui-explicit-id
 msgid "enter.closeWelcome"
 msgstr "Enter sulkee tervetulosivun. tour: tuo sen takaisin"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.closeWelcomeAlone"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.collectionAdd"
