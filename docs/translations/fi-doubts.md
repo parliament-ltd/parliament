@@ -147,3 +147,86 @@ Each: id, the English, the draft, and why I was unsure.
     Why: the choice beside $0.50, $1 and $5. "Pois" matches the earlier "Pois:" in the Settings help; "Ei käytössä" or "Ei varoitusta" is clearer if the choice is ever shown on its own.
 
 The checker gives 4 command warnings for chunks 16 to 19 (branches.unmet, enter.manyUnmet twice, enter.runUndo). Each is prose ("did not run: its condition…", "stops at a run: what it writes stays"), not the command run:. Every real command in these entries is kept as typed.
+
+## Lines drafted 30 October 2026
+
+The 658 lines added since 24 October. The checker passes all of them; its 5 command warnings (enter.focusWhich, enter.layoutMany, enter.themeMany, enter.promptWebGo, guide.why.for) are prose ("by name:", "Which layout:", "search the web:"), not commands.
+
+26. **Ripple as a name** (enter.promptRipple and the lines after it, enter.ripple*, enter.settleSugRipple, collection.legendRustIs, chat.sugRipple, room.rippleOn, room.rippleOff)
+    English: Ripple checks {nums}: 2 calls to {name}, about {cost} / Ripple’s suggestion
+    Draft: Ripple tarkistaa haarat {nums}: 2 kutsua malliin {name}, hinta noin {cost} / Ripplen ehdotus
+    Why: the English writes Ripple with a capital, as a name, so it stays one, like Parliament. The block drafted on 23 October as block.ripple-analysis is "Vaikutusanalyysi". If the block and the feature are the same thing, one of the two should change.
+
+27. **sweep** (enter.sweep*, chat.sugSweep, collection.legendSweepIs, enter.settleSugSweep, reflection.sweepAs)
+    English: Enter sweeps {address}’s last reply as {name} / sweep 245
+    Draft: Enter käy läpi haaran {address} viimeisimmän vastauksen kehyksellä {name} / läpikäynti 245
+    Why: "läpikäynti" (going through) is plain and clear; "seulonta" (sifting) keeps more of the image but is less obvious. As a marker before a number it is long next to "ripple 244" and "kysymys 241".
+
+28. **markup and clean** (enter.markup*, room.markupWord, room.cleanWord, collection.markupWord, collection.cleanWord)
+    English: Enter shows replies marked up: struck words and yours in blue, editable
+    Draft: Enter näyttää vastaukset muutosmerkein: yliviivatut sanat ja omasi sinisellä, muokattavina
+    Why: "merkinnät" would be the usual word, but the glossary keeps it for markings. The existing verb.markup ("Näytä vastaukset muotoiltuina tai pelkkänä tekstinä") reads as formatting, not edit marks; it should become "Näytä vastaukset muutosmerkein tai puhtaina".
+
+29. **enter.settleSugDone**
+    English: Suggestion {num} was {state} already   ({state} is accepted or rejected)
+    Draft: Ehdotus {num} on jo käsitelty ({state})
+    Why: the code passes the stored state (src/lib/editVerbs.js), so {state} arrives in English in every language. The draft puts it in brackets, where an English word hurts least. A select in the English ({state, select, accepted {…} other {…}}) would let each language say it.
+
+30. **enter.promptEditsToReader**
+    English: Your 2 edits and 1 ask go to {name} at the same time…
+    Draft: Samaan aikaan mallille {name} menee 2 muokkaustasi ja 1 kysymyksesi…
+    Why: with the verb first, Finnish takes the singular for one and for many, so the {total} plural says "menee" in both cases. It is kept so the structure matches the English.
+
+31. **Block settings on the Blocks board** (blocksBoard.*)
+    English: New branches carry: the whole history / a summary; Shown as: ambient / compact / a meter; Follows: this chat / a pinned plan
+    Draft: Uusiin haaroihin: koko historia / yhteenveto; Esitystapa: huomaamaton / tiivis / mittari; Seurattava: tämä keskustelu / kiinnitetty suunnitelma
+    Why: the choice words also show alone on the block's row, so they are nominative and the labels are reworded around them. "huomaamaton" (unobtrusive) is a guess at what the ambient display is.
+
+32. **blocksBoard.rm**
+    English: rm
+    Draft: rm
+    Why: the button writes rm: in the bar, and "rm" means nothing but the command, so it stays. Its neighbours (lisää, siirrä ylös, siirrä alas) are translated; "poista" would match them.
+
+33. **Slot names** (slot.*)
+    English: the left rail / the lower right rail / the input dock / the outline
+    Draft: vasen sivupalsta / oikea alempi sivupalsta / syöttöalue / jäsennys
+    Why: "sivupalkki" is the usual Finnish word for a rail, but palkki is the bar. The names follow "paikkaan" and "paikasta" ("Enter siirtää lohkon Muistiinpanot paikasta vasen sivupalsta paikkaan marginaali"), which reads correctly but stiffly.
+
+34. **{head} in Reflection** (enter.reflect*, reflection.from, reflection.reflectAbout, reflection.talkHow)
+    English: Enter reflects on {head}: one call to {model}
+    Draft: Enter pohtii kohdetta {head}: yksi kutsu malliin {model}
+    Why: {head} is a chat's number or, for a plan, the plan's number, so the generic "kohde" carries the case. If it is always one of the two, "keskustelua {head}" would be warmer.
+
+35. **enter.reflectUnder**
+    English: Under {names}
+    Draft: Kehyksin: {names}
+    Why: say.js joins {names} with "or", so two frameworks read "Kehyksin: A tai B" (in English "Under A or B"). It may be meant as an "and" list.
+
+36. **Told to {name}** (chat.toldOnly, collection.changeSent, collection.sugTold, enter.promptEditsOnly)
+    English: Your edits, told to {name}
+    Draft: Muokkauksesi, kerrottu mallille {name}
+    Why: "mallille" assumes {name} is always a model, which the code suggests (a source reads none of the edits). If a source can be named here, "vastaajalle" is the neutral word.
+
+37. **enter.rippleDone**
+    English: Ripple: 3 suggestions, in {nums}
+    Draft: Ripple: 3 ehdotusta haaroissa {nums}
+    Why: {nums} lists the branches where suggestions landed; when all three land in one branch, the plural "haaroissa 201b" reads a little off.
+
+38. **Example names inside commands** (enter.editWhich, enter.duplicateWhich, enter.labNoRoom, enter.blocksNoLayout, canvas.empty, canvas.noLayout, blocksBoard.empty, enter.arrangeSaveName, enter.tellEmpty)
+    English: edit:"Writing studio", layout:"Three panels", arrange:save "review desk"
+    Draft: edit:"Kirjoitusstudio", layout:"Kolme paneelia", arrange:save "arviointipöytä"
+    Why: as ruled on 23 October. Rooms and layouts are matched by the names the page shows, which are the Finnish ones, so these work as typed.
+
+39. **guide.o.talking**
+    English: Talking things through
+    Draft: Asioiden puiminen
+    Why: "puida" (to thresh out) is idiomatic for talking something through; "Keskustelu asioista" is plainer if it reads as too colloquial.
+
+40. **chat.askLabel**
+    English: ASK
+    Draft: KYSYMYS
+    Why: written in capitals as the English is, in case the page does not set the case itself.
+
+41. **Older lines whose English has changed since they were drafted** (not touched in this round)
+    enter.help, enter.popDisplay, keys.checkThenKeep, keys.promise, languagePicker.foot, leader.help, settings.aboutWhat, settings.leaveApp, settings.private2, settings.private2Head, verb.close, verb.duplicate, verb.name, verb.strikethrough, welcome.letter.1 to welcome.letter.4, welcome.signature, welcome.small, welcome.step.ask, welcome.step.pop, welcome.steps.
+    Why: the Finnish still translates the earlier English. Most are small (enter.help still says "täällä toimivat"), but welcome.letter.1 to 4 translate a different letter, welcome.steps still says eight things, welcome.signature says "So Lov" where the English now says "Stef", the key vault lines still say keys are encrypted on this device, and verb.strikethrough lacks the undo: the English now names. They need redrafting before Finnish ships.

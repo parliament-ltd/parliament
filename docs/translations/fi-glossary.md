@@ -120,3 +120,30 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - Quotation marks ”…” (U+201D both sides). ASCII quotes only inside commands (open:"{name}", name:"…").
 - Decimal comma in prose (1,1). Values typed into commands stay ASCII (cost: >0.50, <1 or 0.18).
 - Names inflect when they are literal text, not placeholders: Parliamentin, Parliamentissa, Parliamentiin, Wikipediaan. Multi-word names take a spaced hyphen: Claude Code -työkalulla.
+
+## Edits, asks, the Lab and other screens (drafted 30 October 2026)
+- ask (on a reply) → kysymys (kind.ask already); the ask box → kysymysruutu; asked of {name} → kysytty mallilta {name}. Asks tab → Kysymykset.
+- edit (struck or typed over) → muokkaus; strike, struck → yliviivata, yliviivattu; Edits tab → Muokkaukset.
+- markup, marked up → muutosmerkit, muutosmerkein; clean → puhdas, puhtaina. Kept apart from merkintä, which stays for markings (notes, keywords, quotes).
+- tell, told → kertoa, kerrottu; told once → kertaalleen ("Mukana kertaalleen: …"); told to {name} → kerrottu mallille {name}.
+- hold back (an edit or an ask) → asettaa pitoon, pidossa; let it go → vapauttaa (pidosta). The same pito as plans' hold:.
+- accept → hyväksyä; reject, turn down → hylätä; settle → ratkaista; take back (an answer) → kumota, kumottu.
+- the passage (the words an ask is on) → tekstikohta.
+- Ripple → stays a name, inflected as literal text: Ripple, Ripplen, Ripplen ehdotus. The marker before a number stays "ripple 244", like the command.
+- sweep → läpikäynti; to sweep {address} as {name} → käydä läpi haara {address} kehyksellä {name}; the sweep's suggestions → läpikäynnin ehdotukset.
+- review (the bar over Suggestions) → arviointi. proposal (Reflection) → suositus, kept apart from ehdotus.
+- reflect on → pohtia; synthesis → synteesi; session → istunto. {head} in Reflection is a chat's or a plan's number → kohde {head}.
+- slot (a place in a room's layout) → paikka: "paikasta {fromSlot} paikkaan {toSlot}". The slot names: alusta, keskustelupaneeli, asiakirja, syöttöalue, tarkastelupaneeli, vasen sivupalsta, marginaali, keskustelu, jäsennys, oikea sivupalsta, oikea alempi sivupalsta, liukupaneeli.
+- rail → sivupalsta. Not sivupalkki: palkki is the bar. A room's left and right column → vasen ja oikea palsta. inspector → tarkastelupaneeli.
+- room for one (space in a slot) → tilaa yhdelle; room for more → tilaa useammalle. Never huone.
+- Built for (label) → Laite: tietokone, puhelin. Sends to (label) → Lähettää: kenelle tahansa, vain tälle koneelle.
+- A block setting's label is followed by its choice in the nominative, because the choice words also show alone on the block's row ("Esitystapa: mittari", "Näkyvissä: tämä ajo").
+- tick, untick → valita, poistaa valinta; {count} ticked → {count} valittu.
+- calm (calm:) → rauhoittaa näkymä; calm: on, calm: off → calm: päällä, calm: pois (as framework: ei mitään). on, off as a block's switch → päällä, pois.
+- the guide (new:room guided) → opas. letter (from the maker) → kirje; not read yet → lukematta.
+- key store, key vault → avainsäilö.
+- in beta → beeta (beside a language), beetavaiheessa (in a sentence). coming soon → tulossa, as library.pillSoon.
+- display {n} → näyttö {n}; screen → näyttö; on screen → näytöllä. A popped window → erillinen ikkuna.
+- Runs {command} → Suorittaa komennon {command}; Ran {command} → Suoritettu: {command}.
+- {n} of {total} → {n}/{total}, as library.shown. A percentage written by hand → {n} %, with a space.
+- arrangement → järjestely (as before); arrange:save "review desk" → arrange:save "arviointipöytä". Example room and layout names are the Finnish ones the page shows: edit:"Kirjoitusstudio", layout:"Kolme paneelia".
