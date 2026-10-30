@@ -753,7 +753,7 @@ msgstr "Kirjasto"
 #. One room, as a board in a sentence: Enter moves Room to the left
 #. js-lingui-explicit-id
 msgid "board.oneRoom"
-msgstr ""
+msgstr "Huone"
 
 #. Reads a chat and its markings
 #. js-lingui-explicit-id
@@ -772,7 +772,7 @@ msgstr "Asetukset"
 #. The card with the bar, shown before anything is open
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr ""
+msgstr "Aloitus"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -2338,7 +2338,7 @@ msgstr "Viimeinen taulu pysyy auki"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNoRoom"
-msgstr ""
+msgstr "Mikään huone ei ole auki"
 
 #. js-lingui-explicit-id
 msgid "enter.closeNotHere"
@@ -2995,7 +2995,7 @@ msgstr "Kirjoittaminen korvaa sen. Escape tyhjentää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "Enter näyttää kaikki täällä toimivat komennot"
+msgstr "Enter näyttää kaikki komennot"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3597,7 +3597,7 @@ msgstr "Enter avaa taulun {board} oikealle"
 
 #. js-lingui-explicit-id
 msgid "enter.openBoardAlone"
-msgstr ""
+msgstr "Enter avaa taulun {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openBranch"
@@ -5104,7 +5104,7 @@ msgstr "Enter kumoaa {count, plural, one {kysymyksen {nums} vastauksen} other {k
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr "Ehdotus {num} on jo käsitelty ({state})"
+msgstr "{state, select, accepted {Ehdotus {num} on jo hyväksytty} other {Ehdotus {num} on jo hylätty}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
@@ -6311,7 +6311,7 @@ msgstr "Tallennettaessa avain tarkistetaan ensin palvelusta {provider} yhdellä 
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "Tallennettaessa avain tarkistetaan ensin palvelusta {provider} yhdellä lyhyellä pyynnöllä, ja sitten se säilytetään salattuna tässä selaimessa."
+msgstr "Tallennettaessa avain tarkistetaan ensin palvelusta {provider} yhdellä lyhyellä pyynnöllä, ja sitten avainsäilö säilyttää sen salattuna tässä selaimessa."
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6441,7 +6441,7 @@ msgstr "Tarkistus ei tavoittanut palvelua {provider}. Mitään ei tallennettu."
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "Salattu tässä selaimessa. Kukin avain menee vain omalle palveluntarjoajalleen."
+msgstr "Säilytetään salattuna avainsäilössä tässä selaimessa. Kukin avain menee vain omalle palveluntarjoajalleen."
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -6574,7 +6574,7 @@ msgstr "luonnos"
 
 #. js-lingui-explicit-id
 msgid "languagePicker.foot"
-msgstr "Vastaukset ja haut noudattavat sivun kieltä. reply: antaa vastauksille oman kielen"
+msgstr "Vastaukset ja haut noudattavat sivun kieltä. reply: antaa vastauksille oman kielen."
 
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
@@ -6643,7 +6643,7 @@ msgstr "Kirjoita komento. > pysyy kentässä"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "Kaikki täällä toimivat komennot tai yhden komennon toiminta"
+msgstr "Kaikki komennot tai yhden komennon toiminta"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -8027,7 +8027,7 @@ msgstr "Tietoja ja turvallisuus"
 #. The first sentence is from the welcome letter (C272 (a))
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "Paikka, jossa voit työskennellä tekoälyn kanssa omilla ehdoillasi. MIT-lisenssi. Lähdekoodi julkaistaan lanseerauksessa."
+msgstr "Parliament on yritys ajatella uudelleen, miten toimimme tekoälyn kanssa. MIT-lisenssi. Lähdekoodi julkaistaan lanseerauksessa."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -8268,7 +8268,7 @@ msgstr "{day}."
 
 #. js-lingui-explicit-id
 msgid "settings.leaveApp"
-msgstr "Selaimesi hakee Parliamentin tiedostot osoitteesta parliament.ltd, jota Netlify isännöi. Kuten mikä tahansa sivustoja isännöivä palvelu, se näkee IP-osoitteesi ja selaimesi tyypin. Se ei koskaan saa keskustelujasi eikä avaimiasi."
+msgstr "Selaimesi hakee Parliamentin tiedostot osoitteista parliament.ltd ja keys.parliament.ltd, joita Netlify isännöi. Kuten mikä tahansa sivustoja isännöivä palvelu, se näkee IP-osoitteesi ja selaimesi tyypin. Se ei koskaan saa keskustelujasi eikä avaimiasi."
 
 #. js-lingui-explicit-id
 msgid "settings.leaveAppHead"
@@ -8441,11 +8441,11 @@ msgstr "Ei palvelimia, ei tilejä"
 
 #. js-lingui-explicit-id
 msgid "settings.private2"
-msgstr "Jokainen avain salataan ennen tallentamista ja lähetetään vain omalle palveluntarjoajalleen, eikä sitä koskaan tallenneta varmuuskopioon. Salaus suojaa avaimen levyllä. Se ei voi suojata sivun sisällä toimivalta koodilta, joten Parliament ei lataa mitään koodia mistään muualta."
+msgstr "Jokaista avainta säilyttää salattuna Parliamentin avainsäilö, pieni oma sivunsa osoitteessa keys.parliament.ltd. Avain lähetetään vain omalle palveluntarjoajalleen, eikä sitä koskaan tallenneta varmuuskopioon. Parliamentin sivulla toimiva koodi ei voi lukea avainta; se voi vain pyytää avainsäilöä lähettämään pyynnön sen listalla olevalle palveluntarjoajalle. Parliament ei lataa mitään koodia mistään muualta."
 
 #. js-lingui-explicit-id
 msgid "settings.private2Head"
-msgstr "Avaimet salataan tällä laitteella"
+msgstr "Avaimia säilyttää Parliamentin avainsäilö"
 
 #. js-lingui-explicit-id
 msgid "settings.private3"
@@ -8997,7 +8997,7 @@ msgstr "Tyhjennä kokoelma, poista kaikki suodattimet tai yhdenlainen suodatin"
 
 #. js-lingui-explicit-id
 msgid "verb.close"
-msgstr "Poista taulu näkyvistä. Mitään ei menetetä"
+msgstr "Poista taulu näkyvistä tai sulje kirje. Mitään ei menetetä"
 
 #. js-lingui-explicit-id
 msgid "verb.cols"
@@ -9033,7 +9033,7 @@ msgstr "Poistu Pajasta muutoksinesi"
 
 #. js-lingui-explicit-id
 msgid "verb.duplicate"
-msgstr "Kopioi huone, kokoelma tai suunnitelma uudella nimellä"
+msgstr "Kopioi huone, oma tai pohja, ja avaa kopio Pajassa"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
@@ -9121,7 +9121,7 @@ msgstr "Kerro, lähettääkö huone vain tämän koneen malleille"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Näytä vastaukset muotoiltuina tai pelkkänä tekstinä"
+msgstr "Näytä vastaukset muutosmerkein tai puhtaina"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9133,7 +9133,7 @@ msgstr "Siirrä taulu vasemmalle, oikealle tai keskelle, tai haara suunnitelmass
 
 #. js-lingui-explicit-id
 msgid "verb.name"
-msgstr "Nimeä se, mihin palkki kohdistuu: huone, kokoelma tai keskustelu"
+msgstr "Nimeä se, mihin palkki kohdistuu: huone, kokoelma tai keskustelu. Kahdella nimellä nimeä tallennettu järjestely uudelleen"
 
 #. js-lingui-explicit-id
 msgid "verb.new"
@@ -9245,7 +9245,7 @@ msgstr "Pysäytä ajo tai kaikki ajot kaikissa ikkunoissa"
 
 #. js-lingui-explicit-id
 msgid "verb.strikethrough"
-msgstr "Yliviivaa valittu kohta"
+msgstr "Yliviivaa vastauksesta valitut sanat. undo: ja muokkauksen numero kumoaa sen"
 
 #. js-lingui-explicit-id
 msgid "verb.summarize"
@@ -9361,19 +9361,19 @@ msgstr "Tämä selain ei ole suostunut säilyttämään täällä tekemääsi, j
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"
-msgstr "Parliament on paikka, jossa voit työskennellä tekoälyn kanssa omilla ehdoillasi. Se on vasta alussa ja yhä rakenteilla."
+msgstr "Parliament on yritys ajatella uudelleen, miten toimimme tekoälyn kanssa. Osallistua enemmän itse työhön ja keskusteluun. En halunnut kourallisen yrityksiä päättävän, miten siinä käy. Ja kyllä, huomaan ironian siinä, että rakennan tätä Clauden avulla."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "Se toimii selaimessasi ilman palvelimia ja tilejä. Keskustelusi ja avaimesi pysyvät tällä koneella, ja jokainen pyyntö menee suoraan valitsemallesi palveluntarjoajalle, omalla koneellasi toimivalle mallille tai julkiseen lähteeseen, kuten Wikipediaan. Mainoksia ei ole."
+msgstr "Minuakin pelottaa tekoäly. Se on ihme, josta en tiedä, mitä ajatella. Mutta en halunnut vain istua ja olla tekemättä mitään. Niinpä kuukausien keskustelujen ja lukemisen jälkeen olen yrittänyt koota sovelluksen, jota voi käyttää ilman verkkoyhteyttä. Sovelluksen, jossa voit hakea ensin lähteistä ilman tekoälyä. Sovelluksen, joka toivoo antavansa voimaa aktiivisen osallistumisen kautta. Ehkä se on liian rohkeasti sanottu... vaikka olen koodannut pari verkkosovellusta Rubylla, pitäisin itseäni silti ”suunnittelijana”. Rakentaminen on vaikeaa, varsinkin kun opettelee samalla ja tahti tuntuu siltä kuin joisi paloletkusta. Koodi on avointa, olen ajanut sen Claude Coden tietoturvatarkistusten läpi ja aion teettää lisää ulkopuolisia tarkistuksia. Yritän parhaani mukaan pitää sinut ajan tasalla. Olen miettinyt, miten saisin koodista helpommin lähestyttävää... ehkä voisin tehdä siitä romaanin."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "Tavoite on ajatella uudelleen, miten toimimme tekoälyn kanssa, ja Parliamentin muovaaminen on sinun käsissäsi. Huoneet rakennetaan lohkoista, asetteluista ja teemoista. Sinä luot tilan, sinä valitset, miten toimit."
+msgstr "Mikä Parliament sitten on? Parliamentissa voit luoda huoneita, tiloja, joissa voit keskustella yhden tekoälymallin, usean tai ei yhdenkään kanssa. Huoneet rakennetaan lohkoista, joita voit muokata ja vaihtaa, ja voit tehdä omia asetteluja, teemoja ja järjestelyjä."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "Useimmat tekoälysovellukset on tehty passiiviseen kuluttamiseen. Kysyt jotain, saat vastauksen. Täällä ohjaat komentoriviltä: haarautat keskusteluja, korostat, lisäät ja yhdistelet muistiinpanoja keskustelujen välillä, suunnittelet kehotteiden ajon ja paljon muuta. Otetaan ohjat takaisin."
+msgstr "Kaikki on tauluissa. Jokaisen taulun voi siirtää omaan ikkunaansa ja toiselle näytölle, joten työtila on sinun."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9387,27 +9387,27 @@ msgstr "Nyt keskitytään: {command}"
 #. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
-msgstr "So Lov"
+msgstr "Stef"
 
 #. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
-msgstr "tehty toistaiseksi tietokoneelle; puhelin tulee myöhemmin"
+msgstr "Tehty tietokoneelle, puhelin myöhemmin"
 
 #. {command} is open:records, which stays English, as does open:
 #. js-lingui-explicit-id
 msgid "welcome.start.open"
-msgstr ""
+msgstr "{command} luettelee, mitä olet tehnyt, ja open: ja kohteen numero avaa sen uudelleen"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.room"
-msgstr ""
+msgstr "{command} ja kysymys avaa huoneen"
 
 #. {command} is tour:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.tour"
-msgstr ""
+msgstr "{command} tuo vaiheet takaisin"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"
@@ -9415,7 +9415,7 @@ msgstr "Katso, mitä olet tehnyt"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.ask"
-msgstr "Kysy jotain"
+msgstr "Esitä kysymys"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
@@ -9454,7 +9454,7 @@ msgstr "Nimeä huone"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
-msgstr "Siirrä se toiselle näytölle"
+msgstr "Siirrä taulu omaan ikkunaansa"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
@@ -9477,4 +9477,4 @@ msgstr "valitse sanoja vastauksesta ja paina sitten {keys}"
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
 msgid "welcome.steps"
-msgstr "Kahdeksan kokeiltavaa asiaa"
+msgstr "Kokeiltavia asioita"

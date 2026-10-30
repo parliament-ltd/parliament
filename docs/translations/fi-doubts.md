@@ -166,11 +166,13 @@ The 658 lines added since 24 October. The checker passes all of them; its 5 comm
     English: Enter shows replies marked up: struck words and yours in blue, editable
     Draft: Enter näyttää vastaukset muutosmerkein: yliviivatut sanat ja omasi sinisellä, muokattavina
     Why: "merkinnät" would be the usual word, but the glossary keeps it for markings. The existing verb.markup ("Näytä vastaukset muotoiltuina tai pelkkänä tekstinä") reads as formatting, not edit marks; it should become "Näytä vastaukset muutosmerkein tai puhtaina".
+    Settled since: verb.markup now reads "Näytä vastaukset muutosmerkein tai puhtaina".
 
 29. **enter.settleSugDone**
     English: Suggestion {num} was {state} already   ({state} is accepted or rejected)
     Draft: Ehdotus {num} on jo käsitelty ({state})
     Why: the code passes the stored state (src/lib/editVerbs.js), so {state} arrives in English in every language. The draft puts it in brackets, where an English word hurts least. A select in the English ({state, select, accepted {…} other {…}}) would let each language say it.
+    Settled since: the English is now that select, and the draft follows it: "{state, select, accepted {Ehdotus {num} on jo hyväksytty} other {Ehdotus {num} on jo hylätty}}".
 
 30. **enter.promptEditsToReader**
     English: Your 2 edits and 1 ask go to {name} at the same time…
@@ -230,3 +232,33 @@ The 658 lines added since 24 October. The checker passes all of them; its 5 comm
 41. **Older lines whose English has changed since they were drafted** (not touched in this round)
     enter.help, enter.popDisplay, keys.checkThenKeep, keys.promise, languagePicker.foot, leader.help, settings.aboutWhat, settings.leaveApp, settings.private2, settings.private2Head, verb.close, verb.duplicate, verb.name, verb.strikethrough, welcome.letter.1 to welcome.letter.4, welcome.signature, welcome.small, welcome.step.ask, welcome.step.pop, welcome.steps.
     Why: the Finnish still translates the earlier English. Most are small (enter.help still says "täällä toimivat"), but welcome.letter.1 to 4 translate a different letter, welcome.steps still says eight things, welcome.signature says "So Lov" where the English now says "Stef", the key vault lines still say keys are encrypted on this device, and verb.strikethrough lacks the undo: the English now names. They need redrafting before Finnish ships.
+    Settled since: all 23 are redrafted from the English as it now reads (second round below). enter.popDisplay needed no change: "näyttö" already covers both screen and display.
+
+## Second round, 30 October 2026
+
+The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and 7 new lines (board.oneRoom, board.start, enter.closeNoRoom, enter.openBoardAlone, welcome.start.room, welcome.start.open, welcome.start.tour). The checker passes all of them; its one note (verb.name, "pointed at:") is prose.
+
+42. **The welcome letter** (welcome.letter.1 to welcome.letter.4, welcome.signature)
+    English: Perhaps that's too bold of me... I'd still classify myself as a "designer". ... the pace feels like drinking from a fire hose.
+    Draft: Ehkä se on liian rohkeasti sanottu... pitäisin itseäni silti ”suunnittelijana”. ... tahti tuntuu siltä kuin joisi paloletkusta.
+    Why: the letter is Stefan's own voice, so the draft keeps its first person, its fragments ("Osallistua enemmän itse työhön ja keskusteluun.", "Sovelluksen, jossa…") and its trailing dots. "Juoda paloletkusta" is understood but is a borrowed image; "tahti on hengästyttävä" is the native way to say it. Finnish people in tech often say "designer" for designer; "suunnittelija" is the plain word. The reader is "sinä" ("pitää sinut ajan tasalla"), as everywhere else on the page. The letter is signed Stef, as in English.
+
+43. **settings.aboutWhat and welcome.letter.1**
+    English: Parliament is an attempt to rethink how we interact with AI.
+    Draft: Parliament on yritys ajatella uudelleen, miten toimimme tekoälyn kanssa.
+    Why: the comment says the sentence is the letter's own, so both lines carry the same Finnish. "miettiä uudelleen" would be a little warmer for the letter, but then the two would differ.
+
+44. **verb.strikethrough**
+    English: Strike the selected words in a reply. Its number with undo: takes it back
+    Draft: Yliviivaa vastauksesta valitut sanat. undo: ja muokkauksen numero kumoaa sen
+    Why: "its number" is the number the strike gets as an edit (enter.strikeNumbered), so the draft names it "muokkauksen numero", as enter.undoNotEdit says "undo: ja numero".
+
+45. **welcome.start.open**
+    English: {command} lists what you have made, and open: with its number opens one again
+    Draft: {command} luettelee, mitä olet tehnyt, ja open: ja kohteen numero avaa sen uudelleen
+    Why: "kohde" is the glossary's word for a numbered thing of unknown kind. The line is long for the start card; "open: ja numero avaa sen uudelleen" is the short form if it wraps.
+
+46. **welcome.steps**
+    English: Things to try
+    Draft: Kokeiltavia asioita
+    Why: read only by screen readers. The earlier draft counted the steps ("Kahdeksan…"), which the English no longer does.
