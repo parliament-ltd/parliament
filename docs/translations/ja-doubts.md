@@ -189,12 +189,12 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 37. collection.markupWord, room.markupWord, collection.cleanWord, room.cleanWord, enter.markupOn and the rest
     - en: markup · clean
     - ja: 変更表示・清書
-    - 清書 is the plain word for a clean copy; 変更表示 says the changes are shown. The older verb.markup has 返答を書式付きで表示する、または書式なしで表示する (with or without formatting), which reads markup as formatting and now disagrees. Proposed for verb.markup: 返答を変更表示、または清書で表示する.
+    - 清書 is the plain word for a clean copy; 変更表示 says the changes are shown. The older verb.markup has 返答を書式付きで表示する、または書式なしで表示する (with or without formatting), which read markup as formatting. Settled: verb.markup is now 返答を変更表示か清書で表示する.
 
-38. enter.settleSugDone
-    - en: Suggestion {num} was {state} already
-    - ja: {state, select, accepted {提案{num}はすでに受け入れ済みです} rejected {提案{num}はすでに却下済みです} other {提案{num}はすでに{state}です}}
-    - The code passes {state} as the English word accepted or rejected (lib/editVerbs.js), so a plain {state} would show English. I made it a select on the same variable: the one line whose structure differs from the English. The English entry would be better as a select too, for every language.
+38. Settled: enter.settleSugDone
+    - en: {state, select, accepted {Suggestion {num} was accepted already} other {Suggestion {num} was rejected already}}
+    - ja: {state, select, accepted {提案{num}はすでに受け入れ済みです} other {提案{num}はすでに却下済みです}}
+    - The English became a select (the code passed {state} as an English word), and the Japanese now has its cases exactly.
 
 39. chat.askMarker, chat.sugRipple, chat.sugSweep (how the code joins them)
     - The marker is built in code as the word, a space and the number, then ": accept · undo" (editing/asks.js, editing/suggestions.js), so Japanese shows 依頼 241: 受け入れる · 取り消す, with ASCII spacing and colon. One message with placeholders would let Japanese write 依頼241：受け入れる・取り消す.
@@ -247,30 +247,40 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 49. welcome.letter.5
     - en: Right now, Parliament is built for laptops, and hopefully phones soon too.
     - ja: 今のところ、Parliamentはノートパソコン向けに作られています。近いうちにスマートフォンにも対応できればと思っています。
-    - Translated as written, but it joins letters 1 to 4, whose Japanese is from an older English and says something else (see 50).
+    - Translated as written. Letters 1 to 4 were redrafted to match it (see 50).
 
-50. Existing lines whose English changed after they were drafted. Left as they are, as asked; each shows outdated Japanese. Proposed drafts, not applied:
-    - welcome.letter.1: Parliamentは、AIとの関わり方を考え直す試みです。仕事にも会話にも、もっと加われるように。その行方を一握りの企業に決めてほしくはありませんでした。そして、これをClaudeで作っていることの皮肉にも、ちゃんと気づいています。
-    - welcome.letter.2: 私もAIが怖いのです。驚くべきものですが、どう受け止めればいいのか分かりません。それでも、何もせずに座っているのは嫌でした。そこで、何か月もチャットし、読み続けたあとで、オフラインでも使えるアプリを形にしようとしてきました。まずAIを使わずに情報源を検索できるアプリ。自分から関わることで力を得られるようにと願うアプリ。少し大胆すぎるかもしれません……Rubyでウェブアプリをいくつか書いたことはありますが、自分のことはやはり「デザイナー」だと思っています。作るのは大変です。とくに、学びながら進め、消火ホースから水を飲むような速さに感じられるときには。コードは公開していて、Claude Codeのセキュリティチェックを通し、第三者によるセキュリティチェックもさらに行う予定です。できるだけ近況をお知らせします。コードをもっと身近なものにする方法をずっと考えています……いっそ小説にしてみようかな。
-    - welcome.letter.3: では、Parliamentとは何でしょう。Parliamentでは、ルームを作れます。1つのAIモデル、複数のモデル、あるいはモデルなしでチャットできる場所です。ルームは編集したり入れ替えたりできるブロックで組み立て、レイアウト、テーマ、配置も自分で作れます。
-    - welcome.letter.4: すべてはボードの上にあります。どのボードも別ウインドウに出して別のディスプレイに移せるので、作業空間はあなたのものです。
-    - welcome.signature: Stef (the Japanese still has an older name, So Lov)
+50. Settled: the existing lines whose English changed after they were drafted, applied on 30 October and checked against the English as it is now. The letter keeps Stefan's own informal voice (んです, ね, かな) inside です・ます, and is signed Stef. As applied:
+    - welcome.letter.1: Parliamentは、AIとの付き合い方を考え直してみる試みです。仕事にも会話にも、もっと自分から加われるように。その行方を、ひと握りの企業に決めてほしくなかったんです。そう、これをClaudeで作っているという皮肉にも、ちゃんと気づいています。
+    - welcome.letter.2: 私もAIが怖いんです。すごいものだけど、どう受け止めればいいのか分からない。それでも、ただ座って何もしないのは嫌でした。だから何か月もチャットしたり読んだりしたあとで、オフラインでも使えるアプリを形にしようとしてきました。まずAIを使わずに情報源を検索できるアプリ。自分から関わることで、力を得られるようにと願うアプリ。ちょっと大それた話かもしれませんね……Rubyでウェブアプリをいくつか書いたことはあるけれど、自分ではやっぱり「デザイナー」だと思っています。作るのは大変です。とくに、学びながら進めていて、そのペースが消火ホースから水を飲むように感じられるときは。コードは公開していて、Claude Codeのセキュリティチェックも通しました。第三者によるセキュリティチェックも、これからもっと受けるつもりです。できるだけ近況をお知らせしますね。コードをもっと身近なものにする方法をずっと考えていて……いっそ小説にしてみようかな。
+    - welcome.letter.3: では、Parliamentって何でしょう？Parliamentでは、ルームを作れます。1つのAIモデルとも、いくつものモデルとも、モデルなしでもチャットできる場所です。ルームは編集したり入れ替えたりできるブロックでできていて、レイアウトもテーマも配置も、自分で作れます。
+    - welcome.letter.4: すべてはボードの上にあります。どのボードも別ウインドウに出して、別のディスプレイに移せます。だから、作業の場はあなたのものです。
+    - welcome.signature: Stef
     - welcome.small: コンピュータ向け。スマートフォンはこれから
-    - welcome.steps: 試してみること (the Japanese still says eight)
-    - welcome.step.pop: ボードを別ウインドウに出す (the Japanese still says "move it to another display")
-    - welcome.step.ask: 質問する (the Japanese says "ask something"; close enough to keep)
+    - welcome.steps: 試してみること
+    - welcome.step.pop: ボードを別ウインドウに出す
+    - welcome.step.ask: 質問する
     - settings.aboutWhat: Parliamentは、AIとの関わり方を考え直す試みです。MITライセンス。ソースコードはリリース時に公開します。
     - settings.private2Head: キーはParliamentのキー保管庫に保管されます
-    - settings.private2: 各キーは、keys.parliament.ltdにあるParliament専用の小さなページ、キー保管庫に暗号化して保管され、それぞれのプロバイダにだけ送られ、バックアップに入れられることは決してありません。Parliamentのページで動くコードはキーを読めず、一覧にあるプロバイダへの送信を保管庫に頼むことしかできません。Parliamentはほかの場所からコードを読み込みません。
+    - settings.private2: 各キーは、Parliamentのキー保管庫（keys.parliament.ltdにある独立した小さなページ）が暗号化して保管し、それぞれのプロバイダにだけ送られ、バックアップに入れられることは決してありません。Parliamentのページで動くコードはキーを読めず、保管庫の一覧にあるプロバイダへ送るよう、保管庫に頼むことしかできません。Parliamentはほかの場所からコードを読み込みません。
     - settings.leaveApp: ブラウザは、Netlifyがホストするparliament.ltdとkeys.parliament.ltdから、Parliamentのファイルを取得します。ほかのウェブホストと同じく、ホストにはIPアドレスとブラウザの種類が見えます。チャットやキーをホストが受け取ることは決してありません。
     - keys.promise: キー保管庫が、このブラウザに暗号化して保管します。各キーは、それぞれのプロバイダにだけ送られます。
     - keys.checkThenKeep: 保存すると、まず短いリクエストを1回送って{provider}で確認し、キー保管庫がこのブラウザに暗号化して保管します。
     - verb.close: ボードを画面から外す、または手紙を閉じる。何も失われません
-    - verb.duplicate: 自分のルームかテンプレートを複製し、複製をラボで開く (the Japanese still says room, collection or plan)
+    - verb.duplicate: 自分のルームかテンプレートを複製し、複製をラボで開く
     - verb.name: バーの対象に名前を付ける：ルーム、コレクション、チャット。名前を2つ指定すると、保存した配置の名前を変えます
-    - verb.strikethrough: 返答で選択した言葉に取り消し線を引く。その番号を undo: に付けると取り消せます (the Japanese lacks undo:)
-    - enter.help: Enterで、すべてのコマンドを表示します (the Japanese still says "that work here")
+    - verb.strikethrough: 返答で選択した言葉に取り消し線を引く。undo: とその番号で取り消せます
+    - enter.help: Enterで、すべてのコマンドを表示します
     - leader.help: すべてのコマンド、または1つのコマンドの使い方
-    - languagePicker.foot: the English gained a full stop; the Japanese should end with 。
-    - enter.popDisplay: the English now says display; the Japanese already does, so nothing changes.
-    - The privacy lines (settings.private2, settings.private2Head, settings.leaveApp, keys.promise) matter most: they still describe how keys were kept before the key vault.
+    - languagePicker.foot: 返答と検索はページの言語に従います。reply: で返答だけ別の言語にできます。
+    - enter.popDisplay: the English now says display; the Japanese already did, so it is unchanged.
+    - Least sure: welcome.letter.2. "Drinking from a fire hose" is kept as an image (消火ホースから水を飲むよう), which Japanese readers in tech know but others may find odd; 息つく暇もない is the plain Japanese idea. "Make the code accessible" became 身近なものにする (bring it close to people), reading accessible as approachable, not as accessibility.
+
+51. board.start, and room.home from 30 October
+    - en: Start / Go to Parliament's start
+    - ja: スタート / Parliamentの最初の画面へ
+    - The start card is named スタート, as a board name beside 記録 and ライブラリ. room.home, drafted before the card had a name, says 最初の画面; if it means the card, Parliamentのスタートへ would match.
+
+52. welcome.start.room, welcome.start.open, welcome.start.tour
+    - en: {command} and a question opens a room / {command} lists what you have made, and open: with its number opens one again / {command} brings the steps back
+    - ja: {command} と質問を入力すると、ルームが開きます / {command} で作ったものの一覧を表示し、open: と番号でもう一度開けます / {command} でステップを再び表示できます
+    - Written as the welcome steps' "How" lines are ({command} と質問を入力). The second is long for a card line; 作ったものの一覧。open: と番号で再び開けます is the shorter form.
