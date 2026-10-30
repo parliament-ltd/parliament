@@ -1222,7 +1222,8 @@ export const COPY = {
     settleSugRipple: /*i18n*/ { id: 'enter.settleSugRipple', message: 'Enter accepts {count, plural, one {Ripple’s suggestion} other {Ripple’s suggestions}} {nums}: each becomes an edit of yours in its branch, and goes with your next prompt there' },
     settleSugSweep: /*i18n*/ { id: 'enter.settleSugSweep', message: 'Enter accepts the {count, plural, one {sweep’s suggestion} other {sweep’s suggestions}} {nums}: the suggested words become the reply’s, and the struck ones go' },
     settleSugReject: /*i18n*/ { id: 'enter.settleSugReject', message: 'Enter turns down the {count, plural, one {suggestion} other {suggestions}} {nums}: the reply stays as it is' },
-    settleSugDone: /*i18n*/ { id: 'enter.settleSugDone', message: 'Suggestion {num} was {state} already', comment: '{state} is accepted or rejected' },
+    // A select, so each language words both states (30 October; the state came through in English).
+    settleSugDone: /*i18n*/ { id: 'enter.settleSugDone', message: '{state, select, accepted {Suggestion {num} was accepted already} other {Suggestion {num} was rejected already}}', comment: 'state is accepted or rejected' },
     undoSugUse: /*i18n*/ { id: 'enter.undoSugUse', message: 'A suggestion is settled with accept:{num} or reject:{num}', comment: 'Commands stay English' },
     deleteSugUse: /*i18n*/ { id: 'enter.deleteSugUse', message: 'A suggestion is turned down with reject:{num}, and kept as the record of it', comment: 'Commands stay English' },
     settleNotAsk: /*i18n*/ { id: 'enter.settleNotAsk', message: '{num} is not an ask or a suggestion. accept: and reject: settle the answer to an ask, or a suggestion', comment: 'Commands stay English' },

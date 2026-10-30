@@ -5101,7 +5101,7 @@ msgstr ""
 msgid "enter.settleReject"
 msgstr ""
 
-#. {state} is accepted or rejected
+#. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
 msgstr ""

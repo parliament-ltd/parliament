@@ -5101,10 +5101,10 @@ msgstr "{num} is not an ask or a suggestion. accept: and reject: settle the answ
 msgid "enter.settleReject"
 msgstr "Enter takes back the {count, plural, one {answer to ask} other {answers to asks}} {nums}, and the passage stays"
 
-#. {state} is accepted or rejected
+#. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
-msgstr "Suggestion {num} was {state} already"
+msgstr "{state, select, accepted {Suggestion {num} was accepted already} other {Suggestion {num} was rejected already}}"
 
 #. js-lingui-explicit-id
 msgid "enter.settleSugReject"
