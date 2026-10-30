@@ -182,3 +182,67 @@ Each: id, the English, the draft, and why I was unsure.
     Draft: …Det som har skickats försvinner för gott, efter ett andra tryck på Enter
     Why: "ett andra Enter" is how people say it, but which gender a key takes in Swedish is unsettled; "tryck på Enter" sidesteps it at the cost of three words.
 
+## Words added since, drafted 30 October 2026
+
+36. **enter.settleSugDone**
+    English: Suggestion {num} was {state} already
+    Draft: Förslag {num} är redan {state}
+    Why: {state} arrives as the code's own word (accepted, rejected), not through the copy table, so Swedish shows "Förslag 244 är redan accepted". It needs a select in the English ({state, select, accepted {…} other {…}}) or two entries; the translation cannot fix it.
+
+37. **markup · clean** (room.markupWord, room.cleanWord, collection.markupWord, collection.cleanWord, enter.markupOn and five others)
+    English: markup · clean; Enter shows replies marked up / clean
+    Draft: ändringar · renskrivet; Enter visar svaren med ändringarna / renskrivna
+    Why: Word's Swedish word for markup is "markering", which is taken by highlights. "ändringar" says what is shown, and "renskrivet" is the clean copy. This also settles doubt 7: the older verb.markup draft ("Visa svar med formatering, eller utan") reads wrong now, and should become "Visa svaren med ändringar, eller renskrivna". I left it, as an existing line.
+
+38. **"told once"** (enter.promptEditsGo, enter.promptTellGo, enter.promptSweepsGo, chat.toldNote)
+    English: With it, told once: 2 edits and 1 ask · Sonnet reads them
+    Draft: Följer med, en enda gång: 2 redigeringar och 1 fråga · Sonnet läser dem
+    Why: no Swedish phrase carries "told" as neatly. "meddelad" is used where the English says "told to {name}". "en gång" alone risks being read with "med" as "med en gång" (at once), so "en enda gång".
+
+39. **Possessives with counts** (enter.promptEditsOnly, enter.promptEditsWait, enter.promptEditsOnlyReader)
+    English: just your 2 edits and 1 ask, told to {name}
+    Draft: bara 2 redigeringar och 1 fråga meddelas till {name}
+    Why: Swedish "din" or "dina" must agree with the count, which the message splits across two plurals. I dropped "your" where there is no total to agree with. enter.promptEditsToReader has {total}, so it keeps "Din" or "Dina".
+
+40. **reflection.proposal**
+    English: A proposal
+    Draft: Ett förslag
+    Why: the natural word, but "förslag" is also a suggestion, and the same board counts "# förslag". "Ett uppslag" is taken by the picker's Reference ("Uppslag").
+
+41. **select → markera** (enter.askKeep, enter.strikeGo, verb.ask and others)
+    English: the words you selected in a reply
+    Draft: orden du markerade i ett svar
+    Why: "markera" is what Swedish editors call selecting text, and verb.strikethrough's draft already uses it. But a highlight is "markering". Where both meet, "välja" is the alternative for selecting.
+
+42. **enter.rippleMissed**
+    English: …could not be placed: its words were not found once, unmarked
+    Draft: …dess ord hittades inte exakt en gång, så inget markerades
+    Why: I read "not found once" as "not found exactly once" (the code places a suggestion only where its words occur once). If it means "not found at all", "exakt" should go.
+
+43. **The slots** (slot.left-rail, slot.right-rail, slot.right-rail-extra, slot.input-dock)
+    English: the left rail, the right rail, the lower right rail, the input dock
+    Draft: vänsterspalten, högerspalten, nedre högerspalten, inmatningsytan
+    Why: "rail" has no Swedish UI word; "spalt" is a side column, and the narrow room's buttons keep "kolumn". "dockan" would read as a doll, so the input dock is "inmatningsytan".
+
+44. **Room names the guide offers** (guide.o.essay, guide.o.thinking, guide.o.dataDesk)
+    English: Essay room, Thinking room, Data desk
+    Draft: Essärum, Tankerum, Datapulpet
+    Why: they become the room's name. "Datapulpet" follows the template "Skrivpulpet"; "Databord" would read as a data table.
+
+45. **enter.arrangeSaveName**
+    English: Name it: arrange:save "review desk"
+    Draft: Ge den ett namn: arrange:save "granskningsbord"
+    Why: a free example name, translated as the ruling says. "granska" is the sweep's verb elsewhere, but inside a name it should not mislead.
+
+46. **enter.rippleNothing**
+    English: Ripple carries edits to the other branches of a plan, and this chat has none yet
+    Draft: …och den här chatten har inga än
+    Why: "none" could be other branches or edits; the Swedish keeps the same ambiguity.
+
+47. **The state after a kept command word** (shell.calmOff, shell.focusOn, room.rippleOff and the rest)
+    English: calm: off, focus: on, ripple: off
+    Draft: calm: av, focus: på, ripple: av
+    Why: the comments keep only the command word English, and field.frameworkNone already reads "framework: inget". If these are meant as the typed form (calm:off), the state should stay English too.
+
+48. **Existing lines whose English has changed since they were drafted** (not touched in this pass)
+    Why: the brief was to fill only empty lines, so these still show the older meaning. Most noticeable: welcome.letter.1 to welcome.letter.4 (the old letter), welcome.signature ("So Lov", now "Stef"), welcome.steps ("Åtta saker att prova", now "Things to try"), welcome.step.pop (another screen, now its own window), the key vault lines (settings.private2, settings.private2Head, keys.promise, keys.checkThenKeep, settings.leaveApp, which now name keys.parliament.ltd), verb.duplicate, verb.close, verb.name, verb.strikethrough (its undo: is missing), enter.help and leader.help ("som fungerar här" is gone from the English), settings.aboutWhat, welcome.small. Smaller: enter.popDisplay, languagePicker.foot (a full stop), welcome.step.ask.
