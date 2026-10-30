@@ -119,3 +119,37 @@
 - costly run → 高額な実行; warn before → 前に警告
 - hard limits → 利用上限, the word keys.ownKey uses for a provider's spending limit; monthly limit → 月の上限
 - a chat on its own (not part of a plan of several) → 単独のチャット
+
+## Editing, the Lab and the rest (30 October 2026)
+
+The 658 lines added since 24 October, drafted for the Japanese beta.
+
+- Spacing: {said}, {where} and {value} hold what was typed, so they take the half-width spaces {word} takes ({said} というルームはありません). A placeholder inside a command is command text too (undo:{num} で取り消せます).
+- edit (a change made in place, a card) → 編集, counted 件 (編集#件); edit {num} → 編集{num}
+- ask (an instruction tied to words in a reply, ask:) → 依頼; the box it is written in, and its ASK label → 依頼欄, 依頼; asked of {name} → {name}に依頼. 質問 would say a question, and most asks are requests ("make it shorter"); 依頼 also keeps it apart from questions to sources.
+- drop (an ask still waiting) → 取り下げる
+- suggestion → 提案; accept → 受け入れる; reject, turn down → 却下する; accepted / rejected → 受け入れ済み / 却下済み; settle → 確定する
+- tell, told (edits and notes given to a model with a prompt) → 伝える; told once → 1回だけ伝える. A tell: note stays メモ, as verb.tell has it.
+- hold back (an edit) → 保留にする; held back → 保留中; let it go → 保留を解除, as the plan words have it
+- strike, struck → 取り消し線を引く, 取り消し線 (as compare.legend); the struck words → 取り消し線の言葉
+- markup / clean (the two ways a reply or the Collection shows edits) → 変更表示 / 清書; marked up → 変更表示. 清書 is the plain word for a clean copy. Note: the older verb.markup says 書式付き / 書式なし (with and without formatting), which reads markup as formatting; see the doubts.
+- Ripple → Ripple, kept as a name: the English writes it as a name (Ripple checks, Ripple's suggestion) and the command is ripple:. The older block "Ripple analysis" stays 波及分析.
+- sweep (a framework's pass over a reply, sweep:) → 照合; to sweep → 照合する, as verb.sweep's 照らし合わせる
+- the key store, the key vault → キー保管庫
+- slot (in a layout) → 枠, as verb.place; a layout's places → 場所; the rails → 左レール, 右レール, 右下のレール; the input dock → 入力ドック; the margin → 余白
+- Built for (a device) → 対象; built for a phone → スマートフォン向け; computer → コンピュータ
+- Sends to: anyone / this computer only → 送信先：制限なし / このコンピュータのみ
+- focus (focus:, a saved set of boards) → 集中表示, as the existing focus lines
+- calm (calm:) → 控えめ; calm the screen → 画面を控えめにする, as verb.calm
+- display (a physical screen, display 2) → ディスプレイ; screen (what is shown) → 画面; your screens → お使いのディスプレイ
+- in its own window here → ここで別ウインドウに
+- letter (from the maker of Parliament) → 手紙; letter {n} → 手紙{n}; not read yet → 未読
+- in beta → ベータ版; coming soon → 近日公開, as library.pillSoon
+- the guide (new:room guided) → ガイド
+- the Blocks board → ブロックボード, built as プランボード
+- synthesis → 総括, as verb.reflect; Prompts for reflection → 振り返りの問いかけ; a proposal → ひとつの案 (提案 is the suggestion)
+- review (the review bar) → レビュー
+- voice → 音声 (the feature 音声入力); listening → 聞き取り中; attach → 添付; web search → ウェブ検索
+- "{a} of {b}" for a position (1 of 3) → {a}/{b}
+- Example words in commands follow the 23 October ruling: names shown in Japanese are written in Japanese, since the commands match them (edit:"執筆スタジオ", layout:"3パネル", arrange:save "レビュー用デスク", tell:"1ページ以内にまとめて"). Typed words the code reads stay English: on, off, desktop, mobile, right, left, extra, middle, bottom, up, down, pushback, tried, set:input files on.
+- Toggle labels with a command word ("calm: on", "ripple: off", "focus: on") keep the command and translate the state: calm: オン, ripple: オフ, as field.frameworkNone has framework: なし.
