@@ -613,6 +613,15 @@
 .ch-letter .sig { margin-top: 12px; }
 
 
+/* The start card (30 October; C282): the birds in the middle, the bar under
+   them, and three lines on what to type, in the welcome card's serif. */
+.ch-sgrid { width: 100%; max-width: 520px; margin: auto; display: flex; flex-direction: column; align-items: stretch; }
+.ch-slogo { align-self: center; width: 56px; height: 48px; color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
+.ch-start .ch-wscroll { padding-inline-start: 28px; }
+.ch-shint { list-style: none; margin: 18px 0 0; padding: 0 2px; font: 400 13px/1.7 var(--ch-serif); color: var(--ch-ink-2); }
+.ch-shell .ch-shint .c { font: inherit; color: var(--ch-ink); text-decoration: underline; text-decoration-color: var(--ch-soft); text-underline-offset: 3px; }
+.ch-shell .ch-shint .c:hover { text-decoration-color: var(--ch-ink); }
+
 /* The field resting in the welcome card: no box, only a faint rule under it
    (welcome spec §2). It takes its fills in command and prompt mode. */
 .ch-dock.card { position: static; padding: 0; background: transparent; }
@@ -1132,8 +1141,12 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
    screen the one last tapped (.near). Never calmed: the field, the Enter
    line, the review bar's buttons, the count line and the strip. */
 
-/* A board's head: its title only. */
+/* A board's head: its title only. A room keeps its names, the chat's title
+   and the room's, and its markup switch while it holds edits (30 October):
+   what a room is called is not a detail, and the switch is how hidden
+   markup is found again. */
 .ch-shell.calm .ch-card:not(:hover):not(:focus-within):not(.near) > .ch-chead > :not(h2) { visibility: hidden; }
+.ch-shell.calm .ch-card.room:not(:hover):not(:focus-within):not(.near) > .ch-chead > :is(.ch-aside, .ch-col-markup) { visibility: visible; }
 
 /* A reply as it stands (as markup:off reads it); near, the markup. It stays
    editable. A reply with something marked keeps a rule at its edge, as

@@ -3,8 +3,8 @@
 //
 // The language comes from the browser's own list of the languages its user
 // reads, never from the network address (C89). Only languages Parliament
-// ships are offered; today that is English, so everyone gets English until the
-// first translations ship (C87). In development a test language can be
+// ships are offered: English, and since 30 October Chinese, Japanese, Swedish
+// and Finnish in beta (C87; C282). In development a test language can be
 // chosen with ?lang=en-XA (accented, longer) or ?lang=ar-XB (right to left).
 //
 // Choosing a language with `language:` or the globe (ruled 16 October;
@@ -18,27 +18,30 @@ export { i18n }
 
 export const SOURCE_LANGUAGE = 'en'
 // Languages offered to people, by their own names when there is more than one.
-export const SHIPPED_LANGUAGES = ['en']
+export const SHIPPED_LANGUAGES = ['en', 'zh-Hans', 'ja', 'sv', 'fi']
+// Shipped in beta (30 October; C282): offered, and marked "in beta" until
+// they have been read through.
+export const BETA_LANGUAGES = ['zh-Hans', 'ja', 'sv', 'fi']
+// Listed in the picker as coming soon, and not offered yet (30 October).
+export const COMING_LANGUAGES = ['es']
 // Generated for testing on every compile; offered only in development.
 export const TEST_LANGUAGES = ['en-XA', 'ar-XB']
 // Drafted for Stefan's review (C87; C184): offered in development only, and
 // marked as drafts, until he has read them. Shipping one moves it to
 // SHIPPED_LANGUAGES, and the page then opts out of the browser's own
 // translation (C84).
-export const DRAFT_LANGUAGES = ['ja', 'zh-Hans', 'sv', 'fi']
+// None now: the four drafted on 23 October ship in beta.
+export const DRAFT_LANGUAGES = []
 
 const DEV = Boolean(import.meta.env.DEV)
 const LOADERS = {
   'en-XA': () => import('./locales/en-XA/messages.mjs'),
   'ar-XB': () => import('./locales/ar-XB/messages.mjs'),
-  // import.meta.env.DEV as written, so the build leaves the drafts out of
-  // production entirely.
-  ...(import.meta.env.DEV ? {
-    ja: () => import('./locales/ja/messages.mjs'),
-    'zh-Hans': () => import('./locales/zh-Hans/messages.mjs'),
-    sv: () => import('./locales/sv/messages.mjs'),
-    fi: () => import('./locales/fi/messages.mjs'),
-  } : {}),
+  // Shipped in beta (30 October): each loaded only when chosen.
+  'zh-Hans': () => import('./locales/zh-Hans/messages.mjs'),
+  ja: () => import('./locales/ja/messages.mjs'),
+  sv: () => import('./locales/sv/messages.mjs'),
+  fi: () => import('./locales/fi/messages.mjs'),
 }
 
 /** The languages the picker offers: those shipped, and in development the drafts. */
@@ -48,6 +51,15 @@ export function offeredLanguages(dev = DEV) {
 
 /** Whether a language is offered only as a draft. */
 export const isDraft = (tag) => DRAFT_LANGUAGES.includes(tag) && !SHIPPED_LANGUAGES.includes(tag)
+
+/** Whether a shipped language is still in beta. */
+export const isBeta = (tag) => BETA_LANGUAGES.includes(tag) && SHIPPED_LANGUAGES.includes(tag)
+
+/** The picker's rows: every language offered, then those coming soon. */
+export const languageRows = (dev = DEV) => [
+  ...offeredLanguages(dev).map((tag) => ({ tag, draft: isDraft(tag), beta: isBeta(tag), coming: false })),
+  ...COMING_LANGUAGES.filter((tag) => !offeredLanguages(dev).includes(tag)).map((tag) => ({ tag, draft: false, beta: false, coming: true })),
+]
 
 // Catalogues loaded so far, for the Enter line of `language:`, which speaks
 // the language chosen before it is chosen (ruled 16 October).

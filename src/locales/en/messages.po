@@ -769,6 +769,11 @@ msgstr "Rooms"
 msgid "board.settings"
 msgstr "Settings"
 
+#. The card with the bar, shown before anything is open
+#. js-lingui-explicit-id
+msgid "board.start"
+msgstr "Start"
+
 #. js-lingui-explicit-id
 msgid "board.welcome"
 msgstr "Welcome page"
@@ -2350,11 +2355,6 @@ msgstr "Enter closes the room showing {num}. Nothing is lost"
 #. js-lingui-explicit-id
 msgid "enter.closeWelcome"
 msgstr "Enter closes the welcome page. tour: brings it back"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.closeWelcomeAlone"
-msgstr "Enter closes the welcome page and opens a room in its place. tour: brings it back"
 
 #. js-lingui-explicit-id
 msgid "enter.collectionAdd"
@@ -9389,6 +9389,21 @@ msgstr "Stef"
 #. js-lingui-explicit-id
 msgid "welcome.small"
 msgstr "Built for computer, phone later"
+
+#. {command} is open:records, which stays English, as does open:
+#. js-lingui-explicit-id
+msgid "welcome.start.open"
+msgstr "{command} lists what you have made, and open: with its number opens one again"
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.room"
+msgstr "{command} and a question opens a room"
+
+#. {command} is tour:, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.tour"
+msgstr "{command} brings the steps back"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

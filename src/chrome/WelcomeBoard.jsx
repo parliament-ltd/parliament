@@ -51,7 +51,7 @@ function withCommand(i18n, descriptor, command, onWrite) {
   return (
     <>
       {before}
-      <button type="button" className="c" dir="ltr" onClick={() => onWrite(`>${command}`)}>{command}</button>
+      <button type="button" className="c" dir="ltr" onClick={() => onWrite(command.endsWith('>') ? command : `>${command}`)}>{command}</button>
       {after}
     </>
   )
@@ -117,6 +117,40 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               </p>
             </div>
           )}
+        </div>
+      </div>
+    </article>
+  )
+}
+
+/**
+ * The start card (30 October; C282): when the welcome page closes with
+ * nothing else open, the birds in the middle of the screen with the bar
+ * under them, and how to open a room. Each command is a link that writes it
+ * in the bar; nothing is opened for the person. It gives way to the first
+ * board opened.
+ * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void,
+ *   barSlot: (el: HTMLElement|null) => void, languages?: { now: string }|null, onLanguage?: () => void }} props
+ */
+export function StartBoard({ addressed, onAddress, onWrite, barSlot, languages = null, onLanguage }) {
+  const { i18n } = useLingui()
+  return (
+    <article
+      className={`ch-card ch-welcome ch-start${addressed ? ' addressed' : ''}`}
+      aria-current={addressed ? 'true' : undefined}
+      aria-label={i18n._(COPY.boards.start)}
+      onMouseDown={() => onAddress('start')}
+    >
+      {languages && <div className="ch-wlang"><Globe now={languages.now} onOpen={onLanguage} /></div>}
+      <div className="ch-wscroll">
+        <div className="ch-sgrid">
+          <BirdsMark className="ch-slogo" />
+          <div className="ch-wbar" ref={barSlot} />
+          <ul className="ch-shint">
+            <li>{withCommand(i18n, COPY.welcome.startRoom, 'p>', onWrite)}</li>
+            <li>{withCommand(i18n, COPY.welcome.startOpen, 'open:records', onWrite)}</li>
+            <li>{withCommand(i18n, COPY.welcome.startTour, 'tour:', onWrite)}</li>
+          </ul>
         </div>
       </div>
     </article>

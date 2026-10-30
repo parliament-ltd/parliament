@@ -12,8 +12,9 @@ import { footOf } from './menus'
 // cannot read the page can still pick theirs, and undo: has it.
 
 /**
- * @param {{ items: Array<{ tag: string, draft: boolean }>, now: string, onPick: (tag: string) => void, onClose?: () => void }} props
- *   now: the page's language
+ * @param {{ items: Array<{ tag: string, draft: boolean, beta?: boolean, coming?: boolean }>, now: string, onPick: (tag: string) => void, onClose?: () => void }} props
+ *   now: the page's language. beta: shipped, still being worked on;
+ *   coming: listed, not offered yet, so its row does nothing (C282).
  */
 export default function LanguagePicker({ items, now, onPick, onClose = null }) {
   const { i18n } = useLingui()
@@ -28,11 +29,12 @@ export default function LanguagePicker({ items, now, onPick, onClose = null }) {
         <MenuGroup>
           {items.map((l, i) => {
             const here = nameOf(l.tag, i18n.locale)
-            const own = ownNameOf(l.tag)
+            // A menu of languages starts each name with a capital, as pickers do: Svenska, Español.
+            const own = ((n) => n.charAt(0).toLocaleUpperCase(l.tag) + n.slice(1))(ownNameOf(l.tag))
             return (
-              <MenuRow key={l.tag} on={l.tag === now} mark={i + 1} label={own} lang={l.tag} onClick={() => onPick(l.tag)}>
+              <MenuRow key={l.tag} on={l.tag === now} mark={l.coming ? '' : i + 1} later={Boolean(l.coming)} label={own} lang={l.tag} onClick={() => { if (!l.coming) onPick(l.tag) }}>
                 {here !== own && here}
-                <MenuFacts items={[l.draft && i18n._(COPY.languagePicker.draft)]} />
+                <MenuFacts items={[l.draft && i18n._(COPY.languagePicker.draft), l.beta && i18n._(COPY.languagePicker.beta), l.coming && i18n._(COPY.languagePicker.coming)]} />
               </MenuRow>
             )
           })}

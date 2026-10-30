@@ -866,11 +866,14 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(at('>close:tour', both).next.columns.flat()).not.toContain('welcome')
   })
 
-  it('closes the welcome page alone into a room, and close:room the room here (30 October)', () => {
+  it('closes the welcome page alone to the start card, and close:room the room here (C282)', () => {
     for (const v of ['>close:welcome', '>close:tour']) {
       const p = at(v, shipped('welcome'))
-      expect(p.text).toBe('Enter closes the welcome page and opens a room in its place. tour: brings it back')
-      expect(p.next.columns).toEqual([['room']])
+      expect(p.text).toBe('Enter closes the welcome page. tour: brings it back')
+      expect(p.next.columns).toEqual([['start']])
+      // tour: from the start card brings the welcome page back in its place.
+      expect(at('>tour:', p.next).next.columns).toEqual([['welcome']])
+      // A prompt from it opens a room, and the start card gives way.
     }
     expect(at('>close:room', shipped(SPACE)).text).toBe('No room is open')
     expect(at('>close:room', room).text).toBe('Enter closes this room. Nothing is lost')

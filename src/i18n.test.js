@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import { VERBS } from './commands/verbs'
 import { setupI18n } from '@lingui/core'
-import { pickLanguage, directionOf, offeredLanguages, isDraft, languageFor, optOutOfPageTranslation, DRAFT_LANGUAGES, SHIPPED_LANGUAGES } from './i18n'
+import { pickLanguage, directionOf, offeredLanguages, isDraft, isBeta, languageRows, languageFor, optOutOfPageTranslation, DRAFT_LANGUAGES, SHIPPED_LANGUAGES } from './i18n'
 import { COPY } from './copy'
 import { messages as en } from './locales/en/messages.mjs'
 import { messages as accented } from './locales/en-XA/messages.mjs'
@@ -62,13 +62,17 @@ describe('the compiled catalogues', () => {
 })
 
 describe('the languages offered (C184)', () => {
-  it('are English, and in development the drafts, marked as such', () => {
-    expect(SHIPPED_LANGUAGES).toEqual(['en'])
-    expect(offeredLanguages(false)).toEqual(['en'])
-    expect(offeredLanguages(true)).toEqual(['en', ...DRAFT_LANGUAGES])
-    expect(DRAFT_LANGUAGES).toEqual(['ja', 'zh-Hans', 'sv', 'fi'])
-    expect(isDraft('sv')).toBe(true)
-    expect(isDraft('en')).toBe(false)
+  it('are English, then Chinese, Japanese, Swedish and Finnish in beta, with Spanish coming soon (C282)', () => {
+    expect(SHIPPED_LANGUAGES).toEqual(['en', 'zh-Hans', 'ja', 'sv', 'fi'])
+    expect(offeredLanguages(false)).toEqual(SHIPPED_LANGUAGES)
+    expect(DRAFT_LANGUAGES).toEqual([])
+    expect(isDraft('sv')).toBe(false)
+    expect(isBeta('sv')).toBe(true)
+    expect(isBeta('en')).toBe(false)
+    const rows = languageRows(false)
+    expect(rows.map((r) => r.tag)).toEqual([...SHIPPED_LANGUAGES, 'es'])
+    expect(rows.find((r) => r.tag === 'ja')).toMatchObject({ beta: true, coming: false })
+    expect(rows.at(-1)).toMatchObject({ tag: 'es', coming: true, beta: false })
   })
 
   it('give the page the language chosen, while it is offered', () => {

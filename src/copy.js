@@ -36,6 +36,8 @@ export const COPY = {
     blocks: /*i18n*/ { id: 'board.blocks', message: 'Blocks', comment: 'The pieces a room is built from, beside the Canvas in the Lab' },
     room: /*i18n*/ { id: 'board.room', message: 'Rooms', comment: 'Every room, in a list of where a command works' },
     // One room named in a sentence, as the strip names it (30 October).
+    // The start card, before anything is open (C282); read by screen readers.
+    start: /*i18n*/ { id: 'board.start', message: 'Start', comment: 'The card with the bar, shown before anything is open' },
     oneRoom: /*i18n*/ { id: 'board.oneRoom', message: 'Room', comment: 'One room, as a board in a sentence: Enter moves Room to the left' },
     welcome: /*i18n*/ { id: 'board.welcome', message: 'Welcome page' },
     commands: /*i18n*/ { id: 'board.commands', message: 'Command menu', comment: 'Every command, as a board to keep open or pop out (open:commandmenu)' },
@@ -124,8 +126,6 @@ export const COPY = {
     widthEvenAlready: /*i18n*/ { id: 'enter.widthEvenAlready', message: 'Every board has its usual width already' },
     closeNoRoom: /*i18n*/ { id: 'enter.closeNoRoom', message: 'No room is open' },
     closeWelcome: /*i18n*/ { id: 'enter.closeWelcome', message: 'Enter closes the welcome page. tour: brings it back' },
-    // The welcome page alone on screen: a room opens in its place (30 October).
-    closeWelcomeAlone: /*i18n*/ { id: 'enter.closeWelcomeAlone', message: 'Enter closes the welcome page and opens a room in its place. tour: brings it back', comment: 'Commands stay English' },
     moveIsPopped: /*i18n*/ { id: 'enter.moveIsPopped', message: '{board} is in its own window. pop:back brings it back first' },
     moveThere: /*i18n*/ {
       id: 'enter.moveThere',
@@ -1758,6 +1758,10 @@ export const COPY = {
     closing: /*i18n*/ { id: 'welcome.closing', message: 'All the best,', comment: 'The line before the name that signs the letter' },
     signature: /*i18n*/ { id: 'welcome.signature', message: 'Stef', comment: 'The name the letter is signed with, under the closing line' },
     // The ending (W §7): the letter gives way to one line. {command} is focus:, drawn as a link that writes it in the bar.
+    // The start card, when the welcome page closes with nothing else open (30 October; C282).
+    startRoom: /*i18n*/ { id: 'welcome.start.room', message: '{command} and a question opens a room', comment: '{command} is p>, which stays English' },
+    startOpen: /*i18n*/ { id: 'welcome.start.open', message: '{command} lists what you have made, and open: with its number opens one again', comment: '{command} is open:records, which stays English, as does open:' },
+    startTour: /*i18n*/ { id: 'welcome.start.tour', message: '{command} brings the steps back', comment: '{command} is tour:, which stays English' },
     now: /*i18n*/ { id: 'welcome.now', message: 'Now, let’s {command}', comment: '{command} is focus:, which stays English' },
     // On narrow or touch-only screens only (W §12.4).
     // In the page's foot with the other marginalia, on every screen (29 October).

@@ -769,6 +769,11 @@ msgstr ""
 msgid "board.settings"
 msgstr ""
 
+#. The card with the bar, shown before anything is open
+#. js-lingui-explicit-id
+msgid "board.start"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "board.welcome"
 msgstr ""
@@ -2349,11 +2354,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.closeWelcome"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.closeWelcomeAlone"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9388,6 +9388,21 @@ msgstr ""
 #. In the foot of the welcome page, beside "Created with Claude Code"
 #. js-lingui-explicit-id
 msgid "welcome.small"
+msgstr ""
+
+#. {command} is open:records, which stays English, as does open:
+#. js-lingui-explicit-id
+msgid "welcome.start.open"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.room"
+msgstr ""
+
+#. {command} is tour:, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.tour"
 msgstr ""
 
 #. js-lingui-explicit-id

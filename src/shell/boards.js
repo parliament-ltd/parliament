@@ -38,6 +38,10 @@ export const BOARDS = Object.freeze({
   // The welcome page's card: not a board in the documents, but it sits in
   // the space like one. tour: brings it, close: takes it away (C125).
   welcome: { title: null, resting: 'search', can: [], closable: true, strip: null },
+  // The start card: the birds, the bar and how to open a room, when the
+  // welcome page closes with nothing else open (30 October; C282). It gives
+  // way to the first board opened.
+  start: { title: null, resting: 'search', can: [], closable: true, strip: null },
 })
 
 /**

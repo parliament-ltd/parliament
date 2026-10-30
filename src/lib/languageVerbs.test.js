@@ -40,6 +40,19 @@ describe('reply: (C166 (a))', () => {
   })
 })
 
+describe('language: in beta, and coming soon (C282)', () => {
+  const screens = { language: { offered: [{ tag: 'en' }, { tag: 'sv', beta: true }], coming: ['es'], chosen: null, locale: 'en', reply: null, browserTag: 'en' } }
+
+  it('says a language in beta is still being worked on, and that Spanish is coming soon', () => {
+    const sv = line('>language:sv', screens)
+    expect(sv.next ?? sv.act).toBeTruthy()
+    expect(sv.also).toContain('This translation is in beta: some words may still read oddly')
+    const es = line('>language:es', screens)
+    expect(es.act ?? null).toBeNull()
+    expect(es.text).toBe('Spanish is coming soon. language: takes English or svenska')
+  })
+})
+
 describe('helper: (C166 (d))', () => {
   const rows = {
     model: [

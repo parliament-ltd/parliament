@@ -63,7 +63,8 @@ function offeredFor(tag, offered) {
  * [{ tag, draft }], chosen, locale, reply, browserTag }: the languages the
  * picker offers, the setting (a tag, or null to follow the browser), the
  * page's language now, the reply setting as stored, and the language
- * following the browser gives.
+ * following the browser gives. offered rows may say beta (C282);
+ * coming: the languages listed as coming soon, not offered yet.
  */
 export function planLanguage(step, screens = {}) {
   const l = screens.language
@@ -80,6 +81,7 @@ export function planLanguage(step, screens = {}) {
   const also = (tag) => [
     ...(endsReply ? [{ message: 'languageEndsReply' }] : []),
     ...(l.offered.find((o) => o.tag === tag)?.draft ? [{ message: 'languageDraft' }] : []),
+    ...(l.offered.find((o) => o.tag === tag)?.beta ? [{ message: 'languageBeta' }] : []),
   ]
   if (word.toLocaleLowerCase() === 'browser') {
     if (before.interfaceLanguage == null && !endsReply) return { says: { message: 'languageBrowserSame' }, act: null }
@@ -93,6 +95,7 @@ export function planLanguage(step, screens = {}) {
   const tag = asked ? offeredFor(asked, offered) : null
   if (!tag) {
     if (!asked) return { says: { message: 'languageNone', values: { word } }, act: null }
+    if ((l.coming ?? []).some((t) => t.split('-')[0] === asked.split('-')[0])) return { says: { message: 'languageComing', values: { language: nameOf(asked, l.locale), names: offered.map(ownNameOf) } }, act: null }
     return { says: { message: 'languageNotYet', values: { language: nameOf(asked, l.locale), names: offered.map(ownNameOf) } }, act: null }
   }
   if (before.interfaceLanguage === tag && !endsReply) return { says: { message: 'languageSame', values: { language: ownNameOf(tag) } }, act: null }

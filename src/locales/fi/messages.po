@@ -769,6 +769,11 @@ msgstr "Huoneet"
 msgid "board.settings"
 msgstr "Asetukset"
 
+#. The card with the bar, shown before anything is open
+#. js-lingui-explicit-id
+msgid "board.start"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "board.welcome"
 msgstr "Tervetulosivu"
@@ -2350,11 +2355,6 @@ msgstr "Enter sulkee huoneen, jossa näkyy {num}. Mitään ei menetetä"
 #. js-lingui-explicit-id
 msgid "enter.closeWelcome"
 msgstr "Enter sulkee tervetulosivun. tour: tuo sen takaisin"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.closeWelcomeAlone"
-msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.collectionAdd"
@@ -9389,6 +9389,21 @@ msgstr "So Lov"
 #. js-lingui-explicit-id
 msgid "welcome.small"
 msgstr "tehty toistaiseksi tietokoneelle; puhelin tulee myöhemmin"
+
+#. {command} is open:records, which stays English, as does open:
+#. js-lingui-explicit-id
+msgid "welcome.start.open"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.room"
+msgstr ""
+
+#. {command} is tour:, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.tour"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

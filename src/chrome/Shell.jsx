@@ -10,7 +10,7 @@ import { openSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arran
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
+import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -50,7 +50,7 @@ import Board from './Board'
 import { boardName, roomLabel, andList } from './say'
 import RoomBoard from './RoomBoard'
 import PlanBoard from './PlanBoard'
-import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
+import WelcomeBoard, { WelcomeFoot, StartBoard } from './WelcomeBoard'
 import Intro from './Intro'
 import { showIntro } from './firstLoad'
 import AlmanacBoard from './AlmanacBoard'
@@ -63,7 +63,7 @@ import { backupReminderState, getBackupStatus, dismissBackupBanner, getBackupLog
 import SettingsBoard from './SettingsBoard'
 import { parseBackupFile, BACKUP_VERSION } from '../lib/backup'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { offeredLanguages, isDraft, startingLanguage } from '../i18n'
+import { offeredLanguages, isDraft, isBeta, languageRows, COMING_LANGUAGES, startingLanguage } from '../i18n'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
@@ -2525,7 +2525,7 @@ export default function Shell() {
     reply: { setting: settings.replyLanguage ?? null, now: reply, locale: i18n.locale, nameOf: languageName },
     // language: (C184): what the picker offers, the choice, and what
     // following the browser gives.
-    language: { offered: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), chosen: settings.interfaceLanguage ?? null, locale: i18n.locale, reply: settings.replyLanguage ?? null, browserTag: startingLanguage() },
+    language: { offered: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag), beta: isBeta(tag) })), coming: COMING_LANGUAGES, chosen: settings.interfaceLanguage ?? null, locale: i18n.locale, reply: settings.replyLanguage ?? null, browserTag: startingLanguage() },
     helping: { now: helperNow, rows: answerRows, stored: settings.helper ?? null },
     translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName, privacy: settings.privacyFilter ?? 'off' },
     privacy: { mode: settings.privacyFilter ?? 'off', local: localChecker?.name ?? null },
@@ -3022,6 +3022,15 @@ export default function Shell() {
   const roomAsks = useChatEdits(roomId ? [roomId] : [], 'asks')
   // Suggestions in the room's chat: its accepted sweeps go with the next prompt (C233 (a)).
   const roomSweeps = useChatEdits(roomId ? [roomId] : [], 'suggestions')
+  // The chats of every room on screen or in a window, and which hold markup
+  // (edits, asks or suggestions): a room shows markup · clean once it does
+  // (30 October).
+  const roomChats = useMemo(() => [...arrangement.columns.flat(), ...(arrangement.popped ?? []).map((p) => p.board)]
+    .filter(isRoom).map((b) => chatIn(arrangement, b)).filter(Boolean), [arrangement])
+  const roomsEdits = useChatEdits(roomChats)
+  const roomsAsks = useChatEdits(roomChats, 'asks')
+  const roomsSweeps = useChatEdits(roomChats, 'suggestions')
+  const holdsMarkup = useCallback((chat) => Boolean(chat) && [roomsEdits, roomsAsks, roomsSweeps].some((m) => (m.get(chat) ?? []).length > 0), [roomsEdits, roomsAsks, roomsSweeps])
   // The room's edits by number, for hold: (C216 (f)).
   const heldEdits = useMemo(() => ({
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
@@ -3795,7 +3804,14 @@ export default function Shell() {
   // and the page itself while the bar is in a window of its own.
   const boardDocs = useMemo(() => Object.entries(windows).filter(([key, h]) => key !== BAR && h?.win).map(([, h]) => h.win.document), [windows])
   const otherDocs = useMemo(() => (barWindow ? [document, ...boardDocs] : boardDocs), [barWindow, boardDocs])
-  const onWelcome = arrangement.columns.some((c) => c.includes('welcome'))
+  // The welcome page, or the start card that takes its place (C282): either
+  // lays the screen out as the welcome page does, the bar in the card.
+  const welcomeOpen = arrangement.columns.some((c) => c.includes('welcome'))
+  const onWelcome = welcomeOpen || arrangement.columns.some((c) => c.includes(START))
+  // The strip shows whenever a board is open beside the welcome page, so
+  // what is open, and calm's switch, can always be seen (30 October). The
+  // welcome page alone has nothing for it to name.
+  const welcomeAlone = onWelcome && arrangement.columns.flat().length === 1 && !(arrangement.popped ?? []).length
   const shares = useMemo(() => columnShares(arrangement), [arrangement])
   const shareTotal = shares.reduce((sum, x) => sum + x, 0) || 1
   // What stands beside an edge, named in a sentence.
@@ -3833,7 +3849,7 @@ export default function Shell() {
       context: { ...arrangement.context, room: roomRecord?.num ?? undefined, collection: found ? collectionLabel(found) : undefined },
     }
   }, [arrangement, roomRecord, collections, collectionLabel])
-  const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
+  const welcomeHint = useMemo(() => (welcomeOpen && !welcome.finished ? { next: nextStep(welcome) } : null), [welcomeOpen, welcome])
   const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch, library: librarySearch }
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
   // Features of input, from the field's marginalia (C248).
@@ -3847,7 +3863,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={chat ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} alone={windowed || onlyBoard} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} alone={windowed || onlyBoard} />
     }
     if (board === 'almanac') {
       return (
@@ -3879,6 +3895,9 @@ export default function Shell() {
           query={librarySearch} onCount={setLibraryCount}
           lab={arrangement.lab ? { inLab: true, room: labRoomId && labRoom?.mode ? labRoom : null } : null} />
       )
+    }
+    if (board === START) {
+      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
@@ -3957,7 +3976,7 @@ export default function Shell() {
   return (
     <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
-      {(!onWelcome || (size === 'phone' && arrangement.columns.flat().length > 1)) && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} />}
+      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
@@ -3972,7 +3991,7 @@ export default function Shell() {
             : picking && stepPick ? { rows: answerRows, now: stepPick.model ? stepWho : null, picked: null, reference: referenceName, forStep: { ...stepPick, branchName: stepBranchWho?.name ?? null } }
             : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onSwitchAnswerer={switchAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
-          languagePicker={langPicking ? { items: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
+          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

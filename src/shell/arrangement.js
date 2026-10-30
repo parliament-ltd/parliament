@@ -36,6 +36,8 @@ export { isRoom }
 // the Almanac. The arrangements here say which boards each brings, until
 // their owner edits them (the Lab, stage 13).
 export const SPACE = 'space'
+// The start card's board (C282).
+export const START = 'start'
 export const SHIPPED = Object.freeze({
   space: { columns: [['almanac'], ['collection']], addressed: 'almanac', bar: 'top', resting: null },
   almanac: { columns: [['almanac'], ['collection']], addressed: 'almanac', bar: 'top', resting: null },
@@ -101,6 +103,11 @@ function freeRoom(a) {
  * it pointed at last, and a room no longer here is forgotten.
  */
 export function settle(a) {
+  // The start card is there only while nothing else is open (C282).
+  if (a.columns.some((c) => c.includes(START)) && a.columns.flat().length > 1) {
+    const columns = a.columns.map((c) => c.filter((b) => b !== START)).filter((c) => c.length)
+    return settle({ ...a, columns, addressed: a.addressed === START ? columns[0][0] : a.addressed })
+  }
   const rooms = roomsIn(a)
   const last = isRoom(a.addressed) ? a.addressed : rooms.includes(a.lastRoom) ? a.lastRoom : null
   if ((a.lastRoom ?? null) === last) return a
@@ -174,6 +181,8 @@ function readdress(a, gone, oldColumn) {
 // welcome card they stack in one column, on the right of the card and the
 // chat (welcome spec §5).
 function place(next, board) {
+  // The start card gives way to the first board opened (C282).
+  next.columns = next.columns.filter((c) => !c.includes(START))
   if (board === 'welcome') { next.columns.unshift([board]); return }
   const withWelcome = next.columns.some((c) => c.includes('welcome'))
   // Another room goes beside the room the prompt goes to (C175 (a)).
@@ -292,16 +301,10 @@ export function planClose(a, board = a.addressed) {
   if (!isOnPage(a, board) && !isPopped(a, board)) return refuse(isRoom(board) ? 'closeNoRoom' : 'closeNotHere', { board })
   if (entry && !entry.closable) return refuse('closeFixed', { board })
   if (isOnPage(a, board) && onPage(a).length === 1) {
-    // The welcome page alone, as on a first start: a room takes its place,
-    // ready for a prompt, rather than the page staying (30 October).
-    if (board === 'welcome') {
-      const next = copy(a)
-      const room = freeRoom(a)
-      next.columns = [[room]]
-      delete next.context[room]
-      next.addressed = room
-      return go2(next, 'closeWelcomeAlone', { board })
-    }
+    // The welcome page alone, as on a first start: the start card takes its
+    // place, the birds and the bar with how to open a room, and nothing is
+    // opened for the person (30 October; C282).
+    if (board === 'welcome') return go2({ ...copy(a), columns: [[START]], addressed: START }, 'closeWelcome', { board })
     return refuse('closeLast', { board })
   }
   const oldColumn = columnOf(a, board)
