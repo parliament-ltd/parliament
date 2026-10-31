@@ -4527,6 +4527,30 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **Small, not fixed:** where a send is slow (about 15 seconds in the test browser, where the key vault cannot be reached), a second Enter sends the prompt again.
   - Still open from C281: Settings' model with no key while another provider has one (C150); a key to write the held words out in the field; the line under the cards that stays. On joined words sent to a source: kept as they are, "never send back".
 
+**C283. Windows that hold several boards, and small fixes after 0.8.0** (31 October; **ruled by Stefan, 31 October: "I agree with the lean"**, with the example in the command menu; changes C259 (e) where a window on a display is joined, and C280's "a popped window comes back when closed"). **Built on `claude/after-0.8`, not released.**
+- **Ruled and built:**
+  - **One window for several boards.** "The whole point of arrangements is to be able to leverage multiple monitors ... they will want to have 3 screens." A window of its own can now hold several boards side by side, so one screen is one window:
+    - `pop:records 202 collection` opens them together in one window, in the order named; `display 2` at the end sends it to that screen. A chat no room shows (`pop:206`) opens in a room of its own in the window. The page always keeps one board.
+    - `pop:library display 2` with a window on display 2 already puts the Library into it, rather than opening another.
+    - `beside`, a word inside `pop:` and `move:`: `pop:library beside records` puts the Library into whichever window Records is in, right after it; beside a board on the page, it takes the column after it. It needs no window numbers and works in every browser.
+    - `move:library display 3` moves a board to another screen: into the window there, or, alone in its window, the window goes. `move:`, `swap:` and `pop:back` work on the boards of a window as on the page; `pop:left` and `pop:right` place the whole window.
+    - A window placed on a screen fills it. A window not placed opens at the size its boards had on the page.
+    - Each window has a "full screen" mark in its corner. A browser lets a page go full screen only from a click in that page, so the bar cannot do it from another window; F11 does the same.
+    - **Closing a window closes its boards** ("it shouldn't join the main page again, it should be closed"). Nothing in them is lost; `open:` or `pop:` brings each again. The bar's own window still brings the bar back, since there is always one bar.
+    - The window's title names its boards and follows them. The screens map draws each window as one box with its boards in it.
+    - The command menu lists `pop:records 202 collection display 2`, `pop:library beside records`, `move:library display 3` and `move:202 beside library`.
+    - **Stored data:** each popped board gains an optional window number. An arrangement or backup kept before this reads as one board per window, as it opened then; nothing is converted, and no schema changes.
+    - `width:` inside a window is not built: a window's boards share it evenly.
+  - **The languages menu from the globe** opens right under the globe, kept on screen; Escape or the globe closes it. Typed, `language:` still opens it under the field.
+  - **Panels above a bottom bar.** "When the bar is on bottom ... the api menu opens and moves the bar up." The key panel, backups, `inspect:`, `compare:` and the letter open above the field when the bar is at the bottom, as the menus do; the bar stays where it is.
+  - **Step 5 names the room by its number.** From the welcome page the bar points at the page, so `name:"…"` had nothing to name ("name: is not built yet"). The step now reads `name:202 "…", the room’s number then its name`, with the number of the room on screen, and crosses off when a chat is named that way. A chat renamed by number shows its new title in its room at once (it did only after a reload).
+  - **A highlight starts a collection.** "Highlighting didn't start a collection either." A highlight made with no collection yet starts one holding its chat, so the highlight is in the Collection. Nothing opens: the strip names the new collection. With a collection already, nothing changes; the Collection offers `add:` for the chat.
+  - **Fixed:** a second room was named "room-2" on the Enter line (a pattern lost a character in 0.8.0); it reads "Room".
+  - The new lines are in all four languages. Tests: 1,446. Lint: 30 warnings, all older. Both builds pass. Windows were tried in a separate Chrome, since the app's own browser blocks pop-ups: two boards popped together, a third put beside, reordered, swapped, one sent back, the title following, and the window closed with its boards.
+- **For you:**
+  - **What a highlight is called** (C282): still "keyword" in Records and the Collection.
+  - Still open from C281 and C282: Settings' model with no key while another provider has one (C150); a second Enter on a slow send sends twice; removing the unused copy and the old step 9's check, each on your yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
