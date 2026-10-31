@@ -216,6 +216,9 @@ export function AnnotationsProvider({ children, conversationId = null }) {
         color,
       })
       setHighlights(prev => [...prev, rec])
+      // The shell starts a collection with this chat when there is none yet
+      // (31 October; C283). An id only, never the words.
+      window.dispatchEvent(new CustomEvent('parliament-highlighted', { detail: { chatId: activeConversationId } }))
     } catch { /* tolerate */ }
   }, [activeConversationId])
 

@@ -866,6 +866,27 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(at('>close:tour', both).next.columns.flat()).not.toContain('welcome')
   })
 
+  it('pops several boards into one window, rooms by their number, display and beside (C283)', () => {
+    const many = at('>pop:records 204 display 2')
+    expect(many.text).toBe('Enter opens Records and 204 together in a window on display 2')
+    expect(many.next.popped.map((x) => [x.board, x.display])).toEqual([['almanac', 2], ['room', 2]])
+    expect(many.next.columns.flat()).toEqual(['collection'])
+    // The page keeps a board.
+    expect(at('>pop:records 204 collection').text).toBe('The last board stays on the page')
+    // A chat no room shows opens in a room of its own in the window.
+    const fresh = at('>pop:206')
+    expect(fresh.text).toBe('Enter puts 206 in its own window')
+    expect(fresh.next.context[fresh.next.popped[0].board]).toBe('c206')
+    expect(at('>pop:library beside records').text).toBe('Enter puts Library beside Records')
+    expect(at('>move:204 beside records').text).toBe('Enter puts 204 beside Records')
+    expect(at('>move:204 beside collection').text).toBe('204 is beside Collection already')
+    expect(at('>move:records display 3').text).toBe('Enter moves Records to display 3')
+    expect(at('>pop:records collection display').text).toBe('display takes its number, last: pop:records 202 collection display 2')
+    // A window for a screen this browser cannot reach says it opens here.
+    const here = preview('>pop:records 204 display 2', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: { can: false } } })
+    expect(here.says.also).toEqual([{ message: 'windowHereCannot' }])
+  })
+
   it('closes the welcome page alone to the start card, and close:room the room here (C282)', () => {
     for (const v of ['>close:welcome', '>close:tour']) {
       const p = at(v, shipped('welcome'))

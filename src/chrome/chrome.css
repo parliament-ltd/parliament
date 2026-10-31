@@ -1223,6 +1223,9 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-map-wins { position: absolute; inset-inline-end: 14px; bottom: 14px; width: min(200px, 55%); display: flex; flex-direction: column; gap: 6px; }
 .ch-map-scr > .ch-map-wins:first-child { position: static; margin: auto; }
 .ch-shell .ch-map-b.win { flex: none; min-height: 56px; box-shadow: var(--ch-lift), 0 0 0 .5px rgba(25, 25, 25, .12); }
+/* A window's boards side by side in one box (C283). */
+.ch-map-win { display: flex; gap: 4px; }
+.ch-map-win > .ch-map-b.win { flex: 1 1 0; min-width: 0; }
 .ch-shell .ch-map-b.win.ghost { background: linear-gradient(rgba(var(--ch-navy), .07), rgba(var(--ch-navy), .07)), var(--ch-surface); box-shadow: inset 0 0 0 1.5px rgba(var(--ch-navy), .7); }
 .ch-shell button.ch-map-b:hover { box-shadow: var(--ch-lift), 0 0 0 1px var(--ch-soft); }
 .ch-map-b small { display: block; margin-top: 2px; font-size: 10px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }

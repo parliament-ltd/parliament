@@ -30,7 +30,8 @@ function placesOf(a, screens) {
     // the screens are known, one for another display sits on "another screen".
     const on = p.display == null ? here
       : screens.find((s) => s.n === p.display) ?? (screens.some((s) => s.key === OTHER) && p.display > 1 ? screens.find((s) => s.key === OTHER) : here)
-    places.set(p.board, { key: on.key, window: true })
+    // win: which window, so a window's boards are drawn together (C283).
+    places.set(p.board, { key: on.key, window: true, win: p.window ?? p.board })
   }
   return places
 }
@@ -57,12 +58,12 @@ export function mapOf(a, next, displays) {
     // Where a board that moves is going: a screen and whether in a window, or nowhere when it closes.
     const goes = will ? screens.find((s) => s.key === will.key) : null
     const to = moved && will ? { n: goes?.n ?? null, current: Boolean(goes?.current), window: will.window } : null
-    items[was.key].push({ board, addressed: board === pointed && !moved, mark: moved ? 'leaving' : null, window: was.window, ...(moved ? { to } : {}) })
+    items[was.key].push({ board, addressed: board === pointed && !moved, mark: moved ? 'leaving' : null, window: was.window, win: was.win ?? null, ...(moved ? { to } : {}) })
   }
   for (const [board, will] of after) {
     const was = now.get(board)
     if (was && was.key === will.key && was.window === will.window) continue
-    items[will.key].push({ board, addressed: board === pointed, mark: 'ghost', window: will.window })
+    items[will.key].push({ board, addressed: board === pointed, mark: 'ghost', window: will.window, win: will.win ?? null })
   }
   return screens.map((s) => ({ ...s, items: items[s.key] }))
 }

@@ -632,6 +632,7 @@ export default function Shell() {
     return () => { live = false; off() }
   }, [started, roomRev, priceOf])
   const numbered = useMemo(() => new Map((almanacRows ?? []).map((r) => [r.num, r])), [almanacRows])
+  useEffect(() => { rowsNow.current = almanacRows }, [almanacRows])
   // Steps 9 and 10, from what is stored: a strike saved, an edit sent (C225).
   // Also what waits for a row to be numbered (strikethrough:'s edit).
   const rowWaiters = useRef(new Set())
@@ -727,6 +728,30 @@ export default function Shell() {
   // the messages it holds, and its cards as the tab, the search and the order
   // have them. Tab, order and search are kept for the tab.
   const [collections, setCollections] = useState([])
+  // The first highlight, with no collection yet, starts one holding its chat,
+  // so the highlight is in the Collection (31 October; C283). Nothing opens:
+  // the strip names the new collection, and the Collection shows it.
+  const rowsNow = useRef(null)
+  useEffect(() => {
+    if (!started) return undefined
+    const onHighlight = async (e) => {
+      const chatId = e.detail?.chatId
+      if (typeof chatId !== 'string' || !db.current) return
+      const kept = await readCollections(db.current).catch(() => null)
+      if (!kept || kept.length) return
+      const row = (rowsNow.current ?? []).find((r) => r.kind === 'chat' && r.chatId === chatId)
+      if (!row) return
+      const now = new Date().toISOString()
+      const fresh = newCollection({ id: crypto.randomUUID(), now })
+      const after = withRows(fresh, [row], now).next
+      try { await writeCollection(db.current, { id: fresh.id, before: null, after }) } catch { return }
+      setCollections(await readCollections(db.current).catch(() => []))
+      const a = current.current
+      commit({ ...a, context: { ...a.context, collection: fresh.id } })
+    }
+    window.addEventListener('parliament-highlighted', onHighlight)
+    return () => window.removeEventListener('parliament-highlighted', onHighlight)
+  }, [started, commit])
   const [collectionView, setCollectionView] = useState({ tab: 'all', sort: 'yours', asc: false })
   const collectionLabel = useCallback((c) => c?.name || (c?.builtIn && COPY.collections[c.builtIn] ? i18n._(COPY.collections[c.builtIn]) : i18n._(COPY.collections.untitled)), [i18n])
   const shownCollection = useMemo(() => {
@@ -1168,7 +1193,13 @@ export default function Shell() {
       }
       touched.current?.records.push(...done)
       // name:202 "…" names the chat its room shows: the welcome step crosses off (31 October).
-      if (what.changes.some((c) => c.store === 'conversations' && typeof c.set?.title === 'string')) updateWelcome((w) => tick(w, 'name'))
+      // A chat renamed shows its new title in its room's head at once.
+      if (what.changes.some((c) => c.store === 'conversations' && typeof c.set?.title === 'string')) {
+        updateWelcome((w) => tick(w, 'name'))
+        setRoomRev((n) => n + 1)
+      }
+      // The chats in memory read again, so a room shows what changed (a title, a pin) at once.
+      if (what.changes.some((c) => c.store === 'conversations')) loadConversations?.()
       remember(body)
       return null
     }
@@ -3966,7 +3997,7 @@ export default function Shell() {
       return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" roomNum={lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
+      return <WelcomeBoard key="welcome" roomNum={(roomId ? conversations.find((c) => c.id === roomId)?.num : null) ?? lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
     }
     if (board === 'canvas') {
       return (

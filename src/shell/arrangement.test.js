@@ -7,6 +7,7 @@ import {
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
+  planPopMany, planMoveTo, planMoveBeside, windowsOf,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -502,5 +503,62 @@ describe('cols: (stage 6, piece 2; C141)', () => {
     const p = planReset(a)
     expect(p.says.message).toBe('resetArrangement')
     expect(p.next.recordsCols).toBeUndefined()
+  })
+})
+
+describe('windows that hold several boards (C283)', () => {
+  const space = () => keep(planOpen(keep(planOpen(almanac(), 'library')), 'docket'))
+  const boardsIn = (a) => windowsOf(a).map((w) => [w.boards, w.display])
+
+  it('pops several boards into one window, in the order named, and keeps one on the page', () => {
+    const p = planPopMany(space(), ['almanac', 'collection'])
+    expect(p.says).toMatchObject({ message: 'popTogether', values: { boards: ['almanac', 'collection'] } })
+    expect(boardsIn(p.next)).toEqual([[['almanac', 'collection'], null]])
+    expect(p.next.columns.flat()).toEqual(['library', 'docket'])
+    expect(planPopMany(almanac(), ['almanac', 'collection'])).toMatchObject({ next: null, says: { message: 'popLast' } })
+  })
+
+  it('on a display a window is on already, joins it rather than opening another', () => {
+    const two = keep(planPopMany(space(), ['almanac', 'collection'], { display: 2 }))
+    expect(boardsIn(two)).toEqual([[['almanac', 'collection'], 2]])
+    const p = planPop(two, 'library', 2)
+    expect(p.says).toMatchObject({ message: 'popJoinDisplay', values: { boards: ['library'], display: 2 } })
+    expect(boardsIn(p.next)).toEqual([[['almanac', 'collection', 'library'], 2]])
+    expect(planPop(p.next, 'library', 2)).toMatchObject({ next: null, says: { message: 'popOnDisplay' } })
+  })
+
+  it('moves a board to another display, or a window alone there with it', () => {
+    const one = keep(planPop(space(), 'library'))
+    const moved = planMoveTo(one, 'library', 3)
+    expect(moved.says.message).toBe('moveDisplay')
+    expect(boardsIn(moved.next)).toEqual([[['library'], 3]])
+    const two = keep(planPopMany(space(), ['almanac', 'collection'], { display: 2 }))
+    const out = keep(planMoveTo(two, 'collection', 3))
+    expect(boardsIn(out)).toEqual([[['almanac'], 2], [['collection'], 3]])
+    expect(planMoveTo(two, 'library', 2).says.message).toBe('moveJoinDisplay')
+  })
+
+  it('puts a board beside another: in its window right after it, or the next column on the page', () => {
+    const two = keep(planPopMany(space(), ['almanac', 'collection']))
+    const into = planMoveBeside(two, 'library', 'almanac')
+    expect(into.says).toMatchObject({ message: 'moveBeside', values: { board: 'library', other: 'almanac' } })
+    expect(boardsIn(into.next)).toEqual([[['almanac', 'library', 'collection'], null]])
+    const page = keep(planMoveBeside(into.next, 'collection', 'docket'))
+    expect(page.columns.flat()).toEqual(['docket', 'collection'])
+    expect(planMoveBeside(into.next, 'library', 'almanac')).toMatchObject({ next: null, says: { message: 'besideAlready' } })
+  })
+
+  it('orders, swaps and sends back the boards of a window', () => {
+    const w = keep(planMoveBeside(keep(planPopMany(space(), ['almanac', 'collection'])), 'library', 'collection'))
+    expect(boardsIn(keep(planMove(w, 'library', 'left')))).toEqual([[['library', 'almanac', 'collection'], null]])
+    const swapped = keep(planSwap(w, 'almanac', 'docket'))
+    expect(swapped.columns.flat()).toEqual(['almanac'])
+    expect(boardsIn(swapped)).toEqual([[['docket', 'collection', 'library'], null]])
+    expect(boardsIn(keep(planPopBack(w, 'collection')))).toEqual([[['almanac', 'library'], null]])
+  })
+
+  it('places a window at a side whole', () => {
+    const w = keep(planPopMany(space(), ['almanac', 'collection']))
+    expect(keep(planPopSide(w, 'right')).popped.map((x) => x.side)).toEqual(['right', 'right'])
   })
 })

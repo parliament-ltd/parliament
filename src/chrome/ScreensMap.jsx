@@ -86,7 +86,14 @@ export default function ScreensMap({ screens, foot, under, saved, subOf, listNam
                 {!s.items.length && <span className="ch-marg">{i18n._(COPY.screensMap.empty)}</span>}
                 {/* The boards on the page side by side; windows over them, as on a screen. */}
                 {page.length > 0 && <div className="ch-map-page">{page.map(drawItem)}</div>}
-                {wins.length > 0 && <div className="ch-map-wins">{wins.map(drawItem)}</div>}
+                {/* Each window as a box, its boards side by side in it (C283). */}
+                {wins.length > 0 && (
+                  <div className="ch-map-wins">
+                    {[...new Set(wins.map((it) => it.win ?? it.board))].map((win) => (
+                      <div key={win} className="ch-map-win">{wins.filter((it) => (it.win ?? it.board) === win).map(drawItem)}</div>
+                    ))}
+                  </div>
+                )}
               </div>
               <p className="ch-map-lab"><b>{name}</b><br /><span className="ch-marg">{sub}</span></p>
             </div>
