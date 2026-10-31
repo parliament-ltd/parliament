@@ -72,7 +72,7 @@ describe('the map (C259 (a), (b))', () => {
     const next = { ...a, columns: [['room']], popped: [{ board: 'library', display: 2, side: null, from: 0 }], addressed: 'library' }
     const map = mapOf(a, next, { can: true, extended: true, list })
     expect(map[0].items[0]).toMatchObject({ board: 'library', mark: 'leaving', to: { n: 2, current: false, window: true } })
-    expect(map[1].items).toEqual([{ board: 'library', addressed: true, mark: 'ghost', window: true }])
+    expect(map[1].items).toEqual([{ board: 'library', addressed: true, mark: 'ghost', window: true, win: 'library' }])
   })
   it('before the browser says more, this screen and another, unnumbered', () => {
     const map = mapOf({ ...a, popped: [{ board: 'collection', display: 2, side: null, from: 2 }] }, null, { can: true, extended: true, list: null })

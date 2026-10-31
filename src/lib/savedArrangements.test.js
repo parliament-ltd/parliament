@@ -20,7 +20,8 @@ const at = (value, { a = space(), saved = [desk], rows = [], displays = null } =
 describe('a saved arrangement, kept (C257 (a), (d))', () => {
   it('keeps the boards, windows, widths and what boards show, not which chats rooms show', () => {
     expect(desk).toMatchObject({ id: 'saved:abc', name: 'Review desk', columns: [['room'], ['collection']], widths: { room: 2 }, context: { collection: 'col_1' } })
-    expect(desk.popped).toEqual([{ board: 'library', display: 2, side: 'right', from: 2 }])
+    // A window kept before C283 takes a number of its own.
+    expect(desk.popped).toEqual([{ board: 'library', display: 2, side: 'right', from: 2, window: 2 }])
     expect(desk.context.room).toBeUndefined()
   })
   it('reads only with a name, and a backup keeps reading the rest', () => {
