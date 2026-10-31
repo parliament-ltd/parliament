@@ -1016,6 +1016,9 @@ export default function Shell() {
   useEffect(() => { pendingFwNow.current = pendingFrameworks }, [pendingFrameworks])
   const [fwPicking, setFwPicking] = useState(false)
   const [langPicking, setLangPicking] = useState(false) // language:'s picker (C184)
+  // Where the globe that opened it stands, so the menu opens under it (30 October).
+  const [langAt, setLangAt] = useState(null)
+  const globeAsked = useRef(null)
   const fwList = useMemo(() => frameworkList(ownFrameworks), [ownFrameworks])
   const fwListNow = useRef(fwList)
   useEffect(() => { fwListNow.current = fwList }, [fwList])
@@ -1621,7 +1624,10 @@ export default function Shell() {
       return null
     }
     if (what.kind === 'languagePicker') {
-      // A bare language: or the globe (C184): the picker under the field.
+      // A bare language: or the globe (C184): the picker under the field,
+      // or, from the globe, right under the globe (30 October).
+      setLangAt(globeAsked.current)
+      globeAsked.current = null
       setInspected(null)
       setCompared(null)
       setKeyPanel(null)
@@ -3859,6 +3865,20 @@ export default function Shell() {
   // A room alone on screen opens its side columns; sharing it, they are strips
   // (C279 (b)). A board popped into its own window is alone there.
   const onlyBoard = arrangement.columns.flat().length === 1
+  // The globe opens the languages right under itself, and a second click
+  // closes them (30 October). Typed, language: opens them under the field.
+  const openLanguagesFrom = (from) => {
+    if (langPicking) { setLangPicking(false); return }
+    const r = from?.getBoundingClientRect?.()
+    const doc = from?.ownerDocument ?? document
+    const width = doc.defaultView?.innerWidth ?? window.innerWidth
+    const rtl = doc.documentElement.dir === 'rtl'
+    // Its end lines up with the globe's, kept 16px inside the screen (the panel is at most 340px wide).
+    const panel = Math.min(340, width - 32)
+    const end = rtl ? r?.left : width - (r?.right ?? 0)
+    globeAsked.current = r ? { top: Math.round(r.bottom + 6), end: Math.round(Math.max(16, Math.min(end, width - 16 - panel))), doc } : null
+    runCommand('language:')
+  }
   const drawBoard = (board, windowed = false) => {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
@@ -3880,7 +3900,7 @@ export default function Shell() {
         <SettingsBoard
           key="settings" addressed={arrangement.addressed === 'settings'} onAddress={focusBoard}
           section={arrangement.context?.settings ?? null} query={settingsSearch} facts={settingsFacts}
-          onSet={runSetting} onWrite={writeField} onCount={setSettingsCount}
+          onSet={runSetting} onWrite={writeField} onCount={setSettingsCount} onLanguage={openLanguagesFrom}
           onOpenRun={(num, n) => { run(showPlan(current.current, num, n), null) }}
         />
       )
@@ -3897,10 +3917,10 @@ export default function Shell() {
       )
     }
     if (board === START) {
-      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
+      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
+      return <WelcomeBoard key="welcome" keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
     }
     if (board === 'canvas') {
       return (
@@ -3991,7 +4011,7 @@ export default function Shell() {
             : picking && stepPick ? { rows: answerRows, now: stepPick.model ? stepWho : null, picked: null, reference: referenceName, forStep: { ...stepPick, branchName: stepBranchWho?.name ?? null } }
             : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onSwitchAnswerer={switchAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
-          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
+          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

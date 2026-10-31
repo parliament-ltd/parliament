@@ -10,7 +10,10 @@ import { ownNameOf } from '../lib/languages'
 const GLOBE = '\u{1F310}'
 const OPENS = '▾'
 
-/** @param {{ now: string, onOpen: () => void }} props now: the page's language */
+/**
+ * @param {{ now: string, onOpen: (from: HTMLElement) => void }} props now: the page's language.
+ *   onOpen gets the globe itself, so the menu can open right under it (30 October).
+ */
 export default function Globe({ now, onOpen }) {
   const { i18n } = useLingui()
   const own = ownNameOf(now)
@@ -20,7 +23,7 @@ export default function Globe({ now, onOpen }) {
       className="ch-marg ch-globe"
       aria-label={i18n._(COPY.languagePicker.globe, { language: own })}
       onMouseDown={(e) => e.preventDefault()}
-      onClick={onOpen}
+      onClick={(e) => onOpen?.(e.currentTarget)}
     >
       <span aria-hidden="true">{GLOBE}</span> <span lang={now}>{own}</span> <span aria-hidden="true">{OPENS}</span>
     </button>

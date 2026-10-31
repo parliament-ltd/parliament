@@ -332,6 +332,11 @@
 .ch-dock.bottom .ch-ref { position: absolute; inset-inline: var(--ch-ref-edge); bottom: calc(100% - 12px); margin: 0 0 10px; max-height: 58vh; }
 .ch-dock.window .ch-ref, .ch-dock.card .ch-ref { margin-inline: 0; }
 .ch-shell.size-phone .ch-ref { --ch-ref-edge: 10px; }
+/* The languages opened from the globe: a panel right under it, in its
+   corner, one column (30 October). */
+.ch-shell.ch-float { position: fixed; z-index: 70; min-height: 0; display: block; background: none; width: min(340px, calc(100vw - 32px)); }
+.ch-shell.ch-float .ch-ref { margin: 0; max-height: min(70vh, 560px); }
+.ch-shell.ch-float .ch-ref-cols { columns: auto 1; }
 
 /* ── the menus under the bar, drawn as the reference is (29 October) ──
    Who answers, where a reply goes, the frameworks and the languages take

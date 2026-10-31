@@ -95,7 +95,7 @@ const LOCAL_STATE = { unchecked: COPY.settings.localUnchecked, checking: COPY.se
  *   facts: object, onSet: (line: string) => void, onWrite: (line: string) => void, onCount?: (n: number) => void }} props
  *   facts: the settings now and what the sections show (Shell.jsx, settingsFacts)
  */
-export default function SettingsBoard({ addressed, onAddress, section, query, facts, onSet, onWrite, onCount, onOpenRun = null }) {
+export default function SettingsBoard({ addressed, onAddress, section, query, facts, onSet, onWrite, onCount, onOpenRun = null, onLanguage = null }) {
   const { i18n } = useLingui()
   const body = useRef(null)
   const [current, setCurrent] = useState(section ?? 'keys')
@@ -366,7 +366,7 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
             <SecHead id="appearance" title={say(TITLE.appearance)} />
             {facts.languages && (
               <Row {...rowProps('appearance', 'language')} label={say(COPY.settings.languageLabel)} help={say(COPY.settings.languageHelp)}>
-                <Globe now={facts.languages.now} onOpen={() => onSet('language:')} />
+                <Globe now={facts.languages.now} onOpen={(from) => (onLanguage ? onLanguage(from) : onSet('language:'))} />
               </Row>
             )}
             <Row {...rowProps('appearance', 'text')} label={say(COPY.settings.textLabel)} help={say(COPY.settings.textHelp)}>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { fieldReducer, initialField, fieldValue, showsHeld, dropsHeld } from '../shell/field'
@@ -168,11 +169,21 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     function onDown(e) {
       const at = e.target
       if (root.current?.contains(at) && at.closest?.('.ch-ref, .ch-frow, .ch-fheld')) return
+      // The languages opened from the globe float under it; the globe itself opens and closes them.
+      if (at.closest?.('.ch-float, .ch-globe')) return
       closeNow.current(menu)
     }
+    // The languages floating under the globe close on Escape wherever the focus is.
+    const floating = menu === 'languages' && languagePicker?.at
+    function onKey(e) { if (e.key === 'Escape' && !e.defaultPrevented) closeNow.current(menu) }
+    const keyDocs = floating ? [...docs, languagePicker.at.doc].filter((d, i, all) => d && all.indexOf(d) === i) : []
     for (const d of docs) d.addEventListener('pointerdown', onDown, true)
-    return () => { for (const d of docs) d.removeEventListener('pointerdown', onDown, true) }
-  }, [menu, doc, alsoDocs])
+    for (const d of keyDocs) d.addEventListener('keydown', onKey)
+    return () => {
+      for (const d of docs) d.removeEventListener('pointerdown', onDown, true)
+      for (const d of keyDocs) d.removeEventListener('keydown', onKey)
+    }
+  }, [menu, doc, alsoDocs, languagePicker])
 
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere: in this document,
   // and in every other window of the page, since this bar is the one point of
@@ -487,7 +498,15 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} onSwitch={onSwitchAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} onClose={() => closeMenu('picker', true)} />
       )}
       {menu === 'frameworks' && <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} onClose={() => closeMenu('frameworks', true)} />}
-      {menu === 'languages' && <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} onClose={() => closeMenu('languages', true)} />}
+      {menu === 'languages' && (languagePicker.at
+        // From the globe: right under it, in the corner it sits in (30 October).
+        ? createPortal(
+          <div className="ch-shell ch-float" style={{ top: languagePicker.at.top, insetInlineEnd: languagePicker.at.end }}>
+            <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} onClose={() => closeMenu('languages', true)} />
+          </div>,
+          languagePicker.at.doc.body,
+        )
+        : <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} onClose={() => closeMenu('languages', true)} />)}
     </div>
   )
 }
