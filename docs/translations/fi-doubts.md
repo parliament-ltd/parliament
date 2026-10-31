@@ -266,3 +266,25 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 ## Step 9, drafted 30 October 2026 (C282)
 
 - `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.
+
+## Windows of several boards, drafted 31 October 2026 (C283)
+
+47. **enter.popTogether, enter.popTogetherDisplay, enter.popJoinDisplay**
+    English: Enter opens {boards} together in a window of their own
+    Draft: Enter avaa yhdessä omaan ikkunaansa: {boards}
+    Why: the boards go after a colon, as in enter.bringBoards and enter.focusOff. "Enter avaa taulut {boards} yhdessä omaan ikkunaansa" reads more smoothly with two names, but popJoinDisplay can also hold a single board, and the colon is the settled form for lists.
+
+48. **enter.popDisplayWhich**
+    English: display takes its number, last: pop:records 202 collection display 2
+    Draft: display tarvitsee numeron ja tulee viimeisenä, esimerkiksi pop:records 202 collection display 2
+    Why: "last" read as the word's place in the command. "tulee viimeisenä" is the part I am least sure of; "kirjoitetaan viimeiseksi" is the alternative.
+
+49. **verb.pop**
+    English: Put one or more boards, or the bar, in a window of their own, place it, or bring it back
+    Draft: Siirrä taulu, useita tauluja tai palkki omaan ikkunaansa, sijoita se tai tuo se takaisin
+    Why: a list of three keeps "tai" from coming twice in a row ("yksi tai useampi taulu tai palkki").
+
+50. **shell.fullScreen, shell.leaveFullScreen**
+    English: full screen / leave full screen
+    Draft: koko näyttö / poistu koko näytön tilasta
+    Why: YouTube's Finnish pair. The second is long for a link in a corner; "poistu koko näytöstä" is the short form.

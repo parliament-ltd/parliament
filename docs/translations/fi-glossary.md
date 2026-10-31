@@ -152,3 +152,11 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - the start card (shown before anything is open) → Aloitus, as group.start. One room, as a board's name in a sentence → Huone ("Enter siirtää taulun Huone vasemmalle").
 - key vault (keys.parliament.ltd) → avainsäilö, also in the privacy lines: "Avaimia säilyttää Parliamentin avainsäilö".
 - the welcome letter keeps the writer's voice: first person, his fragments and trailing dots, the reader as sinä. Signed Stef.
+
+## Windows of several boards (31 October 2026, C283)
+- several boards in one window: the boards go after a colon, as in the other {boards} lines ("Enter avaa yhdessä omaan ikkunaansa: {boards}"); as the subject they stand first ("{boards} ovat jo samassa ikkunassa").
+- the window on display {n} (one already there) → näytön {n} ikkuna ("Enter siirtää näytön {display} ikkunaan: {boards}").
+- beside a board → taulun {other} viereen, vieressä, as enter.moveCardSame. rinnalle stays for "beside what is here" (näkyvien rinnalle) and runs side by side. The keyword beside stays English in commands.
+- so it opens here (a note after the Enter line) → joten ikkuna avautuu tällä näytöllä, as the older lines say "tällä näytöllä" for here.
+- full screen / leave full screen (the link in a window's corner) → koko näyttö / poistu koko näytön tilasta, the pair YouTube's Finnish uses, lower case like the English.
+- Hints for a keyword (beside, display) are built as compare: is: "tarvitsee …, esimerkiksi" and the command.

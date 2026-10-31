@@ -2082,12 +2082,12 @@ msgstr "{place, select, top {バーはすでに上にあります} bottom {バ�
 
 #. js-lingui-explicit-id
 msgid "enter.besideAlready"
-msgstr ""
+msgstr "{board}はすでに{other}の横にあります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr ""
+msgstr "beside には pop:library beside records のように、ボードか番号を1つ指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -3419,7 +3419,7 @@ msgstr "{on, select, on {返答はすでに変更表示です} other {返答は�
 
 #. js-lingui-explicit-id
 msgid "enter.moveBeside"
-msgstr ""
+msgstr "Enterで{board}を{other}の横に置きます"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -3439,7 +3439,7 @@ msgstr "カードを自分自身の隣には移動できません"
 
 #. js-lingui-explicit-id
 msgid "enter.moveDisplay"
-msgstr ""
+msgstr "Enterで{board}をディスプレイ{display}に移動します"
 
 #. js-lingui-explicit-id
 msgid "enter.moveIsPopped"
@@ -3447,7 +3447,7 @@ msgstr "{board}は別ウインドウにあります。先に pop:back で戻し�
 
 #. js-lingui-explicit-id
 msgid "enter.moveJoinDisplay"
-msgstr ""
+msgstr "Enterで{board}を、ディスプレイ{display}にあるウインドウに移動します"
 
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
@@ -4037,11 +4037,11 @@ msgstr "ブラウザは、Parliamentにウインドウの配置を許可しな�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.popDisplayWhich"
-msgstr ""
+msgstr "display は pop:records 202 collection display 2 のように、番号を付けて最後に書きます"
 
 #. js-lingui-explicit-id
 msgid "enter.popJoinDisplay"
-msgstr ""
+msgstr "Enterで{boards}を、ディスプレイ{display}にあるウインドウに加えます"
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -4057,7 +4057,7 @@ msgstr "{board}は別ウインドウにありません"
 
 #. js-lingui-explicit-id
 msgid "enter.popOnDisplay"
-msgstr ""
+msgstr "{board}はすでにディスプレイ{display}にあります"
 
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
@@ -4074,15 +4074,15 @@ msgstr "{side, select, left {{board}のウインドウはすでに左にあり�
 
 #. js-lingui-explicit-id
 msgid "enter.popTogether"
-msgstr ""
+msgstr "Enterで{boards}を1つの別ウインドウにまとめて出します"
 
 #. js-lingui-explicit-id
 msgid "enter.popTogetherAlready"
-msgstr ""
+msgstr "{boards}はすでに同じウインドウにあります"
 
 #. js-lingui-explicit-id
 msgid "enter.popTogetherDisplay"
-msgstr ""
+msgstr "Enterで{boards}を、ディスプレイ{display}の1つのウインドウにまとめて出します"
 
 #. js-lingui-explicit-id
 msgid "enter.privacyNames"
@@ -5836,19 +5836,19 @@ msgstr "すでにその幅です"
 
 #. js-lingui-explicit-id
 msgid "enter.windowAsk"
-msgstr ""
+msgstr "Parliamentがディスプレイにウインドウを配置してよいか、ブラウザが一度だけ尋ねます"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereCannot"
-msgstr ""
+msgstr "このブラウザは、ほかのディスプレイにウインドウを配置できないため、ここで開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereNone"
-msgstr ""
+msgstr "ディスプレイ{display}は接続されていないため、ここで開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereRefused"
-msgstr ""
+msgstr "ブラウザは、Parliamentにウインドウの配置を許可しない設定になっているため、ここで開きます"
 
 #. js-lingui-explicit-id
 msgid "erase.about"
@@ -8791,11 +8791,11 @@ msgstr "{command} を実行します"
 
 #. js-lingui-explicit-id
 msgid "shell.fullScreen"
-msgstr ""
+msgstr "全画面表示"
 
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
-msgstr ""
+msgstr "全画面表示を終了"
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"
@@ -9199,7 +9199,7 @@ msgstr "モデルや情報源が答えた内容を表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.move"
-msgstr "ボードを左、右、中央に移動する。プランの中のブランチを移動する"
+msgstr "ボードを左、右、中央、ほかのディスプレイ、または別のボードの横に移動する。プランの中のブランチを移動する"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
@@ -9231,7 +9231,7 @@ msgstr "画面の横にプランのボードを出す"
 
 #. js-lingui-explicit-id
 msgid "verb.pop"
-msgstr "ボードやバーを別ウインドウに出す、配置する、またはページに戻す"
+msgstr "1つまたは複数のボードか、バーを別ウインドウに出す、配置する、またはページに戻す"
 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
@@ -9534,7 +9534,7 @@ msgstr "ルームに名前を付ける"
 #. {command} is name: with the number, as name:202 "…"; it stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.nameHow"
-msgstr ""
+msgstr "{command}、ルームの番号、続けて名前"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"

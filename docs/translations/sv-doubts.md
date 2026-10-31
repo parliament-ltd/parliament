@@ -275,3 +275,25 @@ Each: id, the English, the draft, and why I was unsure.
 ## Step 9, drafted 30 October 2026 (C282)
 
 - `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.
+
+## Windows of several boards, drafted 31 October 2026 (C283)
+
+53. **enter.windowHereCannot, enter.windowHereNone, enter.windowHereRefused**
+    English: …, so it opens here
+    Draft: …, så fönstret öppnas här
+    Why: "it" is the window, but after enter.moveDisplay's line ("Enter flyttar {board} till skärm {display}") "den" would point at the board and "det" at nothing in particular. Naming the window avoids the choice.
+
+54. **enter.popOnDisplay**
+    English: {board} is on display {display} already
+    Draft: {board} är redan på skärm {display}
+    Why: built as enter.moveThere ("är redan till vänster"); the older pop lines say "ligger redan i ett eget fönster". "finns redan på skärm" is the alternative.
+
+55. **enter.popDisplayWhich**
+    English: display takes its number, last: pop:records 202 collection display 2
+    Draft: display tar sitt nummer och står sist, som pop:records 202 collection display 2
+    Why: "last" read as the word's place in the command. "står sist" is plain but terse.
+
+56. **shell.leaveFullScreen**
+    English: leave full screen
+    Draft: avsluta helskärm
+    Why: YouTube's Swedish words; Windows and macOS say "Avsluta helskärmsläge", which is long for a link in a corner.

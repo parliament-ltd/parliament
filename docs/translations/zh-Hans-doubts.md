@@ -322,3 +322,25 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 ## Step 9, drafted 30 October 2026 (C282)
 
 - `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.
+
+## Windows of several boards, drafted 31 October 2026 (C283)
+
+57. **enter.popJoinDisplay, enter.moveJoinDisplay**
+    - EN: Enter puts {boards} in the window on display {display} / Enter moves {board} into the window on display {display}
+    - ZH: 按 Enter 将{boards}放到屏幕 {display} 上已有的窗口中 / 按 Enter 将{board}移到屏幕 {display} 上已有的窗口中
+    - Why: "the window" means the one already there, which the boards join. Chinese has no article, so 已有的 says it. Without it the line reads as opening a new window.
+
+58. **{board} and {other} as a room's number** (enter.moveBeside, enter.besideAlready and the other C283 lines)
+    - EN: Enter puts {board} beside {other}
+    - ZH: 按 Enter 将{board}放到{other}旁边
+    - Why: pop:202 beside records names a room by its number, and the line then shows 202 in place of a board's name. Board names take no spaces, so it reads 将202放到记录旁边. A space would suit the number but not the name, and one line serves both.
+
+59. **welcome.step.nameHow**
+    - EN: {command}, the room’s number then its name
+    - ZH: {command}，房间编号在前，名称在后
+    - Why: it says the form (the number first, the name after). 先输入房间编号，再输入名称 is the alternative, closer to welcome.step.commandHow's 再输入.
+
+60. **verb.pop**
+    - EN: Put one or more boards, or the bar, in a window of their own, place it, or bring it back
+    - ZH: 把一个或多个面板或输入栏放到独立窗口中、调整窗口位置，或放回页面
+    - Why: 一个或多个面板或输入栏 could be read as "one or more boards or bars"; there is only one bar, so I kept it short rather than add commas.
