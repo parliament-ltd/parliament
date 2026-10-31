@@ -42,7 +42,7 @@ export {
   contentsToFlatStores, validateContents,
 } from './backupFormat'
 
-const PARLIAMENT_VERSION = '0.8.0'
+const PARLIAMENT_VERSION = '0.9.0'
 
 // The one shortest password a backup takes, everywhere one is asked for
 // (audit T9; stage 9, piece 2; C182).

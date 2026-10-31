@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.9.0, 31 October 2026
+
+- Several boards can share one window, so each screen can be one window: pop:records 202 collection display 2. beside puts a board in the window of another: pop:library beside records.
+- move:library display 3 moves a board to another screen. A window sent to a screen fills it, and has a full screen mark in its corner.
+- Closing a window closes its boards; nothing in them is lost.
+- The languages open right under the globe, and with the bar at the bottom, api: and the other panels open above it.
+- The welcome page names the room by its number, and a first highlight starts a collection with its chat.
+
 ## 0.8.0, 30 October 2026
 
 - Parliament speaks Chinese, Japanese, Swedish and Finnish, in beta. Pick one with the globe or language:. Spanish is coming soon.
