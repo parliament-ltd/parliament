@@ -171,3 +171,11 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - No room is open → 没有打开的房间
 - the steps (the welcome page's things to try) → 欢迎步骤
 - the key vault (keys.parliament.ltd) → 密钥库, named in every key line: 由密钥库加密保存在此浏览器中
+
+## Windows of several boards (31 October 2026, C283)
+- together in a window of their own (pop: with a list) → 一起放到一个独立窗口中; they share a window → 在同一个窗口中
+- the window on display N (one already there, which the boards join) → 屏幕 N 上已有的窗口
+- beside {other} → {other}旁边; put beside → 放到…旁边. The keyword beside stays as typed in commands
+- so it opens here (a note after the Enter line) → 因此会在这里打开, as the older popDisplayCannot lines have 在这里
+- full screen / leave full screen (the link in a window's corner) → 全屏 / 退出全屏
+- Hints for a keyword (beside, display) are built as compare: and cost: are: 需要…，例如 and the command

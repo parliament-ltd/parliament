@@ -154,3 +154,12 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - Example words in commands follow the 23 October ruling: names shown in Japanese are written in Japanese, since the commands match them (edit:"執筆スタジオ", layout:"3パネル", arrange:save "レビュー用デスク", tell:"1ページ以内にまとめて"). Typed words the code reads stay English: on, off, desktop, mobile, right, left, extra, middle, bottom, up, down, pushback, tried, set:input files on.
 - Toggle labels with a command word ("calm: on", "ripple: off", "focus: on") keep the command and translate the state: calm: オン, ripple: オフ, as field.frameworkNone has framework: なし.
 - Start (the card with the bar, shown before anything is open) → スタート; one room as a board in a sentence → ルーム
+
+## Windows of several boards (31 October 2026, C283)
+
+- several boards together in one window (pop: with a list) → 1つの別ウインドウにまとめて出す; they share a window → 同じウインドウにある
+- the window already on display N (boards join it) → ディスプレイNにあるウインドウ; boards join it → 加える; move: into it → 移動する
+- beside (a board beside another) → {other}の横; put beside → 横に置く. The keyword beside stays English in commands.
+- so it opens here (a note after the Enter line) → ここで開きます, as the older popDisplayCannot lines have ここで
+- full screen / leave full screen (the link in a window's corner) → 全画面表示 / 全画面表示を終了, as Chrome and YouTube write them in Japanese
+- Hints for a keyword (beside, display) are built as compare: and cost: are: the keyword with には or は, then the example with のように.

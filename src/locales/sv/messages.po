@@ -2082,12 +2082,12 @@ msgstr "{place, select, top {Fältet är redan högst upp} bottom {Fältet är r
 
 #. js-lingui-explicit-id
 msgid "enter.besideAlready"
-msgstr ""
+msgstr "{board} är redan bredvid {other}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr ""
+msgstr "beside tar en tavla eller ett nummer, som pop:library beside records"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -3419,7 +3419,7 @@ msgstr "{on, select, on {Svaren visar redan ändringarna} other {Svaren är reda
 
 #. js-lingui-explicit-id
 msgid "enter.moveBeside"
-msgstr ""
+msgstr "Enter lägger {board} bredvid {other}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -3439,7 +3439,7 @@ msgstr "Ett kort kan inte flyttas bredvid sig självt"
 
 #. js-lingui-explicit-id
 msgid "enter.moveDisplay"
-msgstr ""
+msgstr "Enter flyttar {board} till skärm {display}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveIsPopped"
@@ -3447,7 +3447,7 @@ msgstr "{board} ligger i ett eget fönster. pop:back tar tillbaka den först"
 
 #. js-lingui-explicit-id
 msgid "enter.moveJoinDisplay"
-msgstr ""
+msgstr "Enter flyttar {board} in i fönstret på skärm {display}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
@@ -4037,11 +4037,11 @@ msgstr "Webbläsaren är inställd på att inte låta Parliament placera fönste
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.popDisplayWhich"
-msgstr ""
+msgstr "display tar sitt nummer och står sist, som pop:records 202 collection display 2"
 
 #. js-lingui-explicit-id
 msgid "enter.popJoinDisplay"
-msgstr ""
+msgstr "Enter lägger {boards} i fönstret på skärm {display}"
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -4057,7 +4057,7 @@ msgstr "{board} ligger inte i ett eget fönster"
 
 #. js-lingui-explicit-id
 msgid "enter.popOnDisplay"
-msgstr ""
+msgstr "{board} är redan på skärm {display}"
 
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
@@ -4074,15 +4074,15 @@ msgstr "{side, select, left {Fönstret med {board} är redan till vänster} othe
 
 #. js-lingui-explicit-id
 msgid "enter.popTogether"
-msgstr ""
+msgstr "Enter öppnar {boards} tillsammans i ett eget fönster"
 
 #. js-lingui-explicit-id
 msgid "enter.popTogetherAlready"
-msgstr ""
+msgstr "{boards} delar redan ett fönster"
 
 #. js-lingui-explicit-id
 msgid "enter.popTogetherDisplay"
-msgstr ""
+msgstr "Enter öppnar {boards} tillsammans i ett fönster på skärm {display}"
 
 #. js-lingui-explicit-id
 msgid "enter.privacyNames"
@@ -5836,19 +5836,19 @@ msgstr "Den har redan den bredden"
 
 #. js-lingui-explicit-id
 msgid "enter.windowAsk"
-msgstr ""
+msgstr "Webbläsaren frågar en gång om Parliament får placera fönster på dina skärmar"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereCannot"
-msgstr ""
+msgstr "Den här webbläsaren kan inte placera fönster på andra skärmar, så fönstret öppnas här"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereNone"
-msgstr ""
+msgstr "Skärm {display} är inte ansluten, så fönstret öppnas här"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereRefused"
-msgstr ""
+msgstr "Webbläsaren är inställd på att inte låta Parliament placera fönster, så fönstret öppnas här"
 
 #. js-lingui-explicit-id
 msgid "erase.about"
@@ -8791,11 +8791,11 @@ msgstr "Kör {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.fullScreen"
-msgstr ""
+msgstr "helskärm"
 
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
-msgstr ""
+msgstr "avsluta helskärm"
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"
@@ -9199,7 +9199,7 @@ msgstr "Visa vad en modell eller en källa svarade"
 
 #. js-lingui-explicit-id
 msgid "verb.move"
-msgstr "Flytta en tavla till vänster, höger eller mitten, eller en gren i sin plan"
+msgstr "Flytta en tavla till vänster, höger eller mitten, till en annan skärm eller bredvid en annan tavla, eller en gren i sin plan"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
@@ -9231,7 +9231,7 @@ msgstr "Ta fram Planen bredvid det som visas"
 
 #. js-lingui-explicit-id
 msgid "verb.pop"
-msgstr "Lägg en tavla eller fältet i ett eget fönster, placera det eller ta tillbaka det"
+msgstr "Lägg en eller flera tavlor, eller fältet, i ett eget fönster, placera det eller ta tillbaka det"
 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
@@ -9534,7 +9534,7 @@ msgstr "Namnge rummet"
 #. {command} is name: with the number, as name:202 "…"; it stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.nameHow"
-msgstr ""
+msgstr "{command}, rummets nummer och sedan dess namn"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"

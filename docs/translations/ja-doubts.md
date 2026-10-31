@@ -288,3 +288,25 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 ## Step 9, drafted 30 October 2026 (C282)
 
 - `welcome.step.highlight` and `welcome.step.highlightHow` were drafted by the lead session, not the language drafter, from the glossary's words for note, highlight and Collection. Worth a read with the rest.
+
+## Windows of several boards, drafted 31 October 2026 (C283)
+
+53. enter.besideWhich, enter.popDisplayWhich
+    - en: beside takes one board or number: pop:library beside records / display takes its number, last: pop:records 202 collection display 2
+    - ja: beside には pop:library beside records のように、ボードか番号を1つ指定します / display は pop:records 202 collection display 2 のように、番号を付けて最後に書きます
+    - Built as enter.compareTwo and enter.costBad are (the example inside the sentence, with のように), not after a colon. "last" became 最後に書きます; if the hint need only say what display takes, 番号を付けます alone is shorter.
+
+54. enter.popTogether, enter.popTogetherDisplay
+    - en: Enter opens {boards} together in a window of their own / … together in a window on display {display}
+    - ja: Enterで{boards}を1つの別ウインドウにまとめて出します / Enterで{boards}を、ディスプレイ{display}の1つのウインドウにまとめて出します
+    - 1つの…にまとめて makes plain that the boards share one window, not one each. The display line says ウインドウ, not 別ウインドウ, since the English drops "of their own" there.
+
+55. welcome.step.nameHow
+    - en: {command}, the room’s number then its name
+    - ja: {command}、ルームの番号、続けて名前
+    - Built as welcome.step.commandHow ({keys}、続けて {command}). Most "How" lines end in を入力 ({command} と質問を入力); {command}、ルームの番号に続けて名前を入力 is the fuller form if this reads too bare.
+
+56. verb.pop
+    - en: Put one or more boards, or the bar, in a window of their own, place it, or bring it back
+    - ja: 1つまたは複数のボードか、バーを別ウインドウに出す、配置する、またはページに戻す
+    - The comma after か keeps "the bar" apart from "one or more". ボード（複数可）かバーを… is the shorter UI form.

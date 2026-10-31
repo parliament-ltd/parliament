@@ -2082,12 +2082,12 @@ msgstr "{place, select, top {输入栏已经在顶部} bottom {输入栏已经�
 
 #. js-lingui-explicit-id
 msgid "enter.besideAlready"
-msgstr ""
+msgstr "{board}已经在{other}旁边"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr ""
+msgstr "beside 需要一个面板或编号，例如 pop:library beside records"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -3419,7 +3419,7 @@ msgstr "{on, select, on {回复已经带标注} other {回复已经是无标注�
 
 #. js-lingui-explicit-id
 msgid "enter.moveBeside"
-msgstr ""
+msgstr "按 Enter 将{board}放到{other}旁边"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -3439,7 +3439,7 @@ msgstr "卡片不能移到自己旁边"
 
 #. js-lingui-explicit-id
 msgid "enter.moveDisplay"
-msgstr ""
+msgstr "按 Enter 将{board}移到屏幕 {display} 上"
 
 #. js-lingui-explicit-id
 msgid "enter.moveIsPopped"
@@ -3447,7 +3447,7 @@ msgstr "{board}在独立窗口中。请先用 pop:back 把它放回页面"
 
 #. js-lingui-explicit-id
 msgid "enter.moveJoinDisplay"
-msgstr ""
+msgstr "按 Enter 将{board}移到屏幕 {display} 上已有的窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
@@ -4037,11 +4037,11 @@ msgstr "浏览器已设置为不允许 Parliament 放置窗口。按 Enter 在�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.popDisplayWhich"
-msgstr ""
+msgstr "display 要放在最后并接上编号，例如 pop:records 202 collection display 2"
 
 #. js-lingui-explicit-id
 msgid "enter.popJoinDisplay"
-msgstr ""
+msgstr "按 Enter 将{boards}放到屏幕 {display} 上已有的窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -4057,7 +4057,7 @@ msgstr "{board}不在独立窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.popOnDisplay"
-msgstr ""
+msgstr "{board}已经在屏幕 {display} 上"
 
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
@@ -4074,15 +4074,15 @@ msgstr "{side, select, left {{board}的窗口已经在左侧} other {{board}的�
 
 #. js-lingui-explicit-id
 msgid "enter.popTogether"
-msgstr ""
+msgstr "按 Enter 将{boards}一起放到一个独立窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.popTogetherAlready"
-msgstr ""
+msgstr "{boards}已经在同一个窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.popTogetherDisplay"
-msgstr ""
+msgstr "按 Enter 将{boards}一起放到屏幕 {display} 上的一个窗口中"
 
 #. js-lingui-explicit-id
 msgid "enter.privacyNames"
@@ -5836,19 +5836,19 @@ msgstr "它已经是这个宽度"
 
 #. js-lingui-explicit-id
 msgid "enter.windowAsk"
-msgstr ""
+msgstr "浏览器会询问一次，是否允许 Parliament 在你的屏幕上放置窗口"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereCannot"
-msgstr ""
+msgstr "此浏览器无法在其他屏幕上放置窗口，因此会在这里打开"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereNone"
-msgstr ""
+msgstr "屏幕 {display} 未连接，因此会在这里打开"
 
 #. js-lingui-explicit-id
 msgid "enter.windowHereRefused"
-msgstr ""
+msgstr "浏览器已设置为不允许 Parliament 放置窗口，因此会在这里打开"
 
 #. js-lingui-explicit-id
 msgid "erase.about"
@@ -8791,11 +8791,11 @@ msgstr "执行 {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.fullScreen"
-msgstr ""
+msgstr "全屏"
 
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
-msgstr ""
+msgstr "退出全屏"
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"
@@ -9199,7 +9199,7 @@ msgstr "显示某个模型或来源的回答"
 
 #. js-lingui-explicit-id
 msgid "verb.move"
-msgstr "将面板移到左侧、右侧或中间，或在计划中移动分支"
+msgstr "将面板移到左侧、右侧、中间、另一块屏幕上或另一个面板旁边，或在计划中移动分支"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
@@ -9231,7 +9231,7 @@ msgstr "把计划面板放到当前屏幕内容旁边"
 
 #. js-lingui-explicit-id
 msgid "verb.pop"
-msgstr "把面板或输入栏放到独立窗口中、调整窗口位置，或放回页面"
+msgstr "把一个或多个面板或输入栏放到独立窗口中、调整窗口位置，或放回页面"
 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
@@ -9534,7 +9534,7 @@ msgstr "为房间命名"
 #. {command} is name: with the number, as name:202 "…"; it stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.nameHow"
-msgstr ""
+msgstr "{command}，房间编号在前，名称在后"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"

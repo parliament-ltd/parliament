@@ -129,3 +129,11 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - the key vault → nyckelvalvet (Parliaments nyckelvalv, valvet); keys are kept there → förvaras. The error lines' "key store" stays nyckelförrådet, as the English has two words (see doubts).
 - the start card (before anything is open) → Start; one room as a board in a sentence → Rummet.
 - the welcome letter is Stefan's own voice: first person, informal, "du", signed "Stef".
+
+## Windows of several boards (31 October 2026, C283)
+- together in a window of their own (pop: with a list) → tillsammans i ett eget fönster; they share a window → dela ett fönster ("{boards} delar redan ett fönster").
+- the window on display {n} (one already there) → fönstret på skärm {n}; move: into it → flytta in i fönstret.
+- beside {other} → bredvid {other}; put beside → lägga bredvid. The keyword beside stays English in commands.
+- so it opens here (a note after the Enter line) → så fönstret öppnas här. It names the window, so no den or det has to agree with a board.
+- full screen / leave full screen (the link in a window's corner) → helskärm / avsluta helskärm, lower case like the English.
+- Hints for a keyword (beside, display) are built as compare: is: "tar …, som" and the command.
