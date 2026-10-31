@@ -109,5 +109,19 @@ export function popDisplayLine(says, displays) {
   return { message: 'popDisplayAsk', values: { board, display } }
 }
 
+/**
+ * The note under a line that places a window with several boards on a
+ * screen (C283): what happens when it cannot go there, or that the browser
+ * asks first. Null when it can go there as said.
+ */
+export function displayNote(display, displays) {
+  if (!displays) return null
+  if (!displays.can) return { message: 'windowHereCannot' }
+  if (displays.list) return displays.list.some((s) => s.n === display) ? null : { message: 'windowHereNone', values: { display } }
+  if (!displays.extended) return { message: 'windowHereNone', values: { display } }
+  if (displays.permission === 'denied') return { message: 'windowHereRefused' }
+  return { message: 'windowAsk' }
+}
+
 /** True when an Enter that places windows has to ask the browser first. */
 export const mustAsk = (displays) => Boolean(displays?.can && displays.extended && !displays.list && displays.permission !== 'denied')

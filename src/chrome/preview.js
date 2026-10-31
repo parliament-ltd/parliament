@@ -16,7 +16,7 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, planOpenSettings, planBring, planRoom, planFocus, planFocusOff, planFocusSet, focusBoardsOf, FOCUS_BOARDS, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
+import { plan, planOpen, planOpenSettings, planBring, planRoom, planFocus, planFocusOff, planFocusSet, focusBoardsOf, FOCUS_BOARDS, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS, planPopMany, planMoveTo, planMoveBeside, currentRoom, freeRoom } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost, LOCAL_READS } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
@@ -44,7 +44,7 @@ import { planSet } from '../lib/settingVerbs'
 import { planWeb, planAttach } from '../lib/inputFeatures'
 import { boardFor, wordFor } from '../shell/boards'
 import { planArrange, planForgetArrangement, planNameArrangement } from '../lib/savedArrangements'
-import { popDisplayLine } from '../shell/screens'
+import { popDisplayLine, displayNote } from '../shell/screens'
 import { smallRefusal } from '../shell/sizes'
 import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
@@ -530,6 +530,90 @@ function roomByNumber(a, step, screens = {}) {
   return { step: { ...step, exactBoard: true, match: { ...step.match, values: [{ kind: 'word', value: board }, ...rest] } } }
 }
 
+// pop: with several boards, a room by its chat's number, or beside; move:
+// to a display or beside a board (C283). Null for the forms plan() answers
+// as before: one board, pop:settings keys, pop:back, pop:command, pop:left.
+// A chat no room shows opens in a room of its own in the window (pop: only).
+const KEYWORDS = new Set(['display', 'beside'])
+// The lines that open or move a window onto a screen, and their note.
+const PLACES = new Set(['popTogetherDisplay', 'moveDisplay'])
+const withNote = (says, note) => (note ? { ...says, also: [...(says.also ?? []), note] } : says)
+function planWindows(a, step, screens = {}) {
+  const args = step.match?.values ?? []
+  const wordOf = (x) => (x?.kind === 'word' ? String(x.value).toLowerCase() : null)
+  const words = args.map(wordOf)
+  const cut = words.findIndex((w) => KEYWORDS.has(w))
+  const part = cut < 0 ? args : args.slice(0, cut)
+  const key = cut < 0 ? null : words[cut]
+  const isBoardArg = (x) => x?.kind === 'address' || wordOf(x) === 'room' || BOARD_NAMES.includes(wordOf(x))
+  if (step.verb === 'move') {
+    if (!key || part.length !== 1 || !isBoardArg(part[0])) return null
+  } else {
+    if (['back', 'command', 'left', 'right'].includes(words[0])) return null
+    if (!part.length || !part.every(isBoardArg)) return null
+    if (!key && part.length === 1 && part[0].kind !== 'address') return null
+    if (key === 'display' && part.length === 1 && part[0].kind !== 'address') return null
+  }
+  const pops = step.verb === 'pop'
+  // Each board the line names: its id, and how the Enter line names it.
+  let room = a
+  const context = {}
+  const labels = {}
+  const resolve = (x, opening) => {
+    if (wordOf(x) === 'room') {
+      const r = currentRoom(a)
+      return r ? { board: r } : { bad: { message: 'closeNoRoom' } }
+    }
+    if (x.kind !== 'address') return { board: boardFor(wordOf(x)) }
+    const t = targetsOf([x], screens.records?.rows ?? [])
+    if (t.bad) return { bad: t.bad }
+    const row = t.rows[0]
+    const chatId = row.kind === 'chat' || row.kind === 'docket' ? row.chatId : null
+    const num = x.text ?? String(row.num)
+    if (!chatId) return { bad: { message: 'roomNumberNotChat', values: { num } } }
+    let board = roomShowing(a, chatId)
+    if (!board && opening) {
+      board = freeRoom(room)
+      room = { ...room, popped: [...room.popped, { board }] }
+      context[board] = chatId
+    }
+    if (!board) return { bad: { message: 'roomNumberNotHere', values: { num } } }
+    labels[board] = num
+    return { board }
+  }
+  const boards = []
+  for (const x of part) {
+    const r = resolve(x, pops)
+    if (r.bad) return { bad: r.bad }
+    boards.push(r.board)
+  }
+  let p
+  if (key === 'display') {
+    const n = args[cut + 1]
+    if (n?.kind !== 'number' || args.length !== cut + 2) return { bad: { message: 'popDisplayWhich' } }
+    p = step.verb === 'move' ? planMoveTo(a, boards[0], n.value) : planPopMany(a, boards, { display: n.value, context })
+  } else if (key === 'beside') {
+    const t = args[cut + 1]
+    if (!t || args.length !== cut + 2 || !isBoardArg(t)) return { bad: { message: 'besideWhich' } }
+    const other = resolve(t, false)
+    if (other.bad) return { bad: other.bad }
+    // Several boards beside one: each after the one before it.
+    let next = { ...a, context: { ...a.context, ...context } }
+    for (let i = 0; i < boards.length; i++) {
+      p = planMoveBeside(next, boards[i], i ? boards[i - 1] : other.board)
+      if (!p.next) break
+      next = p.next
+    }
+  } else {
+    p = planPopMany(a, boards, { context })
+  }
+  if (!p) return null
+  const name = (b) => labels[b] ?? b
+  const v = p.says.values ?? {}
+  const values = { ...v, ...(v.boards ? { boards: v.boards.map(name) } : {}), ...(v.board ? { board: name(v.board) } : {}), ...(v.other ? { other: name(v.other) } : {}) }
+  return { next: p.next, says: { ...p.says, values } }
+}
+
 /** inspect:204 shows it in detail under the bar. */
 function planInspect(a, step, screens = {}) {
   const num = numberOf(step)
@@ -779,7 +863,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const p = planMoveBranch(only, screens)
     return { answer, says: p.says, next: null, act: p.act }
   }
-  if (only?.verb === 'move' && arrangement.addressed === 'collection' && only.match?.values?.[0]?.kind === 'address') {
+  if (only?.verb === 'move' && arrangement.addressed === 'collection' && only.match?.values?.[0]?.kind === 'address' && !KEYWORDS.has(String(only.match.values[1]?.value ?? ''))) {
     const p = planMoveCard(only, screens)
     return { answer, says: p.says, next: null, act: p.act }
   }
@@ -959,7 +1043,10 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       ? { ...step, match: { ...step.match, values: [{ ...step.match.values[0], value: 'welcome', text: 'welcome' }] } }
       : null
     const planned = byRoom?.step ?? tourShut ?? step
-    const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
+    // Windows with several boards, display and beside (C283).
+    const win = step.verb === 'pop' || step.verb === 'move' ? planWindows(a, step, screens) : null
+    if (win?.bad) return { answer, says: win.bad, next: null }
+    const p = win ? win : BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && step.match?.values?.[0]?.value === 'run' ? planOpenRun(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
         : step.verb === 'open' && branchOf(step) ? openBranch(a, step, screens)
@@ -973,7 +1060,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     last = byRoom && p.says.message === 'closeRoom' ? { message: 'closeRoomNum', values: { num } }
       : byRoom && p.says.message === 'widthRoom' ? { message: 'widthRoomNum', values: { ...p.says.values, num } }
         // pop:… display 2, as this computer's screens allow (C259 (d) to (f)).
-        : p.says.message === 'popDisplay' ? popDisplayLine(p.says, screens.displays ?? null) : p.says
+        : p.says.message === 'popDisplay' ? popDisplayLine(p.says, screens.displays ?? null)
+          // A window for a screen, with a note when it opens here instead (C283).
+          : PLACES.has(p.says.message) ? withNote(p.says, displayNote(p.says.values?.display, screens.displays ?? null)) : p.says
   }
 
   // Records after the line: how many rows it will show, said before Enter.

@@ -2081,6 +2081,15 @@ msgid "enter.barThere"
 msgstr "{place, select, top {The bar is at the top already} bottom {The bar is at the bottom already} left {The bar is on the left already} right {The bar is on the right already} other {The bar is in the centre already}}"
 
 #. js-lingui-explicit-id
+msgid "enter.besideAlready"
+msgstr "{board} is beside {other} already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.besideWhich"
+msgstr "beside takes one board or number: pop:library beside records"
+
+#. js-lingui-explicit-id
 msgid "enter.blockAdd"
 msgstr "Enter puts {block} in {toSlot}"
 
@@ -3409,6 +3418,10 @@ msgid "enter.markupSame"
 msgstr "{on, select, on {Replies are marked up already} other {Replies are clean already}}"
 
 #. js-lingui-explicit-id
+msgid "enter.moveBeside"
+msgstr "Enter puts {board} beside {other}"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter moves {board} to the left} right {Enter moves {board} to the right} other {Enter moves {board} to the middle}}"
 
@@ -3425,8 +3438,16 @@ msgid "enter.moveCardSame"
 msgstr "A card cannot move beside itself"
 
 #. js-lingui-explicit-id
+msgid "enter.moveDisplay"
+msgstr "Enter moves {board} to display {display}"
+
+#. js-lingui-explicit-id
 msgid "enter.moveIsPopped"
 msgstr "{board} is in its own window. pop:back brings it back first"
+
+#. js-lingui-explicit-id
+msgid "enter.moveJoinDisplay"
+msgstr "Enter moves {board} into the window on display {display}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
@@ -4013,6 +4034,15 @@ msgstr "Display {display} is not connected. Enter opens {board} in its own windo
 msgid "enter.popDisplayRefused"
 msgstr "The browser was told not to let Parliament place windows. Enter opens {board} in its own window here"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.popDisplayWhich"
+msgstr "display takes its number, last: pop:records 202 collection display 2"
+
+#. js-lingui-explicit-id
+msgid "enter.popJoinDisplay"
+msgstr "Enter puts {boards} in the window on display {display}"
+
 #. js-lingui-explicit-id
 msgid "enter.popLast"
 msgstr "The last board stays on the page"
@@ -4024,6 +4054,10 @@ msgstr "No board is in its own window"
 #. js-lingui-explicit-id
 msgid "enter.popNotPopped"
 msgstr "{board} is not in its own window"
+
+#. js-lingui-explicit-id
+msgid "enter.popOnDisplay"
+msgstr "{board} is on display {display} already"
 
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
@@ -4037,6 +4071,18 @@ msgstr "{side, select, left {Enter places the window of {board} on the left} oth
 #. js-lingui-explicit-id
 msgid "enter.popSideThere"
 msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.popTogether"
+msgstr "Enter opens {boards} together in a window of their own"
+
+#. js-lingui-explicit-id
+msgid "enter.popTogetherAlready"
+msgstr "{boards} share a window already"
+
+#. js-lingui-explicit-id
+msgid "enter.popTogetherDisplay"
+msgstr "Enter opens {boards} together in a window on display {display}"
 
 #. js-lingui-explicit-id
 msgid "enter.privacyNames"
@@ -5787,6 +5833,22 @@ msgstr "In a window this narrow the boards are stacked, each the whole width"
 #. js-lingui-explicit-id
 msgid "enter.widthThere"
 msgstr "That is its width already"
+
+#. js-lingui-explicit-id
+msgid "enter.windowAsk"
+msgstr "The browser asks once whether Parliament may place windows on your screens"
+
+#. js-lingui-explicit-id
+msgid "enter.windowHereCannot"
+msgstr "This browser cannot place windows on other screens, so it opens here"
+
+#. js-lingui-explicit-id
+msgid "enter.windowHereNone"
+msgstr "Display {display} is not connected, so it opens here"
+
+#. js-lingui-explicit-id
+msgid "enter.windowHereRefused"
+msgstr "The browser was told not to let Parliament place windows, so it opens here"
 
 #. js-lingui-explicit-id
 msgid "erase.about"
@@ -8728,6 +8790,14 @@ msgid "shell.focusRuns"
 msgstr "Runs {command}"
 
 #. js-lingui-explicit-id
+msgid "shell.fullScreen"
+msgstr "full screen"
+
+#. js-lingui-explicit-id
+msgid "shell.leaveFullScreen"
+msgstr "leave full screen"
+
+#. js-lingui-explicit-id
 msgid "shell.referenceClose"
 msgstr "Escape closes this"
 
@@ -9129,7 +9199,7 @@ msgstr "Show what a model or a source answered"
 
 #. js-lingui-explicit-id
 msgid "verb.move"
-msgstr "Move a board to the left, right or middle, or a branch in its plan"
+msgstr "Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
@@ -9161,7 +9231,7 @@ msgstr "Bring the Plan board beside what is on screen"
 
 #. js-lingui-explicit-id
 msgid "verb.pop"
-msgstr "Put a board or the bar in its own window, place it, or bring it back"
+msgstr "Put one or more boards, or the bar, in a window of their own, place it, or bring it back"
 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
@@ -9460,6 +9530,11 @@ msgstr "Open the Lab, where rooms are built"
 #. js-lingui-explicit-id
 msgid "welcome.step.name"
 msgstr "Name the room"
+
+#. {command} is name: with the number, as name:202 "…"; it stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.nameHow"
+msgstr "{command}, the room’s number then its name"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"

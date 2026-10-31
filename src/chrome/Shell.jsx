@@ -10,7 +10,7 @@ import { openSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arran
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
+import { shipped, address, planOpen, planClose, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -18,6 +18,7 @@ import { openPopout, closePopout, placePopout, movePopout, onPopoutClosed } from
 import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../shell/screens'
 import { mapOf, mapFoot, savedNow as savedOnScreen } from '../shell/screensMap'
 import ScreensMap from './ScreensMap'
+import FullScreenMark from './FullScreenMark'
 import { useScreenSize } from '../shell/sizes'
 import { vault, moveKeysToVault, availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
@@ -214,17 +215,19 @@ function failure(err, source = destination(SOURCE)?.name) {
 }
 
 // Windows to open, close and place to go from one arrangement to the next.
+// A window holds one board or several (C283): it is known by its key, and
+// stays open while boards come and go in it.
 function windowChanges(from, to) {
-  const was = new Set(from.popped.map((p) => p.board))
-  const now = new Set(to.popped.map((p) => p.board))
-  const open = [...now].filter((b) => !was.has(b))
-  const close = [...was].filter((b) => !now.has(b))
+  const before = new Map(windowsOf(from).map((w) => [w.key, w]))
+  const after = new Map(windowsOf(to).map((w) => [w.key, w]))
+  const open = [...after.keys()].filter((k) => !before.has(k))
+  const close = [...before.keys()].filter((k) => !after.has(k))
   if (to.bar.popped && !from.bar.popped) open.push(BAR)
   if (!to.bar.popped && from.bar.popped) close.push(BAR)
   // A window moved to its side, or to another screen (a saved arrangement, C259 (e)).
-  const place = to.popped.filter((p) => {
-    const q = from.popped.find((w) => w.board === p.board)
-    return q && ((p.side && q.side !== p.side) || (q.display ?? null) !== (p.display ?? null))
+  const place = [...after.values()].filter((w) => {
+    const q = before.get(w.key)
+    return q && ((w.side && q.side !== w.side) || (q.display ?? null) !== (w.display ?? null))
   })
   return { open, close, place }
 }
@@ -479,11 +482,16 @@ export default function Shell() {
     setWindows({ ...handles.current })
   }, [])
 
-  // A window closed by the person brings its board, or the bar, back.
+  // A window closed by the person closes its boards (31 October; C283):
+  // nothing they hold is lost, and open: or pop: brings each again. The
+  // bar's own window brings the bar back, since there is always one bar.
   const watch = useCallback((key, handle) => onPopoutClosed(handle, () => {
     forget(key)
     const a = current.current
-    commit(key === BAR ? planPopBar(a, false).next : planPopBack(a, key).next)
+    if (key === BAR) { commit(planPopBar(a, false).next); return }
+    let next = a
+    for (const b of windowsOf(a).find((w) => w.key === key)?.boards ?? []) next = planClose(next, b).next ?? next
+    commit(next)
   }), [commit, forget])
 
   /** Runs a planned arrangement: opens, closes and places its windows, then keeps it. */
@@ -501,6 +509,21 @@ export default function Shell() {
     return { width: Math.round(r.width) + 2 * POPPED_MARGIN, height: Math.round(Math.max(shown, 0)) + 2 * POPPED_MARGIN }
   }, [])
 
+  // A window's size from its boards on the page: their widths side by side,
+  // the tallest; a board not on the page counts as 600 (C283).
+  const windowSize = useCallback((boards) => {
+    const sizes = boards.map((b) => boardSize(b))
+    if (sizes.every((s) => !s)) return null
+    return { width: sizes.reduce((t, s) => t + (s?.width ?? 600), 0), height: Math.max(...sizes.map((s) => s?.height ?? 600)) }
+  }, [boardSize])
+  // Its title: its boards' names, never anything someone wrote.
+  const windowTitleOf = useCallback((boards) => {
+    const names = boards.map((b) => i18n._(isRoom(b) ? COPY.boards.oneRoom : COPY.boards[b] ?? COPY.boards.room))
+    let board = names.join(', ')
+    try { board = new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(names) } catch { /* the names, with commas */ }
+    return i18n._(COPY.shell.windowTitle, { board })
+  }, [i18n])
+
   const run = useCallback(async (next, body) => {
     setInspected(null)
     setKeyPanel(null)
@@ -509,14 +532,20 @@ export default function Shell() {
     const opened = []
     // A window for another screen (C259 (e)): the browser is asked first,
     // at this Enter, when it has not been. A screen not here opens it here.
-    const windowOf = (key) => (key === BAR ? null : next.popped.find((p) => p.board === key) ?? null)
+    // A window holds one board or several (C283), known by its key.
+    const windowOf = (key) => (key === BAR ? null : windowsOf(next).find((w) => w.key === key) ?? null)
     let shown = displaysNow.current
     if ((changes.open.some((key) => windowOf(key)?.display) || changes.place.some((p) => p.display)) && mustAsk(shown)) shown = (await learnScreens()) ?? displaysNow.current
     for (const key of changes.open) {
-      const title = key === BAR ? i18n._(COPY.shell.barWindow) : i18n._(COPY.shell.windowTitle, { board: i18n._(COPY.boards[key]) })
       const w = windowOf(key)
-      const at = w?.display ? placeOn(shown?.list, w.display, w.side) : null
-      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop, at, size: key === BAR ? null : boardSize(key) })
+      const title = key === BAR ? i18n._(COPY.shell.barWindow) : windowTitleOf(w.boards)
+      const screen = w?.display ? (shown?.list ?? []).find((s) => s.n === w.display) ?? null : null
+      // A window for a screen fills it (C283), unless it was put at a side;
+      // else it opens at the size its boards had on the page (C280).
+      const fill = Boolean(screen && !w.side)
+      const at = fill ? { left: screen.left, top: screen.top } : w?.display ? placeOn(shown?.list, w.display, w.side) : null
+      const size = key === BAR ? null : fill ? { width: screen.availWidth, height: screen.availHeight } : windowSize(w.boards)
+      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop, at, size, on: fill ? screen : null })
       if (!handle) { opened.forEach(([, h]) => closePopout(h)); return 'popBlocked' }
       opened.push([key, handle])
     }
@@ -528,11 +557,18 @@ export default function Shell() {
     }
     for (const [key, handle] of opened) {
       handle.unwatch = watch(key, handle)
-      if (key !== BAR) handle.win.addEventListener('focus', () => commit(address(current.current, key)))
+      // Focusing a window points the bar at its board, or its first, unless the bar is on one of its boards already.
+      if (key !== BAR) {
+        handle.win.addEventListener('focus', () => {
+          const a = current.current
+          const w = windowsOf(a).find((x) => x.key === key)
+          if (w && !w.boards.includes(a.addressed)) commit(address(a, w.boards[0]))
+        })
+      }
       handles.current[key] = handle
     }
     for (const p of changes.place) {
-      const handle = handles.current[p.board]
+      const handle = handles.current[p.key]
       if (!handle) continue
       const screen = p.display ? (shown?.list ?? []).find((s) => s.n === p.display) ?? null : null
       if (p.side) placePopout(handle, p.side, screen)
@@ -544,7 +580,7 @@ export default function Shell() {
       keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
     }
     return null
-  }, [commit, i18n, watch, learnScreens, boardSize])
+  }, [commit, i18n, watch, learnScreens, windowSize, windowTitleOf])
 
   // ── The room in the space (stage 4; C125) ─────────────
   // The chat it shows, and a prompt waiting for a new room to load.
@@ -1131,6 +1167,8 @@ export default function Shell() {
         return err?.name === 'Changed' ? { message: 'rowsChanged', values: { nums: err.nums } } : 'rowsFailed'
       }
       touched.current?.records.push(...done)
+      // name:202 "…" names the chat its room shows: the welcome step crosses off (31 October).
+      if (what.changes.some((c) => c.store === 'conversations' && typeof c.set?.title === 'string')) updateWelcome((w) => tick(w, 'name'))
       remember(body)
       return null
     }
@@ -3797,7 +3835,8 @@ export default function Shell() {
       }
       board = here
     }
-    if (handles.current[board]) { handles.current[board].win.focus(); commit(address(a, board)); return }
+    const inWindow = handles.current[windowWith(a, board)?.key]
+    if (inWindow) { inWindow.win.focus(); commit(address(a, board)); return }
     commit(a.columns.flat().includes(board) ? address(a, board) : planOpen(a, board).next)
   }
 
@@ -3810,6 +3849,13 @@ export default function Shell() {
   // and the page itself while the bar is in a window of its own.
   const boardDocs = useMemo(() => Object.entries(windows).filter(([key, h]) => key !== BAR && h?.win).map(([, h]) => h.win.document), [windows])
   const otherDocs = useMemo(() => (barWindow ? [document, ...boardDocs] : boardDocs), [barWindow, boardDocs])
+  // A window's title follows the boards in it (C283).
+  useEffect(() => {
+    for (const w of windowsOf(arrangement)) {
+      const h = windows[w.key]
+      if (h?.win && !h.win.closed) h.win.document.title = windowTitleOf(w.boards)
+    }
+  }, [arrangement, windows, windowTitleOf])
   // The welcome page, or the start card that takes its place (C282): either
   // lays the screen out as the welcome page does, the bar in the card.
   const welcomeOpen = arrangement.columns.some((c) => c.includes('welcome'))
@@ -3920,7 +3966,7 @@ export default function Shell() {
       return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
+      return <WelcomeBoard key="welcome" roomNum={lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
     }
     if (board === 'canvas') {
       return (
@@ -4057,19 +4103,23 @@ export default function Shell() {
         </div>,
         barWindow.container,
       )}
-      {arrangement.popped.filter((p) => windows[p.board]).map((p) => createPortal(
-        // A popped board has no bar of its own: the one bar commands it, and
-        // focusing its window points the bar at it (C280).
+      {windowsOf(arrangement).filter((w) => windows[w.key]).map((w) => createPortal(
+        // A popped window has no bar of its own: the one bar commands it, and
+        // focusing it points the bar at it (C280). Its boards side by side,
+        // as columns on the page (C283), and its full screen mark.
         <div className="ch-shell ch-in-window">
-          {awayIn === windows[p.board].win.document && <p className="ch-elsewhere ch-marg" role="status">{i18n._(COPY.shell.barElsewhere)}</p>}
+          {awayIn === windows[w.key].win.document && <p className="ch-elsewhere ch-marg" role="status">{i18n._(COPY.shell.barElsewhere)}</p>}
+          <FullScreenMark win={windows[w.key].win} />
           <main className="ch-stage">
-            <div className="ch-col main">
-              {drawBoard(p.board, true)}
-            </div>
+            {w.boards.map((b) => (
+              <div key={b} className="ch-col main">
+                {drawBoard(b, true)}
+              </div>
+            ))}
           </main>
         </div>,
-        windows[p.board].container,
-        p.board,
+        windows[w.key].container,
+        w.key,
       ))}
       {onWelcome && <WelcomeFoot />}
       {intro && <Intro onEnd={endIntro} />}

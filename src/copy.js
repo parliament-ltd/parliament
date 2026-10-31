@@ -150,6 +150,23 @@ export const COPY = {
     popNotPopped: /*i18n*/ { id: 'enter.popNotPopped', message: '{board} is not in its own window' },
     popNothing: /*i18n*/ { id: 'enter.popNothing', message: 'No board is in its own window' },
     popBackOne: /*i18n*/ { id: 'enter.popBackOne', message: 'Enter brings {board} back to the page' },
+    // Windows that hold several boards (C283).
+    popTogether: /*i18n*/ { id: 'enter.popTogether', message: 'Enter opens {boards} together in a window of their own' },
+    popTogetherDisplay: /*i18n*/ { id: 'enter.popTogetherDisplay', message: 'Enter opens {boards} together in a window on display {display}' },
+    popTogetherAlready: /*i18n*/ { id: 'enter.popTogetherAlready', message: '{boards} share a window already' },
+    popJoinDisplay: /*i18n*/ { id: 'enter.popJoinDisplay', message: 'Enter puts {boards} in the window on display {display}' },
+    popOnDisplay: /*i18n*/ { id: 'enter.popOnDisplay', message: '{board} is on display {display} already' },
+    moveDisplay: /*i18n*/ { id: 'enter.moveDisplay', message: 'Enter moves {board} to display {display}' },
+    moveJoinDisplay: /*i18n*/ { id: 'enter.moveJoinDisplay', message: 'Enter moves {board} into the window on display {display}' },
+    moveBeside: /*i18n*/ { id: 'enter.moveBeside', message: 'Enter puts {board} beside {other}' },
+    besideAlready: /*i18n*/ { id: 'enter.besideAlready', message: '{board} is beside {other} already' },
+    besideWhich: /*i18n*/ { id: 'enter.besideWhich', message: 'beside takes one board or number: pop:library beside records', comment: 'Commands stay English' },
+    popDisplayWhich: /*i18n*/ { id: 'enter.popDisplayWhich', message: 'display takes its number, last: pop:records 202 collection display 2', comment: 'Commands stay English' },
+    // Under a line that places a window on a screen, when it cannot go there (C283; C259 (d) to (f)).
+    windowHereCannot: /*i18n*/ { id: 'enter.windowHereCannot', message: 'This browser cannot place windows on other screens, so it opens here' },
+    windowHereNone: /*i18n*/ { id: 'enter.windowHereNone', message: 'Display {display} is not connected, so it opens here' },
+    windowHereRefused: /*i18n*/ { id: 'enter.windowHereRefused', message: 'The browser was told not to let Parliament place windows, so it opens here' },
+    windowAsk: /*i18n*/ { id: 'enter.windowAsk', message: 'The browser asks once whether Parliament may place windows on your screens' },
     popBackAll: /*i18n*/ { id: 'enter.popBackAll', message: '{count, plural, one {Enter brings # window back to the page} other {Enter brings # windows back to the page}}' },
     popSideThere: /*i18n*/ {
       id: 'enter.popSideThere',
@@ -1729,6 +1746,7 @@ export const COPY = {
     stepAskHowFree: /*i18n*/ { id: 'welcome.step.askHowFree', message: '{command} and a question, answered from Wikipedia with no AI', comment: '{command} is p>, which stays English' },
     stepAlmanac: /*i18n*/ { id: 'welcome.step.almanac', message: 'See what you have made' },
     stepName: /*i18n*/ { id: 'welcome.step.name', message: 'Name the room' },
+    stepNameHow: /*i18n*/ { id: 'welcome.step.nameHow', message: '{command}, the room’s number then its name', comment: '{command} is name: with the number, as name:202 "…"; it stays English' },
     stepPop: /*i18n*/ { id: 'welcome.step.pop', message: 'Pop a board into its own window' },
     stepLab: /*i18n*/ { id: 'welcome.step.lab', message: 'Open the Lab, where rooms are built' },
     stepKey: /*i18n*/ { id: 'welcome.step.key', message: 'Add an AI API key' },
@@ -2612,6 +2630,9 @@ export const COPY = {
     referenceOn: /*i18n*/ { id: 'shell.referenceOn', message: 'Works on {boards}', comment: 'Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection' },
     referenceKeys: /*i18n*/ { id: 'shell.referenceKeys', message: 'A click writes a command into the field, and Enter runs it. {example} shows the forms of one command.', comment: 'The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English' },
     windowTitle: /*i18n*/ { id: 'shell.windowTitle', message: '{board} · Parliament', comment: "A popped window's title: a board name only, never anything someone wrote" },
+    // A window's own marks, in its corner (C283): true full screen needs a click in that window.
+    fullScreen: /*i18n*/ { id: 'shell.fullScreen', message: 'full screen' },
+    leaveFullScreen: /*i18n*/ { id: 'shell.leaveFullScreen', message: 'leave full screen' },
     barWindow: /*i18n*/ { id: 'shell.barWindow', message: 'Parliament', comment: "The popped bar's window title" },
     barAway: /*i18n*/ { id: 'shell.barAway', message: 'The bar is in its own window. pop:back command brings it back.' },
     // The edge between two columns (C126). {first} and {second} are what stands on either side.

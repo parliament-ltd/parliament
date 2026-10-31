@@ -34,7 +34,10 @@ const TITLES = {
 }
 
 // What a step's command line says, where it is more than its command.
-function howOf(i18n, s, keyed) {
+function howOf(i18n, s, keyed, roomNum = null) {
+  // name: with the room's number, then its name (31 October): from the
+  // welcome page the bar points at the page, not the room.
+  if (s.id === 'name') return i18n._(COPY.welcome.stepNameHow, { command: roomNum ? `name:${roomNum} "…"` : 'name:' })
   if (s.id === 'command') return i18n._(COPY.welcome.stepCommandHow, { keys: modKey() === '⌘' ? '⌘K' : 'Ctrl+K', command: s.shows })
   if (s.id === 'ask') return i18n._(keyed ? COPY.welcome.stepAskHow : COPY.welcome.stepAskHowFree, { command: s.shows })
   // Backspace over selected words strikes them (30 October): the key people already know.
@@ -65,7 +68,7 @@ function withCommand(i18n, descriptor, command, onWrite) {
  *   keep?: { asking: boolean, onAsk: () => void }|null }} props
  *   keep: when the browser has not agreed to keep Parliament's data and there is something to lose (C94)
  */
-export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage, keyed = false }) {
+export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage, keyed = false, roomNum = null }) {
   const { i18n } = useLingui()
   const next = nextStep(welcome)
   const steps = !welcome.off && !welcome.finished
@@ -92,7 +95,8 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
             <ol className="ch-steps" aria-label={i18n._(COPY.welcome.steps)}>
               {STEPS.map((s, i) => {
                 const done = welcome.done.includes(s.id)
-                const how = howOf(i18n, s, keyed)
+                const how = howOf(i18n, s, keyed, roomNum)
+                const writes = s.id === 'name' && roomNum ? `>name:${roomNum} ""` : s.writes
                 return (
                   <li key={s.id} className={done ? 'done' : next?.id === s.id ? 'next' : undefined}>
                     <span className="n">{i + 1}</span>
@@ -100,7 +104,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
                       <span className="t">{i18n._(TITLES[s.id], { board: i18n._(COPY.boards.collection) })}</span>
                       {/* A step no command does yet says what to do, and writes nothing (C282). */}
                       {s.writes
-                        ? <button type="button" className="c" dir="ltr" onClick={() => onWrite(s.writes)}>{how}</button>
+                        ? <button type="button" className="c" dir="ltr" onClick={() => onWrite(writes)}>{how}</button>
                         : <span className="c">{how}</span>}
                     </span>
                   </li>

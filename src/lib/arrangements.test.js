@@ -34,7 +34,7 @@ describe('reading an arrangement back', () => {
     expect(a).toEqual({
       id: 'almanac',
       columns: [['almanac'], ['collection']],
-      popped: [{ board: 'library', display: 2, side: null, from: 2 }],
+      popped: [{ board: 'library', display: 2, side: null, from: 2, window: 2 }],
       addressed: 'almanac',
       bar: { at: 'top', side: 'center', popped: false },
       resting: null,

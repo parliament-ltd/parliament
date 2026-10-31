@@ -87,7 +87,7 @@ export function currentRoom(a) {
 export const roomShowing = (a, chat) => (chat ? roomsIn(a).find((b) => chatIn(a, b) === chat) ?? null : null)
 
 /** The board a new room takes: 'room' when free, else the first free 'room-n'. */
-function freeRoom(a) {
+export function freeRoom(a) {
   // In the Lab, the rooms of the space before it are kept for done: too
   // (C245): a room tried there takes a board of its own.
   const before = a.lab ? [...(a.lab.columns ?? []).flat(), ...(a.lab.popped ?? []).map((p) => p.board)].filter(isRoom) : []
@@ -164,6 +164,42 @@ const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x
   === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus), recordsColumns(y), Boolean(y.lab)])
 const refuse = (message, values) => ({ next: null, says: { message, values } })
 const go = (next, message, values) => ({ next, says: { message, values } })
+
+// ── Windows of their own (C283) ─────────────────────────
+// A window can hold several boards, side by side, so one screen is one
+// window. Boards popped with the same window number share it; their order
+// in `popped` is their order in it, left to right, and they share its
+// display and side. The page is window 1; a window takes the lowest number
+// free from 2. One popped before C283 has no number and is a window to
+// itself (cleanArrangement gives it one).
+
+/** The key a window is known by: its number, or its one board's before C283. */
+export const windowKey = (p) => (Number.isInteger(p?.window) ? `w${p.window}` : p?.board)
+
+/**
+ * The windows of an arrangement, in the order they first appear.
+ * @returns {Array<{ key: string, number: number|null, boards: string[], display: number|null, side: string|null }>}
+ */
+export function windowsOf(a) {
+  const out = new Map()
+  for (const p of a.popped ?? []) {
+    const key = windowKey(p)
+    if (!out.has(key)) out.set(key, { key, number: Number.isInteger(p.window) ? p.window : null, boards: [], display: p.display ?? null, side: p.side ?? null })
+    out.get(key).boards.push(p.board)
+  }
+  return [...out.values()]
+}
+
+/** The window a popped board is in, or null. */
+export const windowWith = (a, board) => windowsOf(a).find((w) => w.boards.includes(board)) ?? null
+
+/** The lowest window number free, from 2 (the page is 1). */
+export function freeWindow(a) {
+  const used = new Set((a.popped ?? []).map((p) => p.window).filter(Number.isInteger))
+  let n = 2
+  while (used.has(n)) n++
+  return n
+}
 
 // After a board leaves the page, the bar points at the board that stood
 // before it, or else the first one (Docket v12).
@@ -321,9 +357,27 @@ export function planClose(a, board = a.addressed) {
   return go2(next, said, { board })
 }
 
-/** move:<board> left|right|middle. The board's column goes to that place; the others shift along. */
+/**
+ * move:<board> left|right|middle. The board's column goes to that place;
+ * the others shift along. In a window with others (C283), its place among
+ * them.
+ */
 export function planMove(a, board, place) {
-  if (!isOnPage(a, board)) return refuse(isPopped(a, board) ? 'moveIsPopped' : 'closeNotHere', { board })
+  const w = isPopped(a, board) ? windowWith(a, board) : null
+  if (w) {
+    if (w.boards.length < 2) return refuse('moveIsPopped', { board })
+    const rest = w.boards.filter((b) => b !== board)
+    const at = place === 'left' ? 0 : place === 'right' ? rest.length : Math.floor(rest.length / 2)
+    const order = [...rest.slice(0, at), board, ...rest.slice(at)]
+    if (order.join() === w.boards.join()) return refuse('moveThere', { board, place })
+    const next = copy(a)
+    const mine = next.popped.filter((p) => windowKey(p) === w.key)
+    const others = next.popped.filter((p) => windowKey(p) !== w.key)
+    next.popped = [...others, ...order.map((b) => mine.find((p) => p.board === b))]
+    next.addressed = board
+    return go(next, 'moveBoard', { board, place })
+  }
+  if (!isOnPage(a, board)) return refuse('closeNotHere', { board })
   const rest = without(a.columns, board)
   const at = place === 'left' ? 0 : place === 'right' ? rest.length : Math.floor(rest.length / 2)
   const columns = [...rest.slice(0, at), [board], ...rest.slice(at)]
@@ -331,24 +385,131 @@ export function planMove(a, board, place) {
   return go({ ...copy(a), columns, addressed: board }, 'moveBoard', { board, place })
 }
 
-/** swap:<board> <board>. The two change places. */
+/** swap:<board> <board>. The two change places: on the page, in a window, or one in each (C283). */
 export function planSwap(a, first, second) {
   if (first === second) return refuse('swapSame')
-  for (const b of [first, second]) if (!isOnPage(a, b)) return refuse('closeNotHere', { board: b })
-  const columns = a.columns.map((c) => c.map((b) => (b === first ? second : b === second ? first : b)))
-  return go({ ...copy(a), columns }, 'swapBoards', { first, second })
+  for (const b of [first, second]) if (!isOnPage(a, b) && !isPopped(a, b)) return refuse('closeNotHere', { board: b })
+  const other = (b) => (b === first ? second : b === second ? first : b)
+  const next = copy(a)
+  next.columns = a.columns.map((c) => c.map(other))
+  // In a window, each takes the other's place and keeps where it came from on the page.
+  next.popped = a.popped.map((p) => ({ ...p, board: other(p.board) }))
+  return go(next, 'swapBoards', { first, second })
 }
 
-/** pop:<board> [display n]. Its own window; a board not open goes straight into one. */
-export function planPop(a, board, display = null) {
-  if (isPopped(a, board)) return refuse('popAlready', { board })
-  if (isOnPage(a, board) && onPage(a).length === 1) return refuse('popLast', { board })
+// Takes boards from wherever they are (the page, a window) and puts them in
+// one window: the one keyed `key`, or a new one with `display`. With
+// `after`, they go in right after that board; else at the window's end.
+// Changes nothing of `a`; returns the next arrangement.
+function intoWindow(a, boards, { key = null, display = null, after = null } = {}) {
   const next = copy(a)
-  const from = isOnPage(a, board) ? columnOf(a, board) : a.columns.length
+  const target = key ? windowsOf(a).find((w) => w.key === key) : null
+  const number = target?.number ?? freeWindow(a)
+  const place = target ? { display: target.display, side: target.side } : { display, side: null }
+  // A window from before C283 takes a number as another board joins it.
+  if (target && target.number == null) for (const p of next.popped) if (windowKey(p) === target.key) p.window = number
+  const moving = boards.map((board) => {
+    const was = a.popped.find((p) => p.board === board)
+    const from = isOnPage(a, board) ? columnOf(a, board) : was?.from ?? a.columns.length
+    return { board, ...place, from, window: number }
+  })
+  for (const board of boards) next.columns = without(next.columns, board)
+  next.popped = next.popped.filter((p) => !boards.includes(p.board))
+  const at = after ? next.popped.findIndex((p) => p.board === after) + 1
+    : next.popped.reduce((last, p, i) => (p.window === number ? i + 1 : last), next.popped.length)
+  next.popped.splice(at > 0 ? at : next.popped.length, 0, ...moving)
+  next.addressed = boards[0]
+  return next
+}
+
+// The page keeps at least one board.
+const emptiesPage = (a, boards) => onPage(a).length > 0 && onPage(a).every((b) => boards.includes(b))
+
+/**
+ * pop:<board> [display n]. Its own window; a board not open goes straight
+ * into one. With a display that a window is on already, it joins that
+ * window, so one screen stays one window (C283).
+ */
+export function planPop(a, board, display = null) {
+  const there = display ? windowsOf(a).find((w) => w.display === display) : null
+  if (there?.boards.includes(board)) return refuse('popOnDisplay', { board, display })
+  if (isPopped(a, board) && !display) return refuse('popAlready', { board })
+  if (isPopped(a, board) && !there) return planMoveTo(a, board, display)
+  if (isOnPage(a, board) && onPage(a).length === 1) return refuse('popLast', { board })
+  if (there) return go(intoWindow(a, [board], { key: there.key }), 'popJoinDisplay', { boards: [board], display })
+  return go(intoWindow(a, [board], { display }), display ? 'popDisplay' : 'popBoard', { board, display })
+}
+
+/**
+ * pop:records 202 collection [display n] (C283): the boards side by side in
+ * one window of their own, in the order named. A window already on that
+ * display takes them instead of a new one.
+ * @param {string[]} boards board ids, rooms found or made by the caller
+ * @param {{ display?: number|null, context?: Record<string, string> }} [options] context: a new room's chat
+ */
+export function planPopMany(a, boards, { display = null, context = {} } = {}) {
+  const list = [...new Set(boards)]
+  if (list.length === 1 && !Object.keys(context).length) return planPop(a, list[0], display)
+  if (emptiesPage(a, list)) return refuse('popLast', { board: list[0] })
+  const there = display ? windowsOf(a).find((w) => w.display === display) : null
+  const base = { ...a, context: { ...a.context, ...context } }
+  if (there) {
+    const joining = list.filter((b) => !there.boards.includes(b))
+    if (!joining.length) return refuse('popOnDisplay', { board: list[0], display })
+    return go2(intoWindow(base, joining, { key: there.key }), 'popJoinDisplay', { boards: joining, display })
+  }
+  const one = windowsOf(a).find((w) => w.boards.join() === list.join())
+  if (one && !display) return refuse('popTogetherAlready', { boards: list })
+  // One board, a room opened for its chat: said as pop: says one.
+  if (list.length === 1) return go2(intoWindow(base, list, { display }), display ? 'popDisplay' : 'popBoard', { board: list[0], display })
+  return go2(intoWindow(base, list, { display }), display ? 'popTogetherDisplay' : 'popTogether', { boards: list, display })
+}
+
+/**
+ * move:<board> display n (C283): to the window on that screen, or, alone
+ * in its window, the window goes there; else a window of its own there.
+ */
+export function planMoveTo(a, board, display) {
+  if (!isOnPage(a, board) && !isPopped(a, board)) return refuse('closeNotHere', { board })
+  const w = windowWith(a, board)
+  if (w?.display === display) return refuse('popOnDisplay', { board, display })
+  if (!w && onPage(a).length === 1) return refuse('popLast', { board })
+  const there = windowsOf(a).find((x) => x.display === display)
+  if (there) return go(intoWindow(a, [board], { key: there.key }), 'moveJoinDisplay', { board, display })
+  if (w && w.boards.length === 1) {
+    const next = copy(a)
+    for (const p of next.popped) if (windowKey(p) === w.key) { p.display = display; p.side = null }
+    next.addressed = board
+    return go(next, 'moveDisplay', { board, display })
+  }
+  return go(intoWindow(a, [board], { display }), 'moveDisplay', { board, display })
+}
+
+/**
+ * move:<board> beside <board>, and pop:… beside … (C283): into the window
+ * the other is in, right after it; or onto the page, the column after it.
+ * @param {Record<string, string>} [context] a new room's chat
+ */
+export function planMoveBeside(a, board, other, context = {}) {
+  if (board === other) return refuse('swapSame')
+  if (!isOnPage(a, other) && !isPopped(a, other)) return refuse('closeNotHere', { board: other })
+  const base = { ...a, context: { ...a.context, ...context } }
+  const w = windowWith(a, other)
+  if (w) {
+    if (w.boards.includes(board)) {
+      if (w.boards[w.boards.indexOf(other) + 1] === board) return refuse('besideAlready', { board, other })
+    } else if (isOnPage(a, board) && onPage(a).length === 1) return refuse('popLast', { board })
+    return go2(intoWindow(base, [board], { key: w.key, after: other }), 'moveBeside', { board, other })
+  }
+  // Beside a board on the page: a column of its own right after the other's.
+  const next = copy(base)
+  next.popped = next.popped.filter((p) => p.board !== board)
   next.columns = without(next.columns, board)
-  next.popped.push({ board, display, side: null, from })
+  const at = next.columns.findIndex((c) => c.includes(other)) + 1
+  if (JSON.stringify([...next.columns.slice(0, at), [board], ...next.columns.slice(at)]) === JSON.stringify(a.columns)) return refuse('besideAlready', { board, other })
+  next.columns.splice(at, 0, [board])
   next.addressed = board
-  return go(next, display ? 'popDisplay' : 'popBoard', { board, display })
+  return go2(next, 'moveBeside', { board, other })
 }
 
 /** pop:back, or pop:back <board>. Windows come back to where they stood. */
@@ -362,13 +523,13 @@ export function planPopBack(a, board = null) {
   return board ? go(next, 'popBackOne', { board }) : go(next, 'popBackAll', { count: going.length })
 }
 
-/** pop:left, pop:right. Places the window of the board the bar is pointed at. */
+/** pop:left, pop:right. Places the window of the board the bar is pointed at, and every board in it (C283). */
 export function planPopSide(a, side) {
   const p = a.popped.find((w) => w.board === a.addressed)
   if (!p) return refuse('popNotPopped', { board: a.addressed })
   if (p.side === side) return refuse('popSideThere', { board: p.board, side })
   const next = copy(a)
-  next.popped.find((w) => w.board === p.board).side = side
+  for (const q of next.popped) if (windowKey(q) === windowKey(p)) q.side = side
   return go(next, 'popSide', { board: p.board, side })
 }
 
@@ -714,6 +875,9 @@ export function plan(a, step, layout = null) {
       if (!args.length) return planClose(a)
       return one ? planClose(a, one) : null
     case 'move':
+      // move:library display 3, move:library beside records (C283).
+      if (one && second === 'display' && args[2]?.kind === 'number') return planMoveTo(a, one, args[2].value)
+      if (one && second === 'beside') { const other = room(boardFor(word(args[2]))); return other ? planMoveBeside(a, one, other) : null }
       return one ? planMove(a, one, second) : null
     case 'swap':
       return planSwap(a, one ?? first, two ?? second)

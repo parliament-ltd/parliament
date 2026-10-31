@@ -331,6 +331,10 @@
    58vh). In a window of its own, or in the welcome card, it keeps to them. */
 .ch-dock.bottom .ch-ref { position: absolute; inset-inline: var(--ch-ref-edge); bottom: calc(100% - 12px); margin: 0 0 10px; max-height: 58vh; }
 .ch-dock.window .ch-ref, .ch-dock.card .ch-ref { margin-inline: 0; }
+/* The panels under the field open above it too, with the bar at the bottom: the
+   keys (api:) and backups, inspect: and compare:, and the letter (31 October).
+   The bar stays where it is. */
+.ch-dock.bottom :is(.ch-keys, .ch-inspect, .ch-letterp) { position: absolute; inset-inline: clamp(16px, 4vw, 32px); bottom: calc(100% - 12px); margin: 0 0 10px; max-height: 58vh; z-index: 2; }
 .ch-shell.size-phone .ch-ref { --ch-ref-edge: 10px; }
 /* The languages opened from the globe: a panel right under it, in its
    corner, one column (30 October). */
@@ -391,6 +395,9 @@
 .ch-in-window { min-height: 100vh; }
 .ch-in-window .ch-stage { padding: 12px; }
 .ch-in-window .ch-col > * { flex: 1 1 auto; }
+/* A window's full screen mark, in its corner (C283). */
+.ch-shell .ch-winfull { position: fixed; bottom: 4px; inset-inline-end: 14px; z-index: 5; color: var(--ch-marg); }
+.ch-shell .ch-winfull:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 /* Where the bar is, said in a popped board's window after Ctrl+K or / (C280). */
 .ch-elsewhere { margin: 10px 12px 0; padding: 6px 10px; border-inline-start: 2px solid var(--ch-ink); background: var(--ch-surface); }
 .ch-dock.window { position: static; padding: 12px 14px 6px; background: var(--ch-paper); border-bottom: .5px solid var(--ch-rule); }

@@ -125,8 +125,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `bar:bottom` | Move the bar on the page | `bar:top`, `bar:bottom`, `bar:left`, `bar:center`, `bar:right` | everywhere | yes |
-| `pop:records` | Put a board or the bar in its own window, place it, or bring it back | `pop:records`, `pop:201b`, `pop:settings keys`, `pop:library display 2`, `pop:command`, `pop:back`, `pop:back library`, `pop:left` | everywhere | yes |
-| `move:library left` | Move a board to the left, right or middle, or a branch in its plan | `move:library left`, `move:201c after 201a` | everywhere | yes |
+| `pop:records` | Put one or more boards, or the bar, in a window of their own, place it, or bring it back | `pop:records`, `pop:records 202 collection display 2`, `pop:library beside records`, `pop:settings keys`, `pop:library display 2`, `pop:command`, `pop:back`, `pop:back library`, `pop:left` | everywhere | yes |
+| `move:library left` | Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan | `move:library left`, `move:library display 3`, `move:202 beside library`, `move:201c after 201a` | everywhere | yes |
 | `swap:records collection` | Swap two boards | `swap:records collection` | everywhere | yes |
 | `reset:` | Put the boards back as shipped and close the windows | `reset:` | everywhere | yes |
 | `width:60%` | Choose how much of the width a board takes, or put every width back | `width:60%`, `width:library 30%`, `width:204 40%`, `width:even` | everywhere | yes |

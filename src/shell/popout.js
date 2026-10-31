@@ -60,10 +60,11 @@ function prepare(win, { title, from }) {
  * pop-up blocker lets it through.
  * at: where on which screen it opens, for pop:… display 2 (C259 (e)); the browser places it there once it allows.
  * size: the inside of the window, for a board the size it had on the page (C280); a board not on the page opens at the usual size.
- * @param {{ what: 'bar'|'board', name: string, title: string, onTop?: boolean, at?: { left: number, top: number }|null, size?: { width: number, height: number }|null, from?: Document, host?: Window }} options
+ * on: the screen it fills, kept to that screen's size rather than this one's (C283).
+ * @param {{ what: 'bar'|'board', name: string, title: string, onTop?: boolean, at?: { left: number, top: number }|null, size?: { width: number, height: number }|null, on?: { availWidth: number, availHeight: number }|null, from?: Document, host?: Window }} options
  */
-export async function openPopout({ what, name, title, onTop = false, at = null, size: asked = null, from = document, host = window }) {
-  const size = fitSize(asked, SIZES[what])
+export async function openPopout({ what, name, title, onTop = false, at = null, size: asked = null, on = null, from = document, host = window }) {
+  const size = fitSize(asked, SIZES[what], on ?? globalThis.screen)
   try {
     if (onTop && host.documentPictureInPicture?.requestWindow) {
       const win = await host.documentPictureInPicture.requestWindow(size)

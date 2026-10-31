@@ -6,7 +6,11 @@
 
 import { COPY } from '../copy'
 
-const BOARD_VALUES = new Set(['board', 'first', 'second'])
+const BOARD_VALUES = new Set(['board', 'first', 'second', 'other'])
+// One board named in a sentence: a room on screen is Room, as the strip
+// names it; a room the line names by its chat comes as that number.
+const ROOM_BOARD = /^room(-\d+)?$/
+const oneBoard = (i18n, value) => (ROOM_BOARD.test(String(value)) ? i18n._(COPY.boards.oneRoom) : boardName(i18n, value))
 const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters', 'nums', 'frameworks', 'phrases', 'answering', 'choices', 'files', 'whos'])
 const PERCENTS = new Set(['percent', 'low', 'high', 'share'])
 
@@ -76,12 +80,12 @@ export function say(i18n, message, values = {}) {
   const words = {}
   for (const [key, value] of Object.entries(values ?? {})) {
     // A room on screen is Room, as the strip names it; Rooms names them all (30 October).
-    if (BOARD_VALUES.has(key)) words[key] = /^room(-d+)?$/.test(String(value)) ? i18n._(COPY.boards.oneRoom) : boardName(i18n, value)
+    if (BOARD_VALUES.has(key)) words[key] = oneBoard(i18n, value)
     // A block and a slot of a room, by their ids (the Lab, stage 13; C238).
     else if (key === 'block') words[key] = COPY.blocks[value] ? i18n._(COPY.blocks[value]) : String(value)
     else if (key === 'blocks') words[key] = joined(i18n, value.map((b) => (COPY.blocks[b] ? i18n._(COPY.blocks[b]) : String(b))), 'conjunction')
     else if (key === 'fromSlot' || key === 'toSlot') words[key] = COPY.slots[value] ? i18n._(COPY.slots[value]) : String(value)
-    else if (key === 'boards') words[key] = joined(i18n, value.map((b) => boardName(i18n, b)), 'conjunction')
+    else if (key === 'boards') words[key] = joined(i18n, value.map((b) => oneBoard(i18n, b)), 'conjunction')
     // A focus set's boards (C253): the room as the chat it shows.
     else if (key === 'focusBoards') words[key] = joined(i18n, value.map((b) => (b === 'room' ? i18n._(COPY.enter.focusTheChat) : boardName(i18n, b))), 'conjunction')
     else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')

@@ -57,7 +57,25 @@ export function cleanArrangement(record) {
       display: Number.isInteger(p.display) && p.display > 0 && p.display < 100 ? p.display : null,
       side: SIDES.has(p.side) ? p.side : null,
       from: Number.isInteger(p.from) && p.from >= 0 ? p.from : columns.length,
+      window: Number.isInteger(p.window) && p.window > 1 && p.window < 100 ? p.window : null,
     }))
+  // A window holds one board or several (C283). One kept before C283 has no
+  // number: it takes one of its own, so it opens alone, as it did. The
+  // boards of one window share its screen and side, the first one's.
+  const used = new Set(popped.map((p) => p.window).filter(Number.isInteger))
+  let free = 2
+  for (const p of popped) {
+    if (p.window != null) continue
+    while (used.has(free)) free++
+    p.window = free
+    used.add(free)
+  }
+  const firstOf = new Map()
+  for (const p of popped) {
+    const first = firstOf.get(p.window)
+    if (!first) firstOf.set(p.window, p)
+    else { p.display = first.display; p.side = first.side }
+  }
   const here = [...columns.flat(), ...popped.map((p) => p.board)]
   const bar = record.bar && typeof record.bar === 'object' ? record.bar : {}
   const context = {}
