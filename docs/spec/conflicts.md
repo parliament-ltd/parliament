@@ -4551,6 +4551,21 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **What a highlight is called** (C282): still "keyword" in Records and the Collection.
   - Still open from C281 and C282: Settings' model with no key while another provider has one (C150); a second Enter on a slow send sends twice; removing the unused copy and the old step 9's check, each on your yes.
 
+**C284. spread, saving at the end of a line, the language in the header** (1 November; **ruled by Stefan, 1 November:** "spread is fine let's go with that", "we could also tie in save:arrangement in the initial open command", "update the footer text to be consistent", "move the language setting to the header, and not on the welcome page board"). **Built on `claude/after-0.8`, not released.**
+- **Ruled and built:**
+  - **`spread`.** A word that ends `open:` or `pop:`: `open:202 203 205 208 collection records spread` opens them all and spreads them across every screen attached, in equal groups in the order named. The first group goes on the page; each next group goes in one window on the next screen, which it fills (C283). A chat no room shows opens in a room of its own. `spread:` alone spreads everything open again. With one screen, or a browser that will not place windows, they all open on the page, and the line under the bar says so before Enter. The screens are read at Enter, the browser asking once (C259 (d)), so the line before Enter says how many screens it knows of, or that it will ask.
+  - **`open:` with a list.** `open:202 203 collection` opens each on the page, beside what is there.
+  - **Saving at the end of a line.** `arrange:save "Morning"` can end a line of layout commands, `spread` among them: what the line makes is kept under that name. The line under the bar adds "Then keeps it all as Morning". `arrange:`'s entry in the command menu shows it.
+  - **A line of several commands says each.** Under "Enter runs 2 commands in turn: open: and move:", each command's own line follows: "Enter opens Library on the right · Enter moves Library to the left".
+  - **The language in the header.** The globe sits at the end of the strip, after calm and focus; while the welcome page or the start card is all there is, alone in the top corner. It is no longer on the welcome page or the start card. Settings keeps its own.
+  - **The footer and About:** "MIT licensed, source on GitHub", the footer's a link to the repository; About ends "MIT licensed, and the source is on GitHub."
+  - The new lines are in all four languages. Tests: 1,450 (two editing fuzz tests passed again alone, slow under load). Lint: 30 warnings, all older. Both builds pass. Tried in the app's browser, which has one screen it may not place windows on: the line said so, and Enter opened the boards on the page.
+- **For you:**
+  - **Highlights and keywords** (kept separate, as ruled). Today the colour picker's mark is kept as a keyword: every place its words appear in that chat is marked, and Records and the Collection call it a keyword. **Suggestion:**
+    1. The colour picker makes a highlight: marked only where it was selected, called a highlight everywhere. New marks are kept with the kind `highlight`, a new value in a field marks already have; nothing is converted.
+    2. A keyword as a kind of its own retires (R44, item by item): a tag labels a chat or card, and search finds every place a word appears, so a keyword adds a third way to say one thing. Keywords already kept stay, shown as highlights; nothing is deleted.
+  - **Help with lines of several commands:** beyond the line above, a short group in the command menu of lines to copy (`open:202 203 records spread arrange:save "morning"`, `pin:207 tagadd:essay 207`). **Suggestion:** that, and no new syntax.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
