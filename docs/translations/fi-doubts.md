@@ -288,3 +288,25 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
     English: full screen / leave full screen
     Draft: koko näyttö / poistu koko näytön tilasta
     Why: YouTube's Finnish pair. The second is long for a link in a corner; "poistu koko näytöstä" is the short form.
+
+## Spread and saving at the end of a line, drafted 1 November 2026 (C284)
+
+51. **enter.spreadOver, verb.spread**
+    English: …, in the order named, the first on this one
+    Draft: … annetussa järjestyksessä, ensimmäinen tälle näytölle
+    Why: "ensimmäinen tälle näytölle" is elliptic, as the English is. "ja ensimmäinen tulee tälle näytölle" is the full form if the short one reads as broken.
+
+52. **enter.openMany**
+    English: Enter opens {boards}
+    Draft: Enter avaa: {boards}
+    Why: the list goes after a colon, as in enter.bringBoards and enter.popTogether. A bare verb before the colon is the part I am least sure of; "Enter avaa nämä: {boards}" is the alternative.
+
+53. **enter.spreadOneHere**
+    English: With one screen here, Enter opens # board on the page
+    Draft: Koska näyttöjä on vain yksi, Enter avaa # taulun sivulle
+    Why: "With one screen" has no short Finnish form; "Yhdellä näytöllä" would read as "on one screen". "vain" is added so it reads as the reason.
+
+54. **settings.aboutWhat**
+    English: … MIT licensed, and the source is on GitHub.
+    Draft: … MIT-lisensoitu, ja lähdekoodi on GitHubissa.
+    Why: a participle with Parliament understood as its subject. "Lisenssi on MIT, ja lähdekoodi on GitHubissa" is the alternative; the footer link keeps the noun, "MIT-lisenssi".

@@ -3658,11 +3658,11 @@ msgstr "{board} finns här. Enter riktar fältet mot den"
 
 #. js-lingui-explicit-id
 msgid "enter.openMany"
-msgstr ""
+msgstr "Enter öppnar {boards}"
 
 #. js-lingui-explicit-id
 msgid "enter.openManyHere"
-msgstr ""
+msgstr "Alla är redan öppna"
 
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
@@ -5240,36 +5240,36 @@ msgstr "{source} gick inte att nå. Kontrollera anslutningen och försök igen"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadAsk"
-msgstr ""
+msgstr "{count, plural, one {Enter öppnar # tavla här} other {Enter fördelar # tavlor över dina skärmar. Webbläsaren frågar en gång om Parliament får placera fönster på dem}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadDone"
-msgstr ""
+msgstr "{count, plural, one {Enter lägger # tavla på den här skärmen} other {Enter fördelar # tavlor över {screens} skärmar}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.spreadLast"
-msgstr ""
+msgstr "spread står sist, som open:202 203 collection records spread"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadNothing"
-msgstr ""
+msgstr "Inget är öppet att fördela"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOne"
-msgstr ""
+msgstr "{count, plural, one {Enter öppnar # tavla på sidan} other {Enter öppnar # tavlor på sidan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOneHere"
-msgstr ""
+msgstr "{count, plural, one {Med en enda skärm här öppnar Enter # tavla på sidan} other {Med en enda skärm här öppnar Enter # tavlor på sidan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOver"
-msgstr ""
+msgstr "{count, plural, one {Enter lägger # tavla på den här skärmen} other {Enter fördelar # tavlor över {screens} skärmar, i den ordning de nämns, den första på den här}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadRefused"
-msgstr ""
+msgstr "{count, plural, one {Webbläsaren är inställd på att inte låta Parliament placera fönster, så Enter öppnar # tavla på sidan} other {Webbläsaren är inställd på att inte låta Parliament placera fönster, så Enter öppnar # tavlor på sidan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.stopAll"
@@ -5566,12 +5566,12 @@ msgstr "Temat är redan {name}"
 #. {name} is the person’s own words
 #. js-lingui-explicit-id
 msgid "enter.thenReplace"
-msgstr ""
+msgstr "Sparar sedan alltihop under namnet {name}, i stället för uppställningen som redan heter så"
 
 #. {name} is the person’s own words: the saved arrangement
 #. js-lingui-explicit-id
 msgid "enter.thenSave"
-msgstr ""
+msgstr "Sparar sedan alltihop under namnet {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8140,7 +8140,7 @@ msgstr "Om och säkerhet"
 #. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "Parliament är ett försök att tänka om hur vi interagerar med AI. MIT-licens. Källkoden publiceras vid lanseringen."
+msgstr "Parliament är ett försök att tänka om hur vi interagerar med AI. MIT-licensierat, och källkoden finns på GitHub."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -9083,7 +9083,7 @@ msgstr "Lägg undan något utan att radera det"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
-msgstr "Byt till eller spara en hel uppställning, fönster inräknade"
+msgstr "Byt till eller spara en hel uppställning, fönster inräknade. arrange:save kan avsluta en rad med layoutkommandon, som open:202 203 records spread arrange:save \"morgon\""
 
 #. js-lingui-explicit-id
 msgid "verb.ask"
@@ -9267,7 +9267,7 @@ msgstr "Skriv en anteckning för människor. Den skickas aldrig"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
-msgstr "Öppna en tavla, eller vad som helst med dess nummer eller namn"
+msgstr "Öppna en tavla, eller vad som helst med dess nummer eller namn; flera på en gång, och fördelade över dina skärmar"
 
 #. js-lingui-explicit-id
 msgid "verb.pin"
@@ -9363,7 +9363,7 @@ msgstr "Sortera tabellen"
 
 #. js-lingui-explicit-id
 msgid "verb.spread"
-msgstr ""
+msgstr "Fördela tavlorna över dina skärmar, i lika stora grupper i den ordning de nämns, den första på den här"
 
 #. js-lingui-explicit-id
 msgid "verb.stop"
@@ -9453,7 +9453,7 @@ msgstr "Söker fler som vill bygga"
 #. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
-msgstr "MIT-licens. Källkoden publiceras vid lanseringen"
+msgstr "MIT-licens, källkoden på GitHub"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"

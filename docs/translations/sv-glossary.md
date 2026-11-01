@@ -137,3 +137,13 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - so it opens here (a note after the Enter line) → så fönstret öppnas här. It names the window, so no den or det has to agree with a board.
 - full screen / leave full screen (the link in a window's corner) → helskärm / avsluta helskärm, lower case like the English.
 - Hints for a keyword (beside, display) are built as compare: is: "tar …, som" and the command.
+
+## Spread and saving at the end of a line (1 November 2026, C284)
+- spread (the keyword after open: or pop:, and spread: alone) → fördela över skärmarna, as screensMap.extraGo: "Enter fördelar # tavlor över {screens} skärmar". The keyword stays English in commands (open:202 203 collection records spread).
+- this screen, this one (the screen Parliament's main window is on) → den här skärmen, den här.
+- on the page (in the main window, not in windows of their own) → på sidan.
+- in the order named → i den ordning de nämns; in equal groups → i lika stora grupper; the first on this one → den första på den här.
+- Then keeps it all as {name} (the second line under a line that ends in arrange:save) → "Sparar sedan alltihop under namnet {name}". Not "som {name}", since "alltihop som" can read as "everything that". In place of the one saved by that name → i stället för uppställningen som redan heter så.
+- a line of layout commands → en rad med layoutkommandon.
+- MIT licensed, and the source is on GitHub → MIT-licensierat, och källkoden finns på GitHub; the footer link → MIT-licens, källkoden på GitHub.
+- The example name in verb.arrange (arrange:save "morning") is "morgon", by the 23 October ruling.

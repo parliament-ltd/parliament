@@ -3658,11 +3658,11 @@ msgstr "{board}就在这里。按 Enter 让输入栏指向它"
 
 #. js-lingui-explicit-id
 msgid "enter.openMany"
-msgstr ""
+msgstr "按 Enter 打开{boards}"
 
 #. js-lingui-explicit-id
 msgid "enter.openManyHere"
-msgstr ""
+msgstr "它们都已经打开"
 
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
@@ -5240,36 +5240,36 @@ msgstr "无法连接到 {source}。请检查网络连接，然后重试"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadAsk"
-msgstr ""
+msgstr "{count, plural, =1 {按 Enter 在这里打开 # 个面板} other {按 Enter 将 # 个面板分配到你的屏幕上。浏览器会询问一次，是否允许 Parliament 在这些屏幕上放置窗口}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadDone"
-msgstr ""
+msgstr "{count, plural, =1 {按 Enter 将 # 个面板放到此屏幕上} other {按 Enter 将 # 个面板分配到 {screens} 块屏幕上}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.spreadLast"
-msgstr ""
+msgstr "spread 要放在最后，例如 open:202 203 collection records spread"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadNothing"
-msgstr ""
+msgstr "没有已打开的面板可以分配"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOne"
-msgstr ""
+msgstr "{count, plural, other {按 Enter 在页面上打开 # 个面板}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOneHere"
-msgstr ""
+msgstr "{count, plural, other {这里只有一块屏幕，按 Enter 在页面上打开 # 个面板}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOver"
-msgstr ""
+msgstr "{count, plural, =1 {按 Enter 将 # 个面板放到此屏幕上} other {按 Enter 将 # 个面板按列出的顺序分配到 {screens} 块屏幕上，排在最前的放在此屏幕上}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadRefused"
-msgstr ""
+msgstr "{count, plural, other {浏览器已设置为不允许 Parliament 放置窗口，因此按 Enter 会在页面上打开 # 个面板}}"
 
 #. js-lingui-explicit-id
 msgid "enter.stopAll"
@@ -5566,12 +5566,12 @@ msgstr "它已经是“{name}”主题"
 #. {name} is the person’s own words
 #. js-lingui-explicit-id
 msgid "enter.thenReplace"
-msgstr ""
+msgstr "然后将整个排布保存为“{name}”，替换以此名称保存的那一个"
 
 #. {name} is the person’s own words: the saved arrangement
 #. js-lingui-explicit-id
 msgid "enter.thenSave"
-msgstr ""
+msgstr "然后将整个排布保存为“{name}”"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8140,7 +8140,7 @@ msgstr "关于与安全"
 #. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "Parliament 是一次尝试，重新思考我们与 AI 互动的方式。MIT 许可证。源代码将在正式发布时公开。"
+msgstr "Parliament 是一次尝试，重新思考我们与 AI 互动的方式。采用 MIT 许可证，源代码已在 GitHub 上公开。"
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -9083,7 +9083,7 @@ msgstr "收起内容而不删除"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
-msgstr "切换到或保存一整套排布，包括窗口"
+msgstr "切换到或保存一整套排布，包括窗口。arrange:save 可以放在一行布局命令的末尾，例如 open:202 203 records spread arrange:save \"早晨\""
 
 #. js-lingui-explicit-id
 msgid "verb.ask"
@@ -9267,7 +9267,7 @@ msgstr "写一条给人看的笔记。它绝不会被发送"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
-msgstr "打开面板，或按编号或名称打开任何内容"
+msgstr "打开面板，或按编号或名称打开任何内容；可一次打开多个，并分配到你的屏幕上"
 
 #. js-lingui-explicit-id
 msgid "verb.pin"
@@ -9363,7 +9363,7 @@ msgstr "为表格排序"
 
 #. js-lingui-explicit-id
 msgid "verb.spread"
-msgstr ""
+msgstr "把面板按列出的顺序平均分组，分配到你的屏幕上，第一组放在此屏幕上"
 
 #. js-lingui-explicit-id
 msgid "verb.stop"
@@ -9453,7 +9453,7 @@ msgstr "正在寻找其他共建者"
 #. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
-msgstr "MIT 许可证。源代码将在正式发布时公开"
+msgstr "MIT 许可证，源代码在 GitHub 上"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"
