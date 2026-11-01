@@ -3657,6 +3657,14 @@ msgid "enter.openHere"
 msgstr "{board}はここにあります。Enterでバーの対象にします"
 
 #. js-lingui-explicit-id
+msgid "enter.openMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openManyHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "これを開く機能は後日追加します。今は inspect:{num} で表示できます"
 
@@ -5231,6 +5239,39 @@ msgid "enter.sourceUnreachable"
 msgstr "{source}に接続できませんでした。接続を確認してから、もう一度お試しください"
 
 #. js-lingui-explicit-id
+msgid "enter.spreadAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadDone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.spreadLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOver"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.stopAll"
 msgstr "Enterで、すべてのウインドウのすべての実行と返答を止めます。済んだものはそのまま残り、その分の料金はかかります"
 
@@ -5521,6 +5562,16 @@ msgstr "{said} というテーマはありません。テーマは{choices}で�
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
 msgstr "テーマはすでに{name}です"
+
+#. {name} is the person’s own words
+#. js-lingui-explicit-id
+msgid "enter.thenReplace"
+msgstr ""
+
+#. {name} is the person’s own words: the saved arrangement
+#. js-lingui-explicit-id
+msgid "enter.thenSave"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8086,7 +8137,7 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "概要とセキュリティ"
 
-#. The first sentence is from the welcome letter (C272 (a))
+#. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
 msgstr "Parliamentは、AIとの関わり方を考え直す試みです。MITライセンス。ソースコードはリリース時に公開します。"
@@ -9310,6 +9361,10 @@ msgid "verb.sort"
 msgstr "表を並べ替える"
 
 #. js-lingui-explicit-id
+msgid "verb.spread"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.stop"
 msgstr "実行を止める。すべてのウインドウのすべての実行も止められます"
 
@@ -9394,7 +9449,7 @@ msgstr "それでは、また"
 msgid "welcome.foot.builders"
 msgstr "一緒に作る仲間を探しています"
 
-#. Until the repository is public (C71, C123)
+#. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
 msgstr "MITライセンス。ソースコードはリリース時に公開します"

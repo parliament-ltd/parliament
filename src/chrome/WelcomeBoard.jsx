@@ -175,7 +175,8 @@ export function WelcomeFoot() {
       <span className="sep" aria-hidden="true">·</span>
       <span>{i18n._(COPY.welcome.footMade)}</span>
       <span className="sep" aria-hidden="true">·</span>
-      <span>{i18n._(COPY.welcome.footLicence)}</span>
+      {/* The source, public since 28 October. */}
+      <a href="https://github.com/parliament-ltd/parliament" target="_blank" rel="noopener noreferrer">{i18n._(COPY.welcome.footLicence)}</a>
       <span className="sep" aria-hidden="true">·</span>
       <a href="mailto:support@parliament.ltd">{i18n._(COPY.welcome.footBuilders)}</a>
     </footer>

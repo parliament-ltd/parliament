@@ -3657,6 +3657,14 @@ msgid "enter.openHere"
 msgstr "{board} is here. Enter points the bar at it"
 
 #. js-lingui-explicit-id
+msgid "enter.openMany"
+msgstr "Enter opens {boards}"
+
+#. js-lingui-explicit-id
+msgid "enter.openManyHere"
+msgstr "They are all open already"
+
+#. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Opening this comes later. inspect:{num} shows it now"
 
@@ -5231,6 +5239,39 @@ msgid "enter.sourceUnreachable"
 msgstr "{source} could not be reached. Check the connection, then try again"
 
 #. js-lingui-explicit-id
+msgid "enter.spreadAsk"
+msgstr "{count, plural, one {Enter opens # board here} other {Enter spreads # boards across your screens. The browser asks once whether Parliament may place windows on them}}"
+
+#. js-lingui-explicit-id
+msgid "enter.spreadDone"
+msgstr "{count, plural, one {Enter puts # board on this screen} other {Enter spreads # boards across {screens} screens}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.spreadLast"
+msgstr "spread comes last: open:202 203 collection records spread"
+
+#. js-lingui-explicit-id
+msgid "enter.spreadNothing"
+msgstr "Nothing is open to spread"
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOne"
+msgstr "{count, plural, one {Enter opens # board on the page} other {Enter opens # boards on the page}}"
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOneHere"
+msgstr "{count, plural, one {With one screen here, Enter opens # board on the page} other {With one screen here, Enter opens # boards on the page}}"
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOver"
+msgstr "{count, plural, one {Enter puts # board on this screen} other {Enter spreads # boards across {screens} screens, in the order named, the first on this one}}"
+
+#. js-lingui-explicit-id
+msgid "enter.spreadRefused"
+msgstr "{count, plural, one {The browser was told not to let Parliament place windows, so Enter opens # board on the page} other {The browser was told not to let Parliament place windows, so Enter opens # boards on the page}}"
+
+#. js-lingui-explicit-id
 msgid "enter.stopAll"
 msgstr "Enter stops every run and reply, in every window. What is done stays done and paid for"
 
@@ -5521,6 +5562,16 @@ msgstr "No theme is called {said}. The themes are {choices}"
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
 msgstr "Its theme is {name} already"
+
+#. {name} is the person’s own words
+#. js-lingui-explicit-id
+msgid "enter.thenReplace"
+msgstr "Then keeps it all as {name}, in place of the one saved by that name"
+
+#. {name} is the person’s own words: the saved arrangement
+#. js-lingui-explicit-id
+msgid "enter.thenSave"
+msgstr "Then keeps it all as {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8086,10 +8137,10 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "About and security"
 
-#. The first sentence is from the welcome letter (C272 (a))
+#. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "Parliament is an attempt to rethink how we interact with AI. MIT licensed. Source published at launch."
+msgstr "Parliament is an attempt to rethink how we interact with AI. MIT licensed, and the source is on GitHub."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -9215,7 +9266,7 @@ msgstr "Write a note for people. It is never sent"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
-msgstr "Open a board, or anything by its number or name"
+msgstr "Open a board, or anything by its number or name; several at once, and spread across your screens"
 
 #. js-lingui-explicit-id
 msgid "verb.pin"
@@ -9310,6 +9361,10 @@ msgid "verb.sort"
 msgstr "Order the table"
 
 #. js-lingui-explicit-id
+msgid "verb.spread"
+msgstr "Spread the boards across your screens, in equal groups in the order named, the first on this one"
+
+#. js-lingui-explicit-id
 msgid "verb.stop"
 msgstr "Halt a run, or every run in every window"
 
@@ -9394,10 +9449,10 @@ msgstr "All the best,"
 msgid "welcome.foot.builders"
 msgstr "Looking for other builders"
 
-#. Until the repository is public (C71, C123)
+#. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
-msgstr "MIT licensed. Source published at launch"
+msgstr "MIT licensed, source on GitHub"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"

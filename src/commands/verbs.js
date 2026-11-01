@@ -121,11 +121,12 @@ export const VERBS = Object.freeze([
     stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
-    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys'],
+    // Several at once, and spread across the screens (C284).
+    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys', 'open:202 203 collection records spread', 'open:202 203 collection records spread arrange:save "Morning"'],
     // open:records brings the Records board alone, where records: brings
     // Records and the Collection together (C124, C125, C131).
-    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']]], stage: 3, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
+    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']], ['text', { many: 'text' }]], stage: 3, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name; several at once, and spread across your screens' } }),
   // close:204 closes the room showing chat 204; close:welcome the welcome card (C146 (c)).
   v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:room', 'close:welcome'], takes: [[], [[...ON_SCREEN, 'welcome', 'tour', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen, or close the letter. Nothing is lost' } }),
@@ -318,6 +319,9 @@ export const VERBS = Object.freeze([
     takes: [[ON_SCREEN, ['display'], 'number'], [ON_SCREEN, { opt: 'word' }], ['address'], [['command']], [['back'], { opt: [...ON_SCREEN, 'command'] }], [['left', 'right']], ['text', { many: 'text' }]],
     stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.pop', message: 'Put one or more boards, or the bar, in a window of their own, place it, or bring it back' } }),
+  // spread: alone spreads what is open across the screens; spread after open: or pop: the boards named (C284).
+  v({ verb: 'spread', group: 'layout', example: 'spread:', forms: ['spread:', 'open:202 203 collection records spread', 'pop:202 collection spread'], takes: [[]], stage: 14, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.spread', message: 'Spread the boards across your screens, in equal groups in the order named, the first on this one' } }),
   v({ verb: 'move', group: 'layout', example: 'move:library left', forms: ['move:library left', 'move:library display 3', 'move:202 beside library', 'move:201c after 201a'],
     takes: [[ON_SCREEN, ['left', 'right', 'middle']], ['address', ['after', 'before'], 'address'], [ON_SCREEN, ['display'], 'number'], ['address', ['display'], 'number'], [ON_SCREEN, ['beside'], 'text'], ['address', ['beside'], 'text']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.move', message: 'Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan' } }),

@@ -534,7 +534,14 @@ function roomByNumber(a, step, screens = {}) {
 // to a display or beside a board (C283). Null for the forms plan() answers
 // as before: one board, pop:settings keys, pop:back, pop:command, pop:left.
 // A chat no room shows opens in a room of its own in the window (pop: only).
-const KEYWORDS = new Set(['display', 'beside'])
+const KEYWORDS = new Set(['display', 'beside', 'spread'])
+// What spread says before Enter, from what is known of the screens (C284).
+function spreadSays(count, d) {
+  if (d?.list) return d.list.length > 1 ? { message: 'spreadOver', values: { count, screens: d.list.length } } : { message: 'spreadOneHere', values: { count } }
+  if (!d?.can || !d.extended) return { message: 'spreadOneHere', values: { count } }
+  if (d.permission === 'denied') return { message: 'spreadRefused', values: { count } }
+  return { message: 'spreadAsk', values: { count } }
+}
 // The lines that open or move a window onto a screen, and their note.
 const PLACES = new Set(['popTogetherDisplay', 'moveDisplay'])
 const withNote = (says, note) => (note ? { ...says, also: [...(says.also ?? []), note] } : says)
@@ -546,15 +553,20 @@ function planWindows(a, step, screens = {}) {
   const part = cut < 0 ? args : args.slice(0, cut)
   const key = cut < 0 ? null : words[cut]
   const isBoardArg = (x) => x?.kind === 'address' || wordOf(x) === 'room' || BOARD_NAMES.includes(wordOf(x))
+  // spread: alone takes every board open, in order: the page's, then each window's (C284).
+  if (step.verb === 'spread' && !args.length) return { spread: { boards: [...a.columns.flat(), ...a.popped.map((x) => x.board)], context: {} } }
   if (step.verb === 'move') {
-    if (!key || part.length !== 1 || !isBoardArg(part[0])) return null
+    if (!key || key === 'spread' || part.length !== 1 || !isBoardArg(part[0])) return null
   } else {
     if (['back', 'command', 'left', 'right'].includes(words[0])) return null
     if (!part.length || !part.every(isBoardArg)) return null
-    if (!key && part.length === 1 && part[0].kind !== 'address') return null
+    if (key === 'spread' && args.length !== cut + 1) return { bad: { message: 'spreadLast' } }
+    // open: with one board or number keeps its own forms (open:204, open:203b).
+    if (step.verb === 'open' && !key && part.length === 1) return null
+    if (step.verb !== 'open' && !key && part.length === 1 && part[0].kind !== 'address') return null
     if (key === 'display' && part.length === 1 && part[0].kind !== 'address') return null
   }
-  const pops = step.verb === 'pop'
+  const pops = step.verb !== 'move'
   // Each board the line names: its id, and how the Enter line names it.
   let room = a
   const context = {}
@@ -587,8 +599,18 @@ function planWindows(a, step, screens = {}) {
     if (r.bad) return { bad: r.bad }
     boards.push(r.board)
   }
+  // spread: the screens are known only at Enter, so it is an act (C284).
+  if (key === 'spread' || step.verb === 'spread') return { spread: { boards, context, labels } }
   let p
-  if (key === 'display') {
+  if (step.verb === 'open' && !key) {
+    // open:202 203 collection: each on the page, beside what is there (C284).
+    let next = { ...a, context: { ...a.context, ...context } }
+    for (const b of boards) {
+      if (next.columns.flat().includes(b) || next.popped.some((x) => x.board === b)) continue
+      next = planOpen(next, b).next ?? next
+    }
+    p = { next: next === a ? null : next, says: next === a ? { message: 'openManyHere' } : { message: 'openMany', values: { boards } } }
+  } else if (key === 'display') {
     const n = args[cut + 1]
     if (n?.kind !== 'number' || args.length !== cut + 2) return { bad: { message: 'popDisplayWhich' } }
     p = step.verb === 'move' ? planMoveTo(a, boards[0], n.value) : planPopMany(a, boards, { display: n.value, context })
@@ -851,6 +873,24 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   const small = smallRefusal(answer.steps, screens.size)
   if (small) return { answer, says: small, next: null }
 
+  // A line of arrangement commands, spread among them, may end with
+  // arrange:save "…": what the line makes is kept under that name (C284).
+  const lastStep = answer.steps[answer.steps.length - 1]
+  if (answer.steps.length > 1 && lastStep.verb === 'arrange' && lastStep.match?.values?.[0]?.value === 'save'
+    && answer.steps.slice(0, -1).every((st) => ARRANGEMENT_VERBS.includes(st.verb) || st.verb === 'spread')) {
+    const at = value.search(/\s+arrange:save\b[\s\S]*$/i)
+    if (at > 0) {
+      const head = preview(value.slice(0, at), { mode, arrangement, built, screens })
+      if (!head.next && head.act?.kind !== 'spread') return head
+      const save = planArrange(head.next ?? arrangement, lastStep, screens)
+      if (!save.act) return { answer, says: save.says, next: null }
+      const note = { message: save.act.before ? 'thenReplace' : 'thenSave', values: { name: save.act.record.name } }
+      const says = { ...head.says, also: [...(head.says?.also ?? []), note] }
+      if (head.act?.kind === 'spread') return { answer, says, next: null, act: { ...head.act, save: { id: save.act.record.id, name: save.act.record.name, before: save.act.before } } }
+      return { answer, says, next: head.next, act: save.act }
+    }
+  }
+
   // On the Collection (C144): clear: alone empties it, move: places a card,
   // sort: and type: pick its order and tab.
   const only = answer.steps.length === 1 ? answer.steps[0] : null
@@ -1002,6 +1042,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
 
   let a = arrangement
   let last = null
+  // Each command's own line, said under a line of several (C284).
+  const stepLines = []
   // What the line does to Records: its filters, sort: and clear:, in order.
   const records = screens.records ?? {}
   const start = records.view ?? EMPTY_VIEW
@@ -1044,8 +1086,13 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       : null
     const planned = byRoom?.step ?? tourShut ?? step
     // Windows with several boards, display and beside (C283).
-    const win = step.verb === 'pop' || step.verb === 'move' ? planWindows(a, step, screens) : null
+    const win = ['pop', 'move', 'open', 'spread'].includes(step.verb) ? planWindows(a, step, screens) : null
     if (win?.bad) return { answer, says: win.bad, next: null }
+    // spread: an act, since the screens are known only at Enter (C284).
+    if (win?.spread) {
+      if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: 'spread' } }, next: null }
+      return { answer, says: spreadSays(win.spread.boards.length, screens.displays ?? null), next: null, act: { kind: 'spread', boards: win.spread.boards, context: win.spread.context } }
+    }
     const p = win ? win : BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && step.match?.values?.[0]?.value === 'run' ? planOpenRun(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
@@ -1063,6 +1110,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
         : p.says.message === 'popDisplay' ? popDisplayLine(p.says, screens.displays ?? null)
           // A window for a screen, with a note when it opens here instead (C283).
           : PLACES.has(p.says.message) ? withNote(p.says, displayNote(p.says.values?.display, screens.displays ?? null)) : p.says
+    stepLines.push({ message: last.message, values: last.values })
   }
 
   // Records after the line: how many rows it will show, said before Enter.
@@ -1081,7 +1129,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   }
   const layout = answer.steps.length - answer.steps.filter((s) => VIEW_VERBS.includes(s.verb)).length
   const says = !layout || (opened && answer.steps.length === 1) ? viewWords
-    : answer.steps.length > 1 ? { message: answer.message, values: answer.values, ...(viewParts ? { also: viewParts } : {}) }
+    : answer.steps.length > 1 ? { message: answer.message, values: answer.values, also: [...stepLines, ...(viewParts ?? [])] }
       : last
   // After focus: the field turns to prompt mode, under the chat (W §7).
   const last1 = answer.steps[answer.steps.length - 1]

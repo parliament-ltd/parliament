@@ -7,10 +7,11 @@ import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDo
 import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
 import { TEMPLATES } from '../lib/seedTemplates'
 import { openSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arrangements'
+import { savedOf } from '../lib/savedArrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planClose, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
+import { shipped, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -19,6 +20,7 @@ import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../sh
 import { mapOf, mapFoot, savedNow as savedOnScreen } from '../shell/screensMap'
 import ScreensMap from './ScreensMap'
 import FullScreenMark from './FullScreenMark'
+import Globe from './Globe'
 import { useScreenSize } from '../shell/sizes'
 import { vault, moveKeysToVault, availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
@@ -1570,7 +1572,33 @@ export default function Shell() {
       return null
     }
     // Saved arrangements (stage 14, piece 3; C257 (b)).
+    if (what.kind === 'spread') {
+      // spread (C284): the screens read now, the browser asked once if need
+      // be; this screen first, then the others by number. One screen, or
+      // none the browser will name, takes them all on the page.
+      const shown = mustAsk(displaysNow.current) ? (await learnScreens()) ?? displaysNow.current : displaysNow.current
+      const list = shown?.list ?? []
+      const here = list.find((s) => s.current) ?? null
+      const screens = here ? [here.n, ...list.filter((s) => s !== here).sort((x, y) => x.n - y.n).map((s) => s.n)] : [1]
+      const p = planSpread(current.current, what.boards, screens, what.context ?? {})
+      if (!p.next) return p.says
+      const out = await run(p.next, body)
+      if (out) return out
+      // ... arrange:save "…" at the end of the line keeps what it made.
+      if (what.save) {
+        const record = savedOf(current.current, what.save.id.slice(what.save.id.indexOf(':') + 1), what.save.name)
+        await saveArrangement(db.current, record)
+        if (touched.current) touched.current.layouts.push({ id: record.id, before: what.save.before })
+        setLayoutsRev((n) => n + 1)
+      }
+      return null
+    }
     if (what.kind === 'arrangeSave') {
+      // After a line of arrangement commands (C284), what they make first.
+      if (next) {
+        const out = await run(next, null)
+        if (out) return out
+      }
       await saveArrangement(db.current, what.record)
       if (touched.current) touched.current.layouts.push({ id: what.record.id, before: what.before })
       setLayoutsRev((n) => n + 1)
@@ -3956,6 +3984,8 @@ export default function Shell() {
     globeAsked.current = r ? { top: Math.round(r.bottom + 6), end: Math.round(Math.max(16, Math.min(end, width - 16 - panel))), doc } : null
     runCommand('language:')
   }
+  // The language picker's globe, in the header, with more than one language offered.
+  const globe = offeredLanguages().length > 1 ? <Globe now={i18n.locale} onOpen={openLanguagesFrom} /> : null
   const drawBoard = (board, windowed = false) => {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
@@ -3994,10 +4024,10 @@ export default function Shell() {
       )
     }
     if (board === START) {
-      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
+      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" roomNum={(roomId ? conversations.find((c) => c.id === roomId)?.num : null) ?? lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={openLanguagesFrom} />
+      return <WelcomeBoard key="welcome" roomNum={(roomId ? conversations.find((c) => c.id === roomId)?.num : null) ?? lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />
     }
     if (board === 'canvas') {
       return (
@@ -4073,7 +4103,9 @@ export default function Shell() {
   return (
     <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
-      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} />}
+      {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
+      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}
+      {welcomeAlone && globe && <div className="ch-headcorner">{globe}</div>}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />

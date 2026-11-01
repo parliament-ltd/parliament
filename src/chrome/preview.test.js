@@ -502,7 +502,7 @@ describe('search and filters on Records (stage 6, piece 1; C132)', () => {
 
   it('shares a line with layout commands (C99)', () => {
     const p = at('>tag:owls open:library')
-    expect(p.text).toBe('Enter runs 2 commands in turn: tag: and open: · Enter shows 2 rows')
+    expect(p.text).toBe('Enter runs 2 commands in turn: tag: and open: · Enter opens Library on the right · Enter shows 2 rows')
     expect(p.next.columns).toEqual([['almanac'], ['collection'], ['library']])
     expect(p.act.view.filters).toHaveLength(1)
   })
@@ -885,6 +885,26 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     // A window for a screen this browser cannot reach says it opens here.
     const here = preview('>pop:records 204 display 2', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: { can: false } } })
     expect(here.says.also).toEqual([{ message: 'windowHereCannot' }])
+  })
+
+  it('opens several at once, spreads them, and keeps the line with arrange:save (C284)', () => {
+    const open = at('>open:library plan 206')
+    expect(open.text).toBe('Enter opens Library, Plan, and 206')
+    expect(open.next.columns.flat()).toEqual(expect.arrayContaining(['library', 'docket']))
+    const two = { can: true, extended: true, list: [{ n: 1, current: true }, { n: 2, current: false }] }
+    const sp = preview('>open:library plan 206 spread', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two } })
+    expect(say(i18n, sp.says.message, sp.says.values)).toBe('Enter spreads 3 boards across 2 screens, in the order named, the first on this one')
+    expect(sp.act).toMatchObject({ kind: 'spread', boards: ['library', 'docket', expect.any(String)] })
+    expect(at('>spread:').act).toMatchObject({ kind: 'spread', boards: ['almanac', 'collection', 'room'] })
+    expect(at('>open:library spread plan').text).toBe('spread comes last: open:202 203 collection records spread')
+    const kept = preview('>open:library plan spread arrange:save "Morning"', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two, arrangements: { saved: [] } } })
+    expect(kept.act).toMatchObject({ kind: 'spread', save: { name: 'Morning' } })
+    expect(kept.says.also.map((x) => say(i18n, x.message, x.values))).toContain('Then keeps it all as Morning')
+    const plain = at('>open:library move:library left')
+    expect(plain.says.also.map((x) => say(i18n, x.message, x.values))).toEqual(['Enter opens Library on the right', 'Enter moves Library to the left'])
+    const saved = preview('>open:library arrange:save "Desk"', { mode: 'command', arrangement: room, screens: { records: { rows }, arrangements: { saved: [] } } })
+    expect(saved.next.columns.flat()).toContain('library')
+    expect(saved.act).toMatchObject({ kind: 'arrangeSave', record: { name: 'Desk' } })
   })
 
   it('closes the welcome page alone to the start card, and close:room the room here (C282)', () => {

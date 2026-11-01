@@ -7,7 +7,7 @@ import {
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
-  planPopMany, planMoveTo, planMoveBeside, windowsOf,
+  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -560,5 +560,29 @@ describe('windows that hold several boards (C283)', () => {
   it('places a window at a side whole', () => {
     const w = keep(planPopMany(space(), ['almanac', 'collection']))
     expect(keep(planPopSide(w, 'right')).popped.map((x) => x.side)).toEqual(['right', 'right'])
+  })
+})
+
+describe('spread (C284)', () => {
+  const boardsIn = (a) => windowsOf(a).map((w) => [w.boards, w.display])
+  it('spreads in equal groups in the order named, the first on the page, each next in a window on the next screen', () => {
+    const p = planSpread(almanac(), ['almanac', 'collection', 'library', 'docket', 'reflection', 'settings'], [1, 2, 3])
+    expect(p.says).toMatchObject({ message: 'spreadDone', values: { count: 6, screens: 3 } })
+    expect(p.next.columns.flat()).toEqual(['almanac', 'collection'])
+    expect(boardsIn(p.next)).toEqual([[['library', 'docket'], 2], [['reflection', 'settings'], 3]])
+    expect(p.next.addressed).toBe('almanac')
+  })
+  it('with one screen opens them all on the page, and with fewer boards than screens uses only what it needs', () => {
+    const one = keep(planSpread(almanac(), ['almanac', 'library', 'docket'], [1]))
+    expect(one.columns.flat()).toEqual(['almanac', 'collection', 'library', 'docket'])
+    expect(one.popped).toEqual([])
+    const few = keep(planSpread(almanac(), ['library', 'docket'], [1, 2, 3]))
+    expect(boardsIn(few)).toEqual([[['docket'], 2]])
+  })
+  it('spreads again what is open: a window on a screen takes its group', () => {
+    const two = keep(planPopMany(keep(planOpen(almanac(), 'library')), ['collection'], { display: 2 }))
+    const again = keep(planSpread(two, ['almanac', 'library', 'collection', 'docket'], [1, 2]))
+    expect(again.columns.flat()).toEqual(['almanac', 'library'])
+    expect(boardsIn(again)).toEqual([[['collection', 'docket'], 2]])
   })
 })

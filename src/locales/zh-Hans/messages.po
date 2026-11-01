@@ -3657,6 +3657,14 @@ msgid "enter.openHere"
 msgstr "{board}就在这里。按 Enter 让输入栏指向它"
 
 #. js-lingui-explicit-id
+msgid "enter.openMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openManyHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "暂时还不能打开它。inspect:{num} 现在就可以显示它"
 
@@ -5231,6 +5239,39 @@ msgid "enter.sourceUnreachable"
 msgstr "无法连接到 {source}。请检查网络连接，然后重试"
 
 #. js-lingui-explicit-id
+msgid "enter.spreadAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadDone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.spreadLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOver"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.stopAll"
 msgstr "按 Enter 停止所有窗口中的所有运行和回复。已完成的部分会保留，并照常计费"
 
@@ -5521,6 +5562,16 @@ msgstr "没有名为 {said} 的主题。可用的主题有：{choices}"
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
 msgstr "它已经是“{name}”主题"
+
+#. {name} is the person’s own words
+#. js-lingui-explicit-id
+msgid "enter.thenReplace"
+msgstr ""
+
+#. {name} is the person’s own words: the saved arrangement
+#. js-lingui-explicit-id
+msgid "enter.thenSave"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8086,7 +8137,7 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "关于与安全"
 
-#. The first sentence is from the welcome letter (C272 (a))
+#. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
 msgstr "Parliament 是一次尝试，重新思考我们与 AI 互动的方式。MIT 许可证。源代码将在正式发布时公开。"
@@ -9310,6 +9361,10 @@ msgid "verb.sort"
 msgstr "为表格排序"
 
 #. js-lingui-explicit-id
+msgid "verb.spread"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.stop"
 msgstr "停止一次运行，或停止所有窗口中的所有运行"
 
@@ -9394,7 +9449,7 @@ msgstr "祝一切顺利，"
 msgid "welcome.foot.builders"
 msgstr "正在寻找其他共建者"
 
-#. Until the repository is public (C71, C123)
+#. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
 msgstr "MIT 许可证。源代码将在正式发布时公开"

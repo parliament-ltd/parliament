@@ -3657,6 +3657,14 @@ msgid "enter.openHere"
 msgstr "{board} finns här. Enter riktar fältet mot den"
 
 #. js-lingui-explicit-id
+msgid "enter.openMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openManyHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Att öppna den här kommer senare. inspect:{num} visar den nu"
 
@@ -5231,6 +5239,39 @@ msgid "enter.sourceUnreachable"
 msgstr "{source} gick inte att nå. Kontrollera anslutningen och försök igen"
 
 #. js-lingui-explicit-id
+msgid "enter.spreadAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadDone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.spreadLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOver"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.stopAll"
 msgstr "Enter stoppar alla körningar och svar, i alla fönster. Det som är gjort förblir gjort och betalt"
 
@@ -5521,6 +5562,16 @@ msgstr "Inget tema heter {said}. Temana är {choices}"
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
 msgstr "Temat är redan {name}"
+
+#. {name} is the person’s own words
+#. js-lingui-explicit-id
+msgid "enter.thenReplace"
+msgstr ""
+
+#. {name} is the person’s own words: the saved arrangement
+#. js-lingui-explicit-id
+msgid "enter.thenSave"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8086,7 +8137,7 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "Om och säkerhet"
 
-#. The first sentence is from the welcome letter (C272 (a))
+#. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
 msgstr "Parliament är ett försök att tänka om hur vi interagerar med AI. MIT-licens. Källkoden publiceras vid lanseringen."
@@ -9310,6 +9361,10 @@ msgid "verb.sort"
 msgstr "Sortera tabellen"
 
 #. js-lingui-explicit-id
+msgid "verb.spread"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.stop"
 msgstr "Stoppa en körning, eller alla körningar i alla fönster"
 
@@ -9394,7 +9449,7 @@ msgstr "Allt gott,"
 msgid "welcome.foot.builders"
 msgstr "Söker fler som vill bygga"
 
-#. Until the repository is public (C71, C123)
+#. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
 msgstr "MIT-licens. Källkoden publiceras vid lanseringen"

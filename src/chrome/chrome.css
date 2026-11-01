@@ -37,6 +37,9 @@
 .ch-btitle .ch-ctx { font-weight: 400; color: var(--ch-ink-3); margin-inline-start: 4px; }
 /* focus: at the end of the strip, and its picker (stage 14, piece 1; C253). */
 .ch-scalm { margin-inline-start: auto; }
+/* The language at the end of the header, and alone in the top corner (1 November). */
+.ch-sglobe { margin-inline-start: 14px; }
+.ch-headcorner { position: fixed; top: 10px; inset-inline-end: 18px; z-index: 30; }
 .ch-shell .ch-scalm button { padding: 0; font: inherit; color: inherit; }
 .ch-shell .ch-scalm button:hover, .ch-shell .ch-scalm button.on { color: var(--ch-ink); }
 .ch-sfocus { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }

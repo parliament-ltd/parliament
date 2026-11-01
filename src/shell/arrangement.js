@@ -512,6 +512,37 @@ export function planMoveBeside(a, board, other, context = {}) {
   return go2(next, 'moveBeside', { board, other })
 }
 
+/**
+ * spread (C284): boards across the screens, in the order given, in equal
+ * groups: the first on the page, each next in one window on the next
+ * screen, which it fills. A board already open moves; one not open opens.
+ * With one screen, they all go on the page.
+ * @param {string[]} boards board ids, rooms found or made by the caller
+ * @param {number[]} screens the screens' numbers, the page's first
+ * @param {Record<string, string>} [context] a new room's chat
+ */
+export function planSpread(a, boards, screens, context = {}) {
+  const list = [...new Set(boards)]
+  if (!list.length) return refuse('spreadNothing')
+  const n = Math.max(1, Math.min(screens.length, list.length))
+  const size = Math.ceil(list.length / n)
+  const groups = Array.from({ length: n }, (_, i) => list.slice(i * size, (i + 1) * size)).filter((g) => g.length)
+  let next = { ...copy(a), context: { ...a.context, ...context } }
+  // The first group on the page, out of any window it was in.
+  for (const b of groups[0]) {
+    if (isOnPage(next, b)) continue
+    next.popped = next.popped.filter((p) => p.board !== b)
+    place(next, b)
+  }
+  // Each next group in the window on its screen, or a new one there.
+  for (let i = 1; i < groups.length; i++) {
+    const there = windowsOf(next).find((w) => w.display === screens[i])
+    next = intoWindow(next, groups[i], there ? { key: there.key } : { display: screens[i] })
+  }
+  next.addressed = groups[0][0]
+  return go2(next, groups.length > 1 ? 'spreadDone' : 'spreadOne', { count: list.length, screens: groups.length })
+}
+
 /** pop:back, or pop:back <board>. Windows come back to where they stood. */
 export function planPopBack(a, board = null) {
   const going = board ? a.popped.filter((p) => p.board === board) : a.popped
@@ -843,7 +874,7 @@ export function address(a, board) {
 
 // The verbs this module answers. open: and pop: with a number wait for the
 // stages that build what numbers open.
-export const ARRANGEMENT_VERBS = Object.freeze(['open', 'close', 'move', 'swap', 'pop', 'reset', 'bar', 'width', 'cols'])
+export const ARRANGEMENT_VERBS = Object.freeze(['open', 'close', 'move', 'swap', 'pop', 'reset', 'bar', 'width', 'cols', 'spread'])
 
 const word = (arg) => (arg?.kind === 'word' ? arg.value : null)
 

@@ -151,6 +151,19 @@ export const COPY = {
     popNothing: /*i18n*/ { id: 'enter.popNothing', message: 'No board is in its own window' },
     popBackOne: /*i18n*/ { id: 'enter.popBackOne', message: 'Enter brings {board} back to the page' },
     // Windows that hold several boards (C283).
+    // open: with several, spread, and a line kept with arrange:save (C284).
+    openMany: /*i18n*/ { id: 'enter.openMany', message: 'Enter opens {boards}' },
+    openManyHere: /*i18n*/ { id: 'enter.openManyHere', message: 'They are all open already' },
+    spreadOver: /*i18n*/ { id: 'enter.spreadOver', message: '{count, plural, one {Enter puts # board on this screen} other {Enter spreads # boards across {screens} screens, in the order named, the first on this one}}' },
+    spreadAsk: /*i18n*/ { id: 'enter.spreadAsk', message: '{count, plural, one {Enter opens # board here} other {Enter spreads # boards across your screens. The browser asks once whether Parliament may place windows on them}}' },
+    spreadOneHere: /*i18n*/ { id: 'enter.spreadOneHere', message: '{count, plural, one {With one screen here, Enter opens # board on the page} other {With one screen here, Enter opens # boards on the page}}' },
+    spreadRefused: /*i18n*/ { id: 'enter.spreadRefused', message: '{count, plural, one {The browser was told not to let Parliament place windows, so Enter opens # board on the page} other {The browser was told not to let Parliament place windows, so Enter opens # boards on the page}}' },
+    spreadNothing: /*i18n*/ { id: 'enter.spreadNothing', message: 'Nothing is open to spread' },
+    spreadLast: /*i18n*/ { id: 'enter.spreadLast', message: 'spread comes last: open:202 203 collection records spread', comment: 'Commands stay English' },
+    spreadDone: /*i18n*/ { id: 'enter.spreadDone', message: '{count, plural, one {Enter puts # board on this screen} other {Enter spreads # boards across {screens} screens}}' },
+    spreadOne: /*i18n*/ { id: 'enter.spreadOne', message: '{count, plural, one {Enter opens # board on the page} other {Enter opens # boards on the page}}' },
+    thenSave: /*i18n*/ { id: 'enter.thenSave', message: 'Then keeps it all as {name}', comment: '{name} is the person’s own words: the saved arrangement' },
+    thenReplace: /*i18n*/ { id: 'enter.thenReplace', message: 'Then keeps it all as {name}, in place of the one saved by that name', comment: '{name} is the person’s own words' },
     popTogether: /*i18n*/ { id: 'enter.popTogether', message: 'Enter opens {boards} together in a window of their own' },
     popTogetherDisplay: /*i18n*/ { id: 'enter.popTogetherDisplay', message: 'Enter opens {boards} together in a window on display {display}' },
     popTogetherAlready: /*i18n*/ { id: 'enter.popTogetherAlready', message: '{boards} share a window already' },
@@ -1592,7 +1605,7 @@ export const COPY = {
     // About (stage 9, piece 5; T2; privacy-copy-draft.md, drafts 12 to 16 and
     // "What leaves your device", reviewed 12 October; C185). Each claim is
     // true of the code today; the draft's table says what each one needs.
-    aboutWhat: /*i18n*/ { id: 'settings.aboutWhat', message: 'Parliament is an attempt to rethink how we interact with AI. MIT licensed. Source published at launch.', comment: 'The first sentence is from the welcome letter (C272 (a))' },
+    aboutWhat: /*i18n*/ { id: 'settings.aboutWhat', message: 'Parliament is an attempt to rethink how we interact with AI. MIT licensed, and the source is on GitHub.', comment: 'The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October' },
     privateLabel: /*i18n*/ { id: 'settings.privateLabel', message: 'How your data stays private' },
     private1Head: /*i18n*/ { id: 'settings.private1Head', message: 'No servers, no accounts' },
     private1: /*i18n*/ { id: 'settings.private1', message: 'Parliament runs in your browser. Requests go from here straight to the providers and sources you use, when you press Enter. The line under the bar names where each one goes before it is sent.' },
@@ -1795,7 +1808,7 @@ export const COPY = {
     keepBackup: /*i18n*/ { id: 'welcome.keepBackup', message: 'back up in {board}', comment: '{board} is Settings, from COPY.boards' },
     keepAsking: /*i18n*/ { id: 'welcome.keepAsking', message: 'asking' },
     footMade: /*i18n*/ { id: 'welcome.foot.made', message: 'Created with Claude Code' },
-    footLicence: /*i18n*/ { id: 'welcome.foot.licence', message: 'MIT licensed. Source published at launch', comment: 'Until the repository is public (C71, C123)' },
+    footLicence: /*i18n*/ { id: 'welcome.foot.licence', message: 'MIT licensed, source on GitHub', comment: 'A link to the public repository (C71, C123; public since 28 October)' },
     footBuilders: /*i18n*/ { id: 'welcome.foot.builders', message: 'Looking for other builders' },
   },
 

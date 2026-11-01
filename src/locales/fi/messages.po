@@ -3657,6 +3657,14 @@ msgid "enter.openHere"
 msgstr "{board} on täällä. Enter kohdistaa palkin siihen"
 
 #. js-lingui-explicit-id
+msgid "enter.openMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openManyHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Tämän avaaminen tulee myöhemmin. inspect:{num} näyttää sen nyt"
 
@@ -5231,6 +5239,39 @@ msgid "enter.sourceUnreachable"
 msgstr "Lähteeseen {source} ei saatu yhteyttä. Tarkista yhteys ja yritä uudelleen"
 
 #. js-lingui-explicit-id
+msgid "enter.spreadAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadDone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.spreadLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadOver"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.spreadRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.stopAll"
 msgstr "Enter pysäyttää kaikki ajot ja vastaukset kaikissa ikkunoissa. Tehty pysyy tehtynä ja maksettuna"
 
@@ -5521,6 +5562,16 @@ msgstr "Teemaa {said} ei ole. Teemat: {choices}"
 #. js-lingui-explicit-id
 msgid "enter.themeSame"
 msgstr "Sen teema on jo {name}"
+
+#. {name} is the person’s own words
+#. js-lingui-explicit-id
+msgid "enter.thenReplace"
+msgstr ""
+
+#. {name} is the person’s own words: the saved arrangement
+#. js-lingui-explicit-id
+msgid "enter.thenSave"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8086,7 +8137,7 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "Tietoja ja turvallisuus"
 
-#. The first sentence is from the welcome letter (C272 (a))
+#. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
 msgstr "Parliament on yritys ajatella uudelleen, miten toimimme tekoälyn kanssa. MIT-lisenssi. Lähdekoodi julkaistaan lanseerauksessa."
@@ -9310,6 +9361,10 @@ msgid "verb.sort"
 msgstr "Järjestä taulukko"
 
 #. js-lingui-explicit-id
+msgid "verb.spread"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.stop"
 msgstr "Pysäytä ajo tai kaikki ajot kaikissa ikkunoissa"
 
@@ -9394,7 +9449,7 @@ msgstr "Kaikkea hyvää,"
 msgid "welcome.foot.builders"
 msgstr "Haussa muita rakentajia"
 
-#. Until the repository is public (C71, C123)
+#. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
 msgstr "MIT-lisenssi. Lähdekoodi julkaistaan lanseerauksessa"

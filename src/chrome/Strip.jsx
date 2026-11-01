@@ -23,7 +23,7 @@ import { FOCUS_BOARDS } from '../shell/arrangement'
  *   focus?: { set: string[]|null }|null, onRun?: (line: string) => void, onWrite?: (text: string) => void,
  *   phone?: { rooms: { board: string, num: number|null }[] }|null }} props
  */
-export default function Strip({ arrangement, onPick, focus = null, onRun = null, onWrite = null, calm = false, phone = null }) {
+export default function Strip({ arrangement, onPick, focus = null, onRun = null, onWrite = null, calm = false, phone = null, globe = null }) {
   const { i18n } = useLingui()
   const [picking, setPicking] = useState(false)
   const [ticked, setTicked] = useState([])
@@ -87,6 +87,8 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
           )}
         </span>
       )}
+      {/* The language, at the end of the header (1 November). */}
+      {globe && <span className="ch-sglobe">{globe}</span>}
     </nav>
   )
 }
