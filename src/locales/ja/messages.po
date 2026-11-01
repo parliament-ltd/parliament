@@ -3658,11 +3658,11 @@ msgstr "{board}はここにあります。Enterでバーの対象にします"
 
 #. js-lingui-explicit-id
 msgid "enter.openMany"
-msgstr ""
+msgstr "Enterで{boards}を開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.openManyHere"
-msgstr ""
+msgstr "すべてすでに開いています"
 
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
@@ -5240,36 +5240,36 @@ msgstr "{source}に接続できませんでした。接続を確認してから�
 
 #. js-lingui-explicit-id
 msgid "enter.spreadAsk"
-msgstr ""
+msgstr "{count, plural, =1 {Enterで#個のボードをここで開きます} other {Enterで、#個のボードをお使いのディスプレイに振り分けます。Parliamentがディスプレイにウインドウを配置してよいか、ブラウザが一度だけ尋ねます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadDone"
-msgstr ""
+msgstr "{count, plural, =1 {Enterで#個のボードをこのディスプレイに置きます} other {Enterで#個のボードを{screens}台のディスプレイに振り分けます}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.spreadLast"
-msgstr ""
+msgstr "spread は open:202 203 collection records spread のように、最後に書きます"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadNothing"
-msgstr ""
+msgstr "振り分けるものが何も開いていません"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOne"
-msgstr ""
+msgstr "{count, plural, other {Enterで#個のボードをページ上に開きます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOneHere"
-msgstr ""
+msgstr "{count, plural, other {ディスプレイが1台だけなので、Enterで#個のボードをページ上に開きます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadOver"
-msgstr ""
+msgstr "{count, plural, =1 {Enterで#個のボードをこのディスプレイに置きます} other {Enterで、#個のボードを指定した順に{screens}台のディスプレイへ振り分けます。先頭のものはこのディスプレイに置きます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.spreadRefused"
-msgstr ""
+msgstr "{count, plural, other {ブラウザは、Parliamentにウインドウの配置を許可しない設定になっているため、Enterで#個のボードをページ上に開きます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.stopAll"
@@ -5566,12 +5566,12 @@ msgstr "テーマはすでに{name}です"
 #. {name} is the person’s own words
 #. js-lingui-explicit-id
 msgid "enter.thenReplace"
-msgstr ""
+msgstr "そのあと、同じ名前で保存されている配置に代えて、全体を{name}として保存します"
 
 #. {name} is the person’s own words: the saved arrangement
 #. js-lingui-explicit-id
 msgid "enter.thenSave"
-msgstr ""
+msgstr "そのあと、全体を{name}として保存します"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -8140,7 +8140,7 @@ msgstr "概要とセキュリティ"
 #. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "Parliamentは、AIとの関わり方を考え直す試みです。MITライセンス。ソースコードはリリース時に公開します。"
+msgstr "Parliamentは、AIとの関わり方を考え直す試みです。MITライセンスで、ソースコードはGitHubで公開しています。"
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -9083,7 +9083,7 @@ msgstr "削除せずに、しまっておく"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
-msgstr "ウインドウも含めた画面全体の配置を切り替える、または保存する"
+msgstr "ウインドウも含めた画面全体の配置を切り替える、または保存する。arrange:save は open:202 203 records spread arrange:save \"朝\" のように、レイアウトのコマンドを並べた行の最後にも書けます"
 
 #. js-lingui-explicit-id
 msgid "verb.ask"
@@ -9267,7 +9267,7 @@ msgstr "人のためのメモを書く。送信されることはありません
 
 #. js-lingui-explicit-id
 msgid "verb.open"
-msgstr "ボードを開く。番号や名前で何でも開く"
+msgstr "ボードを開く。番号や名前で何でも開く。複数を一度に開いて、お使いのディスプレイに振り分けることもできます"
 
 #. js-lingui-explicit-id
 msgid "verb.pin"
@@ -9363,7 +9363,7 @@ msgstr "表を並べ替える"
 
 #. js-lingui-explicit-id
 msgid "verb.spread"
-msgstr ""
+msgstr "ボードを指定した順に同じ数ずつ、お使いのディスプレイに振り分ける。先頭のグループはこのディスプレイに"
 
 #. js-lingui-explicit-id
 msgid "verb.stop"
@@ -9453,7 +9453,7 @@ msgstr "一緒に作る仲間を探しています"
 #. A link to the public repository (C71, C123; public since 28 October)
 #. js-lingui-explicit-id
 msgid "welcome.foot.licence"
-msgstr "MITライセンス。ソースコードはリリース時に公開します"
+msgstr "MITライセンス、ソースコードはGitHubで公開"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"

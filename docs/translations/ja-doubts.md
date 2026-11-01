@@ -310,3 +310,30 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
     - en: Put one or more boards, or the bar, in a window of their own, place it, or bring it back
     - ja: 1つまたは複数のボードか、バーを別ウインドウに出す、配置する、またはページに戻す
     - The comma after か keeps "the bar" apart from "one or more". ボード（複数可）かバーを… is the shorter UI form.
+
+## Spread and saving at the end of a line, drafted 1 November 2026 (C284)
+
+57. enter.spreadOver
+    - en: {count, plural, one {Enter puts # board on this screen} other {Enter spreads # boards across {screens} screens, in the order named, the first on this one}}
+    - ja: {count, plural, =1 {Enterで#個のボードをこのディスプレイに置きます} other {Enterで、#個のボードを指定した順に{screens}台のディスプレイへ振り分けます。先頭のものはこのディスプレイに置きます}}
+    - "The first" is 先頭のもの, so it holds for one board or a group of them. Long for the Enter line; 先頭はこのディスプレイ is the shorter second sentence.
+
+58. enter.spreadNothing
+    - en: Nothing is open to spread
+    - ja: 振り分けるものが何も開いていません
+    - A little roundabout. 開いているボードがないため、振り分けられません is plainer, but gives a reason the English does not.
+
+59. verb.spread
+    - en: Spread the boards across your screens, in equal groups in the order named, the first on this one
+    - ja: ボードを指定した順に同じ数ずつ、お使いのディスプレイに振り分ける。先頭のグループはこのディスプレイに
+    - 同じ数ずつ for "in equal groups": when the boards do not divide evenly the groups differ by one, which it overstates as the English does. The second sentence ends without a verb, as a menu line can.
+
+60. verb.open, verb.arrange
+    - en: …; several at once, and spread across your screens / … arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning"
+    - ja: …。複数を一度に開いて、お使いのディスプレイに振り分けることもできます / …。arrange:save は open:202 203 records spread arrange:save "朝" のように、レイアウトのコマンドを並べた行の最後にも書けます
+    - Both are long for the command menu. The added sentence takes ます, as verb.stop's second sentence does; the example is built with のように, as enter.popDisplayWhich is.
+
+61. enter.thenSave, enter.thenReplace
+    - en: Then keeps it all as {name} / …, in place of the one saved by that name
+    - ja: そのあと、全体を{name}として保存します / そのあと、同じ名前で保存されている配置に代えて、全体を{name}として保存します
+    - 全体 for "it all": everything the line makes, windows included. The second follows enter.arrangeReplace.

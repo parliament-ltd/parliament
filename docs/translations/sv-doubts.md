@@ -297,3 +297,20 @@ Each: id, the English, the draft, and why I was unsure.
     English: leave full screen
     Draft: avsluta helskärm
     Why: YouTube's Swedish words; Windows and macOS say "Avsluta helskärmsläge", which is long for a link in a corner.
+
+## Spread and saving at the end of a line, drafted 1 November 2026 (C284)
+
+57. **enter.thenSave, enter.thenReplace**
+    English: Then keeps it all as {name}
+    Draft: Sparar sedan alltihop under namnet {name}
+    Why: subjectless, like the English, since it is a second line under the Enter line and Enter is the subject above it. "Sedan sparas alltihop under namnet {name}" is the passive alternative, if a line starting with a verb reads as an order.
+
+58. **enter.spreadOver, verb.spread**
+    English: …, in the order named, the first on this one
+    Draft: …, i den ordning de nämns, den första på den här
+    Why: terse, as the English is. "den första på den här skärmen" is plainer but says skärm twice in one line.
+
+59. **settings.aboutWhat**
+    English: … MIT licensed, and the source is on GitHub.
+    Draft: … MIT-licensierat, och källkoden finns på GitHub.
+    Why: neuter, agreeing with Parliament as "det" (a program), as elsewhere ("Körs det?" for Ollama). The footer link keeps the noun: "MIT-licens, källkoden på GitHub".

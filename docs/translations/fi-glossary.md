@@ -160,3 +160,14 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - so it opens here (a note after the Enter line) → joten ikkuna avautuu tällä näytöllä, as the older lines say "tällä näytöllä" for here.
 - full screen / leave full screen (the link in a window's corner) → koko näyttö / poistu koko näytön tilasta, the pair YouTube's Finnish uses, lower case like the English.
 - Hints for a keyword (beside, display) are built as compare: is: "tarvitsee …, esimerkiksi" and the command.
+
+## Spread and saving at the end of a line (1 November 2026, C284)
+- spread (the keyword after open: or pop:, and spread: alone) → jakaa näytöille: "Enter jakaa # taulua {screens} näytölle". "levittää" was the alternative. The keyword stays English in commands (open:202 203 collection records spread).
+- this screen, this one (the display Parliament's main window is on) → tämä näyttö; onto it → tälle näytölle. here (one board, enter.spreadAsk) → tällä näytöllä, as the older lines say for here.
+- on the page (in the main window, not in windows of their own) → sivulle, with avaa, as enter.openBoard's "avaa … oikealle".
+- in the order named → annetussa järjestyksessä; in equal groups → tasakokoisina ryhminä; the first on this one → ensimmäinen tälle näytölle.
+- several boards opened (enter.openMany) → after a colon, as the other {boards} lines: "Enter avaa: {boards}".
+- Then keeps it all as {name} (the second line under a line that ends in arrange:save) → "Tallentaa sitten kaiken nimellä {name}"; in place of the one saved by that name → samannimisen tallennetun järjestelyn tilalle, as enter.arrangeReplace.
+- a line of layout commands → asettelukomentojen rivi (group.layout is Asettelu).
+- MIT licensed, and the source is on GitHub → MIT-lisensoitu, ja lähdekoodi on GitHubissa; the footer link → MIT-lisenssi, lähdekoodi GitHubissa. GitHub inflects as literal text.
+- The example name in verb.arrange (arrange:save "morning") is "aamu", by the 23 October ruling.

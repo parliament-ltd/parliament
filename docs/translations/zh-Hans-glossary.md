@@ -179,3 +179,15 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - so it opens here (a note after the Enter line) → 因此会在这里打开, as the older popDisplayCannot lines have 在这里
 - full screen / leave full screen (the link in a window's corner) → 全屏 / 退出全屏
 - Hints for a keyword (beside, display) are built as compare: and cost: are: 需要…，例如 and the command
+
+## Spread and saving at the end of a line (1 November 2026, C284)
+- spread (the keyword after open: or pop:, and spread: alone) → 分配到屏幕上: 按 Enter 将 # 个面板分配到 {screens} 块屏幕上. The keyword stays as typed (open:202 203 collection records spread). Hard choice: 分布 is mostly intransitive (分布在…), so it does not take the boards as its object; 铺开 was the alternative
+- screens, counted → # 块屏幕, as 另一块屏幕; boards, counted → # 个面板
+- this screen, this one (the screen Parliament's main window is on) → 此屏幕, as screensMap.here
+- on the page (in the main window, not in windows of their own) → 在页面上
+- in the order named → 按列出的顺序; the first on this one → 排在最前的放在此屏幕上 (verb.spread: 第一组放在此屏幕上); in equal groups → 平均分组
+- Then keeps it all as {name} (the second line under a line that ends in arrange:save) → 然后将整个排布保存为“{name}”; in place of the one saved by that name → 替换以此名称保存的那一个, as enter.arrangeReplace
+- a line of layout commands → 一行布局命令 (group.layout is 布局)
+- the source is on GitHub → 源代码已在 GitHub 上公开; the footer link → MIT 许可证，源代码在 GitHub 上
+- The example name in verb.arrange (arrange:save "morning") is "早晨", by the 23 October ruling
+- Plurals: `=1` in enter.spreadOver, enter.spreadAsk and enter.spreadDone, whose one case says something else (one board put here, nothing spread); enter.spreadOneHere, enter.spreadRefused and enter.spreadOne collapse to other

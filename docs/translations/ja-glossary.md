@@ -163,3 +163,17 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - so it opens here (a note after the Enter line) → ここで開きます, as the older popDisplayCannot lines have ここで
 - full screen / leave full screen (the link in a window's corner) → 全画面表示 / 全画面表示を終了, as Chrome and YouTube write them in Japanese
 - Hints for a keyword (beside, display) are built as compare: and cost: are: the keyword with には or は, then the example with のように.
+
+## Spread and saving at the end of a line (1 November 2026, C284)
+
+- spread (the keyword after open: or pop:, and spread: alone) → 振り分ける: Enterで#個のボードを{screens}台のディスプレイに振り分けます. The keyword stays English in commands (open:202 203 collection records spread). 広げる was the alternative; 振り分ける says the boards are shared out among the displays.
+- boards, counted → #個のボード, as windows are counted (#個のウインドウ). 件 reads as records, and #つ fails from 10 on.
+- displays, counted → {screens}台のディスプレイ. 台 is the counter for machines and monitors.
+- this screen, this one (the display Parliament's main window is on) → このディスプレイ, as screensMap.here
+- on the page (in the main window, not in windows of their own) → ページ上に
+- in the order named → 指定した順に; the first on this one → 先頭のものはこのディスプレイに (verb.spread: 先頭のグループ); in equal groups → 同じ数ずつ
+- Then keeps it all as {name} (the second line under a line that ends in arrange:save) → そのあと、全体を{name}として保存します, as enter.arrangeSave has {name}として保存
+- a line of layout commands → レイアウトのコマンドを並べた行 (group.layout is レイアウト)
+- the source is on GitHub → ソースコードはGitHubで公開しています; the footer link → MITライセンス、ソースコードはGitHubで公開
+- The example name in verb.arrange (arrange:save "morning") is 朝, by the 23 October ruling.
+- Plurals: enter.spreadOver, enter.spreadAsk and enter.spreadDone keep =1, since their one case says something else (one board put here, nothing spread); enter.spreadOneHere, enter.spreadRefused and enter.spreadOne collapse to other.

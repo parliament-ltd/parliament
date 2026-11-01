@@ -344,3 +344,25 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
     - EN: Put one or more boards, or the bar, in a window of their own, place it, or bring it back
     - ZH: 把一个或多个面板或输入栏放到独立窗口中、调整窗口位置，或放回页面
     - Why: 一个或多个面板或输入栏 could be read as "one or more boards or bars"; there is only one bar, so I kept it short rather than add commas.
+
+## Spread and saving at the end of a line, drafted 1 November 2026 (C284)
+
+61. **enter.spreadOver**
+    - EN: {count, plural, one {Enter puts # board on this screen} other {Enter spreads # boards across {screens} screens, in the order named, the first on this one}}
+    - ZH: {count, plural, =1 {按 Enter 将 # 个面板放到此屏幕上} other {按 Enter 将 # 个面板按列出的顺序分配到 {screens} 块屏幕上，排在最前的放在此屏幕上}}
+    - Why: 按 comes twice (按 Enter, 按列出的顺序). 依列出的顺序 avoids it but reads more formal. 排在最前的 holds for one board or a group of them.
+
+62. **分配 for spread** (enter.spreadOver, enter.spreadAsk, enter.spreadDone, enter.spreadNothing, verb.spread, verb.open)
+    - EN: Enter spreads # boards across your screens
+    - ZH: 按 Enter 将 # 个面板分配到你的屏幕上
+    - Why: 分配 takes the boards as its object and reads plainly, but it sounds a little like sharing out resources. 铺开到 is closer to "spread" and more vivid; 分布 would need the boards as its subject.
+
+63. **enter.thenSave, enter.thenReplace**
+    - EN: Then keeps it all as {name}
+    - ZH: 然后将整个排布保存为“{name}”
+    - Why: "it all" is everything the line makes, windows included, so 整个排布 (as verb.arrange's 一整套排布). 这一切 is closer to the English but vaguer.
+
+64. **settings.aboutWhat**
+    - EN: … MIT licensed, and the source is on GitHub.
+    - ZH: … 采用 MIT 许可证，源代码已在 GitHub 上公开。
+    - Why: 采用 joins the two halves into one sentence, as the English now does; the older draft had MIT 许可证 as a sentence of its own. The footer link keeps the bare noun: MIT 许可证，源代码在 GitHub 上.
