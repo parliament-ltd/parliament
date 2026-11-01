@@ -9080,6 +9080,7 @@ msgstr "在专门的输入框中添加或替换密钥。切勿在这里输入密
 msgid "verb.archive"
 msgstr "收起内容而不删除"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "切换到或保存一整套排布，包括窗口"

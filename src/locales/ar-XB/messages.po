@@ -9080,6 +9080,7 @@ msgstr ""
 msgid "verb.archive"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr ""

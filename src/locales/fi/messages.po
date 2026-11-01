@@ -9080,6 +9080,7 @@ msgstr "Lisää tai vaihda avain sen omassa kentässä. Älä koskaan kirjoita a
 msgid "verb.archive"
 msgstr "Siirrä jotain syrjään poistamatta sitä"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "Vaihda kokonaiseen järjestelyyn tai tallenna se, ikkunat mukaan lukien"

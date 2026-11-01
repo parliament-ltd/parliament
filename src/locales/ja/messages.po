@@ -9080,6 +9080,7 @@ msgstr "キーを専用の入力欄で追加、または置き換える。ここ
 msgid "verb.archive"
 msgstr "削除せずに、しまっておく"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "ウインドウも含めた画面全体の配置を切り替える、または保存する"

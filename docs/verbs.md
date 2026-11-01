@@ -31,7 +31,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `new:chat` | Make a chat, plan, room, collection, framework, branch, step, run or block | `new:chat`, `new:plan`, `new:plan "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:run`, `new:block` | everywhere | yes |
-| `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Writing Studio"`, `open:library`, `open:records`, `open:settings keys`, `open:202 203 collection records spread`, `open:202 203 collection records spread arrange:save "Morning"` | everywhere | no |
+| `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Writing Studio"`, `open:library`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
 | `close:records` | Take a board off the screen, or close the letter. Nothing is lost | `close:records`, `close:204`, `close:room`, `close:welcome` | everywhere | yes |
 
 ## Run
@@ -126,7 +126,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | --- | --- | --- | --- | --- |
 | `bar:bottom` | Move the bar on the page | `bar:top`, `bar:bottom`, `bar:left`, `bar:center`, `bar:right` | everywhere | yes |
 | `pop:records` | Put one or more boards, or the bar, in a window of their own, place it, or bring it back | `pop:records`, `pop:records 202 collection display 2`, `pop:library beside records`, `pop:settings keys`, `pop:library display 2`, `pop:command`, `pop:back`, `pop:back library`, `pop:left` | everywhere | yes |
-| `spread:` | Spread the boards across your screens, in equal groups in the order named, the first on this one | `spread:`, `open:202 203 collection records spread`, `pop:202 collection spread` | everywhere | yes |
+| `spread:` | Spread the boards across your screens, in equal groups in the order named, the first on this one | `spread:` | everywhere | yes |
 | `move:library left` | Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan | `move:library left`, `move:library display 3`, `move:202 beside library`, `move:201c after 201a` | everywhere | yes |
 | `swap:records collection` | Swap two boards | `swap:records collection` | everywhere | yes |
 | `reset:` | Put the boards back as shipped and close the windows | `reset:` | everywhere | yes |
@@ -134,7 +134,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `cols:-room +created` | Hide or show columns of the table | `cols:-room +created`, `cols:` | Records | yes |
 | `focus:` | Clear the screen to your chosen boards, keep that set, or come back | `focus:`, `focus:sym col`, `focus:save`, `focus:off` | everywhere | yes |
 | `calm:` | Show less detail until you come near it, or all of it again | `calm:`, `calm:off` | everywhere | yes |
-| `arrange:"Review desk"` | Switch to or save a whole arrangement, windows included | `arrange:`, `arrange:"Review desk"`, `arrange:save "Review desk"`, `arrange:"Review desk" 207` | everywhere | yes |
+| `arrange:"Review desk"` | Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning" | `arrange:`, `arrange:"Review desk"`, `arrange:save "Review desk"`, `arrange:"Review desk" 207` | everywhere | yes |
 
 ## Building rooms
 

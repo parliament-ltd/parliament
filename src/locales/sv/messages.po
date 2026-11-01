@@ -9080,6 +9080,7 @@ msgstr "Lägg till eller ersätt en nyckel, i en egen ruta. Skriv aldrig en nyck
 msgid "verb.archive"
 msgstr "Lägg undan något utan att radera det"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "Byt till eller spara en hel uppställning, fönster inräknade"

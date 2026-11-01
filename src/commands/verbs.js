@@ -122,7 +122,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     // Several at once, and spread across the screens (C284).
-    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys', 'open:202 203 collection records spread', 'open:202 203 collection records spread arrange:save "Morning"'],
+    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
     // open:records brings the Records board alone, where records: brings
     // Records and the Collection together (C124, C125, C131).
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']], ['text', { many: 'text' }]], stage: 3, click: 'apply',
@@ -320,7 +320,7 @@ export const VERBS = Object.freeze([
     stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.pop', message: 'Put one or more boards, or the bar, in a window of their own, place it, or bring it back' } }),
   // spread: alone spreads what is open across the screens; spread after open: or pop: the boards named (C284).
-  v({ verb: 'spread', group: 'layout', example: 'spread:', forms: ['spread:', 'open:202 203 collection records spread', 'pop:202 collection spread'], takes: [[]], stage: 14, undoable: true, click: 'apply',
+  v({ verb: 'spread', group: 'layout', example: 'spread:', forms: ['spread:'], takes: [[]], stage: 14, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.spread', message: 'Spread the boards across your screens, in equal groups in the order named, the first on this one' } }),
   v({ verb: 'move', group: 'layout', example: 'move:library left', forms: ['move:library left', 'move:library display 3', 'move:202 beside library', 'move:201c after 201a'],
     takes: [[ON_SCREEN, ['left', 'right', 'middle']], ['address', ['after', 'before'], 'address'], [ON_SCREEN, ['display'], 'number'], ['address', ['display'], 'number'], [ON_SCREEN, ['beside'], 'text'], ['address', ['beside'], 'text']], stage: 3, undoable: true, click: 'apply',
@@ -340,7 +340,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.calm', message: 'Show less detail until you come near it, or all of it again' } }),
   v({ verb: 'arrange', group: 'layout', example: 'arrange:"Review desk"', forms: ['arrange:', 'arrange:"Review desk"', 'arrange:save "Review desk"', 'arrange:"Review desk" 207'],
     takes: [[], [['save'], 'text'], ['text', { opt: 'address' }]], stage: 14, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.arrange', message: 'Switch to or save a whole arrangement, windows included' } }),
+    gloss: /*i18n*/ { id: 'verb.arrange', message: 'Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning"', comment: 'Commands stay English' } }),
 
   // Building rooms (the Lab, v7)
   v({ verb: 'edit', group: 'building', example: 'edit:"Reading room"', takes: [[], ['text']], stage: 13,

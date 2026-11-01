@@ -9080,9 +9080,10 @@ msgstr "Add or replace a key, in its own field. Never type a key here"
 msgid "verb.archive"
 msgstr "Put something away without deleting it"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.arrange"
-msgstr "Switch to or save a whole arrangement, windows included"
+msgstr "Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save \"morning\""
 
 #. js-lingui-explicit-id
 msgid "verb.ask"
