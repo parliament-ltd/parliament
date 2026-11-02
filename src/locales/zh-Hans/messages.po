@@ -122,7 +122,7 @@ msgstr "笔记与标记"
 
 #. js-lingui-explicit-id
 msgid "backup.catAnnotationsAbout"
-msgstr "笔记、关键词、摘录、收藏和合集"
+msgstr "笔记、高亮、摘录、收藏和合集"
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
@@ -363,7 +363,7 @@ msgstr "文件架"
 
 #. js-lingui-explicit-id
 msgid "block.highlights"
-msgstr "关键词"
+msgstr "高亮"
 
 #. js-lingui-explicit-id
 msgid "block.input"
@@ -950,7 +950,7 @@ msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "{kind, select, note {笔记 {num}} term {关键词 {num}} quote {摘录 {num}} highlight {高亮 {num}} other {{num}}}，保存在 Parliament 中"
+msgstr "{kind, select, note {笔记 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} other {{num}}}，保存在 Parliament 中"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1306,7 +1306,7 @@ msgstr "按"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {笔记 {num}} term {关键词 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} other {{num}}}"
+msgstr "{kind, select, note {笔记 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1359,7 +1359,7 @@ msgstr "这里还没有内容。用 add:207 放入内容，或从上方列表中
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "其中的内容还没有笔记、关键词或摘录。创建后会显示在这里。"
+msgstr "其中的内容还没有笔记、高亮或摘录。创建后会显示在这里。"
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1483,7 +1483,7 @@ msgstr "在输入栏中写入 open:{num}"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "点击会在输入栏中写入 add: 或 rm:。按来源排列时，顺序由编号决定；add:218 只收入一条笔记、关键词或摘录。"
+msgstr "点击会在输入栏中写入 add: 或 rm:。按来源排列时，顺序由编号决定；add:218 只收入一条笔记、高亮或摘录。"
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1645,7 +1645,7 @@ msgstr "建议"
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
-msgstr "关键词"
+msgstr "高亮"
 
 #. js-lingui-explicit-id
 msgid "collection.under"
@@ -1722,7 +1722,7 @@ msgstr "出自 {num}，已删除"
 
 #. js-lingui-explicit-id
 msgid "copy.keywords"
-msgstr "关键词"
+msgstr "高亮"
 
 #. js-lingui-explicit-id
 msgid "copy.notes"
@@ -2431,7 +2431,7 @@ msgstr "{sort, select, yours {按 Enter 以自定顺序显示} source {按 Enter
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {按 Enter 显示关键词} quote {按 Enter 显示摘录} note {按 Enter 显示笔记} other {按 Enter 显示高亮}}"
+msgstr "{kind, select, term {按 Enter 显示高亮} quote {按 Enter 显示摘录} note {按 Enter 显示笔记} other {按 Enter 显示高亮}}"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2464,7 +2464,7 @@ msgstr "按 Enter 将 {a} 和 {b} 逐词并排对照"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} 不是笔记、关键词或摘录，而 compare: 目前只支持这几种"
+msgstr "{num} 不是笔记、高亮或摘录，而 compare: 目前只支持这几种"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
@@ -2705,12 +2705,12 @@ msgstr "按 Enter 后再按一次 Enter，即永久删除 {erasing}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, other {其中 # 条笔记、关键词和摘录也会一并删除}}"
+msgstr "{count, plural, other {其中 # 条笔记、高亮和摘录也会一并删除}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, other {其中 # 条笔记、关键词和摘录会保留，并标明出自已删除的对话。加上 all 可一并删除}}"
+msgstr "{count, plural, other {其中 # 条笔记、高亮和摘录会保留，并标明出自已删除的对话。加上 all 可一并删除}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -5345,7 +5345,7 @@ msgstr "没有返回摘要，因此未写入任何内容"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num} 不是笔记、关键词或摘录，而 summarize: 目前只支持这几种"
+msgstr "{num} 不是笔记、高亮或摘录，而 summarize: 目前只支持这几种"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -5733,7 +5733,7 @@ msgstr "正在翻译。其间输入栏可照常使用"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "在{board}上，type: 可接 keyword、quote、note 或 highlight 之一"
+msgstr "在{board}上，type: 可接 highlight、quote 或 note 之一"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6279,7 +6279,7 @@ msgstr "随笔室"
 
 #. js-lingui-explicit-id
 msgid "guide.o.keywordsNotes"
-msgstr "关键词和笔记"
+msgstr "高亮和笔记"
 
 #. js-lingui-explicit-id
 msgid "guide.o.own"
@@ -6669,7 +6669,7 @@ msgstr "建议"
 #. Words marked in a chat where they were selected (C131; keywords retired into highlights, C285)
 #. js-lingui-explicit-id
 msgid "kind.term"
-msgstr "关键词"
+msgstr "高亮"
 
 #. Beside a language still being worked on
 #. js-lingui-explicit-id
@@ -7751,7 +7751,7 @@ msgstr "{count, plural, other {# 条建议}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markTerms"
-msgstr "{count, plural, other {# 个关键词}}"
+msgstr "{count, plural, other {# 处高亮}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.noCall"
@@ -8998,7 +8998,7 @@ msgstr "宽阔的阅读界面，适合长文档和研究资料，侧边留有记
 
 #. js-lingui-explicit-id
 msgid "templateAbout.pocket-chat@1.0"
-msgstr "专为手机设计的专注对话，关键词、分支和回顾都放在可上滑的底部抽屉中。"
+msgstr "专为手机设计的专注对话，高亮、分支和回顾都放在可上滑的底部抽屉中。"
 
 #. js-lingui-explicit-id
 msgid "templateAbout.quiet-room@1.0"
@@ -9010,7 +9010,7 @@ msgstr "两个等宽的栏并排：两个对话，或一个对话加一份文档
 
 #. js-lingui-explicit-id
 msgid "templateAbout.writing-studio@1.0"
-msgstr "对话旁随手可用笔记、关键词和分支。适合需要反复推敲的长篇写作。"
+msgstr "对话旁随手可用笔记、高亮和分支。适合需要反复推敲的长篇写作。"
 
 #. js-lingui-explicit-id
 msgid "theme.amber-glow"
@@ -9183,7 +9183,7 @@ msgstr "显示出自某个对话、计划、分支或运行的内容"
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "显示带有笔记、关键词、摘录或高亮的内容"
+msgstr "显示带有笔记、摘录或高亮的内容"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"

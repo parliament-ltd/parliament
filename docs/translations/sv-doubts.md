@@ -314,3 +314,8 @@ Each: id, the English, the draft, and why I was unsure.
     English: … MIT licensed, and the source is on GitHub.
     Draft: … MIT-licensierat, och källkoden finns på GitHub.
     Why: neuter, agreeing with Parliament as "det" (a program), as elsewhere ("Körs det?" for Ollama). The footer link keeps the noun: "MIT-licens, källkoden på GitHub".
+
+60. **backup.catAnnotations, backup.catAnnotationsAbout** (1 November 2026, C285)
+    English: Notes and markings / Notes, highlights, quotes, favourites and collections
+    Draft: Anteckningar och markeringar / Anteckningar, markeringar, citat, favoriter och samlingar
+    Why: with keywords retired into highlights, the line under the heading now names highlights, and highlight is "markering" in Swedish, as is the collective. So the heading says "markeringar" for all of them and the line under it says "markeringar" for one kind. Doubt 3 said no single string uses both; these are two strings shown together. The heading could become "Anteckningar och annat du markerat", or the kind "färgmarkeringar" here only, but either breaks with the rest. I kept markering.

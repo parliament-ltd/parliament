@@ -177,3 +177,10 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - the source is on GitHub → ソースコードはGitHubで公開しています; the footer link → MITライセンス、ソースコードはGitHubで公開
 - The example name in verb.arrange (arrange:save "morning") is 朝, by the 23 October ruling.
 - Plurals: enter.spreadOver, enter.spreadAsk and enter.spreadDone keep =1, since their one case says something else (one board put here, nothing spread); enter.spreadOneHere, enter.spreadRefused and enter.spreadOne collapse to other.
+
+## Keywords retire into highlights (1 November 2026, C285)
+
+- keyword (kind.term) is retired: what was a keyword is now a highlight, words a person selected in a reply and marked with a colour, marked only where selected. kind.term is ハイライト, as kind.highlight, and the keyword → キーワード line under Terms is history.
+- Every line that said キーワード now says ハイライト: in lists of markings (メモ、ハイライト、引用), as a tab or heading (ハイライト, ハイライトとメモ), counted (ハイライト#件), and in the term branch of the kind selects (term {ハイライト{num}}), whose selector stays term.
+- The type: words stay English, in the English order: type: に highlight、quote、note のいずれかを指定します.
+- verb.has follows the new English order: メモ、引用、ハイライトを含むものを表示する.
