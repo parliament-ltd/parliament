@@ -745,6 +745,11 @@ msgstr "Suunnitelma"
 msgid "board.lab"
 msgstr "Paja"
 
+#. The board a letter from the maker of Parliament opens on (letter:)
+#. js-lingui-explicit-id
+msgid "board.letter"
+msgstr "Kirje"
+
 #. Rooms, layouts, blocks, themes and resources
 #. js-lingui-explicit-id
 msgid "board.library"
@@ -2080,6 +2085,11 @@ msgstr "Palkki on jo omassa ikkunassaan"
 msgid "enter.barThere"
 msgstr "{place, select, top {Palkki on jo ylhäällä} bottom {Palkki on jo alhaalla} left {Palkki on jo vasemmalla} right {Palkki on jo oikealla} other {Palkki on jo keskellä}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.barWindowMove"
+msgstr "{place, select, top {Enter siirtää palkin ikkunan näytön yläreunaan} bottom {Enter siirtää palkin ikkunan näytön alareunaan} left {Enter siirtää palkin ikkunan näytön vasempaan reunaan} right {Enter siirtää palkin ikkunan näytön oikeaan reunaan} other {Enter siirtää palkin ikkunan näytön keskelle}}, jos selain sallii sen. pop:back command tuo palkin sivulle"
+
 #. js-lingui-explicit-id
 msgid "enter.besideAlready"
 msgstr "{board} on jo taulun {other} vieressä"
@@ -2218,21 +2228,21 @@ msgstr "{word} voi tarkoittaa: {names}. Kerro mikä, esimerkiksi {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOff"
-msgstr "Enter näyttää taas kaikki yksityiskohdat"
+msgstr "Enter näyttää taas muutosmerkit ja kaikki yksityiskohdat"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enter rauhoittaa näkymän: yksityiskohdat odottavat, kunnes tulet niiden lähelle"
+msgstr "Enter piilottaa muutosmerkit ja taulujen yksityiskohdat, kunnes tulet niiden lähelle"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "Kaikki yksityiskohdat näkyvät jo. calm: rauhoittaa näkymän"
+msgstr "Muutosmerkit ja yksityiskohdat näkyvät jo. calm: piilottaa ne, kunnes tulet lähelle"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOn"
-msgstr "Näkymä on jo rauhallinen. calm:off näyttää kaikki yksityiskohdat"
+msgstr "Muutosmerkit ja yksityiskohdat ovat jo piilossa. calm:off näyttää ne"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -2414,6 +2424,10 @@ msgid "enter.collectionNew"
 msgstr "Enter luo uuden kokoelman ja näyttää sen"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionNewWith"
+msgstr "Enter luo uuden kokoelman, jossa on huoneen keskustelu {num}, ja näyttää sen"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionNone"
 msgstr "Taulussa {board} ei ole vielä kokoelmaa. new:collection luo sellaisen"
 
@@ -2484,12 +2498,20 @@ msgid "enter.copied"
 msgstr "Kopioitu Markdown-muodossa: {num}"
 
 #. js-lingui-explicit-id
+msgid "enter.copiedMessage"
+msgstr "{part, select, prompt {Kehote kopioitu Markdown-muodossa} other {Vastaus kopioitu Markdown-muodossa}}"
+
+#. js-lingui-explicit-id
 msgid "enter.copyFailed"
 msgstr "Selain ei sallinut kopiointia. Napsauta sivua ja yritä uudelleen"
 
 #. js-lingui-explicit-id
 msgid "enter.copyHidden"
 msgstr "{count, plural, one {# piilotettu viesti jätetty pois} other {# piilotettua viestiä jätetty pois}}"
+
+#. js-lingui-explicit-id
+msgid "enter.copyMessage"
+msgstr "Enter kopioi Markdown-muodossa {part, select, prompt {kehotteen} other {vastauksen}}, joka alkaa ”{opening}”"
 
 #. js-lingui-explicit-id
 msgid "enter.copyOne"
@@ -2532,6 +2554,10 @@ msgstr "Enter poistaa haaran {address}, jota ei ole koskaan ajettu, suunnitelman
 msgid "enter.deletedBranch"
 msgstr "Haara {address} on poistettu. undo: tuo sen takaisin"
 
+#. js-lingui-explicit-id
+msgid "enter.deletedMessage"
+msgstr "Poistettu. Sen voi palauttaa keskustelussa 20 sekunnin ajan"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
@@ -2550,6 +2576,18 @@ msgstr "Muokkaus kumotaan komennolla undo:{num}"
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
 msgstr "”Poista kaikki” on painike taulun {board} alaosassa. Enter avaa sen siellä"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessage"
+msgstr "Kaksi Enter-painallusta poistaa {part, select, prompt {kehotteen} other {vastauksen}}, joka alkaa ”{opening}”"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessageAgain"
+msgstr "Toinen Enter poistaa sen. Escape säilyttää sen"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessageUndo"
+msgstr "Sen voi palauttaa keskustelussa 20 sekunnin ajan"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3418,6 +3456,23 @@ msgid "enter.markupSame"
 msgstr "{on, select, on {Vastaukset näkyvät jo muutosmerkein} other {Vastaukset näkyvät jo puhtaina}}"
 
 #. js-lingui-explicit-id
+msgid "enter.messageFailed"
+msgstr "Sitä ei voitu tehdä. Viesti on ehkä muuttunut sillä välin"
+
+#. js-lingui-explicit-id
+msgid "enter.messageLast"
+msgstr "Se on viimeisin {part, select, prompt {kehote} other {vastaus}}. Napsauta toista, niin komento kohdistuu siihen"
+
+#. js-lingui-explicit-id
+msgid "enter.messageNone"
+msgstr "Täällä olevassa keskustelussa ei ole vielä {part, select, prompt {kehotetta} other {vastausta}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.messageNoRoom"
+msgstr "Näytöllä ei ole huonetta, joten {part, select, prompt {kehotetta} other {vastausta}} ei ole otettavissa. room: tuo huoneen takaisin"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBeside"
 msgstr "Enter siirtää taulun {board} taulun {other} viereen"
 
@@ -3594,6 +3649,10 @@ msgstr "Muistiinpanossa saa olla enintään {max} merkkiä"
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
 msgstr "Muistiinpano on ihmisille, eikä sitä koskaan lähetetä"
+
+#. js-lingui-explicit-id
+msgid "enter.noteOnMessage"
+msgstr "Enter kirjoittaa muistiinpanon {part, select, prompt {kehotteesta} other {vastauksesta}}, joka alkaa ”{opening}”, ja lainaa sitä"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
@@ -4046,6 +4105,10 @@ msgstr "Selaimelle on kerrottu, ettei Parliament saa sijoittaa ikkunoita. Enter 
 #. js-lingui-explicit-id
 msgid "enter.popDisplayWhich"
 msgstr "display tarvitsee numeron ja tulee viimeisenä, esimerkiksi pop:records 202 collection display 2"
+
+#. js-lingui-explicit-id
+msgid "enter.popInTab"
+msgstr "Se avautui välilehtenä, koska tämä selain avaa uudet ikkunat välilehtinä. Vedä välilehti ulos ikkunastaan, niin se siirtyy omaan ikkunaansa"
 
 #. js-lingui-explicit-id
 msgid "enter.popJoinDisplay"
@@ -4546,6 +4609,31 @@ msgstr "{count, plural, one {{whos} ei voi hakea verkosta ja vastaa ilman sitä}
 #. js-lingui-explicit-id
 msgid "enter.queryFailed"
 msgstr "Kysymystäsi ei voitu kääntää, joten mitään ei lähetetty. Yritä uudelleen, tai translate:off lähettää sen sellaisenaan"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteAlready"
+msgstr "Se on jo säilytetty lainauksena {num}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.quoteIntoWhich"
+msgstr "{said} ei ole keskustelu. quote:reply tarvitsee keskustelun numeron, esimerkiksi 207"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteKept"
+msgstr "Säilytetty lainauksena {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteMessage"
+msgstr "Enter säilyttää keskustelun rinnalla lainauksen {part, select, prompt {kehotteesta} other {vastauksesta}}, joka alkaa ”{opening}”"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteMessageInto"
+msgstr "Enter säilyttää keskustelussa {into} lainauksen {part, select, prompt {kehotteesta} other {vastauksesta}}, joka alkaa ”{opening}”"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteNeverSent"
+msgstr "Lainaus on ihmisille, eikä sitä koskaan lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -5464,6 +5552,18 @@ msgid "enter.tagLong"
 msgstr "Tunnisteessa saa olla enintään {max} merkkiä"
 
 #. js-lingui-explicit-id
+msgid "enter.tagMessage"
+msgstr "Enter lisää tunnisteen {tag} {part, select, prompt {kehotteeseen} other {vastaukseen}}, joka alkaa ”{opening}”, keskustelun rinnalla säilytettävän lainauksen kautta"
+
+#. js-lingui-explicit-id
+msgid "enter.tagMessageAlready"
+msgstr "Sillä on jo tunniste {tag} lainauksessa {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.tagMessageDone"
+msgstr "Tunniste {tag} lisätty lainaukseen {num}"
+
+#. js-lingui-explicit-id
 msgid "enter.tagNone"
 msgstr "Millään niistä ei ole tunnistetta {tag}"
 
@@ -6065,6 +6165,11 @@ msgstr "kuuntelee"
 msgid "field.toAll"
 msgstr "{count, plural, other {kaikkiin #}}"
 
+#. Grey text in the empty field on the welcome page. {leader} is >, the command leader
+#. js-lingui-explicit-id
+msgid "field.toBegin"
+msgstr "Kirjoita {leader} aloittaaksesi"
+
 #. js-lingui-explicit-id
 msgid "field.toOne"
 msgstr "haaraan {address} · {name}"
@@ -6206,6 +6311,10 @@ msgstr "Asettelu"
 #. js-lingui-explicit-id
 msgid "group.leaders"
 msgstr "Palkki"
+
+#. js-lingui-explicit-id
+msgid "group.lines"
+msgstr "Usean komennon rivit"
 
 #. js-lingui-explicit-id
 msgid "group.run"
@@ -7020,6 +7129,23 @@ msgstr "valitse lohkoja, asettelu tai teema ja lisää ne sitten huoneeseen yhde
 #. js-lingui-explicit-id
 msgid "library.writes"
 msgstr "Kirjoittaa palkkiin {command}"
+
+#. js-lingui-explicit-id
+msgid "line.closePop"
+msgstr "Sulje Luettelo ja siirrä Kokoelma toiselle näytöllesi"
+
+#. js-lingui-explicit-id
+msgid "line.filters"
+msgstr "Keskustelut, joilla on tunniste essay, viimeisen seitsemän päivän ajalta Luettelossa"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "line.pinTag"
+msgstr "Kiinnitä keskustelu ja lisää siihen tunniste. undo: kumoaa koko rivin"
+
+#. js-lingui-explicit-id
+msgid "line.spreadSave"
+msgstr "Avaa kaksi keskustelua ja Luettelo jaettuina näytöillesi ja tallenna se nimellä morning"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -8168,6 +8294,10 @@ msgid "settings.backupLabel"
 msgstr "Varmuuskopiointi ja palautus"
 
 #. js-lingui-explicit-id
+msgid "settings.browserCompare"
+msgstr "Kaikkien selainten vertailu sivustolla"
+
+#. js-lingui-explicit-id
 msgid "settings.browserCompression"
 msgstr "Pienemmät varmuuskopiot"
 
@@ -8793,6 +8923,11 @@ msgstr "calm: pois"
 msgid "shell.calmOn"
 msgstr "calm: päällä"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.calmTitle"
+msgstr "Muutosmerkit ja taulujen yksityiskohdat odottavat, kunnes tulet niiden lähelle. Suorittaa komennon {command}"
+
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -8839,6 +8974,11 @@ msgstr "vasemmalta oikealle:"
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"
 msgstr "Suorittaa komennon {command}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.focusTitle"
+msgstr "Vain keskustelu tai valitsemasi taulut pysyvät näytöllä. Suorittaa komennon {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.fullScreen"
@@ -9107,7 +9247,7 @@ msgstr "Valitse, kuka vastaa tässä keskustelussa: malli tai lähde ilman token
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Näytä vähemmän yksityiskohtia, kunnes tulet lähelle, tai taas kaikki"
+msgstr "Piilota muutosmerkit ja taulujen yksityiskohdat, kunnes tulet niiden lähelle. calm:off näyttää ne"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9122,6 +9262,10 @@ msgid "verb.close"
 msgstr "Poista taulu näkyvistä tai sulje kirje. Mitään ei menetetä"
 
 #. js-lingui-explicit-id
+msgid "verb.collection"
+msgstr "Tuo Kokoelma näkyvien rinnalle"
+
+#. js-lingui-explicit-id
 msgid "verb.cols"
 msgstr "Piilota tai näytä taulukon sarakkeita"
 
@@ -9131,7 +9275,7 @@ msgstr "Aseta kaksi tai useampia rinnakkain. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
-msgstr "Kopioi jotain Markdown-muodossa"
+msgstr "Kopioi Markdown-muodossa kohde tai vastaus, jossa olet"
 
 #. js-lingui-explicit-id
 msgid "verb.cost"
@@ -9167,7 +9311,7 @@ msgstr "Lataa Markdown- tai JSONL-muodossa luettavaksi muualla. Sitä ei voi pal
 
 #. js-lingui-explicit-id
 msgid "verb.focus"
-msgstr "Jätä näkyviin vain valitsemasi taulut, tallenna valinta tai palaa takaisin"
+msgstr "Sulje kaikki taulut paitsi keskustelu tai nimeämäsi taulut. focus:off tuo loput takaisin"
 
 #. js-lingui-explicit-id
 msgid "verb.forget"
@@ -9243,7 +9387,7 @@ msgstr "Kerro, lähettääkö huone vain tämän koneen malleille"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Näytä vastaukset muutosmerkein tai puhtaina"
+msgstr "Muutosmerkit: näytä muokkauksesi vastauksissa tai näytä vastaukset puhtaina"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9288,6 +9432,10 @@ msgstr "Siirrä taulu, useita tauluja tai palkki omaan ikkunaansa, sijoita se ta
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "Korvaa sähköpostiosoitteet, puhelinnumerot sekä tili- ja korttinumerot paikkamerkeillä ennen kehotteen lähettämistä, halutessasi myös nimet, tai jätä korvaamatta"
+
+#. js-lingui-explicit-id
+msgid "verb.quote"
+msgstr "Säilytä lainaus koko vastauksesta, jossa olet, sen keskustelun rinnalla tai toisessa keskustelussa. Sitä ei koskaan lähetetä"
 
 #. js-lingui-explicit-id
 msgid "verb.records"
@@ -9391,7 +9539,7 @@ msgstr "Näytä, millä on tunniste. Miinus jättää ne pois"
 
 #. js-lingui-explicit-id
 msgid "verb.tagadd"
-msgstr "Lisää tunniste kohteisiin tai valittuihin"
+msgstr "Lisää tunniste kohteisiin, valittuihin tai vastaukseen, jossa olet"
 
 #. js-lingui-explicit-id
 msgid "verb.tell"
@@ -9491,15 +9639,15 @@ msgstr "Parliament on yritys ajatella uudelleen, miten toimimme tekoälyn kanssa
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "Minuakin pelottaa tekoäly. Se on ihme, josta en tiedä, mitä ajatella. Mutta en halunnut vain istua ja olla tekemättä mitään. Niinpä kuukausien keskustelujen ja lukemisen jälkeen olen yrittänyt koota sovelluksen, jota voi käyttää ilman verkkoyhteyttä. Sovelluksen, jossa voit hakea ensin lähteistä ilman tekoälyä. Sovelluksen, joka toivoo antavansa voimaa aktiivisen osallistumisen kautta. Ehkä se on liian rohkeasti sanottu... vaikka olen koodannut pari verkkosovellusta Rubylla, pitäisin itseäni silti ”suunnittelijana”. Rakentaminen on vaikeaa, varsinkin kun opettelee samalla ja tahti tuntuu siltä kuin joisi paloletkusta. Koodi on avointa, olen ajanut sen Claude Coden tietoturvatarkistusten läpi ja aion teettää lisää ulkopuolisia tarkistuksia. Yritän parhaani mukaan pitää sinut ajan tasalla. Olen miettinyt, miten saisin koodista helpommin lähestyttävää... ehkä voisin tehdä siitä romaanin."
+msgstr "Minuakin pelottaa tekoäly. Se on ihme, josta en tiedä, mitä ajatella. Mutta en halunnut vain istua ja olla tekemättä mitään. Niinpä olen yrittänyt koota sovelluksen, jota voi käyttää ilman verkkoyhteyttä paikallisten mallien kanssa. Sovelluksen, jossa voit hakea ensin lähteistä ilman tekoälyä. Sovelluksen, joka toivoo antavansa voimaa aktiivisemman osallistumisen kautta. Ehkä se on minulta liian rohkeaa..."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "Mikä Parliament sitten on? Parliamentissa voit luoda huoneita, tiloja, joissa voit keskustella yhden tekoälymallin, usean tai ei yhdenkään kanssa. Huoneet rakennetaan lohkoista, joita voit muokata ja vaihtaa, ja voit tehdä omia asetteluja, teemoja ja järjestelyjä."
+msgstr "Koodi on avointa, olen ajanut sen Claude Coden tietoturvatarkistusten läpi ja aion teettää lisää ulkopuolisia tietoturvatarkistuksia. Yritän parhaani mukaan pitää sinut ajan tasalla."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "Kaikki on tauluissa. Jokaisen taulun voi siirtää omaan ikkunaansa ja toiselle näytölle, joten työtila on sinun."
+msgstr "Mikä Parliament sitten on? Parliament on tila, jossa voit keskustella yhden tekoälymallin kanssa, usean kanssa tai ilman yhtäkään. Voit rakentaa huoneita lohkoista, joita voit muokata ja vaihtaa, ja voit tehdä omia asetteluja, teemoja ja järjestelyjä. Kaikki on tauluissa. Jokaisen taulun voi siirtää omaan ikkunaansa ja toiselle näytölle, joten työtila on sinun. Paja, jossa huoneita muokataan, on tulossa pian!"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9520,20 +9668,20 @@ msgstr "Stef"
 msgid "welcome.small"
 msgstr "Tehty tietokoneelle, puhelin myöhemmin"
 
-#. {command} is open:records, which stays English, as does open:
+#. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id
-msgid "welcome.start.open"
-msgstr "{command} luettelee, mitä olet tehnyt, ja open: ja kohteen numero avaa sen uudelleen"
+msgid "welcome.start.commands"
+msgstr "Käytä toimintoihin komentopalkkia. Kirjoita {first} ja sitten {second}, niin näet, mikä on jo käytössä."
+
+#. {command} is open:records, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.history"
+msgstr "Kirjoita komentopalkkiin {command}, niin näet historiasi."
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
-msgid "welcome.start.room"
-msgstr "{command} ja kysymys avaa huoneen"
-
-#. {command} is tour:, which stays English
-#. js-lingui-explicit-id
-msgid "welcome.start.tour"
-msgstr "{command} tuo vaiheet takaisin"
+msgid "welcome.start.prompt"
+msgstr "Kirjoita {command} aloittaaksesi kehotteen."
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

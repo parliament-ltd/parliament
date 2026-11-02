@@ -745,6 +745,11 @@ msgstr "Planen"
 msgid "board.lab"
 msgstr "Labbet"
 
+#. The board a letter from the maker of Parliament opens on (letter:)
+#. js-lingui-explicit-id
+msgid "board.letter"
+msgstr "Brev"
+
 #. Rooms, layouts, blocks, themes and resources
 #. js-lingui-explicit-id
 msgid "board.library"
@@ -2080,6 +2085,11 @@ msgstr "Fältet ligger redan i ett eget fönster"
 msgid "enter.barThere"
 msgstr "{place, select, top {Fältet är redan högst upp} bottom {Fältet är redan längst ned} left {Fältet är redan till vänster} right {Fältet är redan till höger} other {Fältet är redan i mitten}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.barWindowMove"
+msgstr "{place, select, top {Enter flyttar fältets fönster högst upp på skärmen} bottom {Enter flyttar fältets fönster längst ned på skärmen} left {Enter flyttar fältets fönster till vänster på skärmen} right {Enter flyttar fältets fönster till höger på skärmen} other {Enter flyttar fältets fönster till mitten av skärmen}}, om webbläsaren tillåter det. pop:back command tar tillbaka fältet till sidan"
+
 #. js-lingui-explicit-id
 msgid "enter.besideAlready"
 msgstr "{board} är redan bredvid {other}"
@@ -2218,21 +2228,21 @@ msgstr "{word} kan vara {names}. Ange vilken, till exempel {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOff"
-msgstr "Enter visar alla detaljer igen"
+msgstr "Enter visar ändringarna och alla detaljer igen"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enter lugnar skärmen: detaljerna väntar tills du kommer nära dem"
+msgstr "Enter döljer ändringarna och detaljerna på tavlorna tills du kommer nära dem"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "Alla detaljer visas redan. calm: lugnar skärmen"
+msgstr "Ändringarna och detaljerna visas redan. calm: döljer dem tills du närmar dig"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOn"
-msgstr "Skärmen är redan lugn. calm:off visar alla detaljer"
+msgstr "Ändringarna och detaljerna är redan dolda. calm:off visar dem"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -2414,6 +2424,10 @@ msgid "enter.collectionNew"
 msgstr "Enter skapar en ny samling och visar den"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionNewWith"
+msgstr "Enter skapar en ny samling med {num}, chatten i rummet, och visar den"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionNone"
 msgstr "Ingen samling finns i {board} än. new:collection skapar en"
 
@@ -2484,12 +2498,20 @@ msgid "enter.copied"
 msgstr "Kopierade {num} som Markdown"
 
 #. js-lingui-explicit-id
+msgid "enter.copiedMessage"
+msgstr "Kopierade {part, select, prompt {prompten} other {svaret}} som Markdown"
+
+#. js-lingui-explicit-id
 msgid "enter.copyFailed"
 msgstr "Webbläsaren tillät inte kopiering. Klicka på sidan och försök igen"
 
 #. js-lingui-explicit-id
 msgid "enter.copyHidden"
 msgstr "{count, plural, one {# dolt meddelande utelämnat} other {# dolda meddelanden utelämnade}}"
+
+#. js-lingui-explicit-id
+msgid "enter.copyMessage"
+msgstr "Enter kopierar {part, select, prompt {prompten} other {svaret}} som börjar med ”{opening}” som Markdown"
 
 #. js-lingui-explicit-id
 msgid "enter.copyOne"
@@ -2532,6 +2554,10 @@ msgstr "Enter raderar {address}, som aldrig har körts, ur alla körningar av pl
 msgid "enter.deletedBranch"
 msgstr "{address} har raderats. undo: tar tillbaka den"
 
+#. js-lingui-explicit-id
+msgid "enter.deletedMessage"
+msgstr "Raderat. I 20 sekunder erbjuder sig chatten att ta tillbaka det"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
@@ -2550,6 +2576,18 @@ msgstr "En redigering ångras med undo:{num}"
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
 msgstr "”Radera allt” är en knapp längst ned i {board}. Enter öppnar den där"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessage"
+msgstr "Enter två gånger raderar {part, select, prompt {prompten} other {svaret}} som börjar med ”{opening}”"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessageAgain"
+msgstr "Enter en gång till raderar det. Escape behåller det"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessageUndo"
+msgstr "I 20 sekunder erbjuder sig chatten att ta tillbaka det"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3418,6 +3456,23 @@ msgid "enter.markupSame"
 msgstr "{on, select, on {Svaren visar redan ändringarna} other {Svaren är redan renskrivna}}"
 
 #. js-lingui-explicit-id
+msgid "enter.messageFailed"
+msgstr "Det gick inte att göra. Meddelandet kan ha ändrats sedan dess"
+
+#. js-lingui-explicit-id
+msgid "enter.messageLast"
+msgstr "{part, select, prompt {Det är den sista prompten. Klicka i en annan för att ta den i stället} other {Det är det sista svaret. Klicka i ett annat för att ta det i stället}}"
+
+#. js-lingui-explicit-id
+msgid "enter.messageNone"
+msgstr "Chatten här har {part, select, prompt {ingen prompt} other {inget svar}} än"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.messageNoRoom"
+msgstr "Inget rum visas, så det finns {part, select, prompt {ingen prompt} other {inget svar}} att ta. room: tar tillbaka ett"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBeside"
 msgstr "Enter lägger {board} bredvid {other}"
 
@@ -3594,6 +3649,10 @@ msgstr "En anteckning får vara högst {max} tecken"
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
 msgstr "En anteckning är till för människor och skickas aldrig"
+
+#. js-lingui-explicit-id
+msgid "enter.noteOnMessage"
+msgstr "Enter skriver en anteckning till {part, select, prompt {prompten som börjar med ”{opening}”, och citerar den} other {svaret som börjar med ”{opening}”, och citerar det}}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
@@ -4046,6 +4105,10 @@ msgstr "Webbläsaren är inställd på att inte låta Parliament placera fönste
 #. js-lingui-explicit-id
 msgid "enter.popDisplayWhich"
 msgstr "display tar sitt nummer och står sist, som pop:records 202 collection display 2"
+
+#. js-lingui-explicit-id
+msgid "enter.popInTab"
+msgstr "Det öppnades som en flik, eftersom den här webbläsaren öppnar nya fönster som flikar. Dra ut fliken ur fönstret för att göra den till ett eget fönster"
 
 #. js-lingui-explicit-id
 msgid "enter.popJoinDisplay"
@@ -4546,6 +4609,31 @@ msgstr "{whos} kan inte söka på webben, och {count, plural, one {får} other {
 #. js-lingui-explicit-id
 msgid "enter.queryFailed"
 msgstr "Din fråga kunde inte översättas, så inget skickades. Försök igen, eller skicka den som du skrev den med translate:off"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteAlready"
+msgstr "Det är redan sparat, som {num}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.quoteIntoWhich"
+msgstr "{said} är ingen chatt. quote:reply tar en chatts nummer, som 207"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteKept"
+msgstr "Sparat som {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteMessage"
+msgstr "Enter sparar ett citat av {part, select, prompt {prompten} other {svaret}} som börjar med ”{opening}”, bredvid chatten"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteMessageInto"
+msgstr "Enter sparar ett citat av {part, select, prompt {prompten} other {svaret}} som börjar med ”{opening}” i {into}"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteNeverSent"
+msgstr "Ett citat är till för människor och skickas aldrig"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -5464,6 +5552,18 @@ msgid "enter.tagLong"
 msgstr "En tagg får vara högst {max} tecken"
 
 #. js-lingui-explicit-id
+msgid "enter.tagMessage"
+msgstr "Enter taggar {part, select, prompt {prompten} other {svaret}} som börjar med ”{opening}” med {tag}, genom ett citat bredvid chatten"
+
+#. js-lingui-explicit-id
+msgid "enter.tagMessageAlready"
+msgstr "Det har redan {tag}, som {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.tagMessageDone"
+msgstr "Taggat med {tag}, som {num}"
+
+#. js-lingui-explicit-id
 msgid "enter.tagNone"
 msgstr "Ingen av dem har {tag}"
 
@@ -6065,6 +6165,11 @@ msgstr "lyssnar"
 msgid "field.toAll"
 msgstr "{count, plural, other {till alla #}}"
 
+#. Grey text in the empty field on the welcome page. {leader} is >, the command leader
+#. js-lingui-explicit-id
+msgid "field.toBegin"
+msgstr "Skriv {leader} för att börja"
+
 #. js-lingui-explicit-id
 msgid "field.toOne"
 msgstr "till {address} · {name}"
@@ -6206,6 +6311,10 @@ msgstr "Layout"
 #. js-lingui-explicit-id
 msgid "group.leaders"
 msgstr "Fältet"
+
+#. js-lingui-explicit-id
+msgid "group.lines"
+msgstr "Rader med flera kommandon"
 
 #. js-lingui-explicit-id
 msgid "group.run"
@@ -7020,6 +7129,23 @@ msgstr "kryssa i block, en layout eller ett tema, och lägg sedan till dem i rum
 #. js-lingui-explicit-id
 msgid "library.writes"
 msgstr "Skriver {command} i fältet"
+
+#. js-lingui-explicit-id
+msgid "line.closePop"
+msgstr "Stäng Registret och lägg Samlingen på din andra skärm"
+
+#. js-lingui-explicit-id
+msgid "line.filters"
+msgstr "Chattar taggade med essay från de senaste sju dagarna, i Registret"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "line.pinTag"
+msgstr "Fäst en chatt och tagga den. undo: tar tillbaka hela raden"
+
+#. js-lingui-explicit-id
+msgid "line.spreadSave"
+msgstr "Öppna två chattar och Registret fördelade över dina skärmar, och spara det under namnet morning"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -8168,6 +8294,10 @@ msgid "settings.backupLabel"
 msgstr "Säkerhetskopiering och återställning"
 
 #. js-lingui-explicit-id
+msgid "settings.browserCompare"
+msgstr "Alla webbläsare jämförda, på webbplatsen"
+
+#. js-lingui-explicit-id
 msgid "settings.browserCompression"
 msgstr "Mindre säkerhetskopior"
 
@@ -8793,6 +8923,11 @@ msgstr "calm: av"
 msgid "shell.calmOn"
 msgstr "calm: på"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.calmTitle"
+msgstr "Ändringarna och detaljerna på tavlorna väntar tills du kommer nära dem. Kör {command}"
+
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -8839,6 +8974,11 @@ msgstr "från vänster till höger:"
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"
 msgstr "Kör {command}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.focusTitle"
+msgstr "Bara chatten, eller tavlorna du väljer, blir kvar på skärmen. Kör {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.fullScreen"
@@ -9107,7 +9247,7 @@ msgstr "Välj vem som svarar i den här chatten: en modell, eller en källa utan
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Visa färre detaljer tills du närmar dig, eller allt igen"
+msgstr "Dölj ändringarna och detaljerna på tavlorna tills du kommer nära dem. calm:off visar dem"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9122,6 +9262,10 @@ msgid "verb.close"
 msgstr "Ta bort en tavla från skärmen, eller stäng brevet. Inget går förlorat"
 
 #. js-lingui-explicit-id
+msgid "verb.collection"
+msgstr "Ta fram Samlingen bredvid det som visas"
+
+#. js-lingui-explicit-id
 msgid "verb.cols"
 msgstr "Dölj eller visa kolumner i tabellen"
 
@@ -9131,7 +9275,7 @@ msgstr "Ställ två eller fler sida vid sida. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
-msgstr "Kopiera något som Markdown"
+msgstr "Kopiera något som Markdown, eller svaret du är i"
 
 #. js-lingui-explicit-id
 msgid "verb.cost"
@@ -9167,7 +9311,7 @@ msgstr "Ladda ned som Markdown eller JSONL för att läsa på annat håll. Kan i
 
 #. js-lingui-explicit-id
 msgid "verb.focus"
-msgstr "Rensa skärmen till de tavlor du väljer, spara den uppsättningen eller gå tillbaka"
+msgstr "Stäng alla tavlor utom chatten, eller utom de tavlor du nämner. focus:off tar tillbaka resten"
 
 #. js-lingui-explicit-id
 msgid "verb.forget"
@@ -9243,7 +9387,7 @@ msgstr "Ange om ett rum bara skickar till modeller på den här datorn"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Visa svaren med ändringar, eller renskrivna"
+msgstr "Ändringar: visa dina redigeringar i svaren, eller visa svaren renskrivna"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9288,6 +9432,10 @@ msgstr "Lägg en eller flera tavlor, eller fältet, i ett eget fönster, placera
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "Byt ut e-postadresser, telefonnummer samt bank- och kortnummer mot platshållare innan en prompt skickas, även namn, eller inte"
+
+#. js-lingui-explicit-id
+msgid "verb.quote"
+msgstr "Spara ett citat av hela svaret du är i, bredvid chatten eller i en annan. Det skickas aldrig"
 
 #. js-lingui-explicit-id
 msgid "verb.records"
@@ -9391,7 +9539,7 @@ msgstr "Visa det som har en tagg. Ett minus utesluter den"
 
 #. js-lingui-explicit-id
 msgid "verb.tagadd"
-msgstr "Tagga saker, eller det som är valt"
+msgstr "Tagga saker, det som är valt, eller svaret du är i"
 
 #. js-lingui-explicit-id
 msgid "verb.tell"
@@ -9491,15 +9639,15 @@ msgstr "Parliament är ett försök att tänka om hur vi interagerar med AI. Att
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "Jag är också rädd för AI. Det är ett under som jag inte vet vad jag ska känna inför. Men jag ville inte bara sitta och göra ingenting. Så efter månader av chattande och läsande har jag försökt sätta ihop en app som du kan använda offline. En app där du kan söka i källor utan AI först. En app som hoppas ge egenmakt genom aktivt deltagande. Det kanske är för djärvt av mig... jag har visserligen kodat ett par webbappar i Ruby, men jag skulle ändå kalla mig ”designer”. Att bygga är svårt, särskilt när man lär sig under tiden och tempot känns som att dricka ur en brandslang. Koden är öppen, jag har gjort säkerhetskontroller med Claude Code och planerar fler säkerhetskontroller av tredje part. Jag ska göra mitt bästa för att hålla dig uppdaterad. Jag har funderat på hur jag skulle kunna göra koden mer lättillgänglig... jag kanske kan göra en roman av den."
+msgstr "Jag är också rädd för AI. Det är ett under som jag inte vet vad jag ska känna inför. Men jag ville inte bara sitta och göra ingenting. Så jag har försökt sätta ihop en app som du kan använda offline med lokala modeller. En app där du kan söka i källor utan AI först. En app som hoppas ge egenmakt genom mer aktivt deltagande. Det kanske är för djärvt av mig..."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "Så vad är Parliament? I Parliament kan du skapa rum, ett utrymme där du kan chatta med en AI-modell, flera eller ingen alls. Rum byggs av block som du kan redigera och ändra, och du kan göra egna layouter, teman och uppställningar."
+msgstr "Koden är öppen, jag har gjort säkerhetskontroller med Claude Code och planerar fler säkerhetskontroller av tredje part. Jag ska göra mitt bästa för att hålla dig uppdaterad."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "Allt ligger på tavlor. Alla tavlor kan läggas i egna fönster och flyttas till en annan skärm, så arbetsutrymmet är ditt."
+msgstr "Vad är Parliament? Parliament är ett utrymme där du kan chatta med en AI-modell, flera eller ingen alls. Du kan bygga rum av block som du kan redigera och ändra, och du kan göra egna layouter, teman och uppställningar. Allt ligger på tavlor. Alla tavlor kan läggas i egna fönster och flyttas till en annan skärm, så arbetsutrymmet är ditt. Labbet, där du redigerar rum, kommer snart!"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9520,20 +9668,20 @@ msgstr "Stef"
 msgid "welcome.small"
 msgstr "Byggt för dator, mobil kommer senare"
 
-#. {command} is open:records, which stays English, as does open:
+#. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id
-msgid "welcome.start.open"
-msgstr "{command} listar det du har skapat, och open: med numret öppnar något av det igen"
+msgid "welcome.start.commands"
+msgstr "Använd kommandofältet för att göra saker. Skriv {first} och sedan {second} för att se vad som fungerar nu."
+
+#. {command} is open:records, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.history"
+msgstr "Skriv {command} i kommandofältet för att se din historik."
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
-msgid "welcome.start.room"
-msgstr "{command} och en fråga öppnar ett rum"
-
-#. {command} is tour:, which stays English
-#. js-lingui-explicit-id
-msgid "welcome.start.tour"
-msgstr "{command} tar fram stegen igen"
+msgid "welcome.start.prompt"
+msgstr "Skriv {command} för att börja på en prompt."
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

@@ -319,3 +319,21 @@ Each: id, the English, the draft, and why I was unsure.
     English: Notes and markings / Notes, highlights, quotes, favourites and collections
     Draft: Anteckningar och markeringar / Anteckningar, markeringar, citat, favoriter och samlingar
     Why: with keywords retired into highlights, the line under the heading now names highlights, and highlight is "markering" in Swedish, as is the collective. So the heading says "markeringar" for all of them and the line under it says "markeringar" for one kind. Doubt 3 said no single string uses both; these are two strings shown together. The heading could become "Anteckningar och annat du markerat", or the kind "färgmarkeringar" here only, but either breaks with the rest. I kept markering.
+
+## Words of 2 November 2026 (C286)
+
+- `enter.deleteMessageAgain`, `enter.deleteMessageUndo`, `enter.deletedMessage`: "it" is "det" (and "Raderat"), though a prompt is an en-word (den). These lines carry no {part} to agree with, so the neuter is meant to read as the impersonal; a native reader should say whether it jars after "prompten".
+- `enter.copyMessage`: "som börjar med ”…” som Markdown" says "som" twice. Kept "som Markdown" to match `enter.copyOne`; "i Markdown-format" is the alternative.
+- `enter.tagMessage`: "som börjar med ”…” med {tag}" says "med" twice, and "through a quote of it" is shortened to "genom ett citat", so no den or det has to agree with the prompt or reply.
+- `enter.noteOnMessage`, `enter.messageLast`: the select now holds the rest of the sentence, so "den" and "det" agree with prompten and svaret. Same cases and placeholders as the English. "a note on" is "en anteckning till".
+- `line.spreadSave`, `line.filters`: the example lines beside them are fixed in `src/commands/verbs.js` and stay English, so the glosses name `morning` and `essay` as typed, unlike verb.arrange's "morgon". If the examples become translatable, these become morgon and essä.
+- `welcome.start.commands`: "command bar" is new (see below); "what's live" is "vad som fungerar nu", and "for actions" is "för att göra saker". Both are guesses at the tone of the welcome page.
+- `enter.calmSameOff`: "until you come near" is "tills du närmar dig", since "kommer nära" wants an object; the other calm lines keep "kommer nära dem".
+
+### New terms
+- command bar (welcome page only) → kommandofältet. The bar is fältet; "command line" stays kommandoraden, so the two English words keep two Swedish ones.
+- the reply you are in → svaret du är i.
+- the reply that begins “…” → svaret som börjar med ”…”.
+- keep a quote (quote:reply) → spara ett citat; kept as {num} → sparat som {num}, as chat.quoteHelp ("Spara orden bredvid chatten").
+- Enter twice → Enter två gånger, beside "Enter en gång till".
+- markup in the calm lines → ändringarna, as the glossary's markup · clean; calm now hides rather than "lugnar skärmen".

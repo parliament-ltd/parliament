@@ -337,3 +337,24 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
     - en: Then keeps it all as {name} / …, in place of the one saved by that name
     - ja: そのあと、全体を{name}として保存します / そのあと、同じ名前で保存されている配置に代えて、全体を{name}として保存します
     - 全体 for "it all": everything the line makes, windows included. The second follows enter.arrangeReplace.
+
+## Words of 2 November 2026 (C286)
+
+- `welcome.start.commands`, `welcome.start.history`: "the command bar" is コマンドバー, against the glossary's bare バー, since the English adds "command" here. 今使えるもの for "what's live" is vague; 今使えるコマンド would be plainer if that is what it means.
+- `verb.copy`, `verb.tagadd`, `verb.quote`: "the reply you are in" is 今いる返答, as verb.inspect has 今いる場所. It may read oddly; クリックした返答 says how a reply comes to be "in hand" (enter.messageLast), but more than the English does.
+- `enter.quoteKept`, `enter.quoteAlready`, `enter.tagMessageDone`, `enter.tagMessageAlready`: a bare "as {num}" reads poorly in Japanese, so the number is named 引用{num}, and the tag lines say the tag goes on the quote (引用{num}に{tag}タグを付けました) rather than "tagged, as".
+- `enter.quoteMessageInto`: "in {into}" is チャット{into}. If {into} can be a branch (201a), チャット201a is a little off.
+- `line.filters`, `line.spreadSave`: essay and morning stay English, since the example line beside them (tag:essay, arrange:save "morning") is not translated. If those examples are ever translated (as verb.arrange's 朝 is), these must follow.
+- `enter.barWindowMove`: "where the browser allows it" sits after the select as （ブラウザが許可する場合）, because the select comes first and cannot move.
+- `enter.deletedMessage`, `enter.deleteMessageUndo`: "the chat offers to bring it back" is チャットで元に戻せます, as the undo lines have it, not 復元 (kept for backups).
+- `field.toBegin`: {leader} を入力して開始 is a terse hint; {leader} を入力して始めましょう would match the welcome page's warmer tone.
+- `settings.browserCompare`: すべてのブラウザの比較（サイト上） is a noun phrase for a link; サイトで、すべてのブラウザを比較 is the alternative.
+
+### New terms
+
+- "hides markup and the details on boards" (calm:, reworded) → 変更表示とボードの詳細を隠す; "until you come near them" → 近づくまで. The command's name stays 控えめ.
+- {part, select, prompt {…} other {…}} → プロンプト / 返答; "that begins “{opening}”" → 「{opening}」で始まる.
+- "the command bar" → コマンドバー (welcome page only).
+- "Lines of several commands" → 複数のコマンドを並べた行, as レイアウトのコマンドを並べた行.
+- "your second screen" → 2台目のディスプレイ.
+- the bar's window → バーのウインドウ; top, bottom, left, right, centre of its screen → ディスプレイの上端, 下端, 左端, 右端, 中央.

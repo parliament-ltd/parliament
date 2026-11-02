@@ -310,3 +310,26 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
     English: … MIT licensed, and the source is on GitHub.
     Draft: … MIT-lisensoitu, ja lähdekoodi on GitHubissa.
     Why: a participle with Parliament understood as its subject. "Lisenssi on MIT, ja lähdekoodi on GitHubissa" is the alternative; the footer link keeps the noun, "MIT-lisenssi".
+
+## Words of 2 November 2026 (C286)
+
+- `enter.deleteMessage`: "Enter twice" is "Kaksi Enter-painallusta", so Enter is not the subject as in other Enter lines. "Enter kahdesti poistaa…" keeps the pattern but reads clipped.
+- `line.filters`, `line.spreadSave`: "essay" and "morning" stay English because the example command beside each one (in `src/commands/verbs.js`) is not translated. verb.arrange says "aamu" only because its command sits inside the translated gloss. If the examples get translated, these become essee and aamu. The word order in line.filters is also clumsy.
+- `welcome.start.commands`, `welcome.start.history`: "command bar" is a new term, komentopalkki (see below). "What's live" is "mikä on jo käytössä", which could read as "what is in use". "mikä jo toimii" is the alternative.
+- `enter.copyMessage` and the other "that begins ”{opening}”" lines: "joka alkaa ”…”", with no "sanoilla". That is shorter, and it works for a single word, but a native reader may want "sanoilla" added.
+- `enter.quoteKept`, `enter.quoteAlready`, `enter.tagMessageDone`, `enter.tagMessageAlready`: {num} is the quote's number, so "as {num}" names the quote: lainauksena, lainaukseen, lainauksessa {num}.
+- `enter.tagMessage`: "through a quote of it beside its chat" became a long participle, "keskustelun rinnalla säilytettävän lainauksen kautta".
+- `enter.deletedMessage`, `enter.deleteMessageUndo`: "the chat offers to bring it back" is "Sen voi palauttaa keskustelussa", meaning "it can be brought back in the chat", rather than a literal "offers".
+- `enter.messageNoRoom`: "no reply to take" is "vastausta ei ole otettavissa", which is a little formal.
+- `verb.copy`: "something" is "kohde", since copy: takes a number.
+
+### New terms
+- command bar (welcome page) → komentopalkki, in the palkki family (hakupalkki, osoitepalkki). It is kept apart from komentorivi, the command line.
+- the reply (prompt) you are in → vastaus (kehote), jossa olet.
+- that begins “…” → joka alkaa ”…”.
+- keep a quote, kept → säilyttää lainaus, säilytetty, as in chat.quoteHelp. "Beside its chat" → keskustelun rinnalla. "In {into}" → keskustelussa {into}.
+- Enter twice → kaksi Enter-painallusta. Enter again → toinen Enter, as in enter.deleteAgain.
+- details on boards → taulujen yksityiskohdat. Markup stays muutosmerkit.
+- the top (bottom, left, right, centre) of its screen → näytön yläreunaan (alareunaan, vasempaan reunaan, oikeaan reunaan, keskelle). Where the browser allows it → jos selain sallii sen.
+- Lines of several commands → Usean komennon rivit.
+- Every browser compared → Kaikkien selainten vertailu.

@@ -745,6 +745,11 @@ msgstr "Plan"
 msgid "board.lab"
 msgstr "Lab"
 
+#. The board a letter from the maker of Parliament opens on (letter:)
+#. js-lingui-explicit-id
+msgid "board.letter"
+msgstr "Letter"
+
 #. Rooms, layouts, blocks, themes and resources
 #. js-lingui-explicit-id
 msgid "board.library"
@@ -2080,6 +2085,11 @@ msgstr "The bar is in its own window already"
 msgid "enter.barThere"
 msgstr "{place, select, top {The bar is at the top already} bottom {The bar is at the bottom already} left {The bar is on the left already} right {The bar is on the right already} other {The bar is in the centre already}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.barWindowMove"
+msgstr "{place, select, top {Enter moves the bar’s window to the top of its screen} bottom {Enter moves the bar’s window to the bottom of its screen} left {Enter moves the bar’s window to the left of its screen} right {Enter moves the bar’s window to the right of its screen} other {Enter moves the bar’s window to the centre of its screen}}, where the browser allows it. pop:back command brings the bar to the page"
+
 #. js-lingui-explicit-id
 msgid "enter.besideAlready"
 msgstr "{board} is beside {other} already"
@@ -2218,21 +2228,21 @@ msgstr "{word} could be {names}. Say which, like {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOff"
-msgstr "Enter shows every detail again"
+msgstr "Enter shows markup and every detail again"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enter calms the screen: details wait until you are near them"
+msgstr "Enter hides markup and the details on boards until you come near them"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "Every detail shows already. calm: calms the screen"
+msgstr "Markup and details show already. calm: hides them until you come near"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOn"
-msgstr "The screen is calm already. calm:off shows every detail"
+msgstr "Markup and details are hidden already. calm:off shows them"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -2414,6 +2424,10 @@ msgid "enter.collectionNew"
 msgstr "Enter makes a new collection and shows it"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionNewWith"
+msgstr "Enter makes a new collection holding {num}, the chat in the room, and shows it"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionNone"
 msgstr "No collection is on {board} yet. new:collection makes one"
 
@@ -2484,12 +2498,20 @@ msgid "enter.copied"
 msgstr "Copied {num} as Markdown"
 
 #. js-lingui-explicit-id
+msgid "enter.copiedMessage"
+msgstr "Copied the {part, select, prompt {prompt} other {reply}} as Markdown"
+
+#. js-lingui-explicit-id
 msgid "enter.copyFailed"
 msgstr "The browser did not allow copying. Click into the page and try again"
 
 #. js-lingui-explicit-id
 msgid "enter.copyHidden"
 msgstr "{count, plural, one {# hidden message left out} other {# hidden messages left out}}"
+
+#. js-lingui-explicit-id
+msgid "enter.copyMessage"
+msgstr "Enter copies the {part, select, prompt {prompt} other {reply}} that begins “{opening}” as Markdown"
 
 #. js-lingui-explicit-id
 msgid "enter.copyOne"
@@ -2532,6 +2554,10 @@ msgstr "Enter deletes {address}, which has never run, from every run of plan {nu
 msgid "enter.deletedBranch"
 msgstr "{address} is deleted. undo: brings it back"
 
+#. js-lingui-explicit-id
+msgid "enter.deletedMessage"
+msgstr "Deleted. For 20 seconds the chat offers to bring it back"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
@@ -2550,6 +2576,18 @@ msgstr "An edit is taken back with undo:{num}"
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
 msgstr "Delete everything is a button at the foot of {board}. Enter opens it there"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessage"
+msgstr "Enter twice deletes the {part, select, prompt {prompt} other {reply}} that begins “{opening}”"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessageAgain"
+msgstr "Enter again deletes it. Escape keeps it"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteMessageUndo"
+msgstr "For 20 seconds the chat offers to bring it back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3418,6 +3456,23 @@ msgid "enter.markupSame"
 msgstr "{on, select, on {Replies are marked up already} other {Replies are clean already}}"
 
 #. js-lingui-explicit-id
+msgid "enter.messageFailed"
+msgstr "That could not be done. The message may have changed since"
+
+#. js-lingui-explicit-id
+msgid "enter.messageLast"
+msgstr "It is the last {part, select, prompt {prompt} other {reply}}. Click in another to take that one instead"
+
+#. js-lingui-explicit-id
+msgid "enter.messageNone"
+msgstr "The chat here has no {part, select, prompt {prompt} other {reply}} yet"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.messageNoRoom"
+msgstr "No room is on screen, so there is no {part, select, prompt {prompt} other {reply}} to take. room: brings one back"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBeside"
 msgstr "Enter puts {board} beside {other}"
 
@@ -3594,6 +3649,10 @@ msgstr "A note is at most {max} characters"
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
 msgstr "A note is for people and is never sent"
+
+#. js-lingui-explicit-id
+msgid "enter.noteOnMessage"
+msgstr "Enter writes a note on the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, quoting it"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
@@ -4046,6 +4105,10 @@ msgstr "The browser was told not to let Parliament place windows. Enter opens {b
 #. js-lingui-explicit-id
 msgid "enter.popDisplayWhich"
 msgstr "display takes its number, last: pop:records 202 collection display 2"
+
+#. js-lingui-explicit-id
+msgid "enter.popInTab"
+msgstr "It opened as a tab, since this browser sends new windows to tabs. Drag the tab out of its window to make it a window of its own"
 
 #. js-lingui-explicit-id
 msgid "enter.popJoinDisplay"
@@ -4546,6 +4609,31 @@ msgstr "{whos} cannot search the web, and {count, plural, one {goes} other {go}}
 #. js-lingui-explicit-id
 msgid "enter.queryFailed"
 msgstr "Your question could not be translated, so nothing was sent. Try again, or translate:off sends it as typed"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteAlready"
+msgstr "It is kept already, as {num}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.quoteIntoWhich"
+msgstr "{said} is not a chat. quote:reply takes a chat’s number, as 207"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteKept"
+msgstr "Kept as {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteMessage"
+msgstr "Enter keeps a quote of the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, beside its chat"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteMessageInto"
+msgstr "Enter keeps a quote of the {part, select, prompt {prompt} other {reply}} that begins “{opening}” in {into}"
+
+#. js-lingui-explicit-id
+msgid "enter.quoteNeverSent"
+msgstr "A quote is for people and is never sent"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -5464,6 +5552,18 @@ msgid "enter.tagLong"
 msgstr "A tag is at most {max} characters"
 
 #. js-lingui-explicit-id
+msgid "enter.tagMessage"
+msgstr "Enter tags the {part, select, prompt {prompt} other {reply}} that begins “{opening}” {tag}, through a quote of it beside its chat"
+
+#. js-lingui-explicit-id
+msgid "enter.tagMessageAlready"
+msgstr "It carries {tag} already, as {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.tagMessageDone"
+msgstr "Tagged {tag}, as {num}"
+
+#. js-lingui-explicit-id
 msgid "enter.tagNone"
 msgstr "None of those carries {tag}"
 
@@ -6065,6 +6165,11 @@ msgstr "listening"
 msgid "field.toAll"
 msgstr "{count, plural, other {to all #}}"
 
+#. Grey text in the empty field on the welcome page. {leader} is >, the command leader
+#. js-lingui-explicit-id
+msgid "field.toBegin"
+msgstr "Type {leader} to begin"
+
 #. js-lingui-explicit-id
 msgid "field.toOne"
 msgstr "to {address} · {name}"
@@ -6206,6 +6311,10 @@ msgstr "Layout"
 #. js-lingui-explicit-id
 msgid "group.leaders"
 msgstr "The bar"
+
+#. js-lingui-explicit-id
+msgid "group.lines"
+msgstr "Lines of several commands"
 
 #. js-lingui-explicit-id
 msgid "group.run"
@@ -7020,6 +7129,23 @@ msgstr "tick blocks, a layout or a theme, then add them to the room together"
 #. js-lingui-explicit-id
 msgid "library.writes"
 msgstr "Writes {command} in the bar"
+
+#. js-lingui-explicit-id
+msgid "line.closePop"
+msgstr "Close Records and put the Collection on your second screen"
+
+#. js-lingui-explicit-id
+msgid "line.filters"
+msgstr "Chats tagged essay from the last seven days, in Records"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "line.pinTag"
+msgstr "Pin a chat and tag it. undo: takes back the whole line"
+
+#. js-lingui-explicit-id
+msgid "line.spreadSave"
+msgstr "Open two chats and Records across your screens, and keep that as morning"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -8168,6 +8294,10 @@ msgid "settings.backupLabel"
 msgstr "Backup and restore"
 
 #. js-lingui-explicit-id
+msgid "settings.browserCompare"
+msgstr "Every browser compared, on the site"
+
+#. js-lingui-explicit-id
 msgid "settings.browserCompression"
 msgstr "Smaller backups"
 
@@ -8793,6 +8923,11 @@ msgstr "calm: off"
 msgid "shell.calmOn"
 msgstr "calm: on"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.calmTitle"
+msgstr "Markup and the details on boards wait until you come near them. Runs {command}"
+
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -8839,6 +8974,11 @@ msgstr "left to right:"
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"
 msgstr "Runs {command}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.focusTitle"
+msgstr "Only the chat, or the boards you pick, stay on screen. Runs {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.fullScreen"
@@ -9107,7 +9247,7 @@ msgstr "Choose who answers in this chat: a model, or a source with no tokens"
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Show less detail until you come near it, or all of it again"
+msgstr "Hide markup and the details on boards until you come near them. calm:off shows them"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9122,6 +9262,10 @@ msgid "verb.close"
 msgstr "Take a board off the screen, or close the letter. Nothing is lost"
 
 #. js-lingui-explicit-id
+msgid "verb.collection"
+msgstr "Bring the Collection beside what is on screen"
+
+#. js-lingui-explicit-id
 msgid "verb.cols"
 msgstr "Hide or show columns of the table"
 
@@ -9131,7 +9275,7 @@ msgstr "Set two or more side by side. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
-msgstr "Copy something as Markdown"
+msgstr "Copy something as Markdown, or the reply you are in"
 
 #. js-lingui-explicit-id
 msgid "verb.cost"
@@ -9167,7 +9311,7 @@ msgstr "Download as Markdown or JSONL to read elsewhere. It cannot be restored"
 
 #. js-lingui-explicit-id
 msgid "verb.focus"
-msgstr "Clear the screen to your chosen boards, keep that set, or come back"
+msgstr "Close every board but the chat, or but the boards you name. focus:off brings the rest back"
 
 #. js-lingui-explicit-id
 msgid "verb.forget"
@@ -9243,7 +9387,7 @@ msgstr "Say whether a room sends only to models on this computer"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Show replies marked up, or clean"
+msgstr "Markup: show your edits in replies, or show replies clean"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
@@ -9288,6 +9432,10 @@ msgstr "Put one or more boards, or the bar, in a window of their own, place it, 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, names too, or not"
+
+#. js-lingui-explicit-id
+msgid "verb.quote"
+msgstr "Keep a quote of the whole reply you are in, beside its chat or in another. It is never sent"
 
 #. js-lingui-explicit-id
 msgid "verb.records"
@@ -9391,7 +9539,7 @@ msgstr "Show what carries a tag. A minus leaves it out"
 
 #. js-lingui-explicit-id
 msgid "verb.tagadd"
-msgstr "Tag things, or what is selected"
+msgstr "Tag things, what is selected, or the reply you are in"
 
 #. js-lingui-explicit-id
 msgid "verb.tell"
@@ -9491,15 +9639,15 @@ msgstr "Parliament is an attempt to rethink how we interact with AI. To take par
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "I'm scared of AI too. It's a marvel I don't know how to feel about. But I didn't want to sit there and do nothing. So, after months of chatting and reading, I've tried to put together an app you can use offline. An app where you can search sources without AI first. An app that hopes to empower through active participation. Perhaps that's too bold of me... while I've coded a couple web applications in Ruby, I'd still classify myself as a \"designer\". Building is hard, especially when you're learning as you go and the pace feels like drinking from a fire hose. The code is open, I've run through Claude Code security checks, and plan to do more 3rd-party security checks. I will do my best to keep you posted. I've been wondering how I could make the code accessible... maybe I could turn it into a novel."
+msgstr "I'm scared of AI too. It's a marvel I don't know how to feel about. But I didn't want to sit there and do nothing. So, I've tried to put together an app you can use offline with local models. An app where you can search sources without AI first. An app that hopes to empower through more active participation. Perhaps that's too bold of me..."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "So what is Parliament? In Parliament, you can create rooms, a space where you can chat with one AI model, several, or none. Rooms are built from blocks you can edit and change, and you can make your own layouts, themes, and arrangements."
+msgstr "The code is open, I've run through Claude Code security checks, and plan to do more 3rd-party security checks. I will do my best to keep you posted."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours."
+msgstr "What is Parliament? In Parliament, is a space where you can chat with one AI model, several, or none. You can build rooms with blocks you can edit and change, and you can make your own layouts, themes, and arrangements. Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours. The Lab for editing rooms is coming soon!"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.5"
@@ -9520,20 +9668,20 @@ msgstr "Stef"
 msgid "welcome.small"
 msgstr "Built for computer, phone later"
 
-#. {command} is open:records, which stays English, as does open:
+#. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id
-msgid "welcome.start.open"
-msgstr "{command} lists what you have made, and open: with its number opens one again"
+msgid "welcome.start.commands"
+msgstr "Use the command bar for actions. Type {first} and then {second} to see what’s live."
+
+#. {command} is open:records, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.start.history"
+msgstr "To see your history, type {command} in the command bar."
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
-msgid "welcome.start.room"
-msgstr "{command} and a question opens a room"
-
-#. {command} is tour:, which stays English
-#. js-lingui-explicit-id
-msgid "welcome.start.tour"
-msgstr "{command} brings the steps back"
+msgid "welcome.start.prompt"
+msgstr "Type {command} to start a prompt."
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

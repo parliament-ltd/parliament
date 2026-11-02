@@ -371,3 +371,22 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
     - EN: {count, plural, one {# highlight} other {# highlights}}
     - ZH: {count, plural, other {# 处高亮}}
     - Why: the old line counted keywords with 个. A highlight is a place in a reply, so 处, as edits are counted. The other counts beside it (reflection.markNotes, markQuotes, markAsks) use 条, and # 条高亮 is the alternative if the row should share one counter.
+
+## Words of 2 November 2026 (C286)
+
+- `welcome.start.commands`, `welcome.start.history`: "the command bar" is 命令行, the bar's `>` reading, as welcome.step.command 打开命令行. The glossary turned down 命令栏, and 输入栏 would lose "command". "What's live" is 当前可用的命令, since `?` lists the commands.
+- `enter.tagMessage`: "through a quote of it beside its chat" became a second clause (标签加在它的摘录上，摘录放在对话旁边). Kept in one clause, it read as the message putting the quote there.
+- `line.spreadSave`, `line.filters`: the example line above each gloss stays English, so the gloss keeps “morning” and “essay” to match it. verb.arrange's 早晨 is different, because its example sits inside the translated gloss.
+- `verb.copy`, `verb.tagadd`, `verb.quote`: "the reply you are in" is 光标所在的回复, after enter.askOpen's 光标所在的位置. It assumes "in" means where the caret is (C286 (b): "the one the caret or a selection was last in").
+- `enter.deletedMessage`, `enter.deleteMessageUndo`: "the chat offers to bring it back" became 可在对话中恢复它 (you can bring it back in the chat). The undo line shows before anything is deleted, so it begins 删除后.
+- `enter.barWindowMove`: "where the browser allows it" is 前提是浏览器允许, after the select. Also, the existing `shell.barAway` has "pop:back 命令可将它放回", which translates the keyword `command`. It should probably read pop:back command 可将它放回.
+- `group.lines`: 一行多条命令, a heading beside 布局 and 筛选. 多命令行 would clash with 命令行.
+
+### New terms
+- the reply / prompt you are in → 光标所在的回复 / 提示词
+- the command bar (the start card) → 命令行
+- take (a command acting on one message) → 可用的 (nothing to take), 改用 (take that one instead)
+- Enter twice → 按两次 Enter
+- a line of several commands → 一行多条命令
+- opened as a tab → 已作为标签页打开; drag the tab out → 把这个标签页拖出所在的窗口
+- tagged through its quote → 标签加在它的摘录上
