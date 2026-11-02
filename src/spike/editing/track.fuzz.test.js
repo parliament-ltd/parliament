@@ -124,5 +124,5 @@ describe('undo from every card, after random editing', () => {
       if (failures.length >= 3) break
     }
     expect(failures).toEqual([])
-  })
+  }, 30_000) // 400 random edits: slow under a full run, so more than the usual 5 seconds
 })
