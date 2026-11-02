@@ -154,3 +154,4 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - markering is an en-word where nyckelord was an ett-word, so the articles and participles follow: en markering (enter.summarizeKinds, collection.pickFoot), "markering {num}, sparad i Parliament" (chat.aboutCard).
 - The type: words stay English, in the English order: "I {board} tar type: en av highlight, quote eller note".
 - The collective and the kind now meet in one place: backup.catAnnotations and the line under it (see doubts).
+- blockAbout.highlights (the passages you highlighted, each in its colour where you marked it) → "Textavsnitten du markerade i chatten, vart och ett i sin färg där du satte markeringen". passage → textavsnitt; "satte markeringen" for "marked it", so markera is not said twice.

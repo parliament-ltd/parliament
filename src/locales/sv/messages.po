@@ -431,7 +431,7 @@ msgstr "Datafiler i det här rummet, till exempel kalkylark, och vilka av dem mo
 
 #. js-lingui-explicit-id
 msgid "blockAbout.highlights"
-msgstr "Ord och fraser som lyses upp överallt där de förekommer i chatten, var och en i sin färg. Ett klick hoppar mellan dem."
+msgstr "Textavsnitten du markerade i chatten, vart och ett i sin färg där du satte markeringen. Ett klick hoppar mellan dem."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.input"

@@ -431,7 +431,7 @@ msgstr "Tämän huoneen datatiedostot, kuten laskentataulukot, ja se, mitä niis
 
 #. js-lingui-explicit-id
 msgid "blockAbout.highlights"
-msgstr "Sanat ja ilmaukset erottuvat omalla värillään kaikkialla, missä ne esiintyvät keskustelussa. Napsautus hyppää esiintymästä toiseen."
+msgstr "Keskustelussa korostamasi tekstikohdat, kukin omalla värillään siinä, missä sen merkitsit. Napsautus hyppää kohdasta toiseen."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.input"

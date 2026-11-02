@@ -431,7 +431,7 @@ msgstr "此房间中的数据文件（如电子表格），以及模型可以读
 
 #. js-lingui-explicit-id
 msgid "blockAbout.highlights"
-msgstr "词语和短语在对话中出现的每一处都会高亮，各有各的颜色。点击可在它们之间跳转。"
+msgstr "你在对话中高亮的文字，各以自己的颜色显示在你标记的位置。点击可在它们之间跳转。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.input"

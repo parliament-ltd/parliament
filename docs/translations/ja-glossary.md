@@ -184,3 +184,4 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - Every line that said キーワード now says ハイライト: in lists of markings (メモ、ハイライト、引用), as a tab or heading (ハイライト, ハイライトとメモ), counted (ハイライト#件), and in the term branch of the kind selects (term {ハイライト{num}}), whose selector stays term.
 - The type: words stay English, in the English order: type: に highlight、quote、note のいずれかを指定します.
 - verb.has follows the new English order: メモ、引用、ハイライトを含むものを表示する.
+- blockAbout.highlights (the passages you highlighted, each in its colour where you marked it) → チャットでハイライトした箇所を、マークしたその場所にそれぞれの色で示します. passage → 箇所, as enter.jumpOpen; marked → マークした.
