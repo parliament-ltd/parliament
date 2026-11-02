@@ -97,8 +97,12 @@ function Saved({ saved, current, onOpen }) {
   )
 }
 
-/** The search and filters in force, each a click that removes it. */
-function InForce({ search, line, count, saved, onClear, onSave }) {
+/**
+ * The search and filters in force, each a click that removes it. The
+ * Collection shows its own the same way, counting cards, with no save:
+ * (C287).
+ */
+export function InForce({ search, line, count, saved, onClear, onSave = null, shown = COPY.almanac.shown }) {
   const { i18n } = useLingui()
   const item = (k, label, isCommand) => (
     <button key={`${k}:${label}`} type="button" className="ch-alm-f" title={i18n._(COPY.almanac.removes, { command: CLEAR(k) })} onClick={() => onClear(k)}>
@@ -110,8 +114,8 @@ function InForce({ search, line, count, saved, onClear, onSave }) {
     <div className="ch-alm-in ch-marg" role="group" aria-label={i18n._(COPY.almanac.filtersLabel)}>
       {search && item('search', i18n._(COPY.almanac.searchFor, { text: search }), false)}
       {line.map((f) => item(f.k, f.text, true))}
-      <span className="ch-alm-count">{i18n._(COPY.almanac.shown, { count })}</span>
-      {!saved && <button type="button" className="ch-alm-cmd" title={i18n._(COPY.almanac.saveHelp)} onClick={onSave}>{SAVE}</button>}
+      <span className="ch-alm-count">{i18n._(shown, { count })}</span>
+      {onSave && !saved && <button type="button" className="ch-alm-cmd" title={i18n._(COPY.almanac.saveHelp)} onClick={onSave}>{SAVE}</button>}
       <button type="button" className="ch-alm-cmd" onClick={() => onClear('filters')}>{CLEAR('filters')}</button>
     </div>
   )

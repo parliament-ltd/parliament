@@ -1,6 +1,7 @@
 // The Collection's commands, planned before Enter (refactor-plan.md, stage
 // 6, piece 6; collection board v3; C139, C144): new:collection, add:, rm:,
-// clear:, heading:, move: for a card, name:, and the tabs and orders.
+// clear:, heading:, move: for a card, name:, pin: by name, and the tabs and
+// orders.
 //
 // Each returns what the Enter line says and what Enter does: a write of one
 // collection (before and after, so the write path can refuse one something
@@ -10,7 +11,7 @@
 // the shell (collectionCards.js), names through \`label\`.
 
 import { targetsOf } from './rowVerbs'
-import { withRows, withoutRows, withoutHeading, withHeading, withMoved, emptied, named, cleanCollectionName, findCollection, HEADING_MAX, COLLECTION_NAME_MAX } from './collections'
+import { withRows, withoutRows, withoutHeading, withHeading, withMoved, emptied, named, withPin, pinnedFirst, cleanCollectionName, findCollection, HEADING_MAX, COLLECTION_NAME_MAX } from './collections'
 import { orderKeys } from './collectionCards'
 
 const flat = (values = []) => values.flatMap((a) => (a.kind === 'list' ? a.items : [a]))
@@ -144,8 +145,24 @@ export function planForgetCollection(found, screens) {
   return { says: { message: 'collectionForget', values: { name: screens.collection.label(found) } }, act: write(found, null) }
 }
 
-/** A collection by name, through the names people read. */
-export const collectionNamed = (screens, name) => findCollection(screens.collection?.all ?? [], name, screens.collection?.label ?? ((c) => c.name ?? ''))
+/** A collection by name, through the names people read; pinned ones first where several start that way (C287). */
+export const collectionNamed = (screens, name) => findCollection(pinnedFirst(screens.collection?.all ?? []), name, screens.collection?.label ?? ((c) => c.name ?? ''))
+
+/**
+ * pin:"Rail candidates" keeps a collection at the top of the collections,
+ * from any board; on a pinned one it lets go, as pin: on rows does (C287).
+ * Undo takes it back like any other write of a collection.
+ */
+export function planPinCollection(step, screens = {}) {
+  const name = typed(step.match?.values?.[0])
+  if (!name.trim()) return { says: { message: 'takesExample', values: { verb: 'pin:', example: 'pin:"Rail candidates"' } }, act: null }
+  const { found, several } = collectionNamed(screens, name)
+  if (!found) {
+    return { says: several.length ? { message: 'pinWhich', values: { words: several } } : { message: 'inNoCollection', values: { name } }, act: null }
+  }
+  const on = found.pinned !== true
+  return { says: { message: on ? 'pinCollection' : 'unpinCollection', values: { name: screens.collection.label(found) } }, act: write(found, withPin(found, on)) }
+}
 
 /** sort: and type: on the Collection: its order and its tab (C144 (d), (e)). */
 export function planCollectionView(step, view = {}) {

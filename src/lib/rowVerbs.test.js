@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { targetsOf, planPin, planArchive, planTitle, planTagAdd, planUntag, planRetag, planRowLine, planCopy, planErase, cleanTag, TITLE_MAX, TAG_MAX } from './rowVerbs'
+import { targetsOf, planPin, planArchive, planTitle, planTagAdd, planUntag, planRetag, planRowLine, planCopy, planErase, cleanTag, isCollectionPin, TITLE_MAX, TAG_MAX } from './rowVerbs'
 import { enterLine } from '../commands/registry'
 import { BUILT } from '../chrome/preview'
 
@@ -98,6 +98,13 @@ describe('a line of row commands (C143 (g))', () => {
 
   it('stops at a command that would change nothing, and says why', () => {
     expect(plan('pin:202 archive:off 202')).toEqual({ bad: { message: 'archiveNot' } })
+  })
+
+  it('sends pin: with a collection name to a line of its own (C287)', () => {
+    expect(isCollectionPin(steps('pin:"Rail candidates"')[0])).toBe(true)
+    expect(isCollectionPin(steps('pin:rail')[0])).toBe(true)
+    expect(isCollectionPin(steps('pin:202')[0])).toBe(false)
+    expect(plan('pin:202 pin:"Rail candidates"')).toEqual({ bad: { message: 'aloneNow', values: { verb: 'pin:' } } })
   })
 })
 

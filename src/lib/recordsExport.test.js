@@ -97,6 +97,9 @@ describe('the file', () => {
     expect(exportName({ format: 'jsonl', nums: [1, 2, 3, 4, 5], scope: 'numbers', day: '2026-10-21' })).toBe('parliament-1-and-4-more-2026-10-21.jsonl')
     expect(exportName({ format: 'md', scope: 'records', day: '2026-10-21' })).toBe('parliament-records-2026-10-21.md')
     expect(exportName({ format: 'md', nums: [204], scope: 'shown', day: '2026-10-21' })).toBe('parliament-records-shown-2026-10-21.md')
+    // A collection's cards: never its name (C138, C287).
+    expect(exportName({ format: 'md', scope: 'collection', day: '2026-10-21' })).toBe('parliament-collection-2026-10-21.md')
+    expect(exportName({ format: 'jsonl', nums: [210], scope: 'collection-shown', day: '2026-10-21' })).toBe('parliament-collection-shown-2026-10-21.jsonl')
     expect(exportType('jsonl')).toBe('application/x-ndjson;charset=utf-8')
   })
 })

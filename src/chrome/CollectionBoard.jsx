@@ -4,6 +4,7 @@ import { COPY } from '../copy'
 import { dayOf } from './when'
 import { WORDED, selectionOf, actCommand } from '../lib/cardActs'
 import { isChangeRow } from '../lib/recordsFilter'
+import { InForce } from './AlmanacBoard'
 
 // The Collection (refactor-plan.md, stage 6, piece 6; collection board v3;
 // the editing spec; C139, C144): cards, not a table. Markings are read, not
@@ -28,6 +29,11 @@ import { isChangeRow } from '../lib/recordsFilter'
 // their commands at once (hold:, undo:, accept:, reject:, delete:), each
 // said under the bar as Enter would say it; undo: takes any of them back.
 // markup · clean in the head is the cards' own (C220 (g)).
+//
+// C287: Records' filters work on the cards too, kept apart from Records'.
+// The search and filters in force are one line under the orders, as on
+// Records, each a click that removes it. A pinned collection leads the
+// line of collections, marked so.
 
 const TABS = [
   ['all', COPY.collections.tabAll], ['edit', COPY.collections.tabEdit], ['ask', COPY.collections.tabAsk], ['suggestion', COPY.collections.tabSuggestion], ['highlight', COPY.collections.tabHighlight], ['term', COPY.collections.tabTerm],
@@ -342,7 +348,7 @@ function Picker({ pickable, sources, onWrite }) {
  *   entries: the sequence to draw (collectionCards.sequenceOf); counts: cards by kind; pickable: plans and chats to hold
  */
 export default function CollectionBoard({ collection, collections, label, entries, counts, view, sources, pickable, searching, addressed, onAddress, onWrite, onView, onShow, cards = [], picked = [], onPick, onClearPicked, onFind, onPrompt, rowOf = () => null,
-  clean = false, onRun = () => {}, onFindChange = () => {}, nameOf = (id) => id, notHeld = null }) {
+  clean = false, onRun = () => {}, onFindChange = () => {}, nameOf = (id) => id, notHeld = null, filtered = null, shownCount = 0, onClear = () => {} }) {
   const { i18n } = useLingui()
   const [picking, setPicking] = useState(false)
   const C = COPY.collections
@@ -392,7 +398,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
           />
         )
       })
-      : <p className="ch-marg ch-alm-note">{i18n._(searching ? COPY.collections.noneMatch : collection.items.length ? COPY.collections.emptyHeld : COPY.collections.empty)}</p>
+      : <p className="ch-marg ch-alm-note">{i18n._(filtered?.line.length ? C.noneMatchFiltered : searching ? COPY.collections.noneMatch : collection.items.length ? COPY.collections.emptyHeld : COPY.collections.empty)}</p>
     body = (
       <>
         <div className="ch-col-head">
@@ -432,6 +438,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
             </span>
           ) : null}
         </div>
+        {filtered && <InForce search={filtered.search} line={filtered.line} count={shownCount} onClear={onClear} shown={C.shown} />}
         {changed && !clean ? (
           <div className="ch-col-legend ch-marg" tabIndex={0} data-calm={i18n._(C.coloursFold)}>
             <span><s>{i18n._(C.legendStruck)}</s> {i18n._(C.legendStruckIs)}</span>
@@ -469,6 +476,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
               onClick={() => onShow(c)}
             >
               <span dir="auto">{label(c)}</span>
+              {c.pinned === true && <span className="pin">{i18n._(C.pinned)}</span>}
             </button>
           ))}
         </div>

@@ -81,6 +81,14 @@ describe('what a collection holds', () => {
     expect(C.named(c, 'Q2', LATER)).toMatchObject({ name: 'Q2', updatedAt: LATER })
   })
 
+  it('pins one without changing when it last changed, and lists pinned ones first (C287)', () => {
+    const c = empty({ name: 'Rail' })
+    expect(C.withPin(c, true)).toEqual({ ...c, pinned: true })
+    expect(C.withPin(C.withPin(c, true), false)).toEqual({ ...c, pinned: false })
+    const all = [{ id: 'a', pinned: false }, { id: 'b' }, { id: 'c', pinned: true }, { id: 'd', pinned: true }]
+    expect(C.pinnedFirst(all).map((x) => x.id)).toEqual(['c', 'd', 'a', 'b'])
+  })
+
   it('finds one by name: the same name first, then the only one it starts', () => {
     const all = [{ id: 'a', name: 'Q2 evidence' }, { id: 'b', name: 'Q2 notes' }, { id: 'c', name: 'Owls' }]
     expect(C.findCollection(all, 'owls').found.id).toBe('c')
@@ -117,6 +125,16 @@ describe('writing collections', () => {
     await C.writeCollection(db, { id: 'c1', before: a, after: C.named(a, 'Elsewhere', LATER) })
     await expect(C.writeCollection(db, { id: 'c1', before: a, after: C.named(a, 'Here', LATER) })).rejects.toMatchObject({ name: 'Changed' })
     expect((await db.get('collections', 'c1')).name).toBe('Elsewhere')
+  })
+
+  it('keeps a pin, and takes it back as undo: does (C287)', async () => {
+    const a = empty({ name: 'Rail' })
+    await C.writeCollection(db, { id: 'c1', before: null, after: a })
+    const pinned = C.withPin(a, true)
+    await C.writeCollection(db, { id: 'c1', before: a, after: pinned })
+    expect(await db.get('collections', 'c1')).toMatchObject({ pinned: true, updatedAt: NOW })
+    await C.writeCollection(db, { id: 'c1', before: pinned, after: a })
+    expect((await db.get('collections', 'c1')).pinned).toBe(false)
   })
 
   it('takes a change back by swapping before and after, as undo: does', async () => {

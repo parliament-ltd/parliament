@@ -150,6 +150,8 @@ export function planRetag(from, to, all) {
 
 /** The row verbs, and whether a step is one (name: only with a number). */
 export const ROW_VERBS = Object.freeze(['pin', 'archive', 'name', 'tagadd', 'retag', 'untag'])
+/** pin: with a name rather than numbers: a collection's (C287). */
+export const isCollectionPin = (step) => step.verb === 'pin' && ['text', 'word'].includes(step.match?.values?.[0]?.kind)
 export const isRowStep = (step) => ROW_VERBS.includes(step.verb)
   && (step.verb !== 'name' || ['address', 'number'].includes(step.match?.values?.[0]?.kind))
 
@@ -165,8 +167,9 @@ function planStep(step, rows) {
   switch (step.verb) {
     case 'pin':
     case 'archive': {
-      // pin:"Rail candidates" pins a collection, which comes with the Collection (piece 6).
-      if (step.verb === 'pin' && (args[0]?.kind === 'text' || args[0]?.kind === 'word')) return { bad: { message: 'later', values: { verb: 'pin:' } } }
+      // pin:"Rail candidates" pins a collection (collectionVerbs.planPinCollection,
+      // C287), a write of a collection, not of rows: on a line of its own.
+      if (step.verb === 'pin' && isCollectionPin(step)) return { bad: { message: 'aloneNow', values: { verb: 'pin:' } } }
       const off = step.verb === 'archive' && args[0]?.kind === 'word' && args[0].value === 'off'
       const t = targetsOf(off ? args.slice(1) : args, rows)
       if (t.bad) return t

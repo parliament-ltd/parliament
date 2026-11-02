@@ -8,7 +8,9 @@
 // description, items, headings, order, pinned, createdAt, updatedAt }.
 // `order` is the cards' and headings' keys in the person's own order; cards
 // not in it follow, oldest first. Items of kind chat, plan and marking, and
-// `order`, are new with this piece (C144 (j)).
+// `order`, are new with this piece (C144 (j)). `pinned` was written false
+// from the start; pin:"…" sets it (C287), and a pinned collection is listed
+// first.
 //
 // The planners are pure; readCollections and writeCollection touch the
 // store. A write names what it expects to find, so one that something else
@@ -156,6 +158,16 @@ export const emptied = (collection, now) => ({ ...collection, items: [], heading
 
 /** name:"Q2 evidence". */
 export const named = (collection, name, now) => ({ ...collection, name, updatedAt: now })
+
+/**
+ * pin:"Rail candidates", and again to let go (C287). Pinning is not a change
+ * to what it holds, so the time it last changed stays: unpinned, it goes back
+ * to its place.
+ */
+export const withPin = (collection, on) => ({ ...collection, pinned: on })
+
+/** The collections as they are listed for choosing: pinned ones first, each part in the order given (C287). */
+export const pinnedFirst = (collections) => [...collections.filter((c) => c.pinned === true), ...collections.filter((c) => c.pinned !== true)]
 
 // ── The store ───────────────────────────────────────────
 

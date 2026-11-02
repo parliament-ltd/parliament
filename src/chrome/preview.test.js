@@ -530,8 +530,10 @@ describe('search and filters on Records (stage 6, piece 1; C132)', () => {
     expect(p.act.view.filters).toHaveLength(1)
   })
 
-  it('waits for the Collection to filter it', () => {
-    expect(at('>tag:owls', undefined, { ...almanac(), addressed: 'collection' }).text).toBe('tag: is not built yet')
+  it('leaves Records as it is while the bar points at the Collection, which keeps its own (C287)', () => {
+    const p = at('>tag:owls', undefined, { ...almanac(), addressed: 'collection' })
+    expect(p.act.kind).toBe('collectionFilters')
+    expect(p.act.view).toBeNull()
   })
 })
 
@@ -775,6 +777,126 @@ describe('the Collection (stage 6, piece 6; C144)', () => {
     expect(at('>sort:oldest').text).toBe('Enter shows the oldest first')
     expect(at('>sort:active').text).toBe('On Collection, sort: takes yours, source, newest or oldest')
     expect(at('>type:keyword')).toMatchObject({ text: 'Enter shows the highlights', act: { view: { tab: 'term' } } })
+  })
+})
+
+describe('filters, export: and pin: on the Collection (C287)', () => {
+  const STORE = { chat: 'conversations', note: 'notes', term: 'highlights', quote: 'pins', edit: 'edits' }
+  const NOW = new Date(2026, 9, 21, 12).getTime()
+  const row = (num, kind, extra = {}) => ({
+    num, kind, id: `${kind}${num}`, store: STORE[kind], chatId: kind === 'chat' ? `chat-${num}` : null, title: `${kind} ${num}`, text: null,
+    tags: [], tagsMine: [], pinned: false, archived: false, roomId: null, docketNum: null, branch: null, run: null, chatNum: kind === 'chat' ? num : null,
+    marks: [], models: [], sources: [], cost: null, collections: ['q2'], createdAt: new Date(2026, 9, 1).toISOString(), activeAt: new Date(2026, 9, 1).toISOString(), words: '', ...extra,
+  })
+  const rows = [
+    row(202, 'chat', { models: ['claude-opus-4'], cost: 0.42 }),
+    row(204, 'chat'),
+    row(210, 'note', { chatId: 'chat-202', chatNum: 202, text: 'Range map', tags: ['essay'] }),
+    row(211, 'term', { chatId: 'chat-202', chatNum: 202, text: 'tapetum' }),
+    row(212, 'quote', { chatId: 'chat-204', chatNum: 204, text: 'Owls hunt by ear', tags: ['essay'], createdAt: new Date(2026, 9, 20).toISOString() }),
+    row(242, 'edit', { chatId: 'chat-202', chatNum: 202, text: 'a → b' }),
+  ]
+  const card = (num) => { const r = rows.find((x) => x.num === num); return { key: `mark:${r.store}:${r.id}`, num, kind: r.kind, text: r.text, tags: r.tags, chatNum: r.chatNum, createdAt: r.createdAt } }
+  const message = { key: 'msg:m1', num: null, kind: 'message', text: 'Barn owls hunt by ear', tags: [], chatNum: 204, createdAt: new Date(2026, 9, 18).toISOString() }
+  const cards = [card(210), card(211), card(212), card(242), message]
+  const q2 = { id: 'q2', name: 'Q2', builtIn: null, items: [], headings: [], order: [], pinned: false, createdAt: '2026-10-20T10:00:00Z', updatedAt: '2026-10-20T10:00:00Z' }
+  const q3 = { ...q2, id: 'q3', name: 'Q3', pinned: true }
+  const rail = { ...q2, id: 'rail', name: 'Rail candidates' }
+  const label = (c) => c.name ?? 'Untitled collection'
+  const onCollection = () => ({ ...almanac(), addressed: 'collection' })
+  const at = (value, { a = onCollection(), filtered = { search: '', filters: [] }, view = { tab: 'all', sort: 'yours', asc: false }, shown = q2, shownCards = cards, narrowed = false } = {}) => {
+    const collection = { shown, all: [q2, q3, rail], cards, label, view, filtered, shownCards, narrowed }
+    const records = { rows, view: { search: '', filters: [], sort: { by: 'active', asc: false } }, now: NOW, locale: 'en-US', rooms: [], collections: [{ id: 'q2', label: 'Q2' }], ctx: { models: [{ id: 'claude-opus-4', name: 'Opus' }] } }
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { records, collection, hiddenOf: () => new Set() } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+  const tagged = { search: '', filters: [{ k: 'tag', neg: false, v: ['essay'], text: 'tag:essay' }] }
+
+  it('filters the cards with the filters of Records, says how many Enter shows, and keeps them apart', () => {
+    const p = at('>tag:essay')
+    expect(p.text).toBe('Enter shows 2 cards')
+    expect(p.act).toMatchObject({ kind: 'collectionFilters', filtered: { search: '', filters: [{ k: 'tag', text: 'tag:essay' }] }, view: null })
+    expect(at('>-tag:essay').text).toBe('Enter shows 3 cards')
+    // Who answered and what it cost are the chat's.
+    expect(at('>model:opus').text).toBe('Enter shows 3 cards')
+    expect(at('>cost:>0.10').text).toBe('Enter shows 3 cards · 2 with no cost recorded are left out')
+    expect(at('>from:204').text).toBe('Enter shows 2 cards')
+    expect(at('>since:10/15/26').text).toBe('Enter shows 2 cards · made since October 15, 2026')
+    expect(at('>in:"Q2"').text).toBe('Enter shows 5 cards')
+    expect(at('>tag:nothing').text).toBe('Enter shows no cards')
+  })
+
+  it('refuses what it cannot read, before Enter', () => {
+    expect(at('>since:soon').text).toBe('since: takes 7d, 3w, a month, or a date like 2026-09-01')
+    expect(at('>in:attic').text).toBe('No room or collection is called attic')
+  })
+
+  it('takes the next filter of a kind in place of the last, and keeps the search', () => {
+    const p = at('>tag:range', { filtered: { search: 'map', filters: tagged.filters } })
+    expect(p.act.filtered).toMatchObject({ search: 'map', filters: [{ text: 'tag:range' }] })
+  })
+
+  it('clears one kind of filter, the search, or both', () => {
+    expect(at('>clear:tag', { filtered: tagged }).text).toBe('Enter removes tag:essay · Enter shows 5 cards')
+    expect(at('>clear:filters', { filtered: { ...tagged, search: 'owl' } })).toMatchObject({ text: 'Enter clears the search and every filter · Enter shows 5 cards', act: { filtered: { search: '', filters: [] } } })
+    expect(at('>clear:search', { filtered: { search: 'owl', filters: [] } }).text).toBe('Enter clears the search · Enter shows 5 cards')
+    expect(at('>clear:filters').text).toBe('No search or filter is in force')
+    expect(at('>clear:search').text).toBe('Nothing is searched for')
+    expect(at('>clear:model', { filtered: tagged }).text).toBe('No model: filter is in force')
+  })
+
+  it('takes the tab and the order on the same line; clear:type and clear:sort put them back', () => {
+    const p = at('>tag:essay type:note')
+    expect(p.text).toBe('Enter shows 1 card')
+    expect(p.act.view).toMatchObject({ tab: 'note', sort: 'yours' })
+    expect(at('>tag:essay sort:oldest').act.view).toMatchObject({ sort: 'date', asc: true })
+    expect(at('>clear:type', { view: { tab: 'note', sort: 'yours' } })).toMatchObject({ text: 'Enter removes type:note · Enter shows 5 cards', act: { view: { tab: 'all' } } })
+    expect(at('>clear:type').text).toBe('No type: filter is in force')
+    expect(at('>clear:sort', { view: { tab: 'all', sort: 'date', asc: true } }).act.view).toMatchObject({ sort: 'yours', asc: false })
+    expect(at('>clear:sort').text).toBe('The cards are in your order already')
+  })
+
+  it('shares a line with layout commands, and clear: alone still empties the collection', () => {
+    const p = at('>tag:essay open:library')
+    expect(p.next.columns.flat()).toContain('library')
+    expect(p.act.kind).toBe('collectionFilters')
+    expect(at('>clear:').text).toBe('Q2 is empty already')
+  })
+
+  it('export: alone downloads the cards as shown, the file named for a collection, never its name', () => {
+    const p = at('>export:md')
+    expect(p.text).toBe('Enter downloads 3 cards of Q2 as Markdown: parliament-collection-2026-10-21.md · 2 cards shown stay out: only notes, highlights and quotes are exported · It is for reading elsewhere, and cannot be brought back in')
+    expect(p.act).toEqual({ kind: 'export', format: 'md', picked: [210, 211, 212], file: 'parliament-collection-2026-10-21.md' })
+    // In the order shown, narrowed by its filters.
+    const q = at('>export:jsonl', { shownCards: [card(212), card(210)], narrowed: true })
+    expect(q.text).toBe('Enter downloads 2 cards of Q2 as JSONL: parliament-collection-shown-2026-10-21.jsonl · It is for reading elsewhere, and cannot be brought back in')
+    expect(q.act.picked).toEqual([212, 210])
+  })
+
+  it('export: with numbers or records names what it names, as on Records', () => {
+    expect(at('>export:md 204').text).toBe('Enter downloads 1 thing as Markdown: parliament-204-2026-10-21.md · It is for reading elsewhere, and cannot be brought back in')
+    expect(at('>export:md 299').text).toBe('Nothing here has the number 299')
+  })
+
+  it('export: says when there is no collection, or nothing in it to export', () => {
+    expect(at('>export:md', { shown: null }).text).toBe('No collection is on Collection yet. new:collection makes one')
+    expect(at('>export:md', { shownCards: [card(242), message] }).text).toBe('Nothing to export here')
+  })
+
+  it('pin: with a name pins a collection, from any board; again, it lets go (C287)', () => {
+    const p = at('>pin:"Rail candidates"')
+    expect(p.text).toBe('Enter pins the collection Rail candidates at the top of the collections')
+    expect(p.act).toEqual({ kind: 'collectionWrite', id: 'rail', before: rail, after: { ...rail, pinned: true } })
+    expect(at('>pin:rail', { a: almanac() }).act).toMatchObject({ kind: 'collectionWrite', id: 'rail' })
+    expect(at('>pin:"Q3"')).toMatchObject({ text: 'Enter unpins the collection Q3', act: { after: { pinned: false } } })
+  })
+
+  it('pin: says which, none, or that it goes alone', () => {
+    expect(at('>pin:"Q"').text).toBe('More than one collection starts that way: Q3 or Q2')
+    expect(at('>pin:"attic"').text).toBe('No collection is called attic')
+    expect(at('>pin:202 pin:"Rail"').text).toBe('pin: runs on a line of its own for now')
+    expect(at('>pin:202').text).toBe('Enter pins 202 at the top')
   })
 })
 

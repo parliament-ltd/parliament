@@ -74,6 +74,12 @@ describe('a backup with notes of their own and ordered collections (C144 (j), C1
     expect(validateBackup({ conversations: [], notes: [note({ summary: { at } })] }).valid).toBe(false)
     expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], order: [7] }] }).valid).toBe(false)
   })
+  it('reads a pinned collection, one written unpinned, and one from before pinned was written (C287)', () => {
+    expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], pinned: true }] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], pinned: false }] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [] }] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], pinned: 'yes' }] }).valid).toBe(false)
+  })
 })
 
 describe('a backup with who answers each chat (stage 7; C150)', () => {
