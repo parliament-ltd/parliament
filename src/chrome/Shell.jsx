@@ -71,11 +71,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { offeredLanguages, isDraft, isBeta, languageRows, COMING_LANGUAGES, startingLanguage } from '../i18n'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
-import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
+import { readCollections, writeCollection, newCollection, withRows, pinnedFirst } from '../lib/collections'
 import { aboutText, WORDED } from '../lib/cardActs'
 import { ROW_GUESS } from './rowWindow'
-import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
-import { searchTerms } from '../lib/recordsFilter'
+import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCards'
 import CollectionBoard from './CollectionBoard'
 import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
@@ -680,6 +679,9 @@ export default function Shell() {
   // Search follows the board the bar points at (C144 (h)): Records and the
   // Collection each keep their own, and the field shows the one it points at.
   const [collectionSearch, setCollectionSearch] = useState('')
+  // The Collection's own filters, applied on Enter and kept for the tab, as
+  // Records' are; its search is the one above (C287).
+  const [collectionFilters, setCollectionFilters] = useState([])
   const onSearch = useCallback((board, text) => {
     if (board === 'almanac') setRecordsView((v) => (v.search === text ? v : { ...v, search: text }))
     if (board === 'collection') setCollectionSearch(text)
@@ -784,25 +786,46 @@ export default function Shell() {
   }, [shownCollection, almanacRows])
   const collectionAll = useMemo(() => cardsOf(shownCollection, almanacRows ?? [], collectionMessages), [shownCollection, almanacRows, collectionMessages])
   const collectionShown = useMemo(() => {
-    const terms = searchTerms(collectionSearch)
     const tab = collectionView.tab
     const counts = tabCounts(collectionAll.cards)
-    const inTab = tab === 'all' || !counts[tab] ? collectionAll.cards : collectionAll.cards.filter((c) => c.kind === tab)
-    const cards = terms.length ? inTab.filter((c) => terms.every((t) => c.text.toLocaleLowerCase().includes(t))) : inTab
+    // The tab, the search and the filters, Records' own read on each card (C287).
+    const cards = cardsShown(collectionAll.cards, { tab, search: collectionSearch, filters: collectionFilters }, { rows: almanacRows ?? [], ctx: recordsCtx.ctx })
     const view = { ...collectionView, tab: tab !== 'all' && !counts[tab] ? 'all' : tab }
     const entries = shownCollection ? sequenceOf(cards, shownCollection, view.sort, { asc: view.asc, sources: collectionAll.sources }) : []
-    // While a search narrows the cards, headings wait (collection board v3).
-    return { cards, counts, view, entries: terms.length ? entries.filter((e) => !e.head) : entries }
-  }, [collectionAll, collectionSearch, collectionView, shownCollection])
+    // While a search or a filter narrows the cards, headings wait (collection board v3).
+    const narrowing = Boolean(collectionSearch.trim()) || collectionFilters.length > 0
+    return { cards, counts, view, narrowing, entries: narrowing ? entries.filter((e) => !e.head) : entries }
+  }, [collectionAll, collectionSearch, collectionFilters, collectionView, shownCollection, almanacRows, recordsCtx])
   // What the picker offers to hold: plans and chats, the ones it holds and the most recently active.
   const pickable = useMemo(() => {
     const held = new Set(collectionAll.sources.map((x) => `${x.kind === 'plan' ? 'docket' : 'chat'}:${x.num}`))
     const rows = (almanacRows ?? []).filter((r) => (r.kind === 'chat' || r.kind === 'docket') && !r.archived)
     return rows.filter((r, i) => i < 30 || held.has(`${r.kind}:${r.num}`))
   }, [almanacRows, collectionAll])
+  // The Collection as the Enter line plans against it: its filters, and the
+  // cards as shown, in order, for export: (C287).
   const collectionScreens = useMemo(() => ({
     shown: shownCollection, all: collections, cards: collectionAll.cards, label: collectionLabel, view: collectionView,
-  }), [shownCollection, collections, collectionAll, collectionLabel, collectionView])
+    filtered: { search: collectionSearch, filters: collectionFilters },
+    shownCards: collectionShown.entries.filter((e) => e.card).map((e) => e.card),
+    narrowed: collectionShown.narrowing || collectionShown.view.tab !== 'all',
+  }), [shownCollection, collections, collectionAll, collectionLabel, collectionView, collectionSearch, collectionFilters, collectionShown])
+  // What the Collection shows now, for undo: to put back (C287).
+  const collectionNow = useRef({ search: '', filters: [], view: collectionView })
+  useEffect(() => { collectionNow.current = { search: collectionSearch, filters: collectionFilters, view: collectionView } }, [collectionSearch, collectionFilters, collectionView])
+  const showCollectionView = useCallback(({ search, filters, view }) => {
+    collectionNow.current = { search, filters, view: view ?? collectionNow.current.view }
+    setCollectionSearch(search)
+    setCollectionFilters(filters)
+    if (view) setCollectionView(view)
+  }, [])
+  const onCollectionClear = useCallback((k) => {
+    const now = collectionNow.current
+    const next = nextView({ search: now.search, filters: now.filters, sort: EMPTY_VIEW.sort }, [{ clear: k }])
+    showCollectionView({ search: next.search, filters: next.filters })
+  }, [showCollectionView])
+  // The collections as listed for choosing: pinned ones first (C287).
+  const collectionsListed = useMemo(() => pinnedFirst(collections), [collections])
   const onShowCollection = useCallback((c) => {
     const a = current.current
     commit({ ...a, context: { ...a.context, collection: c.id } })
@@ -1444,8 +1467,14 @@ export default function Shell() {
       remember(body)
       return null
     }
-    if (what.kind === 'collectionView') {
-      setCollectionView(what.view)
+    if (what.kind === 'collectionView' || what.kind === 'collectionFilters') {
+      // sort: and type: on the Collection; and its filters, with any layout
+      // command they share the line with (C287). undo: puts it back as it was.
+      if (next) { const refused = await run(next, null); if (refused) return refused }
+      if (touched.current) touched.current.collectionView = { ...collectionNow.current }
+      const now = collectionNow.current
+      if (what.kind === 'collectionView') showCollectionView({ search: now.search, filters: now.filters, view: what.view })
+      else showCollectionView({ search: what.filtered.search, filters: what.filtered.filters, view: what.view ?? null })
       remember(body)
       return null
     }
@@ -2015,7 +2044,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
+  }, [readKeys, remember, run, showView, showCollectionView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -2119,6 +2148,7 @@ export default function Shell() {
       }
     }
     if (entry.view) showView(entry.view)
+    if (entry.collectionView) showCollectionView(entry.collectionView)
     if (entry.pending) setPendingAnswerer(entry.pending.before)
     if (entry.many) setHeldMany(entry.many.before)
     if (entry.heldTo) setHeldTo(entry.heldTo.before)
@@ -2144,12 +2174,12 @@ export default function Shell() {
     setUndoTop(undoStack.current.at(-1)?.line ?? null)
     remember(body)
     return { done: true, says: { message: 'undone', values: { line: entry.line } } }
-  }, [remember, run, showView, loadConversations, readOwn, showStoredBlocks, holdTell])
+  }, [remember, run, showView, showCollectionView, loadConversations, readOwn, showStoredBlocks, holdTell])
 
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [], rooms: [], roomsMade: [], layouts: [] }
+    touched.current = { records: [], saved: [], collections: [], collectionView: null, created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [], rooms: [], roomsMade: [], layouts: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -2177,6 +2207,7 @@ export default function Shell() {
     if (t.messages.length) entry.messages = t.messages
     if (t.saved.length) entry.saved = t.saved
     if (t.collections.length) entry.collections = t.collections
+    if (t.collectionView) entry.collectionView = t.collectionView
     if (t.created.length) entry.created = t.created
     if (t.pending) entry.pending = t.pending
     if (t.pendingFw) entry.pendingFw = t.pendingFw
@@ -2189,7 +2220,7 @@ export default function Shell() {
     if (t.rooms.length) entry.rooms = t.rooms
     if (t.roomsMade.length) entry.roomsMade = t.roomsMade
     if (t.layouts.length) entry.layouts = t.layouts
-    if (body && (entry.layouts || entry.rooms || entry.roomsMade || entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
+    if (body && (entry.layouts || entry.rooms || entry.roomsMade || entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.collectionView || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -4079,6 +4110,8 @@ export default function Shell() {
   const featureActs = useMemo(() => ({ onWeb: toggleWeb, onAttach: () => { pickFiles().then((says) => { if (says) setBarSaid({ says }) }) }, onDropFile: dropFile }), [toggleWeb, pickFiles, dropFile])
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid, featureActs, onDropDraft: dropJoined }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
+  // The Collection's search and filters in force, shown as Records shows its own (C287).
+  const collectionFiltered = collectionShown.narrowing ? { search: collectionSearch.trim(), line: viewLine({ filters: collectionFilters }) } : null
   // A room alone on screen opens its side columns; sharing it, they are strips
   // (C279 (b)). A board popped into its own window is alone there.
   const onlyBoard = arrangement.columns.flat().length === 1
@@ -4177,9 +4210,10 @@ export default function Shell() {
     if (board === 'collection') {
       return (
         <CollectionBoard
-          key="collection" collection={shownCollection} collections={collections} label={collectionLabel}
+          key="collection" collection={shownCollection} collections={collectionsListed} label={collectionLabel}
           entries={collectionShown.entries} counts={collectionShown.counts} view={collectionShown.view} sources={collectionAll.sources}
-          pickable={pickable} searching={Boolean(collectionSearch.trim())} addressed={arrangement.addressed === 'collection'}
+          pickable={pickable} searching={collectionShown.narrowing} addressed={arrangement.addressed === 'collection'}
+          filtered={collectionFiltered} shownCount={collectionShown.cards.length} onClear={onCollectionClear}
           onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
           cards={collectionAll.cards} picked={pickedHere} onPick={onPick} onClearPicked={clearPicked}
           onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}

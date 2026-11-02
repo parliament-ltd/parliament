@@ -23,8 +23,10 @@ import { holdsKey } from '../commands/parse'
 import { BOARD_NAMES } from '../commands/verbs'
 import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
-import { planNew, planAdd, planRm, planClear, planHeading, planMoveCard, planNameCollection, planForgetCollection, collectionNamed, planCollectionView } from '../lib/collectionVerbs'
-import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
+import { planNew, planAdd, planRm, planClear, planHeading, planMoveCard, planNameCollection, planForgetCollection, collectionNamed, planCollectionView, planPinCollection } from '../lib/collectionVerbs'
+import { cardsShown, cardsCostUnknown } from '../lib/collectionCards'
+import { markKey } from '../lib/collections'
+import { ROW_VERBS, isRowStep, isCollectionPin, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
 import { isMessageWord, planQuoteMessage, planCopyMessage, planDeleteMessage, planNoteMessage, planTagMessage } from '../lib/messageVerbs'
 import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
@@ -138,12 +140,41 @@ const dayStamp = (now = Date.now()) => {
 }
 
 /**
+ * export: alone on the Collection (C138, C287): the collection's numbered
+ * cards as shown, in its order, its tab, search and filters. A card with
+ * no number (a message), an edit, an ask or a suggestion stays out, and the
+ * Enter line says how many. The file says it is a collection's, never its
+ * name (C138).
+ */
+function planExportCollection(format, screens = {}) {
+  const col = screens.collection ?? {}
+  if (!col.shown) return { says: { message: 'collectionNone', values: { board: 'collection' } }, act: null }
+  const records = screens.records ?? {}
+  const rows = records.rows ?? []
+  const shown = col.shownCards ?? []
+  const byKey = new Map(rows.filter((r) => r.store && r.id != null).map((r) => [markKey(r), r]))
+  const picked = shown.map((c) => byKey.get(c.key)).filter(Boolean)
+  const items = exportItems(picked, rows)
+  if (!items.length) return { says: { message: 'exportNothing' }, act: null }
+  const narrowed = Boolean(col.narrowed)
+  const file = exportName({ format, scope: narrowed ? 'collection-shown' : 'collection', day: dayStamp(records.now) })
+  const out = shown.length - items.length
+  const also = [...(out > 0 ? [{ message: 'exportCardsOut', values: { count: out } }] : []), { message: 'exportNoRestore' }]
+  return {
+    says: { message: 'exportCollection', values: { count: items.length, name: col.label(col.shown), format: format === 'jsonl' ? 'JSONL' : 'Markdown', file }, also },
+    act: { kind: 'export', format, picked: items.map((i) => i.row.num), file },
+  }
+}
+
+/**
  * export:md 204, 216, export:jsonl records, or export: alone for the table
  * as it is shown (C138). The Enter line names the file it will download;
- * the shell builds it on Enter. The Collection's export comes with it.
+ * the shell builds it on Enter. On the Collection, export: alone takes the
+ * collection as shown; numbers and records name what they name, as on
+ * Records (collection board v3: "export:md takes any target").
  */
 function planExportStep(a, step, screens = {}) {
-  if (a.addressed !== 'almanac') return null
+  if (a.addressed !== 'almanac' && a.addressed !== 'collection') return null
   const records = screens.records ?? {}
   const rows = records.rows ?? []
   const args = step.match?.values ?? []
@@ -157,7 +188,8 @@ function planExportStep(a, step, screens = {}) {
     if (t.bad) return { says: t.bad, act: null }
     picked = t.rows
     scope = 'numbers'
-  } else { picked = applyView(rows, records.view ?? EMPTY_VIEW, records.ctx); scope = 'shown' }
+  } else if (a.addressed === 'collection') return planExportCollection(format, screens)
+  else { picked = applyView(rows, records.view ?? EMPTY_VIEW, records.ctx); scope = 'shown' }
   const items = exportItems(picked, rows)
   if (!items.length) return { says: { message: 'exportNothing' }, act: null }
   const hidden = chatsOf(items).reduce((n, c) => n + (screens.hiddenOf?.(c.chatId)?.size ?? 0), 0)
@@ -337,6 +369,41 @@ function planViewStep(view, step, records = {}) {
     ? filter.v.map((d) => ({ message: filter.k === 'since' ? 'filterSince' : 'filterUntil', values: { day: d.day } }))
     : []
   return { change: { filter }, also }
+}
+
+// A tab's kind as type: names it, for clear:type on the Collection.
+const TAB_WORD = Object.freeze({ term: 'highlight', highlight: 'highlight', quote: 'quote', note: 'note', edit: 'edit', ask: 'ask', suggestion: 'suggestion' })
+
+/**
+ * One filter, sort:, type: or clear: on the Collection (C144 (d), (e);
+ * C287), against its search and filters (view) and its tab and order
+ * (tabs) as the line has left them. The filters are Records' own; type:
+ * and sort: pick its tab and order, and clear:type and clear:sort put
+ * them back to All and your order.
+ * @returns {{ change: object, says?: object, also?: object[], clear?: boolean }|{ tabs: object, says: object, clear?: boolean }|{ bad: object }|null}
+ *   null for clear: alone, which empties the collection on a line of its own
+ */
+function planCollectionStep(view, tabs, step, records = {}) {
+  const [arg] = step.match?.values ?? []
+  if (step.verb === 'sort' || step.verb === 'type') {
+    const p = planCollectionView(step, tabs)
+    return p.act ? { tabs: p.act.view, says: p.says } : { bad: p.says }
+  }
+  if (step.verb === 'clear') {
+    if (!arg) return null
+    if (arg.value === 'sort') {
+      if ((tabs.sort ?? 'yours') === 'yours') return { bad: { message: 'collectionOrderYours' } }
+      return { tabs: { ...tabs, sort: 'yours', asc: false }, says: { message: 'collectionSort', values: { sort: 'yours', asc: 'no' } }, clear: true }
+    }
+    if (arg.value === 'type') {
+      if ((tabs.tab ?? 'all') === 'all') return { bad: { message: 'clearNoFilter', values: { verb: 'type:' } } }
+      const word = TAB_WORD[tabs.tab]
+      return { tabs: { ...tabs, tab: 'all' }, says: word ? { message: 'clearFilter', values: { filters: [`type:${word}`] } } : { message: 'collectionTabAll' }, clear: true }
+    }
+    const p = planViewStep(view, step, records)
+    return p && { ...p, clear: true }
+  }
+  return planViewStep(view, step, records)
 }
 
 /**
@@ -947,6 +1014,13 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     return { answer, says: p.says, next: null, act: p.act }
   }
 
+  // pin:"Rail candidates": a collection, kept at the top of the collections,
+  // from any board (C287). A write of a collection, so alone on its line.
+  if (only && isCollectionPin(only)) {
+    const p = planPinCollection(only, screens)
+    return { answer, says: p.says, next: null, act: p.act }
+  }
+
   // Row commands (C143): they share a line with each other (C99), and
   // undo: takes the line back whole.
   const rowSteps = answer.steps.filter(isRowStep)
@@ -1082,6 +1156,14 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   let viewSays = null
   let onlyClears = true
   let opened = false // open:"…" showed a saved search
+  // What the line does to the Collection: its own search and filters, and
+  // its tab and order, kept apart from Records' (C287).
+  const onCollection = arrangement.addressed === 'collection'
+  const col = screens.collection ?? {}
+  const colStart = { search: col.filtered?.search ?? '', filters: col.filtered?.filters ?? [], sort: EMPTY_VIEW.sort }
+  const colChanges = []
+  let colTabs = col.view ?? {}
+  let colTabsChanged = false
   for (const step of answer.steps) {
     const saved = step.verb === 'open' ? openSaved(a, step, screens) : null
     if (saved) {
@@ -1094,8 +1176,17 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       opened = true
       continue
     }
+    if (VIEW_VERBS.includes(step.verb) && onCollection) {
+      const p = planCollectionStep(nextView(colStart, colChanges), colTabs, step, records)
+      if (!p) return { answer, says: { message: 'aloneNow', values: { verb: `${step.verb}:` } }, next: null }
+      if (p.bad) return { answer, says: p.bad, next: null }
+      if (p.tabs) { colTabs = p.tabs; colTabsChanged = true } else colChanges.push(p.change)
+      viewSays = viewSays ?? p.says ?? null
+      if (!p.clear) onlyClears = false
+      viewAlso.push(...(p.also ?? []))
+      continue
+    }
     if (VIEW_VERBS.includes(step.verb)) {
-      // The Collection's own search and filters come with it (piece 6).
       const p = arrangement.addressed === 'almanac' ? planViewStep(nextView(start, changes), step, records) : null
       if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
       if (p.bad) return { answer, says: p.bad, next: null }
@@ -1154,6 +1245,19 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     viewParts = [shows, ...also]
     viewWords = onlyClears && viewSays ? { ...viewSays, also: viewParts } : { ...shows, also }
     act = { kind: 'records', view }
+  }
+  if (colChanges.length || colTabsChanged) {
+    // A saved search shows on Records: not on one line with the Collection's filters.
+    if (changes.length) return { answer, says: { message: 'aloneNow', values: { verb: 'open:' } }, next: null }
+    const filtered = nextView(colStart, colChanges)
+    const opts = { rows: records.rows ?? [], ctx: records.ctx }
+    const view = { tab: colTabs.tab, search: filtered.search, filters: filtered.filters }
+    const shows = { message: 'filterShowsCards', values: { count: cardsShown(col.cards ?? [], view, opts).length } }
+    const unknown = cardsCostUnknown(col.cards ?? [], view, opts)
+    const also = [...viewAlso, ...(unknown ? [{ message: 'filterCostUnknown', values: { count: unknown } }] : [])]
+    viewParts = [shows, ...also]
+    viewWords = onlyClears && viewSays ? { ...viewSays, also: viewParts } : { ...shows, also }
+    act = { kind: 'collectionFilters', filtered: { search: filtered.search, filters: filtered.filters }, view: colTabsChanged ? colTabs : null }
   }
   const layout = answer.steps.length - answer.steps.filter((s) => VIEW_VERBS.includes(s.verb)).length
   const says = !layout || (opened && answer.steps.length === 1) ? viewWords

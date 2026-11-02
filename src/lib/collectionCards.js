@@ -10,6 +10,7 @@
 // Pure: rows come from almanacRows.js, messages from the shell.
 
 import { itemKey, markKey, headKey } from './collections'
+import { passes, searchTerms } from './recordsFilter'
 
 // Edits and asks too (stage 11, piece 5; C220): a held chat or plan shows
 // them, from every room it holds chats of (C220 (a1)).
@@ -94,6 +95,74 @@ export function tabCounts(cards) {
 
 /** The kinds a tab shows. A card for something erased shows only under All. */
 export const TABS = Object.freeze(['all', 'edit', 'ask', 'suggestion', 'highlight', 'term', 'quote', 'note', 'message'])
+
+// ── Search and filters on the cards (C132, C144 (h); C287) ─
+
+// What a card cannot carry itself is its chat's: who answered it, what it
+// cost, and what it holds. model:, cost: and has: read the chat a card sits in.
+const BY_CHAT = new Set(['model', 'cost', 'has'])
+const NO_CHAT = Object.freeze({ kind: null, models: [], sources: [], marks: [], cost: null })
+
+// What the filters read for each card: its own row of Records, and its
+// chat's. A card with no row (a message, or something deleted) is read
+// from what it shows: its date, its chat, and no tags.
+function cardReader(rows) {
+  const byKey = new Map(rows.filter((r) => r.store && r.id != null).map((r) => [markKey(r), r]))
+  const chats = new Map(rows.filter((r) => r.kind === 'chat').map((r) => [r.chatId, r]))
+  const chatNums = new Map(rows.filter((r) => r.kind === 'chat').map((r) => [r.num, r]))
+  const read = new Map()
+  return (card) => {
+    if (read.has(card.key)) return read.get(card.key)
+    let own = byKey.get(card.key) ?? null
+    if (!own) {
+      const chat = card.chatNum != null ? chatNums.get(card.chatNum) ?? null : null
+      own = {
+        kind: card.kind, num: card.num, tags: card.tags ?? [], createdAt: card.createdAt ?? null, archived: false,
+        chatId: chat?.chatId ?? null, chatNum: card.chatNum ?? null, docketNum: chat?.docketNum ?? null, branch: chat?.branch ?? null, run: chat?.run ?? null,
+        roomId: chat?.roomId ?? null, collections: chat?.collections ?? [], marks: [], models: [], sources: [], cost: null,
+      }
+    }
+    const out = { own, chat: (own.chatId && chats.get(own.chatId)) || NO_CHAT }
+    read.set(card.key, out)
+    return out
+  }
+}
+
+/**
+ * The cards a tab, a search and the filters leave, in the order given. The
+ * filters are Records' own (recordsFilter.passes), read on each card's row,
+ * and its chat's for model:, cost: and has:. A tab with no cards shows All.
+ * @param {Card[]} cards every card of the collection
+ * @param {{ tab?: string, search?: string, filters?: object[] }} view
+ * @param {{ rows?: object[], ctx?: object }} [opts] rows: every row of Records; ctx: what the filters read (models, sources)
+ * @returns {Card[]}
+ */
+export function cardsShown(cards, view = {}, { rows = [], ctx = {} } = {}) {
+  const tab = view.tab && view.tab !== 'all' && tabCounts(cards)[view.tab] ? view.tab : 'all'
+  const terms = searchTerms(view.search)
+  const filters = view.filters ?? []
+  let out = tab === 'all' ? cards : cards.filter((c) => c.kind === tab)
+  if (terms.length) out = out.filter((c) => terms.every((t) => String(c.text ?? '').toLocaleLowerCase().includes(t)))
+  if (filters.length) {
+    const read = cardReader(rows)
+    out = out.filter((c) => {
+      const r = read(c)
+      return filters.every((f) => passes(BY_CHAT.has(f.k) ? r.chat : r.own, f, ctx))
+    })
+  }
+  return out
+}
+
+/**
+ * How many cards a cost: filter leaves out because their chat's cost is
+ * not known (C132 (h)): those from a chat that pass everything else.
+ */
+export function cardsCostUnknown(cards, view = {}, opts = {}) {
+  if (!(view.filters ?? []).some((f) => f.k === 'cost')) return 0
+  const rest = cardsShown(cards, { ...view, filters: view.filters.filter((f) => f.k !== 'cost') }, opts)
+  const read = cardReader(opts.rows ?? [])
+  return rest.filter((c) => { const { chat } = read(c); return chat.kind === 'chat' && chat.cost == null }).length
+}
 
 /**
  * The cards in an order, with the headings and group labels between them.

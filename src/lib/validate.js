@@ -365,6 +365,8 @@ function validateCollection(item) {
   if (!isId(item.id))                       return 'collection.id invalid'
   if (!Array.isArray(item.items))           return 'collection.items must be an array'
   if (item.order !== undefined && !(Array.isArray(item.order) && item.order.every((k) => isString(k, 300)))) return 'collection.order must be a list of keys'
+  // Written false from the start, true once pin:"…" pins it (C287). Optional.
+  if (item.pinned !== undefined && !isBoolean(item.pinned)) return 'collection.pinned must be boolean'
   return null
 }
 

@@ -247,6 +247,8 @@ export const COPY = {
     searchRecords: /*i18n*/ { id: 'enter.searchRecords', message: 'Search works on {first} and {second} for now', comment: 'In search mode on a board search does not reach yet; {first} and {second} are board names' },
     searchCards: /*i18n*/ { id: 'enter.searchCards', message: '{count, plural, =0 {No card matches} one {# card matches} other {# cards match}}' },
     filterShows: /*i18n*/ { id: 'enter.filterShows', message: '{count, plural, =0 {Enter shows no rows} one {Enter shows # row} other {Enter shows # rows}}' },
+    // The same filters on the Collection's cards (C287).
+    filterShowsCards: /*i18n*/ { id: 'enter.filterShowsCards', message: '{count, plural, =0 {Enter shows no cards} one {Enter shows # card} other {Enter shows # cards}}' },
     filterSince: /*i18n*/ { id: 'enter.filterSince', message: 'made since {day}' },
     filterUntil: /*i18n*/ { id: 'enter.filterUntil', message: 'made until the end of {day}' },
     filterCostUnknown: /*i18n*/ {
@@ -394,6 +396,13 @@ export const COPY = {
       message: '{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}',
     },
     typeCollection: /*i18n*/ { id: 'enter.typeCollection', message: 'On {board}, type: takes one of highlight, quote or note', comment: 'The words stay English' },
+    // clear:type and clear:sort on the Collection: the tab and the order (C287).
+    collectionTabAll: /*i18n*/ { id: 'enter.collectionTabAll', message: 'Enter shows every kind of card' },
+    collectionOrderYours: /*i18n*/ { id: 'enter.collectionOrderYours', message: 'The cards are in your order already' },
+    // pin: with a collection's name (C287). {name} is a collection's name; {words} lists names, joined with "or".
+    pinCollection: /*i18n*/ { id: 'enter.pinCollection', message: 'Enter pins the collection {name} at the top of the collections' },
+    unpinCollection: /*i18n*/ { id: 'enter.unpinCollection', message: 'Enter unpins the collection {name}' },
+    pinWhich: /*i18n*/ { id: 'enter.pinWhich', message: 'More than one collection starts that way: {words}' },
     // The four acts, compare: and jump: (stage 6, piece 7; C145). {nums} is
     // a list of numbers, {name} a collection's name.
     noteIn: /*i18n*/ { id: 'enter.noteIn', message: 'Enter writes a note in {name}' },
@@ -444,6 +453,15 @@ export const COPY = {
     exportHidden: /*i18n*/ { id: 'enter.exportHidden', message: '{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}' },
     exportNoRestore: /*i18n*/ { id: 'enter.exportNoRestore', message: 'It is for reading elsewhere, and cannot be brought back in' },
     exportNothing: /*i18n*/ { id: 'enter.exportNothing', message: 'Nothing to export here' },
+    // export: on the Collection: its cards as shown (C287). {name} is the collection's name; the file's is not.
+    exportCollection: /*i18n*/ {
+      id: 'enter.exportCollection',
+      message: '{count, plural, one {Enter downloads # card of {name} as {format}: {file}} other {Enter downloads # cards of {name} as {format}: {file}}}',
+    },
+    exportCardsOut: /*i18n*/ {
+      id: 'enter.exportCardsOut',
+      message: '{count, plural, one {# card shown stays out: only notes, highlights and quotes are exported} other {# cards shown stay out: only notes, highlights and quotes are exported}}',
+    },
     exported: /*i18n*/ { id: 'enter.exported', message: 'Downloaded {file}' },
     exportFailed: /*i18n*/ { id: 'enter.exportFailed', message: 'The file was not made. Try again' },
     // delete: of what has been sent (C137; C199; the ids keep the old word). {erasing} lists what goes, each as eraseItem; {nums} lists numbers.
@@ -2209,6 +2227,10 @@ export const COPY = {
     empty: /*i18n*/ { id: 'collection.empty', message: 'Nothing here yet. add:207 puts something in, or pick a chat from the list above.', comment: 'add: stays English' },
     emptyHeld: /*i18n*/ { id: 'collection.emptyHeld', message: 'What it holds has no notes, highlights or quotes yet. They show here as they are made.' },
     noneMatch: /*i18n*/ { id: 'collection.noneMatch', message: 'Nothing in this collection matches.' },
+    // Filters on the cards (C287).
+    noneMatchFiltered: /*i18n*/ { id: 'collection.noneMatchFiltered', message: 'Nothing here matches the search and filters. clear:filters removes them.', comment: 'clear:filters stays English' },
+    shown: /*i18n*/ { id: 'collection.shown', message: '{count, plural, =0 {no cards shown} one {# card shown} other {# cards shown}}' },
+    pinned: /*i18n*/ { id: 'collection.pinned', message: 'pinned', comment: 'After a pinned collection’s name in the line of collections (C287)' },
     cardFrom: /*i18n*/ { id: 'collection.cardFrom', message: 'from {num}' },
     openHelp: /*i18n*/ { id: 'collection.openHelp', message: 'Writes open:{num} in the bar', comment: 'open: stays English' },
     under: /*i18n*/ { id: 'collection.under', message: 'under {heading}' },

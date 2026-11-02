@@ -665,6 +665,8 @@
 .ch-shell .ch-alm-saved button { padding: 2px 0; color: var(--ch-ink-2); }
 .ch-shell .ch-alm-saved button:hover { color: var(--ch-ink); }
 .ch-shell .ch-alm-saved button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 3px; }
+/* A pinned collection, marked as a pinned row is (.t-mk; C287). */
+.ch-alm-saved button .pin { margin-inline-start: 4px; font: italic 400 10px var(--ch-serif); color: var(--ch-marg); }
 .ch-shell .ch-alm-cmd { padding: 2px 0; font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
 .ch-shell .ch-alm-cmd:hover { color: var(--ch-ink); }
 .ch-atable tbody tr.ch-gap { cursor: default; }

@@ -158,13 +158,16 @@ export function exportJsonl(data, names) {
 // ── The file ────────────────────────────────────────────
 
 /**
- * The file's name: numbers and a day, never a title (C138).
- * @param {{ format: 'md'|'jsonl', nums?: number[], scope: 'numbers'|'records'|'shown', day: string }} what
+ * The file's name: numbers and a day, never a title (C138). A collection's
+ * cards say they are a collection's, as shown when a tab, a search or a
+ * filter narrows them, but never its name (C287).
+ * @param {{ format: 'md'|'jsonl', nums?: number[], scope: 'numbers'|'records'|'shown'|'collection'|'collection-shown', day: string }} what
  */
 export function exportName({ format, nums = [], scope, day }) {
   const what = scope === 'records' ? 'records'
     : scope === 'shown' ? 'records-shown'
-      : nums.length <= 4 ? nums.join('-') : `${nums[0]}-and-${nums.length - 1}-more`
+      : scope === 'collection' || scope === 'collection-shown' ? scope
+        : nums.length <= 4 ? nums.join('-') : `${nums[0]}-and-${nums.length - 1}-more`
   return `parliament-${what}-${day}.${format === 'jsonl' ? 'jsonl' : 'md'}`
 }
 

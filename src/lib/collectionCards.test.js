@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { cardsOf, tabCounts, sequenceOf, orderKeys } from './collectionCards'
+import { cardsOf, tabCounts, sequenceOf, orderKeys, cardsShown, cardsCostUnknown } from './collectionCards'
+import { readFilter } from './recordsFilter'
 import { newCollection } from './collections'
 
 // The cards a collection shows (stage 6, piece 6; C144).
@@ -101,5 +102,54 @@ describe('edits and asks (stage 11, piece 5; C220)', () => {
     const { cards, sources } = cardsOf(c, more)
     const groups = sequenceOf(cards, c, 'source', { sources }).filter((e) => e.group).map((e) => `${e.group.kind}:${e.group.num}${e.group.branch ?? ''}`)
     expect(groups).toEqual(['chat:202', 'plan:203', 'branch:203a', 'branch:203b'])
+  })
+})
+
+describe('search and filters on the cards (C287)', () => {
+  // Rows as Records holds them: what the filters read.
+  const full = [
+    { num: 202, kind: 'chat', id: 'chat-202', store: 'conversations', chatId: 'chat-202', chatNum: 202, roomId: 'mode_owl', models: ['claude-opus-4'], sources: [], marks: ['note', 'term'], cost: 0.42, collections: ['c1'], tags: [] },
+    { num: 204, kind: 'chat', id: 'chat-204', store: 'conversations', chatId: 'chat-204', chatNum: 204, roomId: null, models: [], sources: ['wikipedia'], marks: ['quote'], cost: null, collections: ['c1'], tags: [], docketNum: 203 },
+    mark(210, 'note', 'chat-202', { chatNum: 202, tags: ['essay'], roomId: 'mode_owl', collections: ['c1'], createdAt: '2026-10-20T10:00:00Z' }),
+    mark(211, 'term', 'chat-202', { chatNum: 202, roomId: 'mode_owl', collections: ['c1', 'c2'], createdAt: '2026-10-21T10:00:00Z' }),
+    mark(212, 'quote', 'chat-204', { chatNum: 204, docketNum: 203, tags: ['essay', 'draft'], collections: ['c1'], createdAt: '2026-10-22T10:00:00Z' }),
+    mark(215, 'note', null, { tags: ['essay'], collections: ['c1'], createdAt: '2026-10-25T10:00:00Z' }),
+  ]
+  const messages = new Map([['m1', { id: 'm1', content: 'Barn owls hunt by ear', createdAt: '2026-10-23T10:00:00Z' }]])
+  const items = [{ kind: 'chat', conversationId: 'chat-202', num: 202 }, { kind: 'chat', conversationId: 'chat-204', num: 204 }, markItem(full[5]), { kind: 'message', messageId: 'm1', conversationId: 'chat-204', addedAt: '2026-10-23T10:00:00Z' }]
+  const { cards } = cardsOf(coll(items), full, messages)
+  const NOW = new Date(2026, 9, 26, 12).getTime()
+  const filter = (verb, values, minus = false) => readFilter({ verb, minus, match: { values } }, {
+    rows: full, now: NOW, locale: 'en', rooms: [{ id: 'mode_owl', label: 'Owl questions' }], collections: [{ id: 'c1', label: 'Q2' }, { id: 'c2', label: 'Rail' }],
+  }).filter
+  const word = (value) => ({ kind: 'word', value, text: value })
+  const ctx = { models: [{ id: 'claude-opus-4', name: 'Opus' }], sources: [{ id: 'wikipedia', name: 'Wikipedia' }] }
+  const shown = (view) => cardsShown(cards, view, { rows: full, ctx }).map((c) => c.num ?? c.kind)
+
+  it('reads a card by its own row: tags, room, collections, where it came from, and when it was made', () => {
+    expect(shown({})).toEqual([210, 211, 212, 215, 'message'])
+    expect(shown({ filters: [filter('tag', [word('essay')])] })).toEqual([210, 212, 215])
+    expect(shown({ filters: [filter('tag', [word('essay')], true)] })).toEqual([211, 'message'])
+    expect(shown({ filters: [filter('in', [{ kind: 'text', value: 'Owl questions', text: '"Owl questions"' }])] })).toEqual([210, 211])
+    expect(shown({ filters: [filter('in', [word('rail')])] })).toEqual([211])
+    expect(shown({ filters: [filter('from', [{ kind: 'address', num: 204, text: '204' }])] })).toEqual([212, 'message'])
+    expect(shown({ filters: [filter('since', [word('2026-10-22')])] })).toEqual([212, 215, 'message'])
+    expect(shown({ filters: [filter('until', [word('2026-10-21')])] })).toEqual([210, 211])
+  })
+
+  it('reads who answered, the cost and what is held from the chat a card sits in', () => {
+    expect(shown({ filters: [filter('model', [word('opus')])] })).toEqual([210, 211])
+    expect(shown({ filters: [filter('model', [word('wikipedia')])] })).toEqual([212, 'message'])
+    expect(shown({ filters: [filter('cost', [word('>0.10')])] })).toEqual([210, 211])
+    expect(cardsCostUnknown(cards, { filters: [filter('cost', [word('>0.10')])] }, { rows: full, ctx })).toBe(2)
+    expect(shown({ filters: [filter('has', [word('quote')])] })).toEqual([212, 'message'])
+  })
+
+  it('narrows with the tab and the search too, and every filter must hold', () => {
+    expect(shown({ tab: 'note', filters: [filter('tag', [word('essay')])] })).toEqual([210, 215])
+    expect(shown({ search: 'quote', filters: [filter('tag', [word('essay')])] })).toEqual([212])
+    expect(shown({ filters: [filter('tag', [word('essay')]), filter('model', [word('opus')])] })).toEqual([210])
+    // A tab with no cards shows All, as the board does.
+    expect(shown({ tab: 'edit' })).toEqual([210, 211, 212, 215, 'message'])
   })
 })

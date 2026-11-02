@@ -56,6 +56,7 @@ export const FIELDS = Object.freeze({
   dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine', 'ripple'],
   runs: ['id', 'docketId', 'n', 'createdAt', 'cost', 'branches'],
   // order: the cards and headings in the person's own order (C144 (j)).
+  // pinned: written false from the start; true once pin:"…" pins it (C287).
   collections: ['id', 'name', 'builtIn', 'description', 'items', 'headings', 'order', 'pinned', 'createdAt', 'updatedAt', 'fromFavorites'],
   collabs: ['id', 'name', 'instruction', 'builtIn', 'on', 'fromPersona', 'createdAt'],
 })
