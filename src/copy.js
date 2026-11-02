@@ -2416,7 +2416,6 @@ export const COPY = {
     condHelp: /*i18n*/ { id: 'picker.condHelp', message: 'When {name} runs. A click changes it' },
     forStep: /*i18n*/ { id: 'picker.forStep', message: 'Who answers step {index} of {address}' },
     asBranch: /*i18n*/ { id: 'picker.asBranch', message: 'As the branch, now {name}' },
-    models: /*i18n*/ { id: 'picker.models', message: 'Models', comment: 'A group in the picker of who answers' },
     local: /*i18n*/ { id: 'picker.local', message: 'On your machine', comment: 'Models that run on this computer (A14)' },
     sources: /*i18n*/ { id: 'picker.sources', message: 'Sources', comment: 'Answers from public sources, with no model' },
     noTokens: /*i18n*/ { id: 'picker.noTokens', message: 'no tokens, no key', comment: 'Beside the Sources group' },

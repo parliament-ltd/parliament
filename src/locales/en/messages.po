@@ -7595,11 +7595,6 @@ msgstr "made by {maker}"
 msgid "picker.marks"
 msgstr "Marks compare cost per token with {reference}."
 
-#. A group in the picker of who answers
-#. js-lingui-explicit-id
-msgid "picker.models"
-msgstr "Models"
-
 #. A source whose answers are mostly in English
 #. js-lingui-explicit-id
 msgid "picker.mostlyEnglish"

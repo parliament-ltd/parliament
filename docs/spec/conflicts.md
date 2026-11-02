@@ -4606,6 +4606,20 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **Unused now, kept:** `enter.toBegin` ("> to begin"); the letter's fifth paragraph (`welcome.letter.5`); the letter panel under the bar (`Letter`'s default export, the `letter` prop of the bar, `enter.letterClose`); with the earlier `.ch-answers` styles and `picker.models`. Each goes only on your yes.
 
 
+**C287. After C286: Mistral by its key, the commands shown but not built, the letter** (2 November; **asked for by Stefan, 2 November:** "can we fix the issue with mistral so if a mistral key is added it works", "let's add filters, export:, open:, room by name, can hide library themes, please add tour advanced, pinning a collection, pop settings keys, inspect highlights, and can hide new:block for now", "ok to remove old "> to begin", ok to drop laptop paragraph, ok to drop old letter panel", "ok for wikipedia", and the rest below; changes C150 and C279 (c)). Not released.
+- **Built:**
+  - **(a) A key answers.** A chat with no choice of its own goes to Settings' model when its provider has a key; otherwise to the first current model of a provider that has one, the default provider first, then the list's order (with a Mistral key alone, Mistral Medium 3.5); Wikipedia only with no key at all. Nothing stored changes, and the Enter line names who answers before Enter. Changes C150's "Wikipedia without a key".
+  - **(b) `open:` with a note's, highlight's or quote's number** opens the chat it is in, at its place, as `jump:` finds it; a note of its own has no chat, so it shows under the bar.
+  - **(c) A room by name:** `room:"Owl notes"`, and `open:"Owl notes"` when no saved search or collection has the name, opens the chat with that title (a room's name is its chat's, welcome step 5): the exact title first, else the titles that begin so; several are named, not guessed.
+  - **(d) `pop:settings keys`** puts Settings in a window of its own, at that section.
+  - **(e) `inspect:highlights`** lists the highlights of the chat in the room under the bar, since the room's column of them is hidden; a click writes `jump:` for one.
+  - **(f) The command menu's lines** are three, each lining up three or four commands: a layout kept as a saved arrangement, three row commands on Records, four filters. Each is tested to plan whole.
+  - **(g) Hidden from the menu:** `library:themes` (a shelf by name) and `new:block`, which says it comes in a later release.
+  - **(h) The birds while a popped board loads:** the window shows the birds, fading in one by one, until its stylesheet has loaded; drawn as SVG that needs no stylesheet and no script, still where less motion is asked for.
+  - **(i) The letter:** "Parliament is a space where…", as Stefan corrected it. **Removed on his yes:** the old "> to begin" line (`enter.toBegin`), the letter's laptop paragraph (`welcome.letter.5`), and the letter panel under the bar with `enter.letterClose`; the Letter board replaces it.
+  - **(j) Removed on his yes** ("feel free to remove .ch-answers and picker.models then"): `.ch-answers` and its 36 rules, which styled the old "who answers" picker (groups, numbered boxes, cost marks), and `picker.models`, its "Models" heading. Neither had been drawn since 29 October, when every picker took the command menu's layout (C280).
+
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

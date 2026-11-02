@@ -7595,11 +7595,6 @@ msgstr "開発：{maker}"
 msgid "picker.marks"
 msgstr "倍率は、トークンあたりの費用を{reference}と比べたものです。"
 
-#. A group in the picker of who answers
-#. js-lingui-explicit-id
-msgid "picker.models"
-msgstr "モデル"
-
 #. A source whose answers are mostly in English
 #. js-lingui-explicit-id
 msgid "picker.mostlyEnglish"
