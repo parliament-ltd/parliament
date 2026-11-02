@@ -1710,7 +1710,7 @@ msgstr "文档"
 msgid "copy.exportedOn"
 msgstr "于 {day} 从 Parliament 导出。仅供在别处阅读，无法再导入恢复。"
 
-#. Where a note, keyword or quote came from: a chat number
+#. Where a note, highlight or quote came from: a chat number
 #. js-lingui-explicit-id
 msgid "copy.from"
 msgstr "出自 {num}"

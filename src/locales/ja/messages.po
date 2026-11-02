@@ -1710,7 +1710,7 @@ msgstr "ドキュメント"
 msgid "copy.exportedOn"
 msgstr "{day}にParliamentから書き出しました。ほかの場所で読むためのもので、Parliamentに戻すことはできません。"
 
-#. Where a note, keyword or quote came from: a chat number
+#. Where a note, highlight or quote came from: a chat number
 #. js-lingui-explicit-id
 msgid "copy.from"
 msgstr "{num}より"

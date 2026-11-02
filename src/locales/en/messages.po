@@ -431,7 +431,7 @@ msgstr "Data files in this room, such as spreadsheets, and which of them the mod
 
 #. js-lingui-explicit-id
 msgid "blockAbout.highlights"
-msgstr "Words and phrases lit wherever they appear in the chat, each in its colour. A click jumps between them."
+msgstr "The passages you highlighted in the chat, each in its colour where you marked it. A click jumps between them."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.input"
@@ -1710,7 +1710,7 @@ msgstr "The document"
 msgid "copy.exportedOn"
 msgstr "Exported from Parliament on {day}. For reading elsewhere: it cannot be brought back in."
 
-#. Where a note, keyword or quote came from: a chat number
+#. Where a note, highlight or quote came from: a chat number
 #. js-lingui-explicit-id
 msgid "copy.from"
 msgstr "from {num}"

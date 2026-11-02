@@ -1710,7 +1710,7 @@ msgstr "Asiakirja"
 msgid "copy.exportedOn"
 msgstr "Viety Parliamentista {day}. Luettavaksi muualla: sitä ei voi tuoda takaisin."
 
-#. Where a note, keyword or quote came from: a chat number
+#. Where a note, highlight or quote came from: a chat number
 #. js-lingui-explicit-id
 msgid "copy.from"
 msgstr "keskustelusta {num}"
