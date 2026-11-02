@@ -328,6 +328,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     terms,
     sections: Object.fromEntries(sections.map((s) => [s.message.id, {
       quotes: s.quotes ?? [],
+      highlights: s.highlights ?? [],
       whole: s.part === 'prompt' ? stripAttachedFileBlocks(s.message.content) : s.message.content,
     }])),
   }

@@ -6666,7 +6666,7 @@ msgstr "摘录"
 msgid "kind.suggestion"
 msgstr "建议"
 
-#. A word or phrase lit wherever it appears in a chat (C131)
+#. Words marked in a chat where they were selected (C131; keywords retired into highlights, C285)
 #. js-lingui-explicit-id
 msgid "kind.term"
 msgstr "关键词"

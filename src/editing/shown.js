@@ -25,21 +25,27 @@ function wordsOf(block, start) {
  * The decorations for a document.
  * @param {import('prosemirror-model').Node} doc
  * @param {{ terms?: Array<{ text: string, bg: string }>, quotes?: Array<{ num: number, text: string }>, whole?: string }} shown
- *   whole: the reply's own text; a quote of all of it is not a passage
+ *   whole: the reply's own text; a quote of all of it is not a passage.
+ *   sections[message].highlights: that message's highlights, each { text, bg, nth }: marked only
+ *   where it was selected, the nth time its words come in the message (C285); one kept before has none, the first.
  */
 export function shownDecorations(doc, shown = {}) {
   const { terms = [], sections = null } = shown
-  const anyQuotes = (shown.quotes ?? []).length || Object.values(sections ?? {}).some((s) => (s.quotes ?? []).length)
+  const anyQuotes = (shown.quotes ?? []).length || Object.values(sections ?? {}).some((s) => (s.quotes ?? []).length || (s.highlights ?? []).length)
   if (!terms.length && !anyQuotes) return DecorationSet.empty
   const decos = []
-  // A prompt and its reply as one: each section's quotes are its own message's.
+  // A prompt and its reply as one: each section's quotes and highlights are its own message's.
   let quotes = shown.quotes ?? []
   let whole = shown.whole ?? ''
+  let lights = []
+  let seen = []
   doc.descendants((node, pos) => {
     if (node.type.name === 'section') {
       const own = sections?.[node.attrs.message] ?? {}
       quotes = own.quotes ?? []
       whole = own.whole ?? ''
+      lights = own.highlights ?? []
+      seen = lights.map(() => 0)
       return true
     }
     if (!node.isTextblock) return true
@@ -50,6 +56,18 @@ export function shownDecorations(doc, shown = {}) {
       const i = text.indexOf(q.text)
       if (i >= 0) ranges.push({ start: i, end: i + q.text.length, quote: q.num, title: q.title })
     }
+    // A highlight: the one time its words come where it was selected, counted through the message.
+    lights.forEach((h, k) => {
+      if (!h.text) return
+      let from = 0
+      for (;;) {
+        const i = indexOfWord(text, h.text, from)
+        if (i === -1) break
+        if (seen[k] === (Number.isInteger(h.nth) ? h.nth : 0)) ranges.push({ start: i, end: i + h.text.length, bg: h.bg })
+        seen[k] += 1
+        from = i + h.text.length
+      }
+    })
     for (const t of terms) {
       if (!t.text) continue
       let from = 0

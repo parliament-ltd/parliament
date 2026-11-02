@@ -17,7 +17,7 @@ import { chatMarkdown, markingMarkdown } from './recordsMarkdown'
 
 const MARKS = new Set(['note', 'term', 'quote'])
 // The kinds by the words people use (C131), in the file.
-const KIND_WORD = Object.freeze({ chat: 'chat', docket: 'plan', note: 'note', term: 'keyword', quote: 'quote' })
+const KIND_WORD = Object.freeze({ chat: 'chat', docket: 'plan', note: 'note', term: 'highlight', quote: 'quote' })
 const byBranch = (a, b) => String(a.branch ?? '').localeCompare(String(b.branch ?? ''))
 const keyOf = (r) => `${r.kind}:${r.id}`
 

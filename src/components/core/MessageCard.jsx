@@ -140,8 +140,19 @@ export default function MessageCard({
     }
     const rect = range.getBoundingClientRect()
     const containerRect = contentRef.current.getBoundingClientRect()
+    // Which time these words come in the message, so a highlight is marked
+    // only where it was selected (C285): counted in the words before it.
+    let nth = 0
+    try {
+      const before = contentRef.current.ownerDocument.createRange()
+      before.setStart(contentRef.current, 0)
+      before.setEnd(range.startContainer, range.startOffset)
+      const prior = before.toString()
+      for (let from = 0, i = indexOfWord(prior, text, 0); i !== -1; from = i + text.length, i = indexOfWord(prior, text, from)) nth += 1
+    } catch { nth = 0 }
     setPopoverPos({
       text,
+      nth,
       x: rect.left - containerRect.left + rect.width / 2,
       y: rect.top  - containerRect.top  - 8,
     })
@@ -149,7 +160,7 @@ export default function MessageCard({
   }, [onPopoverChange])
 
   const handleHighlightColor = (color) => {
-    if (popoverPos?.text) onHighlight?.(popoverPos.text, color)
+    if (popoverPos?.text) onHighlight?.(popoverPos.text, color, popoverPos.nth ?? 0)
     setPopoverPos(null)
     onPopoverChange?.(false)
     window.getSelection()?.removeAllRanges()

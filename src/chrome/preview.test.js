@@ -635,8 +635,8 @@ describe('delete: of what has been sent (stage 6, piece 4; C137; C199)', () => {
   }
 
   it('names everything that goes, what stays, that it is for good, and asks for a second Enter', () => {
-    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 note, keyword or quote stays, marked as from a deleted chat. Add all to delete it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
-    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 note, keyword or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
+    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 note, highlight or quote stays, marked as from a deleted chat. Add all to delete it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
+    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 note, highlight or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
     expect(at('>delete:204').act).toMatchObject({ kind: 'erase', confirm: true, chats: [{ id: 'c204', num: 204 }], keepMarks: true })
   })
 
@@ -751,7 +751,7 @@ describe('the Collection (stage 6, piece 6; C144)', () => {
     expect(at('>sort:source')).toMatchObject({ text: 'Enter groups the cards by where they come from', act: { kind: 'collectionView', view: { sort: 'source', asc: false } } })
     expect(at('>sort:oldest').text).toBe('Enter shows the oldest first')
     expect(at('>sort:active').text).toBe('On Collection, sort: takes yours, source, newest or oldest')
-    expect(at('>type:keyword')).toMatchObject({ text: 'Enter shows the keywords', act: { view: { tab: 'term' } } })
+    expect(at('>type:keyword')).toMatchObject({ text: 'Enter shows the highlights', act: { view: { tab: 'term' } } })
   })
 })
 
@@ -789,7 +789,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
       act: { kind: 'summarize', nums: [214, 217], collection: 'q2' },
     })
     expect(at('>summarize:').act.nums).toEqual([214, 217, 219])
-    expect(at('>summarize:202').text).toBe('202 is not a note, keyword or quote, which are what summarize: takes for now')
+    expect(at('>summarize:202').text).toBe('202 is not a note, highlight or quote, which are what summarize: takes for now')
     expect(at('>summarize:214', { helper: { keyed: false, provider: 'Anthropic' } }).text).toBe('A summary needs a key for Anthropic. api: adds one')
     expect(at('>summarize:214', { addressed: 'almanac' }).text).toBe('summarize: writes a summary note on Collection. Rewriting a summary line here comes later')
   })
@@ -798,7 +798,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
     expect(at('>compare:214 219')).toMatchObject({ text: 'Enter sets 214 and 219 side by side, word by word · Nothing is sent', act: { kind: 'compare', nums: [214, 219] } })
     expect(at('>compare:214, 219').act.nums).toEqual([214, 219])
     expect(at('>compare:214').text).toBe('compare: takes two numbers, like compare:218 231')
-    expect(at('>compare:214 202').text).toBe('202 is not a note, keyword or quote, which are what compare: takes for now')
+    expect(at('>compare:214 202').text).toBe('202 is not a note, highlight or quote, which are what compare: takes for now')
   })
 
   it('jump: finds a number on the board the bar points at', () => {

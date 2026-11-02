@@ -304,6 +304,16 @@ export default function MessagesRender() {
 
   // Each message's quoted passages, to mark where they sit (C145 (b)). A
   // pinned copy of a whole message is not a passage.
+  // Each message's highlights, each marked where it was selected (C285).
+  const highlightsByMessage = useMemo(() => {
+    const out = new Map()
+    for (const hl of highlights) {
+      if (!hl.messageId || !hl.text) continue
+      if (!out.has(hl.messageId)) out.set(hl.messageId, [])
+      out.get(hl.messageId).push({ text: hl.text, nth: Number.isInteger(hl.nth) ? hl.nth : 0, bg: HIGHLIGHT_COLORS.find((c) => c.color === hl.color)?.bg || 'rgba(184,160,112,0.18)' })
+    }
+    return out
+  }, [highlights])
   const quotesByMessage = useMemo(() => {
     const out = new Map()
     for (const p of pins) {
@@ -489,7 +499,8 @@ export default function MessagesRender() {
       isFavorited: isFav,
       showNotes: showNotes.has(msg.id),
       savedNoteText: noteRecord?.text || '',
-      highlights,
+      // A card shows its own message's highlights only (C285).
+      highlights: highlights.filter((h) => h.messageId === msg.id),
       quotes: quotesByMessage.get(msg.id) ?? NO_QUOTES,
       isPopoverActive: activePopoverMsgId === msg.id,
       onPopoverChange: (active) => setActivePopoverMsgId(active ? msg.id : null),
@@ -498,7 +509,7 @@ export default function MessagesRender() {
       onFavorite: () => toggleFavorite(msg.id),
       onNote: () => toggleNotePanel(msg.id),
       onNoteSave: (text) => saveNote(msg.id, text),
-      onHighlight: (text, color) => addHighlight(msg.id, text, color),
+      onHighlight: (text, color, nth) => addHighlight(msg.id, text, color, nth),
       onBranch: () => branchFrom(msg),
       onHide: () => handleHide(msg.id),
       onDelete: () => handleDelete(msg.id),
@@ -550,15 +561,7 @@ export default function MessagesRender() {
     return out
   }, [items, replyEditable])
 
-  // Highlights as every card finds them, by their words.
-  const highlightTerms = useMemo(() => {
-    const seen = new Map()
-    for (const hl of highlights) {
-      const key = hl.text.toLowerCase()
-      if (!seen.has(key)) seen.set(key, { text: hl.text, bg: HIGHLIGHT_COLORS.find((c) => c.color === hl.color)?.bg || 'rgba(184,160,112,0.18)' })
-    }
-    return [...seen.values()]
-  }, [highlights])
+  // Highlights are each message's own now, drawn where selected (highlightsByMessage, C285).
 
   // Under an edited prompt (the editing spec): its branch, edited; the other
   // branches keep theirs; ask again as the plan's next letter (again:).
@@ -592,13 +595,13 @@ export default function MessagesRender() {
 
   const renderPair = useCallback((item, idx) => {
     const { prompt, reply } = item
-    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
-    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES })
+    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(prompt.id) ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
+    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(reply.id) ?? NO_QUOTES })
     return (
       <EditableMessages
         key={item.key}
         sections={sections}
-        terms={highlightTerms}
+        terms={NO_QUOTES}
         quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
         clean={settings.markup === 'off'}
         onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, saved)}
@@ -612,7 +615,7 @@ export default function MessagesRender() {
         sugWords={sugWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords])
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

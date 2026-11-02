@@ -206,7 +206,8 @@ export function AnnotationsProvider({ children, conversationId = null }) {
    * occurrence counting (across all messages of the conversation)
    * happens at render time via `aggregatedHighlights` below.
    */
-  const addHighlight = useCallback(async (messageId, text, color) => {
+  // nth: which time the words come in the message, so it is marked only there (C285).
+  const addHighlight = useCallback(async (messageId, text, color, nth = 0) => {
     if (!activeConversationId || !text?.trim()) return
     try {
       const rec = await dbAddHighlight({
@@ -214,6 +215,7 @@ export function AnnotationsProvider({ children, conversationId = null }) {
         messageId,
         text: text.trim(),
         color,
+        nth: Number.isInteger(nth) && nth >= 0 ? nth : 0,
       })
       setHighlights(prev => [...prev, rec])
       // The shell starts a collection with this chat when there is none yet

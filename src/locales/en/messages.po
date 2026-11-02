@@ -122,7 +122,7 @@ msgstr "Notes and markings"
 
 #. js-lingui-explicit-id
 msgid "backup.catAnnotationsAbout"
-msgstr "Notes, keywords, quotes, favourites and collections"
+msgstr "Notes, highlights, quotes, favourites and collections"
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
@@ -363,7 +363,7 @@ msgstr "File shelf"
 
 #. js-lingui-explicit-id
 msgid "block.highlights"
-msgstr "Keywords"
+msgstr "Highlights"
 
 #. js-lingui-explicit-id
 msgid "block.input"
@@ -950,7 +950,7 @@ msgstr "Writes {command} in the bar"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"
+msgstr "{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1306,7 +1306,7 @@ msgstr "by"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} other {{num}}}"
+msgstr "{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1359,7 +1359,7 @@ msgstr "Nothing here yet. add:207 puts something in, or pick a chat from the lis
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "What it holds has no notes, keywords or quotes yet. They show here as they are made."
+msgstr "What it holds has no notes, highlights or quotes yet. They show here as they are made."
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1483,7 +1483,7 @@ msgstr "Writes open:{num} in the bar"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one note, keyword or quote."
+msgstr "A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one note, highlight or quote."
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1645,7 +1645,7 @@ msgstr "Suggestions"
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
-msgstr "Keywords"
+msgstr "Highlights"
 
 #. js-lingui-explicit-id
 msgid "collection.under"
@@ -1722,7 +1722,7 @@ msgstr "from {num}, deleted"
 
 #. js-lingui-explicit-id
 msgid "copy.keywords"
-msgstr "Keywords"
+msgstr "Highlights"
 
 #. js-lingui-explicit-id
 msgid "copy.notes"
@@ -2431,7 +2431,7 @@ msgstr "{sort, select, yours {Enter shows your order} source {Enter groups the c
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {Enter shows the keywords} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}"
+msgstr "{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2464,7 +2464,7 @@ msgstr "Enter sets {a} and {b} side by side, word by word"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} is not a note, keyword or quote, which are what compare: takes for now"
+msgstr "{num} is not a note, highlight or quote, which are what compare: takes for now"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
@@ -2705,12 +2705,12 @@ msgstr "Enter, then Enter again, deletes {erasing} for good"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, one {# note, keyword or quote goes too} other {# notes, keywords and quotes go too}}"
+msgstr "{count, plural, one {# note, highlight or quote goes too} other {# notes, highlights and quotes go too}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, one {# note, keyword or quote stays, marked as from a deleted chat. Add all to delete it too} other {# notes, keywords and quotes stay, marked as from a deleted chat. Add all to delete them too}}"
+msgstr "{count, plural, one {# note, highlight or quote stays, marked as from a deleted chat. Add all to delete it too} other {# notes, highlights and quotes stay, marked as from a deleted chat. Add all to delete them too}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -5345,7 +5345,7 @@ msgstr "No summary came back, so nothing was written"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num} is not a note, keyword or quote, which are what summarize: takes for now"
+msgstr "{num} is not a note, highlight or quote, which are what summarize: takes for now"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -5733,7 +5733,7 @@ msgstr "Translating. The bar is free meanwhile"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "On {board}, type: takes one of keyword, quote, note or highlight"
+msgstr "On {board}, type: takes one of highlight, quote or note"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6279,7 +6279,7 @@ msgstr "Essay room"
 
 #. js-lingui-explicit-id
 msgid "guide.o.keywordsNotes"
-msgstr "Keywords and notes"
+msgstr "Highlights and notes"
 
 #. js-lingui-explicit-id
 msgid "guide.o.own"
@@ -6666,10 +6666,10 @@ msgstr "Quote"
 msgid "kind.suggestion"
 msgstr "Suggestion"
 
-#. A word or phrase lit wherever it appears in a chat (C131)
+#. Words marked in a chat where they were selected (C131; keywords retired into highlights, C285)
 #. js-lingui-explicit-id
 msgid "kind.term"
-msgstr "Keyword"
+msgstr "Highlight"
 
 #. Beside a language still being worked on
 #. js-lingui-explicit-id
@@ -7751,7 +7751,7 @@ msgstr "{count, plural, one {# suggestion} other {# suggestions}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markTerms"
-msgstr "{count, plural, one {# keyword} other {# keywords}}"
+msgstr "{count, plural, one {# highlight} other {# highlights}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.noCall"
@@ -8998,7 +8998,7 @@ msgstr "A wide reading surface for long documents and research, with room for no
 
 #. js-lingui-explicit-id
 msgid "templateAbout.pocket-chat@1.0"
-msgstr "A focused chat for phones, with keywords, branches and review in a sheet that slides up."
+msgstr "A focused chat for phones, with highlights, branches and review in a sheet that slides up."
 
 #. js-lingui-explicit-id
 msgid "templateAbout.quiet-room@1.0"
@@ -9010,7 +9010,7 @@ msgstr "Two equal panes side by side: two chats, or a chat and a document."
 
 #. js-lingui-explicit-id
 msgid "templateAbout.writing-studio@1.0"
-msgstr "A chat with notes, keywords and branches close at hand. For long writing that goes back and forth."
+msgstr "A chat with notes, highlights and branches close at hand. For long writing that goes back and forth."
 
 #. js-lingui-explicit-id
 msgid "theme.amber-glow"
@@ -9183,7 +9183,7 @@ msgstr "Show what came from a chat, a plan, a branch or a run"
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "Show what holds notes, keywords, quotes or highlights"
+msgstr "Show what holds notes, quotes or highlights"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"

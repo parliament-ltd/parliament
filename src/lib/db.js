@@ -557,7 +557,9 @@ export async function deleteMessage(id) {
 
 // ─── Highlights ──────────────────────────────────────────
 
-export async function addHighlight({ conversationId, messageId, text, color = '#B8A070' }) {
+// nth: which time its words come in the message, where it was selected (C285);
+// one kept before has none and marks the first.
+export async function addHighlight({ conversationId, messageId, text, color = '#B8A070', nth = 0 }) {
   const db = await initDB()
   return addNumbered(db, 'highlights', {
     id: generateId(),
@@ -565,6 +567,7 @@ export async function addHighlight({ conversationId, messageId, text, color = '#
     messageId,
     text,
     color,
+    nth,
     createdAt: new Date().toISOString(),
   })
 }

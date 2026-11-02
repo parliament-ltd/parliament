@@ -52,7 +52,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `model:opus` | Show what a model or a source answered | `model:opus`, `model:wikipedia` | Records, Collection | no |
 | `from:201b` | Show what came from a chat, a plan, a branch or a run | `from:203`, `from:201b`, `from:run 3` | Records, Collection | no |
 | `in:"Q2 evidence"` | Show what is in a collection, or was made in a room | `in:"Q2 evidence"`, `in:"Code Lab"`, `in:"Code Lab" room` | Records, Collection | no |
-| `has:keyword` | Show what holds notes, keywords, quotes or highlights | `has:note`, `has:keyword`, `has:quote`, `has:highlight` | Records, Collection | no |
+| `has:highlight` | Show what holds notes, quotes or highlights | `has:note`, `has:quote`, `has:highlight` | Records, Collection | no |
 | `cost:>0.50` | Show plans by what they cost | `cost:>0.50` | Records, Collection | no |
 | `since:7d` | Show what was made since a date | `since:7d`, `since:3w`, `since:september`, `since:09/01/26` | Records, Collection | no |
 | `until:09/10/26` | Show what was made until a date | `until:09/10/26` | Records, Collection | no |

@@ -78,14 +78,14 @@ describe('naming a block (C240 (b))', () => {
 describe('add: and rm: in the Lab (C240; C63)', () => {
   it('puts a block in its first free place, one of each', () => {
     const p = at('>add:keywords')
-    expect(p.text).toBe('Enter puts Keywords in the left rail')
+    expect(p.text).toBe('Enter puts Highlights in the left rail')
     expect(where(p.act.after).highlights).toBe('left-rail')
     expect(p.act.after.components.map((c) => c.order)).toEqual([0, 1, 2, 3, 4, 5])
     expect(at('>add:notes').text).toBe('Notes is in the room already. place: moves it')
     expect(at('>add:nothing').text).toBe('Nothing in the Library is called nothing')
     const two = at('>add:keywords, contents')
-    expect(two.text).toBe('Enter puts Keywords and Table of contents in the room')
-    expect(two.also).toEqual(['Keywords goes in the left rail', 'Table of contents goes in the left rail'])
+    expect(two.text).toBe('Enter puts Highlights and Table of contents in the room')
+    expect(two.also).toEqual(['Highlights goes in the left rail', 'Table of contents goes in the left rail'])
   })
   it('refuses a block with no free place', () => {
     expect(at('>add:chart').text).toBe('Chart canvas has no free place in Three panels')
@@ -95,7 +95,7 @@ describe('add: and rm: in the Lab (C240; C63)', () => {
     expect(p.text).toBe('Enter takes Context health out of the room. The Library keeps it')
     expect(p.act.after.components.some((c) => c.ref.startsWith('context'))).toBe(false)
     expect(at('>rm:messages').text).toBe('Messages stays: every room has it')
-    expect(at('>rm:keywords').text).toBe('Keywords is not in the room. add: puts it there')
+    expect(at('>rm:keywords').text).toBe('Highlights is not in the room. add: puts it there')
   })
   it('leaves the Collection its add: when the Lab is not addressed', () => {
     expect(at('>add:keywords', { a: inLab('almanac') }).act?.kind).not.toBe('roomChange')
@@ -160,7 +160,7 @@ describe('add: with a layout and a theme, as "add to room" writes it (C242 (b))'
     expect(p.text).toBe('Enter changes Essay room')
     expect(p.also[0]).toBe('It takes the layout Document in the middle')
     expect(p.also).toContain('It is painted in Deep calm')
-    expect(p.also[p.also.length - 1]).toBe('Keywords goes in the margin')
+    expect(p.also[p.also.length - 1]).toBe('Highlights goes in the margin')
     expect(p.act.after).toMatchObject({ layout: { ref: 'document-centric@1.0' }, scheme: { ref: 'deep-calm@1.0' } })
     expect(where(p.act.after).highlights).toBe('margin')
   })

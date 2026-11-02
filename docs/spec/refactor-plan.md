@@ -647,6 +647,7 @@ stay readable so every backup ever written still restores.
 | R40 | The Review modal and its block | `src/components/ReviewModal.jsx`, `src/catalog/entries/review*.jsx` | The Reflection board. Rooms keep the block in their stored list and skip it. **Approved 27 October (C237 (d)),** moved to `src/deprecated/` | 12 |
 | R38 | Four Enter-line messages nothing says any more (**approved 24 October; carried out 24 October, C204**) | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…"), `enter.erase` (the old answer to `delete:`) and `enter.promptManyOrderInclude` in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199); `include:` goes with one after another (C202) | 10 |
 | R43 | The power-on shimmer hook | `src/hooks/useShimmer.js` | Nothing; the ignition is `chrome/ignition.js`. Proposed 27 October (C266); **approved and moved to `src/deprecated/` the same day** | 15 |
+| R44 | Keywords as a kind of their own | The name Keyword on cards, rows and the Collection's tab; `has:keyword` and `type:keyword` in the command menu; "keywords" in the copy | Highlights, marked only where selected, with tags to label and search to find a word everywhere. Keywords already kept show as highlights, at the first place their words come; nothing is converted or deleted, and `keyword` still reads in `has:` and `type:` for searches kept before. **Approved 1 November (C285)** | 15 |
 
 R29 (install and update state that nothing displays) is withdrawn: stage 1
 displays it.

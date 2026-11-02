@@ -156,9 +156,10 @@ export const VERBS = Object.freeze([
   v({ verb: 'in', group: 'filters', example: 'in:"Q2 evidence"', forms: ['in:"Q2 evidence"', 'in:"Code Lab"', 'in:"Code Lab" room'],
     takes: [[{ list: 'text' }, { opt: ['room', 'collection'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.in', message: 'Show what is in a collection, or was made in a room' } }),
-  v({ verb: 'has', group: 'filters', example: 'has:keyword', forms: ['has:note', 'has:keyword', 'has:quote', 'has:highlight'],
+  // keyword stays a word has: and type: read, for searches kept before keywords became highlights (C285).
+  v({ verb: 'has', group: 'filters', example: 'has:highlight', forms: ['has:note', 'has:quote', 'has:highlight'],
     takes: [[{ list: ['note', 'keyword', 'quote', 'highlight'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds notes, keywords, quotes or highlights' } }),
+    gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds notes, quotes or highlights' } }),
   v({ verb: 'cost', group: 'filters', example: 'cost:>0.50', takes: [['text']], on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cost', message: 'Show plans by what they cost' } }),
   v({ verb: 'since', group: 'filters', example: 'since:7d', forms: ['since:7d', 'since:3w', 'since:september', 'since:09/01/26'], takes: [['text']], on: TABLES, stage: 6, click: 'apply',
