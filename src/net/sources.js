@@ -7,7 +7,9 @@
 // source adds data, not code.
 //
 // Two shapes (almanac spec §8): an article (Wikipedia: the first page found,
-// its text, page, revision and licence), and a list of results (Hacker
+// its text, page, revision and licence, and the titles of the pages it
+// links to, since its text comes plain and its links as plain words; C287),
+// and a list of results (Hacker
 // News, OpenAlex: up to a few, each a title, a link, a date, a few facts
 // and perhaps a passage of text). A manifest names where each part is with
 // a path ('query.pages', 'revisions.0.revid'), or with one of a fixed set of
@@ -109,6 +111,36 @@ export function read(item, spec) {
   return null
 }
 
+// Most titles an article keeps of the pages it links to, and the longest
+// title kept, whatever a manifest asks (C287).
+const MOST_LINKS = 500
+const LINK_CHARS = 300
+
+/**
+ * Every value at a path in a list, as text, for a part that is a list:
+ *   { each: path, path }          the value at path in each of the list's
+ *                                 members ({ each: 'links', path: 'title' })
+ * Only text is kept: a value that is not a string or a number is left out,
+ * and so is one longer than chars. At most max.
+ * @returns {string[]}
+ */
+export function readList(item, spec, { max = MOST_LINKS, chars = LINK_CHARS } = {}) {
+  if (!spec || typeof spec.each !== 'string') return []
+  const list = pick(item, spec.each)
+  if (!Array.isArray(list)) return []
+  const most = Math.max(0, Math.min(Number(max) || 0, MOST_LINKS))
+  const longest = Math.max(1, Math.min(Number(chars) || LINK_CHARS, LINK_CHARS))
+  const out = []
+  for (const member of list) {
+    if (out.length >= most) break
+    const v = spec.path ? pick(member, spec.path) : member
+    if (typeof v !== 'string' && typeof v !== 'number') continue
+    const text = String(v).trim()
+    if (text && text.length <= longest) out.push(text)
+  }
+  return out
+}
+
 const cut = (text, max) => (text && text.length > max ? `${text.slice(0, max)}…` : text)
 // A link is kept only when it is a web address the person can open.
 const webLink = (v) => (typeof v === 'string' && /^https:\/\/[^\s]+$/.test(v) && v.length <= 2000 ? v : null)
@@ -142,7 +174,9 @@ export function createSource(manifest, { origins, fetch: request, identity = nul
   return {
     /**
      * Looks a question up. An article: { source, name, title, text, url,
-     * revision, revisedAt, licence, lang }. A list: { source, name, shape:
+     * revision, revisedAt, licence, lang }, and links, the titles of the
+     * pages it links to, when its manifest names them and there are some
+     * (C287). A list: { source, name, shape:
      * 'list', items, text, licence, lang }, each item { title, url,
      * discussion, date, text, facts }. null when nothing was found.
      */
@@ -197,6 +231,10 @@ export function createSource(manifest, { origins, fetch: request, identity = nul
         const v = pick(item, manifest.result[name])
         return v == null ? null : String(v)
       }
+      // The pages it links to, by title: plain words, as its text is (C287).
+      const links = manifest.result.links
+        ? readList(item, manifest.result.links, { max: manifest.limits.links, chars: manifest.limits.linkChars })
+        : []
       return {
         source: manifest.id,
         name: manifest.name,
@@ -207,6 +245,7 @@ export function createSource(manifest, { origins, fetch: request, identity = nul
         revisedAt: field('revisedAt'),
         licence,
         lang: language,
+        ...(links.length ? { links } : {}),
       }
     },
   }

@@ -2746,6 +2746,11 @@ export const COPY = {
     // An answer from a source (stage 4). {source} is its name, from the list.
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
+    // A line of an answer from a source that is the title of a page it
+    // links to (C287): a quiet word after it, which writes the title into
+    // the bar as a prompt. {title} is the page's title, as the source gives it.
+    titleAsk: /*i18n*/ { id: 'chat.titleAsk', message: 'ask', comment: 'After a line of an answer from a source that is the title of a page it links to; an arrow follows it' },
+    titleAskHelp: /*i18n*/ { id: 'chat.titleAskHelp', message: 'Write “{title}” in the bar as your next prompt. Enter sends it', comment: '{title} is the title of a page the answer links to' },
     // A model's thinking (C165), set apart from its answer.
     thinking: /*i18n*/ { id: 'chat.thinking', message: 'thinking · {time}', comment: 'While a model thinks before answering; {time} is minutes and seconds, 2:31' },
     thought: /*i18n*/ { id: 'chat.thought', message: '{short, select, 1 {thought for under a minute} other {{minutes, plural, one {thought for # minute} other {thought for # minutes}}}}' },

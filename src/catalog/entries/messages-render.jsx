@@ -430,6 +430,11 @@ export default function MessagesRender() {
     label: i18n._(COPY.chat.askLabel), placeholder: i18n._(COPY.chat.askPlaceholder),
     ask: i18n._(COPY.chat.askMarker), accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
   }), [i18n])
+  // After a line of a source's answer that is the title of a page it links to (C287).
+  const titleWords = useMemo(() => ({
+    ask: i18n._(COPY.chat.titleAsk),
+    help: (title) => i18n._(COPY.chat.titleAskHelp, { title }),
+  }), [i18n])
   const editsWaitingIn = useCallback((chatId) => (chatEdits.get(chatId) ?? []).filter(editWaits).length, [chatEdits])
   const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members, (chatId, groupId) => waitingIn(linePlan, chatId, groupId)), [visibleMessages, activeConversationId, members, linePlan])
   const [planNum, setPlanNum] = useState(null)
@@ -610,9 +615,10 @@ export default function MessagesRender() {
         sugInfo={pairSugs(sections)}
         onSettleSuggestion={settleSugOf}
         sugWords={sugWords}
+        titleWords={titleWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords])
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

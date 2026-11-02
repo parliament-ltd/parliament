@@ -17,6 +17,7 @@ import { forModel, cutReason } from './sendHistory'
 import { veilRequest, createVeil, withoutPrivate } from '../lib/privacyFilter'
 import { summaryTurns } from '../lib/branchSummary'
 import { loadMode } from '../lib/modes'
+import { titlesIn } from '../lib/linkedTitles'
 
 // A room that sends only to models on this computer (stage 13, piece 5;
 // C246 (d)): checked again here, at the moment of sending, wherever the
@@ -691,6 +692,9 @@ export function ChatProvider({ children }) {
       if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
       // A list of results (Hacker News, OpenAlex; stage 7) keeps each one's
       // title, link, date, text and facts in the note, for the card to draw.
+      // An article keeps, of the pages it links to, the titles that are
+      // lines of its text, for the card to offer to ask about (C287).
+      const links = found && found.shape !== 'list' ? titlesIn(found.text, found.links) : []
       const updates = found?.shape === 'list'
         ? {
           content: found.text,
@@ -704,6 +708,7 @@ export function ChatProvider({ children }) {
           source: {
             id: found.source, name: found.name, title: found.title, url: found.url,
             revision: found.revision, revisedAt: found.revisedAt, licence: found.licence, lang: found.lang,
+            ...(links.length ? { links } : {}),
           },
         }
         : { content: '', incomplete: false, source: { id: source, name: destination(source)?.name ?? source, found: false } }

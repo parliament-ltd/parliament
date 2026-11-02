@@ -19,6 +19,7 @@ import { useAskBox } from './useAskBox'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
+import { titlesPlugin } from '../../editing/titles'
 import MessageCard from './MessageCard'
 import { isReleased, onRelease } from '../../editing/across'
 
@@ -79,11 +80,14 @@ const NO_CLOSED = new Set()
 const SUG_WORDS = { ripple: 'ripple', sweep: 'sweep', accept: 'accept', reject: 'reject' }
 const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it shorter, or add the year it opened', ask: 'ask', accept: 'accept', undo: 'undo' }
 const NO_ASKS = new Map()
+const NO_TITLE_WORDS = { ask: '', help: () => '' }
 // askInfo: each ask's number and state, by its id; onSettleAsk(messageId, askId, how)
 // when one is accepted or undone; askWords: the ASK box's and markers' words (C218).
 // sugInfo: each suggestion's number, by its id; onSettleSuggestion(messageId,
 // suggestionId, how) when one is accepted or rejected in place (C229).
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS }) {
+// titleWords: the "ask" after a line of a source's answer that is the title
+// of a page it links to, and what it says it does, for a title (C287).
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS }) {
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -212,6 +216,12 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       }),
       announcePlugin(() => true),
       shownPlugin({ quotedTitle: (num) => quotedTitle?.(num) ?? '' }),
+      // A line of a source's answer that is the title of a page it links
+      // to: "ask" after it writes the title into the bar (C287).
+      titlesPlugin({
+        words: titleWords,
+        titles: () => ({ sections: Object.fromEntries(sectionsRef.current.filter((s) => s.plain && Array.isArray(s.message.source?.links)).map((s) => [s.message.id, s.message.source.links])) }),
+      }),
     ]
     const sectionView = (node) => {
       const dom = document.createElement('div')

@@ -15,6 +15,7 @@ import { useAskBox } from './useAskBox'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
+import { titlesPlugin } from '../../editing/titles'
 import { isReleased, onRelease } from '../../editing/across'
 
 // A finished reply, edited in place (stage 11, piece 1; the editing spec,
@@ -45,11 +46,15 @@ const NO_CLOSED = new Set()
 const SUG_WORDS = { ripple: 'ripple', sweep: 'sweep', accept: 'accept', reject: 'reject' }
 const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it shorter, or add the year it opened', ask: 'ask', accept: 'accept', undo: 'undo' }
 const NO_ASKS = new Map()
+const NO_TITLES = Object.freeze([])
+const NO_TITLE_WORDS = { ask: '', help: () => '' }
 // closedEdits: edits already told to a model; typing beside one starts a new edit (C216 (i)).
 // askInfo: each ask's number and state, by its id; onSettleAsk(askId, how) when
 // one is accepted or undone; askWords: the ASK box's and markers' words (C218).
 // sugInfo, onSettleSuggestion(suggestionId, how), sugWords: suggestions, as asks (C229).
-export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS }) {
+// titles: a source's answer's lines that are titles of pages it links to;
+// titleWords: the "ask" after each, and what it says it does (C287).
+export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titles = NO_TITLES, titleWords = NO_TITLE_WORDS }) {
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
   const host = useRef(null)
@@ -73,6 +78,8 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
   const askOptions = askBox.options
 
   useEffect(() => { onSaveRef.current = onSave }, [onSave])
+  const titlesRef = useRef(titles)
+  useEffect(() => { titlesRef.current = titles }, [titles])
 
   const save = useCallback(() => {
     clearTimeout(timer.current)
@@ -117,6 +124,8 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
       }),
       announcePlugin(() => true),
       shownPlugin({ quotedTitle: (num) => quotedTitle?.(num) ?? '' }),
+      // A line that is the title of a page the answer links to (C287).
+      titlesPlugin({ words: titleWords, titles: () => ({ titles: plain ? titlesRef.current : [] }) }),
     ]
     const v = new EditorView(host.current, {
       state: EditorState.create({ doc, plugins }),

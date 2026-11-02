@@ -87,6 +87,25 @@ describe('a backup with who answers each chat (stage 7; C150)', () => {
   })
 })
 
+describe('a backup with an answer whose lines are titles of pages it links to (C287)', () => {
+  const source = { id: 'wikipedia', name: 'Wikipedia', title: 'Nintendo', url: 'https://en.wikipedia.org/wiki/Nintendo', revision: '1', lang: 'en' }
+  const withLinks = (links) => check(reply({ incomplete: false, source: { ...source, links } }))
+  it('accepts a list of short titles, and a note kept before, with none', () => {
+    expect(withLinks(['List of Nintendo arcade video games', 'List of Nintendo home video games'])).toEqual({ valid: true })
+    expect(withLinks([])).toEqual({ valid: true })
+    expect(withLinks(null)).toEqual({ valid: true })
+    expect(check(reply({ incomplete: false, source }))).toEqual({ valid: true })
+  })
+  it('refuses anything but short strings, or too many', () => {
+    expect(withLinks('List of Nintendo arcade video games').valid).toBe(false)
+    expect(withLinks([7]).valid).toBe(false)
+    expect(withLinks([{ title: 'x' }]).valid).toBe(false)
+    expect(withLinks(['']).valid).toBe(false)
+    expect(withLinks(['x'.repeat(301)]).valid).toBe(false)
+    expect(withLinks(Array(501).fill('x')).valid).toBe(false)
+  })
+})
+
 describe('a backup with a list of results from a source (stage 7, piece 2; C156 (c))', () => {
   const list = (items, extra = {}) => check(reply({ incomplete: false, source: { id: 'hackernews', name: 'Hacker News', shape: 'list', items, ...extra } }))
   const item = { title: 'Barn owls', url: 'https://example.org/o', discussion: 'https://news.ycombinator.com/item?id=1', date: '2024-05-01T12:00:00Z', text: null, facts: { points: '12' } }

@@ -20,11 +20,13 @@
       "generator": "search",
       "gsrsearch": "{q}",
       "gsrlimit": "1",
-      "prop": "extracts|info|revisions",
+      "prop": "extracts|info|revisions|links",
       "exintro": "1",
       "explaintext": "1",
       "inprop": "url",
-      "rvprop": "ids|timestamp"
+      "rvprop": "ids|timestamp",
+      "plnamespace": "0",
+      "pllimit": "500"
     }
   },
   "result": {
@@ -33,10 +35,13 @@
     "text": "extract",
     "url": "fullurl",
     "revision": "revisions.0.revid",
-    "revisedAt": "revisions.0.timestamp"
+    "revisedAt": "revisions.0.timestamp",
+    "links": { "each": "links", "path": "title" }
   },
   "limits": {
     "queryChars": 300,
-    "textChars": 6000
+    "textChars": 6000,
+    "links": 500,
+    "linkChars": 300
   }
 }

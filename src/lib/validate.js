@@ -5,6 +5,7 @@
 import { isTranslation, isAsked } from './translations'
 import { isSummaryNote } from './branchSummary'
 import { isIncluded } from './included'
+import { isTitleList } from './linkedTitles'
 
 const MAX_STRING_LENGTH = 1_000_000  // 1 MB per field
 const MAX_IMPORT_ITEMS  = 50_000     // across all stores
@@ -92,6 +93,9 @@ function isSourceNote(s) {
     && text(s.name, 100) && text(s.title, 300) && link(s.url) && text(s.revision, 40) && text(s.revisedAt, 40) && text(s.lang, 10)
     && (s.found == null || typeof s.found === 'boolean')
     && (s.licence == null || (typeof s.licence === 'object' && text(s.licence.name, 100) && link(s.licence.url)))
+    // The lines of an article that are titles of pages it links to (C287):
+    // short strings only. Optional; a note kept before has none.
+    && (s.links == null || isTitleList(s.links))
     // A list of results (Hacker News, OpenAlex; stage 7, C156): short text
     // and web links only, and a few facts as short text.
     && (s.shape == null || s.shape === 'list')

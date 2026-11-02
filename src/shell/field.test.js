@@ -245,6 +245,19 @@ describe('a prompt edited in the chat, held as a placeholder (Stefan, 29 October
     expect(showsHeld(fieldReducer(initialField('prompt'), { type: 'draft', value: '' }))).toBe(false)
   })
 
+  it('shows a short prompt written in from an answer as it is, not held (C287)', () => {
+    let s = fieldReducer(initialField('prompt'), { type: 'input', value: '>open:records' })
+    s = { ...s, minimised: true, editingReply: true }
+    s = fieldReducer(s, { type: 'draft', value: 'List of Nintendo arcade video games', held: false })
+    expect([s.mode, s.held, showsHeld(s), shownValue(s)]).toEqual(['prompt', false, false, 'List of Nintendo arcade video games'])
+    expect([s.minimised, s.editingReply, s.focused]).toEqual([false, false, true])
+    // It was typed over a held prompt: the title takes its place.
+    const over = fieldReducer(held(), { type: 'draft', value: 'Kyoto', held: false })
+    expect([over.text.prompt, showsHeld(over)]).toEqual(['Kyoto', false])
+    // Then typed after, as anything typed in the field.
+    expect(typing(over, 'Kyoto?').text.prompt).toBe('Kyoto?')
+  })
+
   it('never holds what was typed in the field itself', () => {
     const s = typing(initialField('prompt'), 'typed here')
     expect([showsHeld(s), shownValue(s), dropsHeld(s, 'typed here!')]).toEqual([false, 'typed here', false])

@@ -36,6 +36,13 @@ describe('records rebuilt from their known fields', () => {
     const mode = { id: 'm', schema: 'parliament-mode/1.0', components: [], anything: 1 }
     expect(rebuildRecord('modes', mode)).toBe(mode)
   })
+
+  it('carries the titles a source\'s answer links to with its note, and a note without them as it was (C287)', () => {
+    const source = { id: 'wikipedia', name: 'Wikipedia', title: 'Nintendo', url: 'https://en.wikipedia.org/wiki/Nintendo', lang: 'en' }
+    const message = { id: 'm1', conversationId: 'c1', role: 'assistant', content: 'List of Nintendo arcade video games', source: { ...source, links: ['List of Nintendo arcade video games'] } }
+    expect(rebuildRecord('messages', message).source.links).toEqual(['List of Nintendo arcade video games'])
+    expect(rebuildRecord('messages', { ...message, source }).source).toEqual(source)
+  })
 })
 
 describe('cleanFlat', () => {

@@ -115,7 +115,7 @@ function input(state, value) {
 /**
  * @param {FieldState} state
  * @param {{ type: string, value?: string, resting?: 'search'|'prompt' }} action
- *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), draft (value, focus), drop, sent, clearSearch, setSearch (value), surface (resting), focus, blur, open,
+ *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), draft (value, focus, held), drop, sent, clearSearch, setSearch (value), surface (resting), focus, blur, open,
  *   editReply, doneEditing, hover, leave
  * @returns {FieldState}
  */
@@ -154,8 +154,10 @@ export function fieldReducer(state, action) {
       // It opens the field, folded while the reply was edited.
       // Without focus (joined by typing), it is filled and opened, and the
       // person goes on typing where they were. Held: the placeholder shows
-      // in its place, and Enter sends it.
-      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: action.focus !== false, minimised: false, editingReply: false, peek: false, held: Boolean(String(action.value ?? '')) }
+      // in its place, and Enter sends it. A short prompt written in from a
+      // room (the title of a page an answer links to, C287) is not held
+      // (held: false): it is shown as it is, to edit or send with Enter.
+      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: action.focus !== false, minimised: false, editingReply: false, peek: false, held: action.held !== false && Boolean(String(action.value ?? '')) }
 
     case 'sent':
       // A prompt went, or a search was done with: its text is cleared.
