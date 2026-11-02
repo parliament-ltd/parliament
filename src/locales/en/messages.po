@@ -1205,6 +1205,16 @@ msgstr "show"
 msgid "chat.thoughtUntimed"
 msgstr "thought first"
 
+#. After a line of an answer from a source that is the title of a page it links to; an arrow follows it
+#. js-lingui-explicit-id
+msgid "chat.titleAsk"
+msgstr "ask"
+
+#. {title} is the title of a page the answer links to
+#. js-lingui-explicit-id
+msgid "chat.titleAskHelp"
+msgstr "Write “{title}” in the bar as your next prompt. Enter sends it"
+
 #. A tell: note the prompt carried, in the words of the person (C225 (d))
 #. js-lingui-explicit-id
 msgid "chat.toldNote"
@@ -1476,6 +1486,11 @@ msgstr "No collection yet. new:collection makes one."
 msgid "collection.noneMatch"
 msgstr "Nothing in this collection matches."
 
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "collection.noneMatchFiltered"
+msgstr "Nothing here matches the search and filters. clear:filters removes them."
+
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "The chat in the room, {num}, is not in this collection"
@@ -1494,6 +1509,11 @@ msgstr "A click writes add: or rm: in the bar. The numbers set the order by sour
 #. js-lingui-explicit-id
 msgid "collection.pickHelp"
 msgstr "Writes {command} in the bar"
+
+#. After a pinned collection’s name in the line of collections (C287)
+#. js-lingui-explicit-id
+msgid "collection.pinned"
+msgstr "pinned"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
@@ -1562,6 +1582,10 @@ msgstr "Select cards to act on them, or act on the whole collection."
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
 msgstr "Shows it, as open:\"{name}\" does"
+
+#. js-lingui-explicit-id
+msgid "collection.shown"
+msgstr "{count, plural, =0 {no cards shown} one {# card shown} other {# cards shown}}"
 
 #. js-lingui-explicit-id
 msgid "collection.source"
@@ -2436,6 +2460,10 @@ msgid "enter.collectionNotIn"
 msgstr "{count, plural, one {{nums} is not in {name}} other {{nums} are not in {name}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionOrderYours"
+msgstr "The cards are in your order already"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionRm"
 msgstr "Enter takes {nums} out of {name}. The things themselves stay"
 
@@ -2446,6 +2474,10 @@ msgstr "{sort, select, yours {Enter shows your order} source {Enter groups the c
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
 msgstr "{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTabAll"
+msgstr "Enter shows every kind of card"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2759,6 +2791,14 @@ msgid "enter.eraseUndo"
 msgstr "{count, plural, one {Undo cannot bring it back, and stops here} other {Undo cannot bring them back, and stops here}}"
 
 #. js-lingui-explicit-id
+msgid "enter.exportCardsOut"
+msgstr "{count, plural, one {# card shown stays out: only notes, highlights and quotes are exported} other {# cards shown stay out: only notes, highlights and quotes are exported}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportCollection"
+msgstr "{count, plural, one {Enter downloads # card of {name} as {format}: {file}} other {Enter downloads # cards of {name} as {format}: {file}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.exported"
 msgstr "Downloaded {file}"
 
@@ -2798,6 +2838,10 @@ msgstr "{count, plural, one {Enter applies # filter} other {Enter applies # filt
 #. js-lingui-explicit-id
 msgid "enter.filterShows"
 msgstr "{count, plural, =0 {Enter shows no rows} one {Enter shows # row} other {Enter shows # rows}}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterShowsCards"
+msgstr "{count, plural, =0 {Enter shows no cards} one {Enter shows # card} other {Enter shows # cards}}"
 
 #. js-lingui-explicit-id
 msgid "enter.filterSince"
@@ -3006,6 +3050,10 @@ msgstr "Enter brings the last room beside what is here"
 #. js-lingui-explicit-id
 msgid "enter.goWelcome"
 msgstr "Enter brings the welcome page and its steps beside what is here"
+
+#. js-lingui-explicit-id
+msgid "enter.goWelcomeAdvanced"
+msgstr "Enter brings the welcome page beside what is here, with its second list"
 
 #. js-lingui-explicit-id
 msgid "enter.headingAfter"
@@ -3217,6 +3265,31 @@ msgstr "No room is on screen. room: brings one back"
 #. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter shows {num} in detail, here"
+
+#. js-lingui-explicit-id
+msgid "enter.installAlready"
+msgstr "This is Parliament installed as an app already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.installDismissed"
+msgstr "Not installed. install: asks again when the browser offers it"
+
+#. js-lingui-explicit-id
+msgid "enter.installDone"
+msgstr "Installed. Parliament opens as an app from now on, with everything you have here"
+
+#. js-lingui-explicit-id
+msgid "enter.installGo"
+msgstr "Enter asks the browser to install Parliament as an app on this computer"
+
+#. js-lingui-explicit-id
+msgid "enter.installNotOffered"
+msgstr "This browser has not offered to install Parliament here. Where it can, its own menu offers to install the site or add it to the dock"
+
+#. js-lingui-explicit-id
+msgid "enter.installSame"
+msgstr "The app and this page share everything: your chats, keys and backups"
 
 #. room and collection stay English: they are words of the command
 #. js-lingui-explicit-id
@@ -3860,12 +3933,20 @@ msgid "enter.openWhichSaved"
 msgstr "More than one saved search starts that way: {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.pinCollection"
+msgstr "Enter pins the collection {name} at the top of the collections"
+
+#. js-lingui-explicit-id
 msgid "enter.pinOff"
 msgstr "Enter unpins {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.pinOn"
 msgstr "Enter pins {nums} at the top"
+
+#. js-lingui-explicit-id
+msgid "enter.pinWhich"
+msgstr "More than one collection starts that way: {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.placeCramped"
@@ -5753,6 +5834,15 @@ msgstr "Your prompts go there already"
 msgid "enter.toSome"
 msgstr "Enter sends your next prompts to {nums}, each carrying its own branch on, until changed"
 
+#. tour: stays English
+#. js-lingui-explicit-id
+msgid "enter.tourAdvanced"
+msgstr "Enter shows the second list. tour: brings back the first"
+
+#. js-lingui-explicit-id
+msgid "enter.tourAdvancedHere"
+msgstr "The second list is here already"
+
 #. js-lingui-explicit-id
 msgid "enter.tourHere"
 msgstr "The steps are here already"
@@ -5921,6 +6011,10 @@ msgstr "No command called {verb}. Type ? for every command"
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
 msgstr "No command called {verb}. Enter shows every command"
+
+#. js-lingui-explicit-id
+msgid "enter.unpinCollection"
+msgstr "Enter unpins the collection {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.untag"
@@ -9384,6 +9478,10 @@ msgid "verb.inspect"
 msgstr "Look at one thing in detail, where you are"
 
 #. js-lingui-explicit-id
+msgid "verb.install"
+msgstr "Install Parliament as an app on this computer, where the browser can. Your work stays the same"
+
+#. js-lingui-explicit-id
 msgid "verb.jump"
 msgstr "Scroll to a number on this board"
 
@@ -9615,6 +9713,26 @@ msgstr "Let the model search the web for your next prompt only"
 msgid "verb.width"
 msgstr "Choose how much of the width a board takes, or put every width back"
 
+#. A heading in the second list of steps: keeping and quoting what was found
+#. js-lingui-explicit-id
+msgid "welcome.advanced.collection"
+msgstr "Collection"
+
+#. A heading in the second list of steps: asking several at once
+#. js-lingui-explicit-id
+msgid "welcome.advanced.sources"
+msgstr "Sources"
+
+#. A heading in the second list of steps: shaping the screen
+#. js-lingui-explicit-id
+msgid "welcome.advanced.space"
+msgstr "Space"
+
+#. The name of the second list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.advancedSteps"
+msgstr "More things to try"
+
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
@@ -9632,6 +9750,11 @@ msgstr "MIT licensed, source on GitHub"
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"
 msgstr "Created with Claude Code"
+
+#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. js-lingui-explicit-id
+msgid "welcome.further"
+msgstr "or go further"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"
@@ -9710,6 +9833,10 @@ msgid "welcome.step.almanac"
 msgstr "See what you have made"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.arrange"
+msgstr "Save your screen"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.ask"
 msgstr "Ask a question"
 
@@ -9728,6 +9855,10 @@ msgid "welcome.step.bar"
 msgstr "Move the bar to the bottom"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.collection"
+msgstr "Start a collection"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.command"
 msgstr "Open the command line"
 
@@ -9735,6 +9866,15 @@ msgstr "Open the command line"
 #. js-lingui-explicit-id
 msgid "welcome.step.commandHow"
 msgstr "{keys} then {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.compare"
+msgstr "Compare their answers"
+
+#. {quote} is quote:reply and {command} is compare:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.step.compareHow"
+msgstr "{quote} in each answer, then {command}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id
@@ -9763,6 +9903,19 @@ msgid "welcome.step.nameHow"
 msgstr "{command}, the room’s number then its name"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.noteQuotes"
+msgstr "Write a note that quotes them"
+
+#. {command} is note:"…", which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.noteQuotesHow"
+msgstr "select the cards, then {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.passage"
+msgstr "Highlight a passage"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.pop"
 msgstr "Pop a board into its own window"
 
@@ -9776,6 +9929,15 @@ msgid "welcome.step.sendHow"
 msgstr "{command} and a prompt, with an edit waiting"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.sources"
+msgstr "Ask two sources at once"
+
+#. {command} is p>, which stays English. The menu opens from who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "welcome.step.sourcesHow"
+msgstr "{command}, then tick two in the menu of who answers"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.strike"
 msgstr "Strike through a line"
 
@@ -9783,6 +9945,15 @@ msgstr "Strike through a line"
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr "select words in a reply, then {keys}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.summary"
+msgstr "Summarize them"
+
+#. {command} is summarize:, which stays English. The one step that spends tokens
+#. js-lingui-explicit-id
+msgid "welcome.step.summaryHow"
+msgstr "{command}, optional, with an AI API key"
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id

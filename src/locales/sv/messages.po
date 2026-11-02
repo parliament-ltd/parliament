@@ -1205,6 +1205,16 @@ msgstr "visa"
 msgid "chat.thoughtUntimed"
 msgstr "tänkte först"
 
+#. After a line of an answer from a source that is the title of a page it links to; an arrow follows it
+#. js-lingui-explicit-id
+msgid "chat.titleAsk"
+msgstr "fråga"
+
+#. {title} is the title of a page the answer links to
+#. js-lingui-explicit-id
+msgid "chat.titleAskHelp"
+msgstr "Skriv ”{title}” i fältet som din nästa prompt. Enter skickar den"
+
 #. A tell: note the prompt carried, in the words of the person (C225 (d))
 #. js-lingui-explicit-id
 msgid "chat.toldNote"
@@ -1476,6 +1486,11 @@ msgstr "Ingen samling än. new:collection skapar en."
 msgid "collection.noneMatch"
 msgstr "Inget i samlingen matchar."
 
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "collection.noneMatchFiltered"
+msgstr "Inget här matchar sökningen och filtren. clear:filters tar bort dem."
+
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "Chatten i rummet, {num}, finns inte i den här samlingen"
@@ -1494,6 +1509,11 @@ msgstr "Ett klick skriver add: eller rm: i fältet. Numren styr ordningen efter 
 #. js-lingui-explicit-id
 msgid "collection.pickHelp"
 msgstr "Skriver {command} i fältet"
+
+#. After a pinned collection’s name in the line of collections (C287)
+#. js-lingui-explicit-id
+msgid "collection.pinned"
+msgstr "fäst"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
@@ -1562,6 +1582,10 @@ msgstr "Välj kort att arbeta med, eller arbeta med hela samlingen."
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
 msgstr "Visar den, som open:\"{name}\" gör"
+
+#. js-lingui-explicit-id
+msgid "collection.shown"
+msgstr "{count, plural, =0 {inga kort visas} one {# kort visas} other {# kort visas}}"
 
 #. js-lingui-explicit-id
 msgid "collection.source"
@@ -2436,6 +2460,10 @@ msgid "enter.collectionNotIn"
 msgstr "{count, plural, one {{nums} finns inte i {name}} other {{nums} finns inte i {name}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionOrderYours"
+msgstr "Korten är redan i din ordning"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionRm"
 msgstr "Enter tar ut {nums} ur {name}. Sakerna själva ligger kvar"
 
@@ -2446,6 +2474,10 @@ msgstr "{sort, select, yours {Enter visar din ordning} source {Enter grupperar k
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
 msgstr "{kind, select, term {Enter visar markeringarna} quote {Enter visar citaten} note {Enter visar anteckningarna} other {Enter visar markeringarna}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTabAll"
+msgstr "Enter visar alla sorters kort"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2759,6 +2791,14 @@ msgid "enter.eraseUndo"
 msgstr "{count, plural, one {Ångra kan inte ta tillbaka den och går inte förbi raderingen} other {Ångra kan inte ta tillbaka dem och går inte förbi raderingen}}"
 
 #. js-lingui-explicit-id
+msgid "enter.exportCardsOut"
+msgstr "{count, plural, one {# kort som visas lämnas utanför: bara anteckningar, markeringar och citat exporteras} other {# kort som visas lämnas utanför: bara anteckningar, markeringar och citat exporteras}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportCollection"
+msgstr "{count, plural, one {Enter laddar ned # kort ur {name} som {format}: {file}} other {Enter laddar ned # kort ur {name} som {format}: {file}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.exported"
 msgstr "Laddade ned {file}"
 
@@ -2798,6 +2838,10 @@ msgstr "{count, plural, one {Enter använder # filter} other {Enter använder # 
 #. js-lingui-explicit-id
 msgid "enter.filterShows"
 msgstr "{count, plural, =0 {Enter visar inga rader} one {Enter visar # rad} other {Enter visar # rader}}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterShowsCards"
+msgstr "{count, plural, =0 {Enter visar inga kort} one {Enter visar # kort} other {Enter visar # kort}}"
 
 #. js-lingui-explicit-id
 msgid "enter.filterSince"
@@ -3008,6 +3052,10 @@ msgid "enter.goWelcome"
 msgstr "Enter tar fram välkomstsidan och dess steg bredvid det som visas"
 
 #. js-lingui-explicit-id
+msgid "enter.goWelcomeAdvanced"
+msgstr "Enter tar fram välkomstsidan bredvid det som visas, med den andra listan"
+
+#. js-lingui-explicit-id
 msgid "enter.headingAfter"
 msgstr "Enter lägger till rubriken {heading} efter {num}"
 
@@ -3203,20 +3251,45 @@ msgstr "Inget rum heter {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectHighlights"
-msgstr ""
+msgstr "{count, plural, one {Enter listar markeringen i det här rummets chatt, här} other {Enter listar de # markeringarna i det här rummets chatt, här}}"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectHighlightsNone"
-msgstr ""
+msgstr "Det här rummets chatt har inga markeringar än. Markera ord i ett svar och välj sedan en färg"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.inspectNoRoom"
-msgstr ""
+msgstr "Inget rum visas. room: tar tillbaka ett"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter visar {num} i detalj, här"
+
+#. js-lingui-explicit-id
+msgid "enter.installAlready"
+msgstr "Det här är Parliament, redan installerat som app"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.installDismissed"
+msgstr "Inte installerat. install: frågar igen när webbläsaren erbjuder det"
+
+#. js-lingui-explicit-id
+msgid "enter.installDone"
+msgstr "Installerat. Parliament öppnas som en app från och med nu, med allt du har här"
+
+#. js-lingui-explicit-id
+msgid "enter.installGo"
+msgstr "Enter ber webbläsaren installera Parliament som en app på den här datorn"
+
+#. js-lingui-explicit-id
+msgid "enter.installNotOffered"
+msgstr "Den här webbläsaren har inte erbjudit att installera Parliament här. Där det går kan webbplatsen installeras, eller läggas till i Dock, från webbläsarens egen meny"
+
+#. js-lingui-explicit-id
+msgid "enter.installSame"
+msgstr "Appen och den här sidan delar allt: dina chattar, nycklar och säkerhetskopior"
 
 #. room and collection stay English: they are words of the command
 #. js-lingui-explicit-id
@@ -3737,11 +3810,11 @@ msgstr "Att öppna den här kommer senare. inspect:{num} visar den nu"
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr ""
+msgstr "{num} är en fristående anteckning, utan någon chatt att öppna. Enter visar den under fältet"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
-msgstr ""
+msgstr "Enter öppnar chatten som {num} finns i, på rätt ställe"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -3860,12 +3933,20 @@ msgid "enter.openWhichSaved"
 msgstr "Fler än en sparad sökning börjar så: {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.pinCollection"
+msgstr "Enter fäster samlingen {name} överst bland samlingarna"
+
+#. js-lingui-explicit-id
 msgid "enter.pinOff"
 msgstr "Enter lossar {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.pinOn"
 msgstr "Enter fäster {nums} överst"
+
+#. js-lingui-explicit-id
+msgid "enter.pinWhich"
+msgstr "Fler än en samling börjar så: {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.placeCramped"
@@ -4153,7 +4234,7 @@ msgstr "Det öppnas som ett vanligt fönster, eftersom den här webbläsaren int
 
 #. js-lingui-explicit-id
 msgid "enter.popSettingsAt"
-msgstr ""
+msgstr "Enter lägger {board} i ett eget fönster, vid avsnittet {section}"
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4890,12 +4971,12 @@ msgstr "Det senaste rummet finns redan här"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.roomNameNone"
-msgstr ""
+msgstr "Ingen chatt heter ”{name}”. records: listar dem efter namn"
 
 #. {nums} is a list of numbers
 #. js-lingui-explicit-id
 msgid "enter.roomNameWhich"
-msgstr ""
+msgstr "Flera chattar heter ”{name}”: {nums}. Öppna en med dess nummer"
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5753,6 +5834,15 @@ msgstr "Dina promptar går redan dit"
 msgid "enter.toSome"
 msgstr "Enter skickar dina nästa promptar till {nums}, som var och en fortsätter sin egen gren, tills du ändrar det"
 
+#. tour: stays English
+#. js-lingui-explicit-id
+msgid "enter.tourAdvanced"
+msgstr "Enter visar den andra listan. tour: tar tillbaka den första"
+
+#. js-lingui-explicit-id
+msgid "enter.tourAdvancedHere"
+msgstr "Den andra listan finns redan här"
+
 #. js-lingui-explicit-id
 msgid "enter.tourHere"
 msgstr "Stegen finns redan här"
@@ -5921,6 +6011,10 @@ msgstr "Inget kommando heter {verb}. Skriv ? för alla kommandon"
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
 msgstr "Inget kommando heter {verb}. Enter visar alla kommandon"
+
+#. js-lingui-explicit-id
+msgid "enter.unpinCollection"
+msgstr "Enter lossar samlingen {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.untag"
@@ -6539,7 +6633,7 @@ msgstr "skapad {day}"
 #. {num} is the chat's number
 #. js-lingui-explicit-id
 msgid "inspect.highlights"
-msgstr ""
+msgstr "Markeringar i {num}"
 
 #. js-lingui-explicit-id
 msgid "inspect.label"
@@ -6548,7 +6642,7 @@ msgstr "{num} i detalj"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.listFoot"
-msgstr ""
+msgstr "Ett klick skriver jump: för en av dem. Escape stänger det här"
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7168,15 +7262,15 @@ msgstr "Skriver {command} i fältet"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "line.items"
-msgstr ""
+msgstr "I Registret: fäst en chatt, tagga två saker och lägg undan en tredje. undo: tar tillbaka hela raden"
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr ""
+msgstr "Öppna Registret, stäng Biblioteket, lägg Samlingen på din andra skärm och spara alltihop under namnet review"
 
 #. js-lingui-explicit-id
 msgid "line.records"
-msgstr ""
+msgstr "I Registret: chattar taggade med essay från de senaste sju dagarna, de äldsta först"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9384,6 +9478,10 @@ msgid "verb.inspect"
 msgstr "Titta på en sak i detalj, där du är"
 
 #. js-lingui-explicit-id
+msgid "verb.install"
+msgstr "Installera Parliament som en app på den här datorn, där webbläsaren kan. Ditt arbete förblir detsamma"
+
+#. js-lingui-explicit-id
 msgid "verb.jump"
 msgstr "Rulla till ett nummer på den här tavlan"
 
@@ -9405,7 +9503,7 @@ msgstr "Läs det senaste brevet från den som gör Parliament, ett brev efter nu
 
 #. js-lingui-explicit-id
 msgid "verb.library"
-msgstr "Ta fram Biblioteket bredvid det som visas, eller en av dess hyllor"
+msgstr "Ta fram Biblioteket bredvid det som visas"
 
 #. js-lingui-explicit-id
 msgid "verb.local"
@@ -9615,6 +9713,26 @@ msgstr "Låt modellen söka på webben, bara för din nästa prompt"
 msgid "verb.width"
 msgstr "Välj hur stor del av bredden en tavla tar, eller ställ tillbaka alla bredder"
 
+#. A heading in the second list of steps: keeping and quoting what was found
+#. js-lingui-explicit-id
+msgid "welcome.advanced.collection"
+msgstr "Samlingen"
+
+#. A heading in the second list of steps: asking several at once
+#. js-lingui-explicit-id
+msgid "welcome.advanced.sources"
+msgstr "Källor"
+
+#. A heading in the second list of steps: shaping the screen
+#. js-lingui-explicit-id
+msgid "welcome.advanced.space"
+msgstr "Utrymmet"
+
+#. The name of the second list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.advancedSteps"
+msgstr "Fler saker att prova"
+
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
@@ -9632,6 +9750,11 @@ msgstr "MIT-licens, källkoden på GitHub"
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"
 msgstr "Skapat med Claude Code"
+
+#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. js-lingui-explicit-id
+msgid "welcome.further"
+msgstr "eller gå vidare"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"
@@ -9710,6 +9833,10 @@ msgid "welcome.step.almanac"
 msgstr "Se vad du har skapat"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.arrange"
+msgstr "Spara skärmen som den är"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.ask"
 msgstr "Ställ en fråga"
 
@@ -9728,6 +9855,10 @@ msgid "welcome.step.bar"
 msgstr "Flytta fältet längst ned"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.collection"
+msgstr "Starta en samling"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.command"
 msgstr "Öppna kommandoraden"
 
@@ -9735,6 +9866,15 @@ msgstr "Öppna kommandoraden"
 #. js-lingui-explicit-id
 msgid "welcome.step.commandHow"
 msgstr "{keys} och sedan {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.compare"
+msgstr "Jämför deras svar"
+
+#. {quote} is quote:reply and {command} is compare:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.step.compareHow"
+msgstr "{quote} i varje svar och sedan {command}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id
@@ -9763,6 +9903,19 @@ msgid "welcome.step.nameHow"
 msgstr "{command}, rummets nummer och sedan dess namn"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.noteQuotes"
+msgstr "Skriv en anteckning som citerar dem"
+
+#. {command} is note:"…", which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.noteQuotesHow"
+msgstr "välj korten och sedan {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.passage"
+msgstr "Markera ett textavsnitt"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.pop"
 msgstr "Lägg en tavla i ett eget fönster"
 
@@ -9776,6 +9929,15 @@ msgid "welcome.step.sendHow"
 msgstr "{command} och en prompt, med en redigering som väntar"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.sources"
+msgstr "Fråga två källor samtidigt"
+
+#. {command} is p>, which stays English. The menu opens from who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "welcome.step.sourcesHow"
+msgstr "{command} och kryssa sedan i två i menyn över vem som svarar"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.strike"
 msgstr "Stryk igenom en rad"
 
@@ -9783,6 +9945,15 @@ msgstr "Stryk igenom en rad"
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr "markera ord i ett svar och tryck sedan {keys}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.summary"
+msgstr "Sammanfatta dem"
+
+#. {command} is summarize:, which stays English. The one step that spends tokens
+#. js-lingui-explicit-id
+msgid "welcome.step.summaryHow"
+msgstr "{command}, valfritt, med en API-nyckel för AI"
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id

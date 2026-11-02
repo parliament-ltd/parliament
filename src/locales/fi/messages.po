@@ -1205,6 +1205,16 @@ msgstr "näytä"
 msgid "chat.thoughtUntimed"
 msgstr "mietti ensin"
 
+#. After a line of an answer from a source that is the title of a page it links to; an arrow follows it
+#. js-lingui-explicit-id
+msgid "chat.titleAsk"
+msgstr "kysy"
+
+#. {title} is the title of a page the answer links to
+#. js-lingui-explicit-id
+msgid "chat.titleAskHelp"
+msgstr "Kirjoita ”{title}” palkkiin seuraavaksi kehotteeksesi. Enter lähettää sen"
+
 #. A tell: note the prompt carried, in the words of the person (C225 (d))
 #. js-lingui-explicit-id
 msgid "chat.toldNote"
@@ -1476,6 +1486,11 @@ msgstr "Ei vielä kokoelmia. new:collection luo sellaisen."
 msgid "collection.noneMatch"
 msgstr "Tässä kokoelmassa ei ole osumia."
 
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "collection.noneMatchFiltered"
+msgstr "Täällä ei ole osumia tällä haulla ja näillä suodattimilla. clear:filters poistaa ne."
+
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "Huoneen keskustelu {num} ei ole tässä kokoelmassa"
@@ -1494,6 +1509,11 @@ msgstr "Napsautus kirjoittaa palkkiin add: tai rm:. Numerot määräävät järj
 #. js-lingui-explicit-id
 msgid "collection.pickHelp"
 msgstr "Kirjoittaa palkkiin {command}"
+
+#. After a pinned collection’s name in the line of collections (C287)
+#. js-lingui-explicit-id
+msgid "collection.pinned"
+msgstr "kiinnitetty"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
@@ -1562,6 +1582,10 @@ msgstr "Valitse kortteja käsitelläksesi niitä, tai käsittele koko kokoelmaa.
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
 msgstr "Näyttää sen, kuten open:\"{name}\""
+
+#. js-lingui-explicit-id
+msgid "collection.shown"
+msgstr "{count, plural, =0 {ei kortteja näkyvissä} one {# kortti näkyvissä} other {# korttia näkyvissä}}"
 
 #. js-lingui-explicit-id
 msgid "collection.source"
@@ -2436,6 +2460,10 @@ msgid "enter.collectionNotIn"
 msgstr "{count, plural, one {{nums} ei ole kokoelmassa {name}} other {{nums} eivät ole kokoelmassa {name}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionOrderYours"
+msgstr "Kortit ovat jo omassa järjestyksessäsi"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionRm"
 msgstr "Enter poistaa kokoelmasta {name}: {nums}. Itse kohteet säilyvät"
 
@@ -2446,6 +2474,10 @@ msgstr "{sort, select, yours {Enter näyttää oman järjestyksesi} source {Ente
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
 msgstr "{kind, select, term {Enter näyttää korostukset} quote {Enter näyttää lainaukset} note {Enter näyttää muistiinpanot} other {Enter näyttää korostukset}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTabAll"
+msgstr "Enter näyttää kaikenlaiset kortit"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2759,6 +2791,14 @@ msgid "enter.eraseUndo"
 msgstr "{count, plural, one {Kumoaminen ei voi palauttaa sitä vaan pysähtyy tähän} other {Kumoaminen ei voi palauttaa niitä vaan pysähtyy tähän}}"
 
 #. js-lingui-explicit-id
+msgid "enter.exportCardsOut"
+msgstr "{count, plural, one {# näkyvä kortti jää pois: vain muistiinpanot, korostukset ja lainaukset viedään} other {# näkyvää korttia jää pois: vain muistiinpanot, korostukset ja lainaukset viedään}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportCollection"
+msgstr "{count, plural, one {Enter lataa kokoelmasta {name} # kortin muodossa {format}: {file}} other {Enter lataa kokoelmasta {name} # korttia muodossa {format}: {file}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.exported"
 msgstr "Ladattu: {file}"
 
@@ -2798,6 +2838,10 @@ msgstr "{count, plural, one {Enter ottaa käyttöön # suodattimen} other {Enter
 #. js-lingui-explicit-id
 msgid "enter.filterShows"
 msgstr "{count, plural, =0 {Enter ei näytä yhtään riviä} one {Enter näyttää # rivin} other {Enter näyttää # riviä}}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterShowsCards"
+msgstr "{count, plural, =0 {Enter ei näytä yhtään korttia} one {Enter näyttää # kortin} other {Enter näyttää # korttia}}"
 
 #. js-lingui-explicit-id
 msgid "enter.filterSince"
@@ -3008,6 +3052,10 @@ msgid "enter.goWelcome"
 msgstr "Enter tuo tervetulosivun vaiheineen näkyvien rinnalle"
 
 #. js-lingui-explicit-id
+msgid "enter.goWelcomeAdvanced"
+msgstr "Enter tuo tervetulosivun näkyvien rinnalle ja näyttää sen toisen listan"
+
+#. js-lingui-explicit-id
 msgid "enter.headingAfter"
 msgstr "Enter lisää otsikon {heading} kohteen {num} jälkeen"
 
@@ -3203,20 +3251,45 @@ msgstr "Huonetta {name} ei ole"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectHighlights"
-msgstr ""
+msgstr "{count, plural, one {Enter näyttää tässä tämän huoneen keskustelun korostuksen} other {Enter listaa tässä tämän huoneen keskustelun # korostusta}}"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectHighlightsNone"
-msgstr ""
+msgstr "Tämän huoneen keskustelussa ei ole vielä korostuksia. Valitse sanoja vastauksesta ja poimi sitten väri"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.inspectNoRoom"
-msgstr ""
+msgstr "Näytöllä ei ole huonetta. room: tuo huoneen takaisin"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter näyttää kohteen {num} tiedot tässä"
+
+#. js-lingui-explicit-id
+msgid "enter.installAlready"
+msgstr "Tämä on jo sovellukseksi asennettu Parliament"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.installDismissed"
+msgstr "Ei asennettu. install: kysyy uudelleen, kun selain tarjoaa asennusta"
+
+#. js-lingui-explicit-id
+msgid "enter.installDone"
+msgstr "Asennettu. Parliament avautuu tästä lähtien sovelluksena, ja kaikki täällä oleva on mukana"
+
+#. js-lingui-explicit-id
+msgid "enter.installGo"
+msgstr "Enter pyytää selainta asentamaan Parliamentin sovellukseksi tälle koneelle"
+
+#. js-lingui-explicit-id
+msgid "enter.installNotOffered"
+msgstr "Tämä selain ei ole tarjonnut Parliamentin asentamista täällä. Jos selain pystyy siihen, sen omassa valikossa voi asentaa sivuston tai lisätä sen Dockiin"
+
+#. js-lingui-explicit-id
+msgid "enter.installSame"
+msgstr "Sovellus ja tämä sivu jakavat kaiken: keskustelusi, avaimesi ja varmuuskopiosi"
 
 #. room and collection stay English: they are words of the command
 #. js-lingui-explicit-id
@@ -3737,11 +3810,11 @@ msgstr "Tämän avaaminen tulee myöhemmin. inspect:{num} näyttää sen nyt"
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr ""
+msgstr "{num} on erillinen muistiinpano, eikä sillä ole avattavaa keskustelua. Enter näyttää sen palkin alla"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
-msgstr ""
+msgstr "Enter avaa kohteen {num} keskustelun siitä kohdasta, jossa se on"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -3860,12 +3933,20 @@ msgid "enter.openWhichSaved"
 msgstr "Useampi tallennettu haku alkaa noin: {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.pinCollection"
+msgstr "Enter kiinnittää kokoelman {name} kokoelmien kärkeen"
+
+#. js-lingui-explicit-id
 msgid "enter.pinOff"
 msgstr "Enter irrottaa kiinnityksen: {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.pinOn"
 msgstr "Enter kiinnittää ylös: {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.pinWhich"
+msgstr "Useamman kokoelman nimi alkaa noin: {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.placeCramped"
@@ -4153,7 +4234,7 @@ msgstr "Se avautuu tavallisena ikkunana, koska tämä selain ei voi pitää ikku
 
 #. js-lingui-explicit-id
 msgid "enter.popSettingsAt"
-msgstr ""
+msgstr "Enter siirtää taulun {board} omaan ikkunaansa ja avaa sen kohdasta {section}"
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4890,12 +4971,12 @@ msgstr "Viimeisin huone on jo täällä"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.roomNameNone"
-msgstr ""
+msgstr "Mikään keskustelu ei ole nimeltään ”{name}”. records: näyttää keskustelut nimineen"
 
 #. {nums} is a list of numbers
 #. js-lingui-explicit-id
 msgid "enter.roomNameWhich"
-msgstr ""
+msgstr "Usean keskustelun nimi on ”{name}”: {nums}. Avaa yksi niistä sen numerolla"
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5753,6 +5834,15 @@ msgstr "Kehotteesi menevät jo sinne"
 msgid "enter.toSome"
 msgstr "Enter lähettää seuraavat kehotteesi haaroihin {nums}, ja kukin jatkaa omaa haaraansa, kunnes toisin valitaan"
 
+#. tour: stays English
+#. js-lingui-explicit-id
+msgid "enter.tourAdvanced"
+msgstr "Enter näyttää toisen listan. tour: tuo ensimmäisen takaisin"
+
+#. js-lingui-explicit-id
+msgid "enter.tourAdvancedHere"
+msgstr "Toinen lista on jo täällä"
+
 #. js-lingui-explicit-id
 msgid "enter.tourHere"
 msgstr "Vaiheet ovat jo täällä"
@@ -5921,6 +6011,10 @@ msgstr "Komentoa {verb} ei ole. Kirjoita ? nähdäksesi kaikki komennot"
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
 msgstr "Komentoa {verb} ei ole. Enter näyttää kaikki komennot"
+
+#. js-lingui-explicit-id
+msgid "enter.unpinCollection"
+msgstr "Enter irrottaa kokoelman {name} kiinnityksen"
 
 #. js-lingui-explicit-id
 msgid "enter.untag"
@@ -6539,7 +6633,7 @@ msgstr "luotu {day}"
 #. {num} is the chat's number
 #. js-lingui-explicit-id
 msgid "inspect.highlights"
-msgstr ""
+msgstr "Korostukset keskustelussa {num}"
 
 #. js-lingui-explicit-id
 msgid "inspect.label"
@@ -6548,7 +6642,7 @@ msgstr "Kohteen {num} tiedot"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.listFoot"
-msgstr ""
+msgstr "Napsauta yhtä, niin palkkiin tulee komento jump: sen numerolla. Escape sulkee tämän"
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7168,15 +7262,15 @@ msgstr "Kirjoittaa palkkiin {command}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "line.items"
-msgstr ""
+msgstr "Luettelossa: kiinnitä keskustelu, lisää tunniste kahteen kohteeseen ja siirrä kolmas syrjään. undo: kumoaa koko rivin"
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr ""
+msgstr "Avaa Luettelo, sulje Kirjasto, siirrä Kokoelma toiselle näytöllesi ja tallenna kaikki nimellä review"
 
 #. js-lingui-explicit-id
 msgid "line.records"
-msgstr ""
+msgstr "Luettelossa: keskustelut, joilla on tunniste essay, viimeisen seitsemän päivän ajalta, vanhimmat ensin"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9384,6 +9478,10 @@ msgid "verb.inspect"
 msgstr "Tarkastele yhtä kohdetta tarkemmin siellä, missä olet"
 
 #. js-lingui-explicit-id
+msgid "verb.install"
+msgstr "Asenna Parliament sovellukseksi tälle koneelle, jos selain pystyy siihen. Työsi säilyy ennallaan"
+
+#. js-lingui-explicit-id
 msgid "verb.jump"
 msgstr "Vieritä numeroon tässä taulussa"
 
@@ -9405,7 +9503,7 @@ msgstr "Lue Parliamentin tekijän uusin kirje, tietty kirje sen numerolla tai ki
 
 #. js-lingui-explicit-id
 msgid "verb.library"
-msgstr "Tuo Kirjasto tai sen yksi hylly näkyvien rinnalle"
+msgstr "Tuo Kirjasto näkyvien rinnalle"
 
 #. js-lingui-explicit-id
 msgid "verb.local"
@@ -9615,6 +9713,26 @@ msgstr "Anna mallin hakea verkosta vain seuraavaa kehotettasi varten"
 msgid "verb.width"
 msgstr "Valitse, kuinka paljon leveydestä taulu vie, tai palauta kaikki leveydet"
 
+#. A heading in the second list of steps: keeping and quoting what was found
+#. js-lingui-explicit-id
+msgid "welcome.advanced.collection"
+msgstr "Kokoelma"
+
+#. A heading in the second list of steps: asking several at once
+#. js-lingui-explicit-id
+msgid "welcome.advanced.sources"
+msgstr "Lähteet"
+
+#. A heading in the second list of steps: shaping the screen
+#. js-lingui-explicit-id
+msgid "welcome.advanced.space"
+msgstr "Työtila"
+
+#. The name of the second list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.advancedSteps"
+msgstr "Lisää kokeiltavia asioita"
+
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
@@ -9632,6 +9750,11 @@ msgstr "MIT-lisenssi, lähdekoodi GitHubissa"
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"
 msgstr "Tehty Claude Code -työkalulla"
+
+#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. js-lingui-explicit-id
+msgid "welcome.further"
+msgstr "tai jatka pidemmälle"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"
@@ -9710,6 +9833,10 @@ msgid "welcome.step.almanac"
 msgstr "Katso, mitä olet tehnyt"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.arrange"
+msgstr "Tallenna näkymäsi"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.ask"
 msgstr "Esitä kysymys"
 
@@ -9728,6 +9855,10 @@ msgid "welcome.step.bar"
 msgstr "Siirrä palkki alas"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.collection"
+msgstr "Aloita kokoelma"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.command"
 msgstr "Avaa komentorivi"
 
@@ -9735,6 +9866,15 @@ msgstr "Avaa komentorivi"
 #. js-lingui-explicit-id
 msgid "welcome.step.commandHow"
 msgstr "{keys} ja sitten {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.compare"
+msgstr "Vertaa niiden vastauksia"
+
+#. {quote} is quote:reply and {command} is compare:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.step.compareHow"
+msgstr "{quote} kummassakin vastauksessa ja sitten {command}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id
@@ -9763,6 +9903,19 @@ msgid "welcome.step.nameHow"
 msgstr "{command}, huoneen numero ja sitten sen nimi"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.noteQuotes"
+msgstr "Kirjoita muistiinpano, joka lainaa niitä"
+
+#. {command} is note:"…", which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.noteQuotesHow"
+msgstr "valitse kortit ja sitten {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.passage"
+msgstr "Korosta tekstikohta"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.pop"
 msgstr "Siirrä taulu omaan ikkunaansa"
 
@@ -9776,6 +9929,15 @@ msgid "welcome.step.sendHow"
 msgstr "{command} ja kehote, kun muokkaus odottaa"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.sources"
+msgstr "Kysy kahdelta lähteeltä yhtä aikaa"
+
+#. {command} is p>, which stays English. The menu opens from who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "welcome.step.sourcesHow"
+msgstr "{command} ja valitse sitten vastaajavalikosta kaksi"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.strike"
 msgstr "Yliviivaa rivi"
 
@@ -9783,6 +9945,15 @@ msgstr "Yliviivaa rivi"
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr "valitse sanoja vastauksesta ja paina sitten {keys}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.summary"
+msgstr "Tee niistä yhteenveto"
+
+#. {command} is summarize:, which stays English. The one step that spends tokens
+#. js-lingui-explicit-id
+msgid "welcome.step.summaryHow"
+msgstr "{command} halutessasi, tekoälyn API-avaimella"
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id

@@ -358,3 +358,24 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - "Lines of several commands" → 複数のコマンドを並べた行, as レイアウトのコマンドを並べた行.
 - "your second screen" → 2台目のディスプレイ.
 - the bar's window → バーのウインドウ; top, bottom, left, right, centre of its screen → ディスプレイの上端, 下端, 左端, 右端, 中央.
+
+## Words of 2 November 2026, second batch (C287)
+
+- `chat.titleAsk`: "ask" here asks the page title as a prompt, so it is 尋ねる (as verb.again's もう一度尋ねる), not 依頼, which the glossary keeps for ask:.
+- `welcome.advanced.space`: スペース for "Space" (shaping the screen). 画面 is plainer and matches the glossary's screen, but drops the English's wider sense.
+- `welcome.further`: または、さらに先へ is a little bare as a link. または、もっと試してみる says what the click gives.
+- `enter.installDismissed`: "install: asks again when the browser offers it" is install: でもう一度確認できます (ブラウザが提示できるときに). It turns "asks again" into "you can ask again".
+- `enter.installNotOffered`: "add it to the dock" is Dockに追加, the wording Safari uses in Japanese. The dock is a Mac thing, so other systems' readers may wonder.
+- `line.layout`, `line.items`, `line.records`: review and essay stay English, because the example line beside them is not translated, as in the first batch. "Put a third away" (archive:) is しまう, as verb.archive has it. アーカイブする would match the command.
+- `collection.shown`, `enter.filterShowsCards`, `enter.exportCardsOut`, `enter.exportCollection`, `enter.inspectHighlights`: `one` collapses to `other` and `=0` is kept, as collection.count has it. inspect's one case ("the highlight") reads as ハイライト1件.
+- `welcome.step.passage`: 箇所をハイライトする follows the glossary's passage → 箇所, but it reads a little abstract on its own. 文章の一部をハイライトする is the alternative.
+- `inspect.listFoot`: "for one" is その項目への jump:, so it holds for any list, not only highlights.
+
+### New terms
+
+- install (install:) → インストール; as an app → アプリとして; the browser offers it → ブラウザが提示する; installed → インストールしました.
+- pinned (a collection, a label) → ピン留め済み; at the top of the collections → コレクションの先頭に.
+- the second list (tour:advanced) → 2つ目の一覧, as verb.tour; More things to try → さらに試してみること.
+- cards shown → 表示中のカード, カード#枚を表示中.
+- ask (the link after a page title) → 尋ねる.
+- tick (in a menu) → チェックを入れる; the menu of who answers → 答えるものを選ぶメニュー.

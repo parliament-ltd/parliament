@@ -333,3 +333,22 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 - the top (bottom, left, right, centre) of its screen → näytön yläreunaan (alareunaan, vasempaan reunaan, oikeaan reunaan, keskelle). Where the browser allows it → jos selain sallii sen.
 - Lines of several commands → Usean komennon rivit.
 - Every browser compared → Kaikkien selainten vertailu.
+
+## Words of 2 November 2026, second batch (C287)
+
+- `line.layout`, `line.records`, `line.items`: "review" and "essay" stay English. The example command beside each line (in `src/commands/verbs.js`) is not translated, as in the first batch.
+- `welcome.advanced.space`: "Space" is rendered as Työtila, following the letter's "työtila on sinun". Plain "Tila" also reads as state or mode.
+- `inspect.listFoot`: "A click writes jump: for one" became "Napsauta yhtä, niin palkkiin tulee komento jump: sen numerolla", which says what lands in the bar rather than following the English closely.
+- `enter.installNotOffered`: "the dock" is rendered as "Dockiin", keeping the Mac's name, lower case "dock" in the English notwithstanding. Plain "telakkaan" would need checking against the system's own Finnish.
+- `welcome.step.summaryHow`: "optional" is rendered as "halutessasi" (if you wish), not "vapaaehtoinen".
+- `welcome.step.compareHow`: "in each answer" is rendered as "kummassakin" (in each of the two), since the step asks two sources.
+- `enter.inspectHighlights`: "lists" is rendered as "näyttää" for one highlight and "listaa" for several. "luettelee" was avoided so it does not echo Luettelo, the Records board.
+
+### New terms
+- second list (tour:advanced) → toinen lista. "More things to try" → Lisää kokeiltavia asioita. "or go further" → tai jatka pidemmälle.
+- install as an app → asentaa sovellukseksi. Installed → Asennettu. "the browser offers it" → selain tarjoaa asennusta.
+- the menu of who answers → vastaajavalikko, from vastaaja in the glossary.
+- pinned (a collection) → kiinnitetty. "at the top of the collections" → kokoelmien kärkeen. Unpin → irrottaa kiinnitys.
+- a card shown → näkyvä kortti, # korttia näkyvissä.
+- at {section} (pop:settings) → avaa sen kohdasta {section}, as in enter.openSettingsAt.
+- "Save your screen" → Tallenna näkymäsi. Screen as an arrangement is näkymä, as in enter.resetArrangement. Näyttö stays for the display.

@@ -1205,6 +1205,16 @@ msgstr "显示"
 msgid "chat.thoughtUntimed"
 msgstr "已先思考"
 
+#. After a line of an answer from a source that is the title of a page it links to; an arrow follows it
+#. js-lingui-explicit-id
+msgid "chat.titleAsk"
+msgstr "追问"
+
+#. {title} is the title of a page the answer links to
+#. js-lingui-explicit-id
+msgid "chat.titleAskHelp"
+msgstr "把“{title}”作为下一条提示词写入输入栏。按 Enter 即可发送"
+
 #. A tell: note the prompt carried, in the words of the person (C225 (d))
 #. js-lingui-explicit-id
 msgid "chat.toldNote"
@@ -1476,6 +1486,11 @@ msgstr "还没有合集。用 new:collection 新建一个。"
 msgid "collection.noneMatch"
 msgstr "此合集中没有匹配项。"
 
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "collection.noneMatchFiltered"
+msgstr "这里没有与搜索和筛选条件匹配的内容。clear:filters 可移除筛选条件。"
+
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "房间中的对话 {num} 不在此合集中"
@@ -1494,6 +1509,11 @@ msgstr "点击会在输入栏中写入 add: 或 rm:。按来源排列时，顺�
 #. js-lingui-explicit-id
 msgid "collection.pickHelp"
 msgstr "在输入栏中写入 {command}"
+
+#. After a pinned collection’s name in the line of collections (C287)
+#. js-lingui-explicit-id
+msgid "collection.pinned"
+msgstr "已置顶"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
@@ -1562,6 +1582,10 @@ msgstr "选择卡片后可对其操作，也可以对整个合集操作。"
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
 msgstr "显示它，效果与 open:\"{name}\" 相同"
+
+#. js-lingui-explicit-id
+msgid "collection.shown"
+msgstr "{count, plural, =0 {未显示卡片} other {已显示 # 张卡片}}"
 
 #. js-lingui-explicit-id
 msgid "collection.source"
@@ -2436,6 +2460,10 @@ msgid "enter.collectionNotIn"
 msgstr "{count, plural, other {{nums} 不在“{name}”中}}"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionOrderYours"
+msgstr "卡片已经按自定顺序排列"
+
+#. js-lingui-explicit-id
 msgid "enter.collectionRm"
 msgstr "按 Enter 将 {nums} 移出“{name}”。内容本身会保留"
 
@@ -2446,6 +2474,10 @@ msgstr "{sort, select, yours {按 Enter 以自定顺序显示} source {按 Enter
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
 msgstr "{kind, select, term {按 Enter 显示高亮} quote {按 Enter 显示摘录} note {按 Enter 显示笔记} other {按 Enter 显示高亮}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTabAll"
+msgstr "按 Enter 显示所有类型的卡片"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2759,6 +2791,14 @@ msgid "enter.eraseUndo"
 msgstr "{count, plural, other {撤销无法将其恢复，也不能越过这一步继续撤销}}"
 
 #. js-lingui-explicit-id
+msgid "enter.exportCardsOut"
+msgstr "{count, plural, other {已显示的卡片中有 # 张不包含在内：只导出笔记、高亮和摘录}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportCollection"
+msgstr "{count, plural, other {按 Enter 将“{name}”中的 # 张卡片下载为 {format}：{file}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.exported"
 msgstr "已下载 {file}"
 
@@ -2798,6 +2838,10 @@ msgstr "{count, plural, other {按 Enter 应用 # 个筛选条件}}"
 #. js-lingui-explicit-id
 msgid "enter.filterShows"
 msgstr "{count, plural, =0 {按 Enter 后没有可显示的行} other {按 Enter 显示 # 行}}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterShowsCards"
+msgstr "{count, plural, =0 {按 Enter 后没有可显示的卡片} other {按 Enter 显示 # 张卡片}}"
 
 #. js-lingui-explicit-id
 msgid "enter.filterSince"
@@ -3008,6 +3052,10 @@ msgid "enter.goWelcome"
 msgstr "按 Enter 把欢迎页及其步骤放到当前内容旁边"
 
 #. js-lingui-explicit-id
+msgid "enter.goWelcomeAdvanced"
+msgstr "按 Enter 把欢迎页放到当前内容旁边，并显示第二组步骤"
+
+#. js-lingui-explicit-id
 msgid "enter.headingAfter"
 msgstr "按 Enter 在 {num} 之后添加标题“{heading}”"
 
@@ -3203,20 +3251,45 @@ msgstr "没有名为“{name}”的房间"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectHighlights"
-msgstr ""
+msgstr "{count, plural, other {按 Enter 在这里列出此房间对话中的 # 处高亮}}"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectHighlightsNone"
-msgstr ""
+msgstr "此房间的对话中还没有高亮。在回复中选中文字，然后选一种颜色"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.inspectNoRoom"
-msgstr ""
+msgstr "屏幕上没有房间。room: 可让房间回到屏幕上"
 
 #. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "按 Enter 在这里显示 {num} 的详情"
+
+#. js-lingui-explicit-id
+msgid "enter.installAlready"
+msgstr "这已经是以应用形式安装的 Parliament"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.installDismissed"
+msgstr "未安装。浏览器提供安装时，install: 会再次询问"
+
+#. js-lingui-explicit-id
+msgid "enter.installDone"
+msgstr "已安装。今后 Parliament 会以应用形式打开，你在这里的所有内容都在其中"
+
+#. js-lingui-explicit-id
+msgid "enter.installGo"
+msgstr "按 Enter 让浏览器把 Parliament 作为应用安装到本机"
+
+#. js-lingui-explicit-id
+msgid "enter.installNotOffered"
+msgstr "此浏览器尚未提供在这里安装 Parliament 的选项。如果浏览器支持，它自己的菜单中可以安装此网站，或将其添加到程序坞"
+
+#. js-lingui-explicit-id
+msgid "enter.installSame"
+msgstr "应用和此页面共享所有内容：你的对话、密钥和备份"
 
 #. room and collection stay English: they are words of the command
 #. js-lingui-explicit-id
@@ -3737,11 +3810,11 @@ msgstr "暂时还不能打开它。inspect:{num} 现在就可以显示它"
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr ""
+msgstr "{num} 是一条独立笔记，没有可打开的对话。按 Enter 在输入栏下方显示它"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
-msgstr ""
+msgstr "按 Enter 打开 {num} 所属的对话，并转到它所在的位置"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -3860,12 +3933,20 @@ msgid "enter.openWhichSaved"
 msgstr "有多个保存的搜索以此开头：{words}"
 
 #. js-lingui-explicit-id
+msgid "enter.pinCollection"
+msgstr "按 Enter 将合集“{name}”置顶，排在所有合集之前"
+
+#. js-lingui-explicit-id
 msgid "enter.pinOff"
 msgstr "按 Enter 取消置顶 {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.pinOn"
 msgstr "按 Enter 将 {nums} 置顶"
+
+#. js-lingui-explicit-id
+msgid "enter.pinWhich"
+msgstr "有多个合集以此开头：{words}"
 
 #. js-lingui-explicit-id
 msgid "enter.placeCramped"
@@ -4153,7 +4234,7 @@ msgstr "它会作为普通窗口打开，因为此浏览器无法让窗口始终
 
 #. js-lingui-explicit-id
 msgid "enter.popSettingsAt"
-msgstr ""
+msgstr "按 Enter 将{board}放到独立窗口中，并转到{section}"
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4890,12 +4971,12 @@ msgstr "上一个房间已经在这里"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.roomNameNone"
-msgstr ""
+msgstr "没有名为“{name}”的对话。records: 可按名称列出所有对话"
 
 #. {nums} is a list of numbers
 #. js-lingui-explicit-id
 msgid "enter.roomNameWhich"
-msgstr ""
+msgstr "有多个对话名为“{name}”：{nums}。请按编号打开其中一个"
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5753,6 +5834,15 @@ msgstr "你的提示词已经发往那里"
 msgid "enter.toSome"
 msgstr "按 Enter 将你接下来的提示词发给 {nums}，各自延续自己的分支，直到更改"
 
+#. tour: stays English
+#. js-lingui-explicit-id
+msgid "enter.tourAdvanced"
+msgstr "按 Enter 显示第二组步骤。tour: 可恢复第一组"
+
+#. js-lingui-explicit-id
+msgid "enter.tourAdvancedHere"
+msgstr "第二组步骤已经在这里"
+
 #. js-lingui-explicit-id
 msgid "enter.tourHere"
 msgstr "步骤已经在这里"
@@ -5921,6 +6011,10 @@ msgstr "没有名为 {verb} 的命令。输入 ? 查看所有命令"
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
 msgstr "没有名为 {verb} 的命令。按 Enter 查看所有命令"
+
+#. js-lingui-explicit-id
+msgid "enter.unpinCollection"
+msgstr "按 Enter 取消置顶合集“{name}”"
 
 #. js-lingui-explicit-id
 msgid "enter.untag"
@@ -6539,7 +6633,7 @@ msgstr "创建于 {day}"
 #. {num} is the chat's number
 #. js-lingui-explicit-id
 msgid "inspect.highlights"
-msgstr ""
+msgstr "{num} 中的高亮"
 
 #. js-lingui-explicit-id
 msgid "inspect.label"
@@ -6548,7 +6642,7 @@ msgstr "{num} 详情"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.listFoot"
-msgstr ""
+msgstr "点击一项即在输入栏中写入对应的 jump:。按 Escape 关闭"
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7168,15 +7262,15 @@ msgstr "在输入栏中写入 {command}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "line.items"
-msgstr ""
+msgstr "在记录中：置顶一个对话，给两项内容加标签，再归档第三项。undo: 可撤销这一整行"
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr ""
+msgstr "打开记录，关闭资源库，把合集放到你的第二块屏幕上，然后将整个排布保存为“review”"
 
 #. js-lingui-explicit-id
 msgid "line.records"
-msgstr ""
+msgstr "在记录中：最近七天内带有标签“essay”的对话，先显示最早的"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9384,6 +9478,10 @@ msgid "verb.inspect"
 msgstr "在当前位置查看某一项的详情"
 
 #. js-lingui-explicit-id
+msgid "verb.install"
+msgstr "在浏览器支持时，把 Parliament 作为应用安装到本机。你的内容保持原样"
+
+#. js-lingui-explicit-id
 msgid "verb.jump"
 msgstr "在此面板上滚动到某个编号"
 
@@ -9405,7 +9503,7 @@ msgstr "阅读 Parliament 作者的最新一封信、按编号指定的一封，
 
 #. js-lingui-explicit-id
 msgid "verb.library"
-msgstr "把资源库或其中一个书架放到当前屏幕内容旁边"
+msgstr "把资源库放到当前屏幕内容旁边"
 
 #. js-lingui-explicit-id
 msgid "verb.local"
@@ -9615,6 +9713,26 @@ msgstr "只为你的下一条提示词让模型搜索网页"
 msgid "verb.width"
 msgstr "选择面板所占的宽度，或将所有宽度恢复默认"
 
+#. A heading in the second list of steps: keeping and quoting what was found
+#. js-lingui-explicit-id
+msgid "welcome.advanced.collection"
+msgstr "合集"
+
+#. A heading in the second list of steps: asking several at once
+#. js-lingui-explicit-id
+msgid "welcome.advanced.sources"
+msgstr "来源"
+
+#. A heading in the second list of steps: shaping the screen
+#. js-lingui-explicit-id
+msgid "welcome.advanced.space"
+msgstr "空间"
+
+#. The name of the second list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.advancedSteps"
+msgstr "更多可以试试的事"
+
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
@@ -9632,6 +9750,11 @@ msgstr "MIT 许可证，源代码在 GitHub 上"
 #. js-lingui-explicit-id
 msgid "welcome.foot.made"
 msgstr "使用 Claude Code 创建"
+
+#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. js-lingui-explicit-id
+msgid "welcome.further"
+msgstr "或者更进一步"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"
@@ -9710,6 +9833,10 @@ msgid "welcome.step.almanac"
 msgstr "查看你创建的内容"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.arrange"
+msgstr "保存屏幕上的排布"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.ask"
 msgstr "提个问题"
 
@@ -9728,6 +9855,10 @@ msgid "welcome.step.bar"
 msgstr "把输入栏移到底部"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.collection"
+msgstr "新建一个合集"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.command"
 msgstr "打开命令行"
 
@@ -9735,6 +9866,15 @@ msgstr "打开命令行"
 #. js-lingui-explicit-id
 msgid "welcome.step.commandHow"
 msgstr "按 {keys}，再输入 {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.compare"
+msgstr "比较它们的回答"
+
+#. {quote} is quote:reply and {command} is compare:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.step.compareHow"
+msgstr "对每个回答执行 {quote}，再执行 {command}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id
@@ -9763,6 +9903,19 @@ msgid "welcome.step.nameHow"
 msgstr "{command}，房间编号在前，名称在后"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.noteQuotes"
+msgstr "写一条引用它们的笔记"
+
+#. {command} is note:"…", which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.noteQuotesHow"
+msgstr "选中这些卡片，然后输入 {command}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.passage"
+msgstr "高亮一段文字"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.pop"
 msgstr "把一个面板放到独立窗口中"
 
@@ -9776,6 +9929,15 @@ msgid "welcome.step.sendHow"
 msgstr "{command} 加上一条提示词，同时有一处编辑等待发送"
 
 #. js-lingui-explicit-id
+msgid "welcome.step.sources"
+msgstr "同时向两个来源提问"
+
+#. {command} is p>, which stays English. The menu opens from who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "welcome.step.sourcesHow"
+msgstr "{command}，然后在“由谁回答”菜单中勾选两个"
+
+#. js-lingui-explicit-id
 msgid "welcome.step.strike"
 msgstr "给一行文字加删除线"
 
@@ -9783,6 +9945,15 @@ msgstr "给一行文字加删除线"
 #. js-lingui-explicit-id
 msgid "welcome.step.strikeHow"
 msgstr "在回复中选中文字，然后按 {keys}"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.summary"
+msgstr "为它们写一份摘要"
+
+#. {command} is summarize:, which stays English. The one step that spends tokens
+#. js-lingui-explicit-id
+msgid "welcome.step.summaryHow"
+msgstr "{command}，可选，需要 AI API 密钥"
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id

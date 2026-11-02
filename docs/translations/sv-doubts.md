@@ -337,3 +337,22 @@ Each: id, the English, the draft, and why I was unsure.
 - keep a quote (quote:reply) → spara ett citat; kept as {num} → sparat som {num}, as chat.quoteHelp ("Spara orden bredvid chatten").
 - Enter twice → Enter två gånger, beside "Enter en gång till".
 - markup in the calm lines → ändringarna, as the glossary's markup · clean; calm now hides rather than "lugnar skärmen".
+
+## Words of 2 November 2026, second batch (C287)
+
+- `welcome.advanced.space`: "Space" is "Utrymmet", as the letter's "arbetsutrymmet"; "Arbetsytan" is taken by the Lab's Canvas. "Skärmen" is the alternative, since the heading is about shaping the screen. Beside it, "Källor" is indefinite and "Samlingen" is the board's name, so the three headings do not match in form.
+- `enter.installNotOffered` (its new English): "the dock" is "Dock", as macOS writes it in Swedish ("Lägg till i Dock"), without an article; "dockan" is the everyday alternative. The menu that "offers" is turned round: "kan webbplatsen installeras, eller läggas till i Dock, från webbläsarens egen meny".
+- `welcome.step.arrange`: "Save your screen" is "Spara skärmen som den är", because "Spara din skärm" can read as a screenshot.
+- `line.layout`, `line.records`: the example lines are fixed English in `src/commands/verbs.js`, so the glosses keep `review` and `essay`, as in the first batch.
+- `enter.openPassage`: "at its place" is "på rätt ställe", so nothing has to agree with {num} (a highlight is en, a quote ett).
+- `enter.installAlready`, `enter.installDone`, `enter.installDismissed`: Parliament is neuter ("installerat"), as the glossary treats Ollama as a program.
+- `chat.titleAskHelp`: "Write" is the imperative "Skriv", as in the English, though the click writes it.
+
+### New terms
+- install (Parliament as an app) → installera; installed → installerat; the app → appen.
+- the second list (tour:advanced) → den andra listan, as verb.tour; More things to try → Fler saker att prova; or go further → eller gå vidare.
+- select (cards) → välja, so "markera" stays with words in a reply and with highlights (welcome.step.passage "Markera ett textavsnitt" sits in the same list).
+- tick (in the menu of who answers) → kryssa i, as library.tick; the menu of who answers → menyn över vem som svarar.
+- pinned (a collection, in the line of collections) → fäst; pin at the top of the collections → fästa överst bland samlingarna.
+- oldest first → de äldsta först, as enter.collectionSort.
+- put away (archive:) → lägga undan, as verb.archive.

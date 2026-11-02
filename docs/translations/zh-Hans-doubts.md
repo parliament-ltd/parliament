@@ -390,3 +390,22 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - a line of several commands → 一行多条命令
 - opened as a tab → 已作为标签页打开; drag the tab out → 把这个标签页拖出所在的窗口
 - tagged through its quote → 标签加在它的摘录上
+
+## Words of 2 November 2026, second batch (C287)
+
+- `chat.titleAsk`: 追问 (a follow-up question), not 提问. The glossary keeps 提问 for an ask tied to a passage, and this link only writes the page's title as your next prompt. 问一问 is the plainer alternative.
+- `enter.installNotOffered`: "add it to the dock" is 添加到程序坞, the Dock's name in Chinese macOS and in Safari's own menu (添加到程序坞…). Elsewhere it may read as Mac-only, which it mostly is.
+- `welcome.step.arrange`: "Save your screen" is 保存屏幕上的排布. Taken literally, 保存你的屏幕 reads like taking a screenshot. 布局 is kept for layouts.
+- `welcome.step.compareHow`: "{quote} in each answer, then {command}" is 对每个回答执行 {quote}，再执行 {command}. 在每个回答中输入 would suggest typing into the answer itself.
+- `welcome.advanced.space`: 空间, a short heading beside 来源 and 合集. 屏幕 or 排布 would say "shaping the screen" more plainly.
+- `line.layout`, `line.records`: as in the first batch, “review” and “essay” stay English to match the example line shown above each gloss.
+- `collection.shown`: 已显示 # 张卡片, with 未显示卡片 for none. This is the =0 case kept and `one` collapsed, as the glossary says. `enter.inspectHighlights`, `enter.exportCardsOut` and `enter.exportCollection` collapse to `other` too.
+
+### New terms
+- ask → (after a page title) → 追问
+- pinned (a collection) → 已置顶; pin a collection → 将合集“{name}”置顶，排在所有合集之前
+- the second list (tour:advanced) → 第二组步骤, as verb.tour; More things to try → 更多可以试试的事; or go further → 或者更进一步
+- install as an app → 作为应用安装到本机; installed as an app → 以应用形式安装; the dock → 程序坞
+- every kind of card → 所有类型的卡片
+- a note of its own → 独立笔记, as enter.noteAlone
+- put away (archive:) → 归档
