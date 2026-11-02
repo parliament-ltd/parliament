@@ -191,3 +191,9 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - the source is on GitHub → 源代码已在 GitHub 上公开; the footer link → MIT 许可证，源代码在 GitHub 上
 - The example name in verb.arrange (arrange:save "morning") is "早晨", by the 23 October ruling
 - Plurals: `=1` in enter.spreadOver, enter.spreadAsk and enter.spreadDone, whose one case says something else (one board put here, nothing spread); enter.spreadOneHere, enter.spreadRefused and enter.spreadOne collapse to other
+
+## Keywords retire into highlights (1 November 2026, C285)
+- keyword (kind.term) is retired: what was a keyword is now a highlight, words a person selected in a reply and marked with a colour, marked only where selected. kind.term is 高亮, as kind.highlight, and the keyword → 关键词 line under Things you make is history
+- Every line that said 关键词 now says 高亮: in lists of markings (笔记、高亮和摘录), as a tab or heading (高亮, 高亮和笔记), and in the term branch of the kind selects (term {高亮 {num}}), whose selector stays term
+- highlights counted alone → # 处高亮 (reflection.markTerms), as edits are counted 处, since a highlight is a place in a reply. In a list shared with notes and quotes the list keeps its 条 (# 条笔记、高亮和摘录)
+- The type: words stay as typed, in the English order: type: 可接 highlight、quote 或 note 之一

@@ -122,7 +122,7 @@ msgstr "Muistiinpanot ja merkinnät"
 
 #. js-lingui-explicit-id
 msgid "backup.catAnnotationsAbout"
-msgstr "Muistiinpanot, avainsanat, lainaukset, suosikit ja kokoelmat"
+msgstr "Muistiinpanot, korostukset, lainaukset, suosikit ja kokoelmat"
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
@@ -363,7 +363,7 @@ msgstr "Tiedostohylly"
 
 #. js-lingui-explicit-id
 msgid "block.highlights"
-msgstr "Avainsanat"
+msgstr "Korostukset"
 
 #. js-lingui-explicit-id
 msgid "block.input"
@@ -950,7 +950,7 @@ msgstr "Kirjoittaa palkkiin {command}"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "{kind, select, note {muistiinpano {num}} term {avainsana {num}} quote {lainaus {num}} highlight {korostus {num}} other {{num}}}, tallessa Parliamentissa"
+msgstr "{kind, select, note {muistiinpano {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} other {{num}}}, tallessa Parliamentissa"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1306,7 +1306,7 @@ msgstr "lajittelu"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {muistiinpano {num}} term {avainsana {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} other {{num}}}"
+msgstr "{kind, select, note {muistiinpano {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1359,7 +1359,7 @@ msgstr "Täällä ei ole vielä mitään. add:207 lisää jotain, tai valitse ke
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "Sen sisällössä ei ole vielä muistiinpanoja, avainsanoja eikä lainauksia. Ne näkyvät täällä sitä mukaa kuin niitä tehdään."
+msgstr "Sen sisällössä ei ole vielä muistiinpanoja, korostuksia eikä lainauksia. Ne näkyvät täällä sitä mukaa kuin niitä tehdään."
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1483,7 +1483,7 @@ msgstr "Kirjoittaa palkkiin open:{num}"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "Napsautus kirjoittaa palkkiin add: tai rm:. Numerot määräävät järjestyksen lähteen mukaan; add:218 ottaa mukaan vain yhden muistiinpanon, avainsanan tai lainauksen."
+msgstr "Napsautus kirjoittaa palkkiin add: tai rm:. Numerot määräävät järjestyksen lähteen mukaan; add:218 ottaa mukaan vain yhden muistiinpanon, korostuksen tai lainauksen."
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1645,7 +1645,7 @@ msgstr "Ehdotukset"
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
-msgstr "Avainsanat"
+msgstr "Korostukset"
 
 #. js-lingui-explicit-id
 msgid "collection.under"
@@ -1722,7 +1722,7 @@ msgstr "keskustelusta {num}, poistettu"
 
 #. js-lingui-explicit-id
 msgid "copy.keywords"
-msgstr "Avainsanat"
+msgstr "Korostukset"
 
 #. js-lingui-explicit-id
 msgid "copy.notes"
@@ -2431,7 +2431,7 @@ msgstr "{sort, select, yours {Enter näyttää oman järjestyksesi} source {Ente
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {Enter näyttää avainsanat} quote {Enter näyttää lainaukset} note {Enter näyttää muistiinpanot} other {Enter näyttää korostukset}}"
+msgstr "{kind, select, term {Enter näyttää korostukset} quote {Enter näyttää lainaukset} note {Enter näyttää muistiinpanot} other {Enter näyttää korostukset}}"
 
 #. js-lingui-explicit-id
 msgid "enter.colsHide"
@@ -2464,7 +2464,7 @@ msgstr "Enter asettaa rinnakkain sana sanalta: {a} ja {b}"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} ei ole muistiinpano, avainsana tai lainaus, ja vain niitä compare: toistaiseksi hyväksyy"
+msgstr "{num} ei ole muistiinpano, korostus tai lainaus, ja vain niitä compare: toistaiseksi hyväksyy"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
@@ -2705,12 +2705,12 @@ msgstr "Enter ja sen jälkeen toinen Enter poistavat pysyvästi: {erasing}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, one {Myös # muistiinpano, avainsana tai lainaus poistuu} other {Myös # muistiinpanoa, avainsanaa ja lainausta poistuu}}"
+msgstr "{count, plural, one {Myös # muistiinpano, korostus tai lainaus poistuu} other {Myös # muistiinpanoa, korostusta ja lainausta poistuu}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, one {# muistiinpano, avainsana tai lainaus säilyy, merkittynä poistetusta keskustelusta peräisin olevaksi. Lisää all, niin sekin poistetaan} other {# muistiinpanoa, avainsanaa ja lainausta säilyy, merkittyinä poistetusta keskustelusta peräisin oleviksi. Lisää all, niin nekin poistetaan}}"
+msgstr "{count, plural, one {# muistiinpano, korostus tai lainaus säilyy, merkittynä poistetusta keskustelusta peräisin olevaksi. Lisää all, niin sekin poistetaan} other {# muistiinpanoa, korostusta ja lainausta säilyy, merkittyinä poistetusta keskustelusta peräisin oleviksi. Lisää all, niin nekin poistetaan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -5345,7 +5345,7 @@ msgstr "Yhteenvetoa ei saatu, joten mitään ei kirjoitettu"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num} ei ole muistiinpano, avainsana tai lainaus, ja vain niitä summarize: toistaiseksi hyväksyy"
+msgstr "{num} ei ole muistiinpano, korostus tai lainaus, ja vain niitä summarize: toistaiseksi hyväksyy"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -5733,7 +5733,7 @@ msgstr "Käännetään. Palkki on sillä aikaa vapaa"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "Taulussa {board} type: hyväksyy yhden näistä: keyword, quote, note tai highlight"
+msgstr "Taulussa {board} type: hyväksyy yhden näistä: highlight, quote tai note"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6279,7 +6279,7 @@ msgstr "Esseehuone"
 
 #. js-lingui-explicit-id
 msgid "guide.o.keywordsNotes"
-msgstr "Avainsanat ja muistiinpanot"
+msgstr "Korostukset ja muistiinpanot"
 
 #. js-lingui-explicit-id
 msgid "guide.o.own"
@@ -6669,7 +6669,7 @@ msgstr "Ehdotus"
 #. Words marked in a chat where they were selected (C131; keywords retired into highlights, C285)
 #. js-lingui-explicit-id
 msgid "kind.term"
-msgstr "Avainsana"
+msgstr "Korostus"
 
 #. Beside a language still being worked on
 #. js-lingui-explicit-id
@@ -7751,7 +7751,7 @@ msgstr "{count, plural, one {# ehdotus} other {# ehdotusta}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markTerms"
-msgstr "{count, plural, one {# avainsana} other {# avainsanaa}}"
+msgstr "{count, plural, one {# korostus} other {# korostusta}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.noCall"
@@ -8998,7 +8998,7 @@ msgstr "Leveä lukupinta pitkille asiakirjoille ja tutkimukselle, sivussa tilaa 
 
 #. js-lingui-explicit-id
 msgid "templateAbout.pocket-chat@1.0"
-msgstr "Keskittynyt keskustelu puhelimille: avainsanat, haarat ja kooste alhaalta esiin liukuvassa paneelissa."
+msgstr "Keskittynyt keskustelu puhelimille: korostukset, haarat ja kooste alhaalta esiin liukuvassa paneelissa."
 
 #. js-lingui-explicit-id
 msgid "templateAbout.quiet-room@1.0"
@@ -9010,7 +9010,7 @@ msgstr "Kaksi yhtä suurta ruutua rinnakkain: kaksi keskustelua tai keskustelu j
 
 #. js-lingui-explicit-id
 msgid "templateAbout.writing-studio@1.0"
-msgstr "Keskustelu, jossa muistiinpanot, avainsanat ja haarat ovat käden ulottuvilla. Pitkään kirjoittamiseen, joka kulkee edestakaisin."
+msgstr "Keskustelu, jossa muistiinpanot, korostukset ja haarat ovat käden ulottuvilla. Pitkään kirjoittamiseen, joka kulkee edestakaisin."
 
 #. js-lingui-explicit-id
 msgid "theme.amber-glow"
@@ -9183,7 +9183,7 @@ msgstr "Näytä, mitä on peräisin keskustelusta, suunnitelmasta, haarasta tai 
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "Näytä, missä on muistiinpanoja, avainsanoja, lainauksia tai korostuksia"
+msgstr "Näytä, missä on muistiinpanoja, lainauksia tai korostuksia"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"

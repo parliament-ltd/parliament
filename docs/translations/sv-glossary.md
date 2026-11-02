@@ -147,3 +147,10 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - a line of layout commands → en rad med layoutkommandon.
 - MIT licensed, and the source is on GitHub → MIT-licensierat, och källkoden finns på GitHub; the footer link → MIT-licens, källkoden på GitHub.
 - The example name in verb.arrange (arrange:save "morning") is "morgon", by the 23 October ruling.
+
+## Keywords retire into highlights (1 November 2026, C285)
+- keyword (kind.term) is retired: what was a keyword is now a highlight, words a person selected in a reply and marked with a colour, marked only where selected. kind.term → Markering, as kind.highlight; "keyword → nyckelord" under Chats and what is in them is history.
+- Every line that said nyckelord now says markering: in lists (anteckningar, markeringar och citat), as a tab or heading (Markeringar, Markeringar och anteckningar), counted (# markering, # markeringar), and in the term branch of the kind selects (term {markering {num}}), whose selector stays term.
+- markering is an en-word where nyckelord was an ett-word, so the articles and participles follow: en markering (enter.summarizeKinds, collection.pickFoot), "markering {num}, sparad i Parliament" (chat.aboutCard).
+- The type: words stay English, in the English order: "I {board} tar type: en av highlight, quote eller note".
+- The collective and the kind now meet in one place: backup.catAnnotations and the line under it (see doubts).

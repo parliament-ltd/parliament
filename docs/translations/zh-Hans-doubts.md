@@ -366,3 +366,8 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
     - EN: … MIT licensed, and the source is on GitHub.
     - ZH: … 采用 MIT 许可证，源代码已在 GitHub 上公开。
     - Why: 采用 joins the two halves into one sentence, as the English now does; the older draft had MIT 许可证 as a sentence of its own. The footer link keeps the bare noun: MIT 许可证，源代码在 GitHub 上.
+
+65. **reflection.markTerms** (1 November 2026, C285)
+    - EN: {count, plural, one {# highlight} other {# highlights}}
+    - ZH: {count, plural, other {# 处高亮}}
+    - Why: the old line counted keywords with 个. A highlight is a place in a reply, so 处, as edits are counted. The other counts beside it (reflection.markNotes, markQuotes, markAsks) use 条, and # 条高亮 is the alternative if the row should share one counter.
