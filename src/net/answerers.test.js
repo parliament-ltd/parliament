@@ -101,6 +101,19 @@ describe('answererFor', () => {
     expect(answererFor({ ...base, keys: { anthropic: true }, defaultModel: 'claude-sonnet-9' })).toMatchObject({ id: 'claude-sonnet-9', chosen: false, needsKey: false })
     expect(answererFor({ ...base, keys: {}, defaultModel: 'claude-sonnet-9' })).toMatchObject({ id: KEYLESS_DEFAULT, group: 'source', chosen: false })
   })
+  it('takes a model whose provider has a key, before Wikipedia (C287)', () => {
+    const dests = DESTS.map((d) => (d.id === 'mistral' ? { ...d, ships: true } : d))
+    const models = (id) => (id === 'mistral'
+      ? [{ id: 'mistral-large-5', name: 'Large 5', preview: true }, { id: 'mistral-medium-9', name: 'Medium 9' }, { id: 'mistral-small-9', name: 'Small 9' }]
+      : modelsOf(id))
+    const only = { destinations: dests, modelsOf: models, defaultProvider: 'anthropic', defaultModel: 'claude-sonnet-9' }
+    // Only a Mistral key: its first current model that is not a preview.
+    expect(answererFor({ ...only, keys: { mistral: true } })).toMatchObject({ id: 'mistral-medium-9', provider: 'mistral', chosen: false, needsKey: false })
+    // Settings' own provider keyed: Settings' model, as before.
+    expect(answererFor({ ...only, keys: { anthropic: true, mistral: true } })).toMatchObject({ id: 'claude-sonnet-9' })
+    // A provider that has not shipped is never taken.
+    expect(answererFor({ ...base, keys: { mistral: true }, defaultModel: 'claude-sonnet-9' })).toMatchObject({ id: KEYLESS_DEFAULT })
+  })
   it('follows the chat\'s own choice, and says when it needs a key that is not here', () => {
     expect(answererFor({ ...base, chosen: 'wikipedia', keys: { anthropic: true } })).toMatchObject({ id: 'wikipedia', chosen: true })
     expect(answererFor({ ...base, chosen: 'claude-haiku-9', keys: {} })).toMatchObject({ id: 'claude-haiku-9', chosen: true, needsKey: true })

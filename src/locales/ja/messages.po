@@ -3202,6 +3202,19 @@ msgid "enter.inNoRoom"
 msgstr "{name}というルームはありません"
 
 #. js-lingui-explicit-id
+msgid "enter.inspectHighlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inspectHighlightsNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.inspectNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enterで、{num}の詳細をここに表示します"
 
@@ -3375,11 +3388,6 @@ msgstr "Escapeで検索に戻ります"
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
 msgstr "Enterで手紙をすべて一覧表示します"
-
-#. close:letter, the same as Escape
-#. js-lingui-explicit-id
-msgid "enter.letterClose"
-msgstr "Enterで手紙を閉じます"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
@@ -3726,6 +3734,14 @@ msgstr "すべてすでに開いています"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "これを開く機能は後日追加します。今は inspect:{num} で表示できます"
+
+#. js-lingui-explicit-id
+msgid "enter.openOwnNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPassage"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -4134,6 +4150,10 @@ msgstr "{board}はすでにディスプレイ{display}にあります"
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
 msgstr "このブラウザではウインドウを最前面に固定できないため、通常のウインドウで開きます"
+
+#. js-lingui-explicit-id
+msgid "enter.popSettingsAt"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4866,6 +4886,16 @@ msgstr "Enterで、プラン{num}のRippleをオンにします。{nums}を確�
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "最後に使ったルームはすでにここにあります"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomNameNone"
+msgstr ""
+
+#. {nums} is a list of numbers
+#. js-lingui-explicit-id
+msgid "enter.roomNameWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5693,11 +5723,6 @@ msgstr "{on, select, on {思考はすでにオンです} other {思考はすで�
 msgid "enter.toAll"
 msgstr "{count, plural, other {Enterで、変更するまで次からのプロンプトを#件のブランチすべてに送ります。それぞれが自分のブランチを続けます}}"
 
-#. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "enter.toBegin"
-msgstr "{leader} で開始"
-
 #. In prompt mode on the welcome page (C119)
 #. js-lingui-explicit-id
 msgid "enter.toCommand"
@@ -6511,9 +6536,19 @@ msgstr "Escapeで閉じます"
 msgid "inspect.created"
 msgstr "作成：{day}"
 
+#. {num} is the chat's number
+#. js-lingui-explicit-id
+msgid "inspect.highlights"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "inspect.label"
 msgstr "{num}の詳細"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "inspect.listFoot"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7130,22 +7165,18 @@ msgstr "ブロック、レイアウト、テーマにチェックを入れてか
 msgid "library.writes"
 msgstr "バーに {command} と入力します"
 
-#. js-lingui-explicit-id
-msgid "line.closePop"
-msgstr "記録を閉じ、コレクションを2台目のディスプレイに出す"
-
-#. js-lingui-explicit-id
-msgid "line.filters"
-msgstr "記録にある、過去7日間のessayタグが付いたチャット"
-
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "line.pinTag"
-msgstr "チャットをピン留めしてタグを付ける。undo: で行全体を取り消せます"
+msgid "line.items"
+msgstr ""
 
 #. js-lingui-explicit-id
-msgid "line.spreadSave"
-msgstr "2つのチャットと記録をお使いのディスプレイに振り分けて開き、その配置をmorningという名前で保存する"
+msgid "line.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "line.records"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9648,10 +9679,6 @@ msgstr "コードは公開していて、Claude Codeのセキュリティチェ�
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
 msgstr "Parliamentって何でしょう？Parliamentは、1つのAIモデルとも、いくつものモデルとも、モデルなしでもチャットできる場所です。編集したり入れ替えたりできるブロックで、ルームを組み立てられます。レイアウトもテーマも配置も、自分で作れます。すべてはボードの上にあります。どのボードも別ウインドウに出して、別のディスプレイに移せます。だから、作業の場はあなたのものです。ルームを編集するためのラボも、もうすぐ登場します！"
-
-#. js-lingui-explicit-id
-msgid "welcome.letter.5"
-msgstr "今のところ、Parliamentはノートパソコン向けに作られています。近いうちにスマートフォンにも対応できればと思っています。"
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id

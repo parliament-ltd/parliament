@@ -666,7 +666,6 @@ export default function Shell() {
   }), [])
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
   // letter: under the bar, and which letters were read, on this device only (C279 (c)).
-  const [letterShown, setLetterShown] = useState(null)
   const [lettersRead, setLettersRead] = useState([])
   const lettersReadRef = useRef([])
   const [compared, setCompared] = useState(null) // the two numbers compare: shows under the bar
@@ -964,7 +963,10 @@ export default function Shell() {
       .catch(() => { if (live) setCatalogue([]) })
     return () => { live = false }
   }, [started, roomRev, libraryHere])
-  const inspectedRow = inspected != null ? numbered.get(inspected) ?? null : null
+  const inspectedRow = inspected == null ? null
+    : typeof inspected === 'object'
+      ? { list: inspected.list, chatNum: (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === inspected.chatId)?.num ?? null, rows: (almanacRows ?? []).filter((r) => r.chatId === inspected.chatId && (r.kind === 'highlight' || r.kind === 'term')) }
+      : numbered.get(inspected) ?? null
   const comparedRows = useMemo(() => {
     const [a, b] = (compared ?? []).map((n) => numbered.get(n))
     return a && b ? { a, b } : null
@@ -1322,11 +1324,6 @@ export default function Shell() {
       remember(body)
       return null
     }
-    if (what.kind === 'letterClose') {
-      setLetterShown(null)
-      remember(body)
-      return null
-    }
     if (what.kind === 'letter') {
       setInspected(null)
       setCompared(null)
@@ -1347,9 +1344,9 @@ export default function Shell() {
       return null
     }
     if (what.kind === 'inspect') {
-      setLetterShown(null)
       setCompared(null)
-      setInspected(what.num)
+      // A number, or a list: inspect:highlights (C287).
+      setInspected(what.list ? { list: what.list, chatId: what.chatId } : what.num)
       remember(body)
       return null
     }
@@ -4227,7 +4224,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} onAway={onAway} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)} letter={letterShown ? { ...letterShown, read: lettersRead } : null} onLetterClose={() => setLetterShown(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} onAway={onAway} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}

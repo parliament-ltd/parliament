@@ -264,6 +264,18 @@ export function planOpenSettings(a, word) {
   return go2(next, 'openSettingsAt', { board: 'settings', section })
 }
 
+/** pop:settings keys: Settings in a window of its own, at one section (C287). */
+export function planPopSettings(a, word) {
+  const section = sectionOf(word)
+  if (!section) return refuse('openSettingsNone', { word })
+  const popped = isPopped(a, 'settings') ? { next: copy(a) } : planPop(a, 'settings')
+  if (!popped.next) return popped
+  const next = copy(popped.next)
+  next.addressed = 'settings'
+  next.context.settings = section
+  return go2(next, 'popSettingsAt', { board: 'settings', section })
+}
+
 /**
  * alm:, tour: (and lab: with the Lab). Brings an arrangement's boards into
  * the space beside what is there: those not here already, in its order
@@ -953,7 +965,9 @@ export function plan(a, step, layout = null) {
       if (one) {
         if (args.length === 1) return planPop(a, one)
         if (second === 'display' && args[2]?.kind === 'number') return planPop(a, one, args[2].value)
-        return null // pop:settings keys: sections come with Settings
+        // pop:settings keys: Settings in a window, at that section (C287).
+        if (one === 'settings' && args.length === 2) return planPopSettings(a, second)
+        return null
       }
       return null
     case 'reset':

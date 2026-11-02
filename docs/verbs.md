@@ -17,10 +17,9 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Type | What it does |
 | --- | --- |
-| `open:202 203 records spread arrange:save "morning"` | Open two chats and Records across your screens, and keep that as morning |
-| `close:records pop:collection display 2` | Close Records and put the Collection on your second screen |
-| `pin:207 tagadd:essay 207` | Pin a chat and tag it. undo: takes back the whole line |
-| `type:chat tag:essay since:7d` | Chats tagged essay from the last seven days, in Records |
+| `open:records close:library pop:collection display 2 arrange:save "review"` | Open Records, close the Library, put the Collection on your second screen, and keep it all as review |
+| `pin:207 tagadd:essay 207, 216 archive:209` | In Records: pin a chat, tag two things, and put a third away. undo: takes back the whole line |
+| `type:chat tag:essay since:7d sort:oldest` | In Records: chats tagged essay from the last seven days, oldest first |
 
 ## Go to
 
@@ -29,9 +28,9 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `records:` | Bring Records and the Collection beside what is on screen | `records:` | everywhere | no |
 | `collection:` | Bring the Collection beside what is on screen | `collection:` | everywhere | no |
 | `plan:` | Bring the Plan board beside what is on screen | `plan:` | everywhere | no |
-| `library:` | Bring the Library beside what is on screen, or one shelf of it | `library:`, `library:themes` | everywhere | no |
+| `library:` | Bring the Library beside what is on screen | `library:` | everywhere | no |
 | `settings:` | Bring Settings beside what is on screen, or one section of it | `settings:`, `settings:data` | everywhere | no |
-| `room:` | Bring the last room beside what is on screen, or a room by name | `room:` | everywhere | no |
+| `room:` | Bring the last room beside what is on screen, or a room by name | `room:`, `room:"Owl notes"` | everywhere | no |
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |
 | `tour:` | Show the welcome steps, put them away, or show the second list | `tour:`, `tour:off`, `tour:advanced` | everywhere | no |
 | `letter:` | Read the newest letter from the maker of Parliament, one by its number, or the list of them | `letter:`, `letter:1`, `letter:all` | everywhere | no |
@@ -40,8 +39,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `new:chat` | Make a chat, plan, room, collection, framework, branch, step, run or block | `new:chat`, `new:plan`, `new:plan "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:run`, `new:block` | everywhere | yes |
-| `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Writing Studio"`, `open:library`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
+| `new:chat` | Make a chat, plan, room, collection, framework, branch, step, run or block | `new:chat`, `new:plan`, `new:plan "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:run` | everywhere | yes |
+| `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Owl notes"`, `open:library`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
 | `close:records` | Take a board off the screen, or close the letter. Nothing is lost | `close:records`, `close:204`, `close:room`, `close:welcome` | everywhere | yes |
 
 ## Run

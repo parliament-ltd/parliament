@@ -265,6 +265,8 @@ const newStep = (a, step, screens) => {
     return { ...p, after: p.next ? 'prompt' : null }
   }
   if (what === 'room' && !LAB) return { says: { message: 'notOffered', values: { verb: 'new:room guided' } }, next: null }
+  // new:block waits too (C287): blocks arrive by pull request (CLAUDE.md), and its Resources card with the Lab.
+  if (what === 'block') return { says: { message: 'notOffered', values: { verb: 'new:block' } }, next: null }
   if (what === 'room') return !second ? planNewRoom() : second.value === 'guided' ? planNewRoom(true) : null
   if (what === 'branch') {
     // On the Plan board, or with a name: a branch with no chat until it
@@ -395,12 +397,34 @@ function focusSetLine(a, step, screens = {}) {
 // plan: are open:library and open:plan (C95), settings: open:settings, and
 // settings:data open:settings data (C181, C279). A room or a shelf by name
 // comes later.
+/**
+ * room:"Owl notes", and open:"Owl notes" when no saved search or collection
+ * has that name (C287): the chat with that title, a room's name being its
+ * chat's (welcome step 5), opened as open: with its number would. The exact
+ * title first, else the titles that begin so; several are named, not guessed.
+ * @returns {{ next: object|null, says: object }|null}
+ */
+function roomByName(a, name, screens = {}) {
+  const want = String(name ?? '').trim().toLocaleLowerCase()
+  if (!want) return null
+  const chats = (screens.records?.rows ?? []).filter((r) => r.kind === 'chat' && r.chatId)
+  const titled = (r) => String(r.title ?? '').trim().toLocaleLowerCase()
+  const exact = chats.filter((r) => titled(r) === want)
+  const found = exact.length ? exact : chats.filter((r) => titled(r).startsWith(want))
+  const said = String(name).trim()
+  if (!found.length) return { next: null, says: { message: 'roomNameNone', values: { name: said } } }
+  const label = (r) => (r.num != null ? String(r.num) : `${r.docketNum}${r.branch}`)
+  if (found.length > 1) return { next: null, says: { message: 'roomNameWhich', values: { name: said, nums: found.slice(0, 6).map(label) } } }
+  const p = planRoom(a, found[0].chatId)
+  return { next: p.next, says: { message: OPENED[p.says.message] ?? p.says.message, values: { num: label(found[0]) } } }
+}
+
 function bring(a, step, screens = {}) {
   const named = Boolean(step.match?.values?.length)
   if (step.verb === 'records') return planBring(a, 'almanac')
   // collection: (C286 (d)): the Collection alone, as open:collection.
   if (step.verb === 'collection') return planOpen(a, 'collection')
-  if (step.verb === 'room') return named ? null : planRoom(a, screens.lastRoom?.id ?? null)
+  if (step.verb === 'room') return named ? roomByName(a, typed(step.match.values[0]), screens) : planRoom(a, screens.lastRoom?.id ?? null)
   if (step.verb === 'library') return named ? null : planOpen(a, 'library')
   if (step.verb === 'plan') return planOpen(a, 'docket')
   if (step.verb === 'settings') return named ? planOpenSettings(a, step.match.values[0].value) : planOpen(a, 'settings')
@@ -465,7 +489,11 @@ function openNumber(a, step, screens = {}) {
   if (!row && (screens.records?.rows ?? []).some((r) => r.kind === 'chat' && r.docketNum === num)) return planOpenPlan(a, num, screens)
   if (!row) return { next: null, says: { message: 'numNone', values: { num } } }
   if (row.kind === 'docket') return planOpenPlan(a, num, screens)
-  if (row.kind !== 'chat' || !row.chatId) return { next: null, says: { message: 'openNotYet', values: { num } } }
+  // A note, highlight or quote (C287): the chat it is in, at its passage, as
+  // jump: finds it; a note of its own has no chat, so it shows under the bar.
+  if (row.kind !== 'chat' && row.chatId) return { next: null, says: { message: 'openPassage', values: { num } }, act: { kind: 'find', num, to: 'chat' } }
+  if (row.kind !== 'chat') return { next: null, says: { message: 'openOwnNote', values: { num } }, act: { kind: 'inspect', num } }
+  if (!row.chatId) return { next: null, says: { message: 'openNotYet', values: { num } } }
   const p = planRoom(a, row.chatId)
   return { next: p.next, says: { message: OPENED[p.says.message] ?? p.says.message, values: { num } } }
 }
@@ -650,6 +678,16 @@ function planWindows(a, step, screens = {}) {
 
 /** inspect:204 shows it in detail under the bar. */
 function planInspect(a, step, screens = {}) {
+  // inspect:highlights (C287): the highlights of the chat in the room, listed
+  // under the bar, since the room's column of them is hidden for now.
+  const [arg] = step.match?.values ?? []
+  if ((arg?.kind === 'word' || arg?.kind === 'text') && String(arg.value ?? '').trim().toLowerCase() === 'highlights') {
+    const chat = screens.roomChat
+    if (!chat) return { says: { message: 'inspectNoRoom' }, act: null }
+    const count = (screens.records?.rows ?? []).filter((r) => r.chatId === chat && (r.kind === 'highlight' || r.kind === 'term')).length
+    if (!count) return { says: { message: 'inspectHighlightsNone' }, act: null }
+    return { says: { message: 'inspectHighlights', values: { count } }, act: { kind: 'inspect', list: 'highlights', chatId: chat } }
+  }
   const num = numberOf(step)
   if (num == null) return null
   if (!screens.numbered?.get(num)) return { says: { message: 'numNone', values: { num } }, act: null }
@@ -1084,6 +1122,16 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   let opened = false // open:"…" showed a saved search
   for (const step of answer.steps) {
     const saved = step.verb === 'open' ? openSaved(a, step, screens) : null
+    // open:"Owl notes": no saved search or collection by that name, so a chat by its title (C287).
+    const byTitle = step.verb === 'open' && !saved && step.match?.values?.length === 1 && step.match.values[0].kind === 'text'
+      ? roomByName(a, typed(step.match.values[0]), screens) : null
+    if (byTitle) {
+      if (!byTitle.next) return { answer, says: byTitle.says, next: null }
+      a = byTitle.next
+      last = byTitle.says
+      stepLines.push({ message: last.message, values: last.values })
+      continue
+    }
     if (saved) {
       if (saved.bad) return { answer, says: saved.bad, next: null }
       a = saved.next
@@ -1128,6 +1176,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
         : step.verb === FOCUS ? planFocusStep(a, step, screens)
           : plan(a, planned, screens.measure?.() ?? null)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
+    // open:245 on a note, highlight or quote finds it (C287): an act, alone on its line.
+    if (!p.next && p.act) return answer.steps.length > 1 ? { answer, says: { message: 'aloneNow', values: { verb: `${step.verb}:` } }, next: null } : { answer, says: p.says, next: null, act: p.act }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next
     // A room found by its chat is named by it, with several rooms open (C175 (a)).

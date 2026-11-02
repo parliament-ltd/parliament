@@ -3202,6 +3202,19 @@ msgid "enter.inNoRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.inspectHighlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inspectHighlightsNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.inspectNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr ""
 
@@ -3374,11 +3387,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
-msgstr ""
-
-#. close:letter, the same as Escape
-#. js-lingui-explicit-id
-msgid "enter.letterClose"
 msgstr ""
 
 #. letter:all stays English
@@ -3725,6 +3733,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openOwnNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPassage"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4133,6 +4149,10 @@ msgstr ""
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popSettingsAt"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4865,6 +4885,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomNameNone"
+msgstr ""
+
+#. {nums} is a list of numbers
+#. js-lingui-explicit-id
+msgid "enter.roomNameWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5693,11 +5723,6 @@ msgstr ""
 msgid "enter.toAll"
 msgstr ""
 
-#. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "enter.toBegin"
-msgstr ""
-
 #. In prompt mode on the welcome page (C119)
 #. js-lingui-explicit-id
 msgid "enter.toCommand"
@@ -6511,8 +6536,18 @@ msgstr ""
 msgid "inspect.created"
 msgstr ""
 
+#. {num} is the chat's number
+#. js-lingui-explicit-id
+msgid "inspect.highlights"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "inspect.label"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "inspect.listFoot"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7130,21 +7165,17 @@ msgstr ""
 msgid "library.writes"
 msgstr ""
 
-#. js-lingui-explicit-id
-msgid "line.closePop"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "line.filters"
-msgstr ""
-
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "line.pinTag"
+msgid "line.items"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "line.spreadSave"
+msgid "line.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "line.records"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9647,10 +9678,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "welcome.letter.5"
 msgstr ""
 
 #. {command} is focus:, which stays English

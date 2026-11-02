@@ -161,6 +161,16 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
   // knows counts as the default provider's, and is said to be gone).
   const d = describe(defaultModel, false)
   if (keys[d.provider ?? defaultProvider]) return d
+  // No key for that model's provider, but one for another (C287, ruled 2
+  // November: "if a mistral key is added it works"): that provider's first
+  // current model, the default provider first, then the list's order.
+  // Wikipedia only with no key at all. Nothing stored changes.
+  const keyed = [byId.get(defaultProvider), ...destinations.filter((x) => x.id !== defaultProvider)]
+    .filter((p) => p && p.kind === 'model' && p.ships && p.key && keys[p.id])
+  for (const p of keyed) {
+    const m = (modelsOf(p.id) ?? []).find((x) => x.current !== false && !x.preview && !x.retired)
+    if (m) return describe(m.id, false)
+  }
   return describe(KEYLESS_DEFAULT, false)
 }
 

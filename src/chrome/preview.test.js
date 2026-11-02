@@ -38,7 +38,7 @@ describe('what Enter would do', () => {
   })
 
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
-    expect(words('>pop:settings keys').text).toBe('pop: is not built yet')
+    expect(words('>resources:').text).toBe('resources: is not built yet')
     expect(words('>tour:advanced').text).toBe('tour: is not built yet')
   })
 
@@ -132,11 +132,11 @@ describe('one space: records: and room: bring boards beside what is here (C125, 
     expect(at('>room:', p.next, { lastRoom: null }).text).toBe('This room is empty. Its first prompt starts it')
   })
 
-  it('shares a line with other layout commands (C99), and a room by name waits for name:', () => {
+  it('shares a line with other layout commands (C99), and a room by name (C287)', () => {
     const p = at('>records: bar:bottom', { ...shipped('welcome'), id: SPACE })
     expect(p.text).toBe('Enter runs 2 commands in turn: records: and bar:')
     expect(p.next.bar.at).toBe('bottom')
-    expect(at('>room:"Barn owls"').text).toBe('room: is not built yet')
+    expect(at('>room:"Barn owls"').text).toBe('No chat is called “Barn owls”. records: lists them by name')
   })
 
   it('takes the new words, and points the old verbs to them (C131)', () => {
@@ -281,13 +281,13 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
     expect(r.next.addressed).toBe('room')
   })
 
-  it('opens a plan on the Plan board, and says opening a marking comes later', () => {
+  it('opens a plan on the Plan board, and a marking in its chat (C287)', () => {
     // Its first branch until the board was built (C127); the board now (C196 (g)).
     const plan = at('>open:203')
     expect(plan.text).toBe('Enter opens plan 203 on the Plan board')
     expect(plan.next.addressed).toBe('docket')
     expect(plan.next.context.docket).toBe('203')
-    expect(at('>open:210').text).toBe('Opening this comes later. inspect:210 shows it now')
+    expect(at('>open:210').text).toMatch(/^Enter opens the chat 210 is in|^210 is a note of its own/)
     expect(at('>open:999').text).toBe('Nothing here has the number 999')
     // A branch by its letter is built with stage 8 (C175): none here has this address.
     expect(at('>open:204a').text).toBe('Nothing here has the number 204a')
@@ -1244,5 +1244,63 @@ describe('Ripple and a source answering (C228 (d))', () => {
     const wiki = { id: 'wikipedia', group: 'source', name: 'Wikipedia' }
     const p = promptPreview('glass', { ...room, answerer: wiki, edits: { count: 1, chars: 80 }, ripple: { nums: ['201b'], count: 1, ready: true, name: 'Haiku 5.5', perMillion: 1, chars: 100 } })
     expect((p.says?.also ?? []).some((x) => x.message.startsWith('promptRipple'))).toBe(false)
+  })
+})
+
+describe('open: by the number of a note, highlight or quote (C287)', () => {
+  const rows = [
+    { kind: 'highlight', num: 230, chatId: 'c1', id: 'h' },
+    { kind: 'note', num: 231, chatId: null, id: 'n' },
+    { kind: 'chat', num: 202, chatId: 'c1', id: 'c' },
+  ]
+  const screens = { records: { rows }, numbered: new Map(rows.map((r) => [r.num, r])) }
+  const go = (line) => preview(line, { mode: 'command', arrangement: shipped(SPACE), screens })
+  it('finds a highlight in its chat, and shows a note of its own under the bar', () => {
+    expect(go('>open:230')).toMatchObject({ says: { message: 'openPassage', values: { num: 230 } }, act: { kind: 'find', num: 230, to: 'chat' } })
+    expect(go('>open:231')).toMatchObject({ says: { message: 'openOwnNote' }, act: { kind: 'inspect', num: 231 } })
+    expect(go('>open:202').next).toBeTruthy()
+  })
+})
+
+describe('a room by name (C287)', () => {
+  const rows = [
+    { kind: 'chat', num: 202, chatId: 'c202', title: 'Owl notes', id: 'a' },
+    { kind: 'chat', num: 204, chatId: 'c204', title: 'Owl pellets', id: 'b' },
+    { kind: 'chat', num: 206, chatId: 'c206', title: 'Barn owl', id: 'c' },
+  ]
+  const screens = { records: { rows }, numbered: new Map(rows.map((r) => [r.num, r])) }
+  const go = (line) => preview(line, { mode: 'command', arrangement: shipped(SPACE), screens })
+  it('opens the chat with that title, by room: or open:', () => {
+    expect(go('>room:"owl notes"').next?.context).toMatchObject({ room: 'c202' })
+    expect(go('>open:"Barn owl"').next?.context).toMatchObject({ room: 'c206' })
+  })
+  it('names the several a beginning fits, and says when none does', () => {
+    expect(go('>room:"Owl"').says).toMatchObject({ message: 'roomNameWhich', values: { nums: ['202', '204'] } })
+    expect(go('>room:"Tawny"').says).toMatchObject({ message: 'roomNameNone', values: { name: 'Tawny' } })
+  })
+})
+
+describe('pop:settings keys (C287)', () => {
+  it('puts Settings in a window of its own, at that section', () => {
+    const p = preview('>pop:settings keys', { mode: 'command', arrangement: shipped(SPACE) })
+    expect(p.next.popped.map((x) => x.board)).toContain('settings')
+    expect(p.next.context.settings).toBe('keys')
+    expect(p.says.message).toBe('popSettingsAt')
+    expect(preview('>pop:settings nowhere', { mode: 'command', arrangement: shipped(SPACE) }).says.message).toBe('openSettingsNone')
+  })
+})
+
+describe('inspect:highlights (C287)', () => {
+  const rows = [
+    { kind: 'chat', num: 202, chatId: 'c1', id: 'c' },
+    { kind: 'highlight', num: 230, chatId: 'c1', id: 'h1', text: 'barn owls' },
+    { kind: 'term', num: 231, chatId: 'c1', id: 'h2', text: 'Tyto' },
+    { kind: 'highlight', num: 240, chatId: 'c9', id: 'h3', text: 'elsewhere' },
+  ]
+  const go = (line, roomChat) => preview(line, { mode: 'command', arrangement: shipped(SPACE), screens: { roomChat, records: { rows }, numbered: new Map(rows.map((r) => [r.num, r])) } })
+  it('lists the highlights of the chat in the room, under the bar', () => {
+    expect(go('>inspect:highlights', 'c1')).toMatchObject({ says: { message: 'inspectHighlights', values: { count: 2 } }, act: { kind: 'inspect', list: 'highlights', chatId: 'c1' } })
+    expect(go('>inspect:highlights', 'c2').says.message).toBe('inspectHighlightsNone')
+    expect(go('>inspect:highlights', undefined).says.message).toBe('inspectNoRoom')
   })
 })

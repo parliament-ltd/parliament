@@ -12,6 +12,8 @@
 // has one (Document Picture-in-Picture); boards open ordinary windows. One
 // always-on-top window per tab (Almanac spec §4; C107).
 
+import { BIRDS } from '../chrome/BirdsMark'
+
 const SIZES = { bar: { width: 600, height: 150 }, board: { width: 760, height: 600 } }
 // Room for a window's own frame and title bar, outside the size asked for.
 const FRAME = { width: 16, height: 80 }
@@ -41,6 +43,42 @@ export function copyStyles(from, to, { dev = Boolean(import.meta.env?.DEV) } = {
   return counts
 }
 
+const SVG = 'http://www.w3.org/2000/svg'
+
+/**
+ * The birds, centred in a window whose stylesheet has not loaded yet: an SVG
+ * that needs no stylesheet and no script, each bird fading in after the one
+ * before, held still where the person asks for less motion. Placed with the
+ * element's style object, which the site's policy allows (C287).
+ * @returns {Element|null} the element, to remove once the board shows
+ */
+export function birdsWaiting(doc) {
+  if (!doc?.body || typeof doc.createElementNS !== 'function') return null
+  const still = Boolean(doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
+  const wrap = doc.createElement('div')
+  wrap.setAttribute('aria-hidden', 'true')
+  Object.assign(wrap.style, { position: 'fixed', inset: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FCFCFA', zIndex: '10' })
+  const svg = doc.createElementNS(SVG, 'svg')
+  svg.setAttribute('viewBox', '478 665 752 640')
+  svg.setAttribute('width', '56')
+  svg.setAttribute('height', '48')
+  BIRDS.forEach((d, i) => {
+    const path = doc.createElementNS(SVG, 'path')
+    path.setAttribute('d', d)
+    for (const [k, v] of [['fill', '#191919'], ['stroke', '#191919'], ['stroke-width', '4'], ['stroke-linejoin', 'round']]) path.setAttribute(k, v)
+    if (!still) {
+      path.setAttribute('opacity', '0')
+      const fade = doc.createElementNS(SVG, 'animate')
+      for (const [k, v] of [['attributeName', 'opacity'], ['values', '0;1;1;0'], ['keyTimes', '0;0.3;0.8;1'], ['dur', '1.8s'], ['begin', `${i * 0.25}s`], ['repeatCount', 'indefinite']]) fade.setAttribute(k, v)
+      path.appendChild(fade)
+    }
+    svg.appendChild(path)
+  })
+  wrap.appendChild(svg)
+  doc.body.appendChild(wrap)
+  return wrap
+}
+
 // How long a window waits for its stylesheets before it shows the board anyway.
 export const STYLED_MOST_MS = 3000
 
@@ -53,8 +91,13 @@ export function showWhenStyled(doc, container, most = STYLED_MOST_MS) {
   const waiting = [...(doc.head?.querySelectorAll?.('link[rel="stylesheet"]') ?? [])].filter((l) => !l.sheet)
   if (!waiting.length) return 0
   container.hidden = true
+  // The birds meanwhile, so it is plain the board is coming (C287).
+  const birds = birdsWaiting(doc)
   let left = waiting.length
-  const show = () => { container.hidden = false }
+  const show = () => {
+    container.hidden = false
+    birds?.remove()
+  }
   const one = () => { left -= 1; if (left <= 0) show() }
   for (const l of waiting) {
     l.addEventListener('load', one, { once: true })

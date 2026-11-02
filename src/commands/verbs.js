@@ -82,13 +82,13 @@ export const LEADERS = Object.freeze({
 
 // Lines of several commands to copy, in the command menu after the bar's
 // leaders (C284's suggestion; C286 (g)). A click writes the line into the bar.
+// Three, each with several commands lined up (Stefan, 2 November; C287).
 export const LINES = Object.freeze({
   title: /*i18n*/ { id: 'group.lines', message: 'Lines of several commands' },
   rows: [
-    { example: 'open:202 203 records spread arrange:save "morning"', gloss: /*i18n*/ { id: 'line.spreadSave', message: 'Open two chats and Records across your screens, and keep that as morning' } },
-    { example: 'close:records pop:collection display 2', gloss: /*i18n*/ { id: 'line.closePop', message: 'Close Records and put the Collection on your second screen' } },
-    { example: 'pin:207 tagadd:essay 207', gloss: /*i18n*/ { id: 'line.pinTag', message: 'Pin a chat and tag it. undo: takes back the whole line', comment: 'Commands stay English' } },
-    { example: 'type:chat tag:essay since:7d', gloss: /*i18n*/ { id: 'line.filters', message: 'Chats tagged essay from the last seven days, in Records' } },
+    { example: 'open:records close:library pop:collection display 2 arrange:save "review"', gloss: /*i18n*/ { id: 'line.layout', message: 'Open Records, close the Library, put the Collection on your second screen, and keep it all as review' } },
+    { example: 'pin:207 tagadd:essay 207, 216 archive:209', gloss: /*i18n*/ { id: 'line.items', message: 'In Records: pin a chat, tag two things, and put a third away. undo: takes back the whole line', comment: 'Commands stay English' } },
+    { example: 'type:chat tag:essay since:7d sort:oldest', gloss: /*i18n*/ { id: 'line.records', message: 'In Records: chats tagged essay from the last seven days, oldest first' } },
   ],
 })
 
@@ -102,15 +102,15 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.collection', message: 'Bring the Collection beside what is on screen' } }),
   v({ verb: 'plan', group: 'go', example: 'plan:', takes: [[]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.plan', message: 'Bring the Plan board beside what is on screen' } }),
-  v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:', 'library:themes'], takes: [[], ['word']], stage: 5, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.library', message: 'Bring the Library beside what is on screen, or one shelf of it' } }),
+  v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:'], takes: [[]], stage: 5, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.library', message: 'Bring the Library beside what is on screen' } }),
   // settings: is open:settings, and settings:data open:settings data
   // (arrangements spec §5; C95 left it for its stage; C181; C279).
   v({ verb: 'settings', group: 'go', example: 'settings:', forms: ['settings:', 'settings:data'], takes: [[], ['word']], stage: 9, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.settings', message: 'Bring Settings beside what is on screen, or one section of it' } }),
   v({ verb: 'lab', group: 'go', example: 'lab:', takes: [[]], stage: 13, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.lab', message: 'Go to the Lab, where rooms are built' } }),
-  v({ verb: 'room', group: 'go', example: 'room:', takes: [[], ['text']], stage: 4, click: 'apply',
+  v({ verb: 'room', group: 'go', example: 'room:', forms: ['room:', 'room:"Owl notes"'], takes: [[], ['text']], stage: 4, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.room', message: 'Bring the last room beside what is on screen, or a room by name' } }),
   v({ verb: 'jump', group: 'go', example: 'jump:242', takes: [['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.jump', message: 'Scroll to a number on this board' } }),
@@ -125,7 +125,7 @@ export const VERBS = Object.freeze([
 
   // Start
   v({ verb: 'new', group: 'start', example: 'new:chat',
-    forms: ['new:chat', 'new:plan', 'new:plan "Grant application"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:run', 'new:block'],
+    forms: ['new:chat', 'new:plan', 'new:plan "Grant application"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:run'],
     // new:framework "Name" "What it asks": a framework of your own (C164).
     // new:branch 201a 2: a fork after step 2 of 201a (C178).
     // new:step 201b "…", new:plan "…" and new:branch "…" (C198): an address
@@ -136,7 +136,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     // Several at once, and spread across the screens (C284).
-    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
+    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Owl notes"', 'open:library', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
     // open:records brings the Records board alone, where records: brings
     // Records and the Collection together (C124, C125, C131).
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']], ['text', { many: 'text' }]], stage: 3, click: 'apply',

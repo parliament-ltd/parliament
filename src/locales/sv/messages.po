@@ -3202,6 +3202,19 @@ msgid "enter.inNoRoom"
 msgstr "Inget rum heter {name}"
 
 #. js-lingui-explicit-id
+msgid "enter.inspectHighlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inspectHighlightsNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.inspectNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter visar {num} i detalj, här"
 
@@ -3375,11 +3388,6 @@ msgstr "Escape går tillbaka till sökningen"
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
 msgstr "Enter listar alla brev"
-
-#. close:letter, the same as Escape
-#. js-lingui-explicit-id
-msgid "enter.letterClose"
-msgstr "Enter stänger brevet"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
@@ -3726,6 +3734,14 @@ msgstr "Alla är redan öppna"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Att öppna den här kommer senare. inspect:{num} visar den nu"
+
+#. js-lingui-explicit-id
+msgid "enter.openOwnNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPassage"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -4134,6 +4150,10 @@ msgstr "{board} är redan på skärm {display}"
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
 msgstr "Det öppnas som ett vanligt fönster, eftersom den här webbläsaren inte kan hålla ett fönster överst"
+
+#. js-lingui-explicit-id
+msgid "enter.popSettingsAt"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4866,6 +4886,16 @@ msgstr "Enter slår på Ripple för plan {num}. En kontroll av {nums} behöver e
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "Det senaste rummet finns redan här"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomNameNone"
+msgstr ""
+
+#. {nums} is a list of numbers
+#. js-lingui-explicit-id
+msgid "enter.roomNameWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5693,11 +5723,6 @@ msgstr "{on, select, on {Tänkandet är redan på} other {Tänkandet är redan a
 msgid "enter.toAll"
 msgstr "{count, plural, other {Enter skickar dina nästa promptar till alla # grenar, som var och en fortsätter sin egen, tills du ändrar det}}"
 
-#. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "enter.toBegin"
-msgstr "{leader} för att börja"
-
 #. In prompt mode on the welcome page (C119)
 #. js-lingui-explicit-id
 msgid "enter.toCommand"
@@ -6511,9 +6536,19 @@ msgstr "Escape stänger det här"
 msgid "inspect.created"
 msgstr "skapad {day}"
 
+#. {num} is the chat's number
+#. js-lingui-explicit-id
+msgid "inspect.highlights"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "inspect.label"
 msgstr "{num} i detalj"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "inspect.listFoot"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7130,22 +7165,18 @@ msgstr "kryssa i block, en layout eller ett tema, och lägg sedan till dem i rum
 msgid "library.writes"
 msgstr "Skriver {command} i fältet"
 
-#. js-lingui-explicit-id
-msgid "line.closePop"
-msgstr "Stäng Registret och lägg Samlingen på din andra skärm"
-
-#. js-lingui-explicit-id
-msgid "line.filters"
-msgstr "Chattar taggade med essay från de senaste sju dagarna, i Registret"
-
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "line.pinTag"
-msgstr "Fäst en chatt och tagga den. undo: tar tillbaka hela raden"
+msgid "line.items"
+msgstr ""
 
 #. js-lingui-explicit-id
-msgid "line.spreadSave"
-msgstr "Öppna två chattar och Registret fördelade över dina skärmar, och spara det under namnet morning"
+msgid "line.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "line.records"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9648,10 +9679,6 @@ msgstr "Koden är öppen, jag har gjort säkerhetskontroller med Claude Code och
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
 msgstr "Vad är Parliament? Parliament är ett utrymme där du kan chatta med en AI-modell, flera eller ingen alls. Du kan bygga rum av block som du kan redigera och ändra, och du kan göra egna layouter, teman och uppställningar. Allt ligger på tavlor. Alla tavlor kan läggas i egna fönster och flyttas till en annan skärm, så arbetsutrymmet är ditt. Labbet, där du redigerar rum, kommer snart!"
-
-#. js-lingui-explicit-id
-msgid "welcome.letter.5"
-msgstr "Just nu är Parliament byggt för bärbara datorer, och förhoppningsvis snart för mobiler också."
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id

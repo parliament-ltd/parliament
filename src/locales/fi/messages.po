@@ -3202,6 +3202,19 @@ msgid "enter.inNoRoom"
 msgstr "Huonetta {name} ei ole"
 
 #. js-lingui-explicit-id
+msgid "enter.inspectHighlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inspectHighlightsNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.inspectNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter näyttää kohteen {num} tiedot tässä"
 
@@ -3375,11 +3388,6 @@ msgstr "Escape palaa hakuun"
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
 msgstr "Enter näyttää kaikki kirjeet"
-
-#. close:letter, the same as Escape
-#. js-lingui-explicit-id
-msgid "enter.letterClose"
-msgstr "Enter sulkee kirjeen"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
@@ -3726,6 +3734,14 @@ msgstr "Kaikki ovat jo auki"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Tämän avaaminen tulee myöhemmin. inspect:{num} näyttää sen nyt"
+
+#. js-lingui-explicit-id
+msgid "enter.openOwnNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPassage"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -4134,6 +4150,10 @@ msgstr "{board} on jo näytöllä {display}"
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
 msgstr "Se avautuu tavallisena ikkunana, koska tämä selain ei voi pitää ikkunaa muiden päällä"
+
+#. js-lingui-explicit-id
+msgid "enter.popSettingsAt"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4866,6 +4886,16 @@ msgstr "Enter ottaa Ripplen käyttöön suunnitelmassa {num}. Haarojen {nums} ta
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "Viimeisin huone on jo täällä"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomNameNone"
+msgstr ""
+
+#. {nums} is a list of numbers
+#. js-lingui-explicit-id
+msgid "enter.roomNameWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5693,11 +5723,6 @@ msgstr "{on, select, on {Miettiminen on jo päällä} other {Miettiminen on jo p
 msgid "enter.toAll"
 msgstr "{count, plural, other {Enter lähettää seuraavat kehotteesi kaikkiin # haaraan, ja kukin jatkaa omaansa, kunnes toisin valitaan}}"
 
-#. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "enter.toBegin"
-msgstr "{leader} aloittaa"
-
 #. In prompt mode on the welcome page (C119)
 #. js-lingui-explicit-id
 msgid "enter.toCommand"
@@ -6511,9 +6536,19 @@ msgstr "Escape sulkee tämän"
 msgid "inspect.created"
 msgstr "luotu {day}"
 
+#. {num} is the chat's number
+#. js-lingui-explicit-id
+msgid "inspect.highlights"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "inspect.label"
 msgstr "Kohteen {num} tiedot"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "inspect.listFoot"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7130,22 +7165,18 @@ msgstr "valitse lohkoja, asettelu tai teema ja lisää ne sitten huoneeseen yhde
 msgid "library.writes"
 msgstr "Kirjoittaa palkkiin {command}"
 
-#. js-lingui-explicit-id
-msgid "line.closePop"
-msgstr "Sulje Luettelo ja siirrä Kokoelma toiselle näytöllesi"
-
-#. js-lingui-explicit-id
-msgid "line.filters"
-msgstr "Keskustelut, joilla on tunniste essay, viimeisen seitsemän päivän ajalta Luettelossa"
-
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "line.pinTag"
-msgstr "Kiinnitä keskustelu ja lisää siihen tunniste. undo: kumoaa koko rivin"
+msgid "line.items"
+msgstr ""
 
 #. js-lingui-explicit-id
-msgid "line.spreadSave"
-msgstr "Avaa kaksi keskustelua ja Luettelo jaettuina näytöillesi ja tallenna se nimellä morning"
+msgid "line.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "line.records"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9648,10 +9679,6 @@ msgstr "Koodi on avointa, olen ajanut sen Claude Coden tietoturvatarkistusten l�
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
 msgstr "Mikä Parliament sitten on? Parliament on tila, jossa voit keskustella yhden tekoälymallin kanssa, usean kanssa tai ilman yhtäkään. Voit rakentaa huoneita lohkoista, joita voit muokata ja vaihtaa, ja voit tehdä omia asetteluja, teemoja ja järjestelyjä. Kaikki on tauluissa. Jokaisen taulun voi siirtää omaan ikkunaansa ja toiselle näytölle, joten työtila on sinun. Paja, jossa huoneita muokataan, on tulossa pian!"
-
-#. js-lingui-explicit-id
-msgid "welcome.letter.5"
-msgstr "Tällä hetkellä Parliament on tehty kannettaville tietokoneille, ja toivottavasti pian myös puhelimille."
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id

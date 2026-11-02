@@ -3202,6 +3202,19 @@ msgid "enter.inNoRoom"
 msgstr "No room is called {name}"
 
 #. js-lingui-explicit-id
+msgid "enter.inspectHighlights"
+msgstr "{count, plural, one {Enter lists the highlight in this room's chat, here} other {Enter lists the # highlights in this room's chat, here}}"
+
+#. js-lingui-explicit-id
+msgid "enter.inspectHighlightsNone"
+msgstr "This room's chat has no highlights yet. Select words in a reply, then pick a colour"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.inspectNoRoom"
+msgstr "No room is on screen. room: brings one back"
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter shows {num} in detail, here"
 
@@ -3375,11 +3388,6 @@ msgstr "Escape goes back to search"
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
 msgstr "Enter lists every letter"
-
-#. close:letter, the same as Escape
-#. js-lingui-explicit-id
-msgid "enter.letterClose"
-msgstr "Enter closes the letter"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
@@ -3726,6 +3734,14 @@ msgstr "They are all open already"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Opening this comes later. inspect:{num} shows it now"
+
+#. js-lingui-explicit-id
+msgid "enter.openOwnNote"
+msgstr "{num} is a note of its own, with no chat to open. Enter shows it under the bar"
+
+#. js-lingui-explicit-id
+msgid "enter.openPassage"
+msgstr "Enter opens the chat {num} is in, at its place"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -4134,6 +4150,10 @@ msgstr "{board} is on display {display} already"
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
 msgstr "It opens as an ordinary window, since this browser cannot keep one on top"
+
+#. js-lingui-explicit-id
+msgid "enter.popSettingsAt"
+msgstr "Enter puts {board} in a window of its own, at {section}"
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4866,6 +4886,16 @@ msgstr "Enter turns Ripple on for plan {num}. Checking {nums} needs a model with
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "The last room is here already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomNameNone"
+msgstr "No chat is called “{name}”. records: lists them by name"
+
+#. {nums} is a list of numbers
+#. js-lingui-explicit-id
+msgid "enter.roomNameWhich"
+msgstr "Several chats are called “{name}”: {nums}. Open one by its number"
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5693,11 +5723,6 @@ msgstr "{on, select, on {Thinking is on already} other {Thinking is off already}
 msgid "enter.toAll"
 msgstr "{count, plural, other {Enter sends your next prompts to all # branches, each carrying its own on, until changed}}"
 
-#. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "enter.toBegin"
-msgstr "{leader} to begin"
-
 #. In prompt mode on the welcome page (C119)
 #. js-lingui-explicit-id
 msgid "enter.toCommand"
@@ -6511,9 +6536,19 @@ msgstr "Escape closes this"
 msgid "inspect.created"
 msgstr "created {day}"
 
+#. {num} is the chat's number
+#. js-lingui-explicit-id
+msgid "inspect.highlights"
+msgstr "Highlights in {num}"
+
 #. js-lingui-explicit-id
 msgid "inspect.label"
 msgstr "{num} in detail"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "inspect.listFoot"
+msgstr "A click writes jump: for one. Escape closes this"
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7130,22 +7165,18 @@ msgstr "tick blocks, a layout or a theme, then add them to the room together"
 msgid "library.writes"
 msgstr "Writes {command} in the bar"
 
-#. js-lingui-explicit-id
-msgid "line.closePop"
-msgstr "Close Records and put the Collection on your second screen"
-
-#. js-lingui-explicit-id
-msgid "line.filters"
-msgstr "Chats tagged essay from the last seven days, in Records"
-
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "line.pinTag"
-msgstr "Pin a chat and tag it. undo: takes back the whole line"
+msgid "line.items"
+msgstr "In Records: pin a chat, tag two things, and put a third away. undo: takes back the whole line"
 
 #. js-lingui-explicit-id
-msgid "line.spreadSave"
-msgstr "Open two chats and Records across your screens, and keep that as morning"
+msgid "line.layout"
+msgstr "Open Records, close the Library, put the Collection on your second screen, and keep it all as review"
+
+#. js-lingui-explicit-id
+msgid "line.records"
+msgstr "In Records: chats tagged essay from the last seven days, oldest first"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9379,7 +9410,7 @@ msgstr "Read the newest letter from the maker of Parliament, one by its number, 
 
 #. js-lingui-explicit-id
 msgid "verb.library"
-msgstr "Bring the Library beside what is on screen, or one shelf of it"
+msgstr "Bring the Library beside what is on screen"
 
 #. js-lingui-explicit-id
 msgid "verb.local"
@@ -9647,11 +9678,7 @@ msgstr "The code is open, I've run through Claude Code security checks, and plan
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "What is Parliament? In Parliament, is a space where you can chat with one AI model, several, or none. You can build rooms with blocks you can edit and change, and you can make your own layouts, themes, and arrangements. Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours. The Lab for editing rooms is coming soon!"
-
-#. js-lingui-explicit-id
-msgid "welcome.letter.5"
-msgstr "Right now, Parliament is built for laptops, and hopefully phones soon too."
+msgstr "What is Parliament? Parliament is a space where you can chat with one AI model, several, or none. You can build rooms with blocks you can edit and change, and you can make your own layouts, themes, and arrangements. Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours. The Lab for editing rooms is coming soon!"
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id

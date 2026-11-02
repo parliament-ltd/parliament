@@ -450,7 +450,7 @@ describe('from a typed command', () => {
   it('leaves forms that need later stages unanswered', () => {
     const a = almanac()
     expect(run(a, '>open:207')[0]).toBeNull()
-    expect(run(a, '>pop:settings keys')[0]).toBeNull()
+    expect(run(a, '>pop:settings keys')[0]).not.toBeNull() // built since C287
     expect(run(a, '>open:lab')[0]).toBeNull()
   })
 

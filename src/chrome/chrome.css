@@ -162,17 +162,15 @@
 
 /* inspect: one thing in detail under the bar, drawn like the reference
    (stage 5, piece 3; Almanac v30's peek). */
+.ch-inspect-list { list-style: none; margin: 6px 0 0; padding: 0; max-height: 40vh; overflow: auto; }
+.ch-shell .ch-inspect-list button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); text-align: start; font: 400 13px/1.5 var(--ch-serif); color: var(--ch-ink); }
+.ch-shell .ch-inspect-list button:hover { background: var(--ch-wash); }
 .ch-inspect { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 52vh; overflow: auto; padding: 14px 18px; font: 400 var(--ch-t-small)/1.55 var(--ch-sans); color: var(--ch-ink); }
 .ch-inspect-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .ch-inspect-tags { margin-inline-start: auto; display: flex; gap: 4px; flex-wrap: wrap; }
 .ch-inspect h3 { font: 600 15px var(--ch-sans); margin: 0 0 4px; }
 /* letter: under the bar (C279 (c)): the panel inspect: draws, the letter in
    the type it had on the welcome page. */
-.ch-letterp { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 60vh; overflow: auto; padding: 14px 18px 16px; color: var(--ch-ink); }
-.ch-letterp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
-.ch-letterp h3 { font: 600 var(--ch-t-small) var(--ch-sans); margin: 0; }
-.ch-letterp h3 .ch-marg { font-weight: 400; margin-inline-start: 8px; }
-.ch-letterp .ch-letter { margin: 10px 0 0; max-width: 62ch; }
 .ch-letterp-list { list-style: none; margin: 8px 0 0; padding: 0; }
 .ch-shell .ch-letterp-list button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); text-align: start; font: 400 13px var(--ch-serif); color: var(--ch-ink); }
 .ch-shell .ch-letterp-list button:hover { background: var(--ch-wash); }
@@ -180,7 +178,6 @@
 .ch-letterb .ch-cbody { padding: 18px 22px 22px; }
 .ch-letterb .ch-letter { margin: 0; max-width: 62ch; font-size: 15px; line-height: 1.7; }
 .ch-letterb .ch-letter p + p { margin-top: 12px; }
-.ch-dock.bottom .ch-letterp { position: absolute; inset-inline: 0; bottom: 100%; margin: 0 0 10px; }
 .ch-inspect blockquote { margin: 0 0 6px; padding-inline-start: 10px; border-inline-start: 2px solid var(--ch-ink); font-style: italic; font-size: 14px; white-space: pre-wrap; }
 .ch-inspect p { margin: 6px 0; white-space: pre-wrap; }
 .ch-inspect .ch-inspect-foot { margin-top: 12px; }
@@ -341,7 +338,7 @@
 /* The panels under the field open above it too, with the bar at the bottom: the
    keys (api:) and backups, inspect: and compare:, and the letter (31 October).
    The bar stays where it is. */
-.ch-dock.bottom :is(.ch-keys, .ch-inspect, .ch-letterp) { position: absolute; inset-inline: clamp(16px, 4vw, 32px); bottom: 100%; margin: 0 0 10px; max-height: 58vh; z-index: 2; }
+.ch-dock.bottom :is(.ch-keys, .ch-inspect) { position: absolute; inset-inline: clamp(16px, 4vw, 32px); bottom: 100%; margin: 0 0 10px; max-height: 58vh; z-index: 2; }
 .ch-shell.size-phone .ch-ref { --ch-ref-edge: 10px; }
 /* The languages opened from the globe: a panel right under it, in its
    corner, one column (30 October). */

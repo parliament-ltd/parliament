@@ -230,12 +230,10 @@ export const COPY = {
     // letter: (C279 (c)).
     letterOpen: /*i18n*/ { id: 'enter.letterOpen', message: 'Enter opens letter {n}', comment: 'A letter from the maker of Parliament; {n} is its number' },
     letterAll: /*i18n*/ { id: 'enter.letterAll', message: 'Enter lists every letter' },
-    letterClose: /*i18n*/ { id: 'enter.letterClose', message: 'Enter closes the letter', comment: 'close:letter, the same as Escape' },
     letterNone: /*i18n*/ { id: 'enter.letterNone', message: 'There is no letter {n}. letter:all lists them', comment: 'letter:all stays English' },
     tourOffAlready: /*i18n*/ { id: 'enter.tourOffAlready', message: 'The steps are put away already' },
     // On the welcome page (W §2, §6): the one line at rest, and the next
     // step's command leading the command line's.
-    toBegin: /*i18n*/ { id: 'enter.toBegin', message: '{leader} to begin', comment: '{leader} is >, the command leader' },
     nextStep: /*i18n*/ { id: 'enter.nextStep', message: 'next: {command}', comment: 'The next welcome step\'s command, which stays English' },
     toCommand: /*i18n*/ { id: 'enter.toCommand', message: '{leader} for the command line', comment: 'In prompt mode on the welcome page (C119)' },
     // A prompt edited in the chat, held in the field as a placeholder (Stefan, 29 October).
@@ -566,6 +564,10 @@ export const COPY = {
     openChatHere: /*i18n*/ { id: 'enter.openChatHere', message: 'Enter shows {num} in the room here' },
     openChatThere: /*i18n*/ { id: 'enter.openChatThere', message: '{num} is in the room here already' },
     openChatAddressed: /*i18n*/ { id: 'enter.openChatAddressed', message: '{num} is open in a room already. Enter points the bar at it' },
+    roomNameNone: /*i18n*/ { id: 'enter.roomNameNone', message: 'No chat is called “{name}”. records: lists them by name', comment: 'Commands stay English' },
+    roomNameWhich: /*i18n*/ { id: 'enter.roomNameWhich', message: 'Several chats are called “{name}”: {nums}. Open one by its number', comment: '{nums} is a list of numbers' },
+    openPassage: /*i18n*/ { id: 'enter.openPassage', message: 'Enter opens the chat {num} is in, at its place' },
+    openOwnNote: /*i18n*/ { id: 'enter.openOwnNote', message: '{num} is a note of its own, with no chat to open. Enter shows it under the bar' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
     // new:branch, a fork (stage 8, piece 6; C8; C178). {step} counts the person's prompts.
     newBranch: /*i18n*/ { id: 'enter.newBranch', message: 'Enter starts {next} from {address}, a copy of its whole history, in a room of its own. No call' },
@@ -653,6 +655,7 @@ export const COPY = {
     restoreReplaced: /*i18n*/ { id: 'enter.restoreReplaced', message: '{count, plural, one {Replaced: # item brought back. The page reads it all again} other {Replaced: # items brought back. The page reads it all again}}' },
     // Settings as a board, and set: (stage 9, piece 1; C181). {section} is a section's title.
     openSettingsAt: /*i18n*/ { id: 'enter.openSettingsAt', message: 'Enter opens {board} at {section}' },
+    popSettingsAt: /*i18n*/ { id: 'enter.popSettingsAt', message: 'Enter puts {board} in a window of its own, at {section}' },
     openSettingsNone: /*i18n*/ { id: 'enter.openSettingsNone', message: 'Settings has no section called {word}. The sections are keys, spending, context, data, appearance and about', comment: 'Commands stay English' },
     setList: /*i18n*/ { id: 'enter.setList', message: 'set: changes a setting: {words}', comment: 'Commands stay English' },
     setUnknown: /*i18n*/ { id: 'enter.setUnknown', message: 'No setting called {word}. set: takes {words}', comment: 'Commands stay English' },
@@ -705,6 +708,9 @@ export const COPY = {
     openSummaryDone: /*i18n*/ { id: 'enter.openSummaryDone', message: '{next} starts from a summary of {address}, in a room of its own' },
     openSummaryFailed: /*i18n*/ { id: 'enter.openSummaryFailed', message: 'The summary of {address} could not be written, so no branch was made' },
     inspectOne: /*i18n*/ { id: 'enter.inspectOne', message: 'Enter shows {num} in detail, here' },
+    inspectHighlights: /*i18n*/ { id: 'enter.inspectHighlights', message: '{count, plural, one {Enter lists the highlight in this room\'s chat, here} other {Enter lists the # highlights in this room\'s chat, here}}' },
+    inspectHighlightsNone: /*i18n*/ { id: 'enter.inspectHighlightsNone', message: 'This room\'s chat has no highlights yet. Select words in a reply, then pick a colour' },
+    inspectNoRoom: /*i18n*/ { id: 'enter.inspectNoRoom', message: 'No room is on screen. room: brings one back', comment: 'Commands stay English' },
     // focus: and focus:off, the first form (W §7; stage 5, piece 6). {boards} is a list of board names.
     focusClosing: /*i18n*/ { id: 'enter.focusClosing', message: 'Enter clears the screen to the chat, closing {boards}. Nothing is lost, and focus:off brings them back' },
     focusAlone: /*i18n*/ { id: 'enter.focusAlone', message: 'Enter leaves the chat alone here, with the bar under it' },
@@ -1802,7 +1808,7 @@ export const COPY = {
     stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
     stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
     // The letter, in Stefan's own words, as he wrote it (C265; rewritten by him
-    // on 2 November, C286 (p)): not edited. letter5 is no longer in it.
+    // on 2 November, C286 (p); "Parliament is a space" as he corrected it, C287).
     letter1: /*i18n*/ {
       id: 'welcome.letter.1',
       message: "Parliament is an attempt to rethink how we interact with AI. To take part more in the work and conversation. I didn't want a handful of companies deciding how that goes. And yes, I see the irony of building this with Claude.",
@@ -1817,11 +1823,7 @@ export const COPY = {
     },
     letter4: /*i18n*/ {
       id: 'welcome.letter.4',
-      message: "What is Parliament? In Parliament, is a space where you can chat with one AI model, several, or none. You can build rooms with blocks you can edit and change, and you can make your own layouts, themes, and arrangements. Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours. The Lab for editing rooms is coming soon!",
-    },
-    letter5: /*i18n*/ {
-      id: 'welcome.letter.5',
-      message: "Right now, Parliament is built for laptops, and hopefully phones soon too.",
+      message: "What is Parliament? Parliament is a space where you can chat with one AI model, several, or none. You can build rooms with blocks you can edit and change, and you can make your own layouts, themes, and arrangements. Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours. The Lab for editing rooms is coming soon!",
     },
     closing: /*i18n*/ { id: 'welcome.closing', message: 'All the best,', comment: 'The line before the name that signs the letter' },
     signature: /*i18n*/ { id: 'welcome.signature', message: 'Stef', comment: 'The name the letter is signed with, under the closing line' },
@@ -2603,6 +2605,8 @@ export const COPY = {
     openChat: /*i18n*/ { id: 'inspect.openChat', message: 'open:{num} brings it beside what is here. Escape closes this' },
     close: /*i18n*/ { id: 'inspect.close', message: 'Escape closes this' },
     label: /*i18n*/ { id: 'inspect.label', message: '{num} in detail' },
+    highlights: /*i18n*/ { id: 'inspect.highlights', message: 'Highlights in {num}', comment: '{num} is the chat\'s number' },
+    listFoot: /*i18n*/ { id: 'inspect.listFoot', message: 'A click writes jump: for one. Escape closes this', comment: 'Commands stay English' },
   },
 
   // The hint line: the keys that open the field where focus is (P2). {key}

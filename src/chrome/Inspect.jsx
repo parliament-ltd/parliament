@@ -8,9 +8,13 @@ import { dayOf, agoOf } from './when'
 // peek). Read-only. Escape closes it. Everything in it is someone's words
 // or a model's, so it is drawn as text.
 
-/** @param {{ row: object }} props a row from almanacRows.js */
-export default function Inspect({ row }) {
+/**
+ * @param {{ row: object, onPick?: (form: string) => void }} props a row from
+ *   almanacRows.js, or a list: { list: 'highlights', chatNum, rows } (C287)
+ */
+export default function Inspect({ row, onPick = null }) {
   const { i18n } = useLingui()
+  if (row.list) return <InspectList list={row} onPick={onPick} />
   const quoted = row.kind === 'term' || row.kind === 'quote'
   const facts = [
     row.room ? roomLabel(i18n, row.room) : null,
@@ -39,6 +43,29 @@ export default function Inspect({ row }) {
       <p className="ch-marg ch-inspect-foot">
         {opens ? i18n._(COPY.inspect.openChat, { num: row.num }) : i18n._(COPY.inspect.close)}
       </p>
+    </section>
+  )
+}
+
+/** inspect:highlights (C287): the highlights of the room's chat, each a click from jump: to its place. */
+function InspectList({ list, onPick }) {
+  const { i18n } = useLingui()
+  return (
+    <section className="ch-inspect" aria-label={i18n._(COPY.inspect.highlights, { num: list.chatNum ?? '' })}>
+      <div className="ch-inspect-head">
+        <h3>{i18n._(COPY.inspect.highlights, { num: list.chatNum ?? '' })}</h3>
+      </div>
+      <ol className="ch-inspect-list">
+        {list.rows.map((r) => (
+          <li key={r.num}>
+            <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onPick?.(`jump:${r.num}`)}>
+              <span className="c-id">{r.num}</span>
+              <span dir="auto">{r.text}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <p className="ch-marg ch-inspect-foot">{i18n._(COPY.inspect.listFoot)}</p>
     </section>
   )
 }

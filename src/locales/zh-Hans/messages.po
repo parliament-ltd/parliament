@@ -3202,6 +3202,19 @@ msgid "enter.inNoRoom"
 msgstr "没有名为“{name}”的房间"
 
 #. js-lingui-explicit-id
+msgid "enter.inspectHighlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inspectHighlightsNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.inspectNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "按 Enter 在这里显示 {num} 的详情"
 
@@ -3375,11 +3388,6 @@ msgstr "按 Escape 返回搜索"
 #. js-lingui-explicit-id
 msgid "enter.letterAll"
 msgstr "按 Enter 列出所有信"
-
-#. close:letter, the same as Escape
-#. js-lingui-explicit-id
-msgid "enter.letterClose"
-msgstr "按 Enter 关闭这封信"
 
 #. letter:all stays English
 #. js-lingui-explicit-id
@@ -3726,6 +3734,14 @@ msgstr "它们都已经打开"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "暂时还不能打开它。inspect:{num} 现在就可以显示它"
+
+#. js-lingui-explicit-id
+msgid "enter.openOwnNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPassage"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
@@ -4134,6 +4150,10 @@ msgstr "{board}已经在屏幕 {display} 上"
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
 msgstr "它会作为普通窗口打开，因为此浏览器无法让窗口始终显示在最前面"
+
+#. js-lingui-explicit-id
+msgid "enter.popSettingsAt"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popSide"
@@ -4866,6 +4886,16 @@ msgstr "按 Enter 为计划 {num} 开启涟漪。检查 {nums} 需要一个有�
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "上一个房间已经在这里"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomNameNone"
+msgstr ""
+
+#. {nums} is a list of numbers
+#. js-lingui-explicit-id
+msgid "enter.roomNameWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomNumberNotChat"
@@ -5693,11 +5723,6 @@ msgstr "{on, select, on {思考已经是开启的} other {思考已经是关闭�
 msgid "enter.toAll"
 msgstr "{count, plural, other {按 Enter 将你接下来的提示词发给全部 # 个分支，各自延续，直到更改}}"
 
-#. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "enter.toBegin"
-msgstr "输入 {leader} 开始"
-
 #. In prompt mode on the welcome page (C119)
 #. js-lingui-explicit-id
 msgid "enter.toCommand"
@@ -6511,9 +6536,19 @@ msgstr "按 Escape 关闭"
 msgid "inspect.created"
 msgstr "创建于 {day}"
 
+#. {num} is the chat's number
+#. js-lingui-explicit-id
+msgid "inspect.highlights"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "inspect.label"
 msgstr "{num} 详情"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "inspect.listFoot"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
@@ -7130,22 +7165,18 @@ msgstr "勾选模块、布局或主题，然后一起添加到房间"
 msgid "library.writes"
 msgstr "在输入栏中写入 {command}"
 
-#. js-lingui-explicit-id
-msgid "line.closePop"
-msgstr "关闭记录，并把合集放到你的第二块屏幕上"
-
-#. js-lingui-explicit-id
-msgid "line.filters"
-msgstr "记录中最近七天内带有标签“essay”的对话"
-
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "line.pinTag"
-msgstr "置顶一个对话并给它加标签。undo: 可撤销这一整行"
+msgid "line.items"
+msgstr ""
 
 #. js-lingui-explicit-id
-msgid "line.spreadSave"
-msgstr "打开两个对话和记录，分配到你的屏幕上，然后将整个排布保存为“morning”"
+msgid "line.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "line.records"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -9648,10 +9679,6 @@ msgstr "代码是开源的，我已经跑过 Claude Code 的安全检查，也�
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
 msgstr "Parliament 是什么？Parliament 是一个空间，在这里你可以和一个 AI 模型对话，也可以和好几个对话，或者一个都不用。你可以用能编辑、能修改的模块搭建房间，还可以做自己的布局、主题和排布。所有内容都放在面板上。每个面板都可以弹出来，移到另一台显示器上，工作区由你做主。用来编辑房间的工坊很快就会推出！"
-
-#. js-lingui-explicit-id
-msgid "welcome.letter.5"
-msgstr "目前 Parliament 是为笔记本电脑设计的，希望很快也能支持手机。"
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
