@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.10.0, 2 November 2026
+
+- spread: open:202 203 205 collection records spread opens them all across your screens, in equal groups in the order named. spread: alone spreads what is open again.
+- open: takes several at once, and arrange:save "Morning" can end a line, keeping what it made.
+- A line of several commands says what each one will do.
+- A highlight is marked only where you selected it. Keywords are now highlights; tags label and search finds.
+- The language sits in the header, and the footer links to the source.
+
 ## 0.9.0, 31 October 2026
 
 - Several boards can share one window, so each screen can be one window: pop:records 202 collection display 2. beside puts a board in the window of another: pop:library beside records.
