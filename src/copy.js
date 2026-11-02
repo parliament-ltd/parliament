@@ -227,6 +227,10 @@ export const COPY = {
     tourOn: /*i18n*/ { id: 'enter.tourOn', message: 'Enter shows the steps again' },
     tourHere: /*i18n*/ { id: 'enter.tourHere', message: 'The steps are here already' },
     tourOff: /*i18n*/ { id: 'enter.tourOff', message: 'Enter puts the steps away. tour: brings them back' },
+    // tour:advanced, the welcome page's second list (welcome spec §13; A20).
+    goWelcomeAdvanced: /*i18n*/ { id: 'enter.goWelcomeAdvanced', message: 'Enter brings the welcome page beside what is here, with its second list' },
+    tourAdvanced: /*i18n*/ { id: 'enter.tourAdvanced', message: 'Enter shows the second list. tour: brings back the first', comment: 'tour: stays English' },
+    tourAdvancedHere: /*i18n*/ { id: 'enter.tourAdvancedHere', message: 'The second list is here already' },
     // letter: (C279 (c)).
     letterOpen: /*i18n*/ { id: 'enter.letterOpen', message: 'Enter opens letter {n}', comment: 'A letter from the maker of Parliament; {n} is its number' },
     letterAll: /*i18n*/ { id: 'enter.letterAll', message: 'Enter lists every letter' },
@@ -1801,6 +1805,24 @@ export const COPY = {
     stepHighlightHow: /*i18n*/ { id: 'welcome.step.highlightHow', message: 'select words in a reply, then pick a colour' },
     stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
     stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
+    // The second list (welcome spec §13; tour:advanced), offered under the
+    // first, never pushed: three short headings, a step a line.
+    further: /*i18n*/ { id: 'welcome.further', message: 'or go further', comment: 'One quiet line under the steps; a click writes tour:advanced in the bar, for the second list' },
+    advancedSteps: /*i18n*/ { id: 'welcome.advancedSteps', message: 'More things to try', comment: 'The name of the second list of steps, read by screen readers' },
+    advancedSources: /*i18n*/ { id: 'welcome.advanced.sources', message: 'Sources', comment: 'A heading in the second list of steps: asking several at once' },
+    advancedCollection: /*i18n*/ { id: 'welcome.advanced.collection', message: 'Collection', comment: 'A heading in the second list of steps: keeping and quoting what was found' },
+    advancedSpace: /*i18n*/ { id: 'welcome.advanced.space', message: 'Space', comment: 'A heading in the second list of steps: shaping the screen' },
+    stepSources: /*i18n*/ { id: 'welcome.step.sources', message: 'Ask two sources at once' },
+    stepSourcesHow: /*i18n*/ { id: 'welcome.step.sourcesHow', message: '{command}, then tick two in the menu of who answers', comment: '{command} is p>, which stays English. The menu opens from who answers, in the prompt field' },
+    stepCompare: /*i18n*/ { id: 'welcome.step.compare', message: 'Compare their answers' },
+    stepCompareHow: /*i18n*/ { id: 'welcome.step.compareHow', message: '{quote} in each answer, then {command}', comment: '{quote} is quote:reply and {command} is compare:, which stay English' },
+    stepPassage: /*i18n*/ { id: 'welcome.step.passage', message: 'Highlight a passage' },
+    stepCollection: /*i18n*/ { id: 'welcome.step.collection', message: 'Start a collection' },
+    stepNoteQuotes: /*i18n*/ { id: 'welcome.step.noteQuotes', message: 'Write a note that quotes them' },
+    stepNoteQuotesHow: /*i18n*/ { id: 'welcome.step.noteQuotesHow', message: 'select the cards, then {command}', comment: '{command} is note:"…", which stays English' },
+    stepSummary: /*i18n*/ { id: 'welcome.step.summary', message: 'Summarize them' },
+    stepSummaryHow: /*i18n*/ { id: 'welcome.step.summaryHow', message: '{command}, optional, with an AI API key', comment: '{command} is summarize:, which stays English. The one step that spends tokens' },
+    stepArrange: /*i18n*/ { id: 'welcome.step.arrange', message: 'Save your screen' },
     // The letter, in Stefan's own words, as he wrote it (C265; rewritten by him
     // on 2 November, C286 (p)): not edited. letter5 is no longer in it.
     letter1: /*i18n*/ {

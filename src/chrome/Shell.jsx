@@ -13,7 +13,7 @@ import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
 import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
-import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade, carriesEdit } from '../shell/welcome'
+import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, nextAdvanced, showSteps, stepsShown, stepsMade, stepsKept, advancedNumbers, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, movePopout, popoutToEdge, onPopoutClosed } from '../shell/popout'
 import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../shell/screens'
@@ -1316,9 +1316,10 @@ export default function Shell() {
       return { done: true, says: { message: 'noteDone', values: { num: note.num } } }
     }
     if (what.kind === 'tourOn' || what.kind === 'tourOff') {
-      // tour: may bring the welcome card back into the space first.
+      // tour: may bring the welcome card back into the space first;
+      // tour:advanced shows the second list in the first's place (W §13).
       if (next) { const refused = await run(next, null); if (refused) return refused }
-      updateWelcome((w) => showSteps(w, what.kind === 'tourOn'))
+      updateWelcome((w) => showSteps(w, what.kind === 'tourOn', what.advanced === true))
       remember(body)
       return null
     }
@@ -1357,6 +1358,8 @@ export default function Shell() {
       // compare: (C145 (i)): under the bar, word by word; nothing is sent.
       setInspected(null)
       setCompared(what.nums)
+      // It leaves nothing stored, so the second list's step crosses off here (W §13).
+      updateWelcome((w) => tick(w, 'compare'))
       remember(body)
       return null
     }
@@ -2446,6 +2449,12 @@ export default function Shell() {
     return () => { live = false }
   }, [started, layoutsRev])
   const arrangementsScreen = useMemo(() => ({ saved: savedLayouts }), [savedLayouts])
+  // The second list's steps that what is kept shows as done: a collection
+  // of one's own, an arrangement saved (W §13), however they were made.
+  useEffect(() => {
+    if (!started) return
+    for (const id of stepsKept({ collections, arrangements: savedLayouts })) updateWelcome((w) => tick(w, id))
+  }, [started, collections, savedLayouts, updateWelcome])
 
   // ── Calm (stage 14, piece 2; C255) ──
   // A setting of this device (C253 (d)), off for someone new (C253 (c)).
@@ -3249,7 +3258,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3551,6 +3560,8 @@ export default function Shell() {
       if (whos.some((w) => w.later || w.gone || w.needsKey || w.unchecked)) return { refused: 'promptChanged' }
       if (whos.map((w) => w.id).join('|') !== (shown?.many ?? []).map((w) => w.id).join('|')) return { refused: 'promptChanged' }
       setStalledIn(null)
+      // Two or more answering one prompt at once: the second list's first step (W §13).
+      if (new Set(whos.map((w) => w.id)).size > 1) updateWelcome((w) => tick(w, 'sources'))
       const sendOne = (c, w) => {
         const fw = frameworksOf(c.frameworks ?? [], fwListNow.current).map((x) => x.id)
         if (w.group === 'source') return askOne(c.id, w)
@@ -3612,6 +3623,8 @@ export default function Shell() {
       setHeldMany(null)
       setStalledIn((was) => (was === chatId ? null : was))
       updateWelcome((w) => tick(w, 'ask'))
+      // Asked of several at once, each a branch: the second list's first step (W §13).
+      updateWelcome((w) => tick(w, 'sources'))
       const group = { id: crypto.randomUUID(), chats: [id, ...others] }
       // One after another (branch slider v9; C201): the prompt is planned as
       // a step in each branch, each after the first on its condition, and
@@ -4072,7 +4085,18 @@ export default function Shell() {
       context: { ...arrangement.context, room: roomRecord?.num ?? undefined, collection: found ? collectionLabel(found) : undefined },
     }
   }, [arrangement, roomRecord, collections, collectionLabel])
-  const welcomeHint = useMemo(() => (welcomeOpen && !welcome.finished ? { next: nextStep(welcome) } : null), [welcomeOpen, welcome])
+  // The command line leads with the next step of the list shown: the
+  // second list's, where it has a command (W §6, §13).
+  const welcomeHint = useMemo(() => {
+    if (!welcomeOpen) return null
+    if (welcome.advanced && !welcome.off) {
+      const further = nextAdvanced(welcome)
+      return further?.shows ? { next: further } : null
+    }
+    return !welcome.finished ? { next: nextStep(welcome) } : null
+  }, [welcomeOpen, welcome])
+  // The numbers the second list's compare: and note: are shown with, where known.
+  const advancedNums = useMemo(() => advancedNumbers(almanacRows ?? []), [almanacRows])
   const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch, library: librarySearch }
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
   // Features of input, from the field's marginalia (C248).
@@ -4144,7 +4168,7 @@ export default function Shell() {
       return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" roomNum={(roomId ? conversations.find((c) => c.id === roomId)?.num : null) ?? lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />
+      return <WelcomeBoard key="welcome" roomNum={(roomId ? conversations.find((c) => c.id === roomId)?.num : null) ?? lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} advancedNums={advancedNums} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />
     }
     if (board === 'canvas') {
       return (
