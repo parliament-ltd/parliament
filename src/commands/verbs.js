@@ -43,7 +43,7 @@
 // so only open: takes its name.
 // The words for boards (C131): Records is the Almanac's board, Plan the
 // docket's (boards.js maps them to the boards' ids).
-export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'commandmenu', 'canvas', 'blocks'])
+export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'commandmenu', 'letter', 'canvas', 'blocks'])
 // The boards, and room: the room the bar points at, or the one last used
 // (arrangement.js, currentRoom). For the verbs that act on a board on
 // screen (30 October); open: and new: make rooms their own way.
@@ -80,12 +80,26 @@ export const LEADERS = Object.freeze({
   ],
 })
 
+// Lines of several commands to copy, in the command menu after the bar's
+// leaders (C284's suggestion; C286 (g)). A click writes the line into the bar.
+export const LINES = Object.freeze({
+  title: /*i18n*/ { id: 'group.lines', message: 'Lines of several commands' },
+  rows: [
+    { example: 'open:202 203 records spread arrange:save "morning"', gloss: /*i18n*/ { id: 'line.spreadSave', message: 'Open two chats and Records across your screens, and keep that as morning' } },
+    { example: 'close:records pop:collection display 2', gloss: /*i18n*/ { id: 'line.closePop', message: 'Close Records and put the Collection on your second screen' } },
+    { example: 'pin:207 tagadd:essay 207', gloss: /*i18n*/ { id: 'line.pinTag', message: 'Pin a chat and tag it. undo: takes back the whole line', comment: 'Commands stay English' } },
+    { example: 'type:chat tag:essay since:7d', gloss: /*i18n*/ { id: 'line.filters', message: 'Chats tagged essay from the last seven days, in Records' } },
+  ],
+})
+
 const v = (entry) => Object.freeze({ forms: null, rest: false, minus: false, on: 'everywhere', spends: false, destructive: false, undoable: false, click: 'fill', retiredArgs: null, ...entry })
 
 export const VERBS = Object.freeze([
   // Go to
   v({ verb: 'records', group: 'go', example: 'records:', takes: [[]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.records', message: 'Bring Records and the Collection beside what is on screen' } }),
+  v({ verb: 'collection', group: 'go', example: 'collection:', takes: [[]], stage: 15, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.collection', message: 'Bring the Collection beside what is on screen' } }),
   v({ verb: 'plan', group: 'go', example: 'plan:', takes: [[]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.plan', message: 'Bring the Plan board beside what is on screen' } }),
   v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:', 'library:themes'], takes: [[], ['word']], stage: 5, click: 'apply',
@@ -128,7 +142,7 @@ export const VERBS = Object.freeze([
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']], ['text', { many: 'text' }]], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name; several at once, and spread across your screens' } }),
   // close:204 closes the room showing chat 204; close:welcome the welcome card (C146 (c)).
-  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:room', 'close:welcome'], takes: [[], [[...ON_SCREEN, 'welcome', 'tour', 'letter']], ['address']], stage: 3, undoable: true, click: 'apply',
+  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:room', 'close:welcome'], takes: [[], [[...ON_SCREEN, 'welcome', 'tour']], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen, or close the letter. Nothing is lost' } }),
 
   // Run
@@ -202,8 +216,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.forget', message: 'Remove a saved search, collection, framework of yours or arrangement' } }),
 
   // Tags
-  v({ verb: 'tagadd', group: 'tags', example: 'tagadd:essay 207, 216', takes: [['text', { opt: 'addresses' }]], on: TABLES, stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.tagadd', message: 'Tag things, or what is selected' } }),
+  v({ verb: 'tagadd', group: 'tags', example: 'tagadd:essay 207, 216', forms: ['tagadd:essay 207, 216', 'tagadd:favorite reply'], takes: [['text', { opt: 'addresses' }], ['text', ['reply', 'prompt']]], on: [...TABLES, 'room'], stage: 6, undoable: true,
+    gloss: /*i18n*/ { id: 'verb.tagadd', message: 'Tag things, what is selected, or the reply you are in' } }),
   v({ verb: 'retag', group: 'tags', example: 'retag:essay to "Long form"', takes: [['text', ['to'], 'text']], on: TABLES, stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.retag', message: 'Rename a tag everywhere' } }),
   v({ verb: 'untag', group: 'tags', example: 'untag:essay 207', takes: [['text', { opt: 'addresses' }]], on: TABLES, stage: 6, undoable: true,
@@ -216,20 +230,23 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.pin', message: 'Keep something at the top of its list' } }),
   v({ verb: 'archive', group: 'items', example: 'archive:209', forms: ['archive:209', 'archive:off 209'], takes: [['addresses'], [['off'], 'addresses']], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.archive', message: 'Put something away without deleting it' } }),
-  v({ verb: 'copy', group: 'items', example: 'copy:207', takes: [['address']], stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.copy', message: 'Copy something as Markdown' } }),
+  // reply and prompt: the message in hand, or the last one (C286 (b); lib/messageVerbs.js).
+  v({ verb: 'copy', group: 'items', example: 'copy:207', forms: ['copy:207', 'copy:reply'], takes: [['address'], [['reply', 'prompt']]], stage: 6, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.copy', message: 'Copy something as Markdown, or the reply you are in' } }),
+  v({ verb: 'quote', group: 'items', example: 'quote:reply', forms: ['quote:reply', 'quote:prompt', 'quote:reply 207'], takes: [[], [['reply', 'prompt']], [['reply', 'prompt'], 'address']], stage: 15, undoable: true,
+    gloss: /*i18n*/ { id: 'verb.quote', message: 'Keep a quote of the whole reply you are in, beside its chat or in another. It is never sent' } }),
   v({ verb: 'export', group: 'items', example: 'export:md 201', forms: ['export:md 201', 'export:jsonl 207, 216', 'export:md records'],
     takes: [[], [['md', 'jsonl'], { opt: 'addresses' }], [['md', 'jsonl'], ['records']]], on: TABLES, stage: 6,
     gloss: /*i18n*/ { id: 'verb.export', message: 'Download as Markdown or JSONL to read elsewhere. It cannot be restored' } }),
-  v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"'],
+  v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"', 'note:reply "Check this figure"'],
     rest: true, takes: [['text']], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.note', message: 'Write a note for people. It is never sent' } }),
   // delete: (C199): the one word for removing. What has been sent goes for
   // good after a second Enter (C137); what has not (a planned step, a branch
   // that never ran, a plan with no chat) goes on one Enter, and undo: brings
   // it back. Alone, it points to Delete everything in Settings.
-  v({ verb: 'delete', group: 'items', example: 'delete:207', forms: ['delete:207', 'delete:207, 216', 'delete:201c', 'delete:201c all', 'delete:201a 2'],
-    takes: [[], [['everything']], ['addresses', { opt: ['all'] }], ['address', 'number']], stage: 6, destructive: true,
+  v({ verb: 'delete', group: 'items', example: 'delete:207', forms: ['delete:207', 'delete:207, 216', 'delete:201c', 'delete:201c all', 'delete:201a 2', 'delete:reply'],
+    takes: [[], [['everything']], ['addresses', { opt: ['all'] }], ['address', 'number'], [['reply', 'prompt']]], stage: 6, destructive: true,
     gloss: /*i18n*/ { id: 'verb.delete', message: 'Delete something by its number. What has been sent goes for good, after a second Enter' } }),
   v({ verb: 'undo', group: 'items', example: 'undo:', forms: ['undo:', 'undo:242'], takes: [[], ['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.undo', message: 'Take back the last command, or one edit. It stops at a run' } }),
@@ -256,7 +273,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'hold', group: 'editing', example: 'hold:242', forms: ['hold:242', 'hold:201c', 'hold:off 242'], takes: [['addresses'], [['off'], { opt: 'addresses' }]], on: EDITING, stage: 10, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.hold', message: 'Keep a branch or an edit from going until you say' } }),
   v({ verb: 'markup', group: 'editing', example: 'markup:off', forms: ['markup:on', 'markup:off'], takes: [[['on', 'off'], { opt: ['col'] }]], on: EDITING, stage: 11, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.markup', message: 'Show replies marked up, or clean' } }),
+    gloss: /*i18n*/ { id: 'verb.markup', message: 'Markup: show your edits in replies, or show replies clean' } }),
   // Who answers in the chat the room shows (C149): a model or a source.
   // Works from any board, as a prompt does. Several at once is branches.
   // A name of several words needs no quotes: by:mistral small.
@@ -336,9 +353,9 @@ export const VERBS = Object.freeze([
   v({ verb: 'cols', group: 'layout', example: 'cols:-room +created', forms: ['cols:-room +created', 'cols:'], takes: [[], [{ many: 'word' }]], on: ['almanac'], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cols', message: 'Hide or show columns of the table' } }),
   v({ verb: 'focus', group: 'layout', example: 'focus:', forms: ['focus:', 'focus:sym col', 'focus:save', 'focus:off'], takes: [[], [['save', 'off']], [{ many: 'word' }]], stage: 5, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.focus', message: 'Clear the screen to your chosen boards, keep that set, or come back' } }),
+    gloss: /*i18n*/ { id: 'verb.focus', message: 'Close every board but the chat, or but the boards you name. focus:off brings the rest back' } }),
   v({ verb: 'calm', group: 'layout', example: 'calm:', forms: ['calm:', 'calm:off'], takes: [[], [['off']]], stage: 14, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.calm', message: 'Show less detail until you come near it, or all of it again' } }),
+    gloss: /*i18n*/ { id: 'verb.calm', message: 'Hide markup and the details on boards until you come near them. calm:off shows them' } }),
   v({ verb: 'arrange', group: 'layout', example: 'arrange:"Review desk"', forms: ['arrange:', 'arrange:"Review desk"', 'arrange:save "Review desk"', 'arrange:"Review desk" 207'],
     takes: [[], [['save'], 'text'], ['text', { opt: 'address' }]], stage: 14, undoable: true,
     gloss: /*i18n*/ { id: 'verb.arrange', message: 'Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning"', comment: 'Commands stay English' } }),

@@ -577,7 +577,10 @@ export function planPopBar(a, popped) {
  */
 export function planBar(a, place) {
   const axis = place === 'top' || place === 'bottom' ? 'at' : 'side'
-  if (a.bar[axis] === place && !a.bar.popped) return refuse('barThere', { place })
+  // The bar in a window of its own moves that window, on the screen it is
+  // on, and stays out; pop:back command brings it to the page (C286 (n)).
+  if (a.bar.popped) return go({ ...copy(a), bar: { ...a.bar, [axis]: place, moved: (a.bar.moved ?? 0) + 1 } }, 'barWindowMove', { place })
+  if (a.bar[axis] === place) return refuse('barThere', { place })
   return go({ ...copy(a), bar: { ...a.bar, [axis]: place, popped: false } }, 'barMove', { place })
 }
 
@@ -646,8 +649,32 @@ function shareFor(shares, least, k, target, total) {
  * its least width is counted as it is drawn.
  * @param {{ columns: string[][], widths: number[], least: number[], stacked?: boolean }|null} [layout]
  */
+/** A board's share of its window's width: 1, unless width: set another (C286 (k)). */
+export function windowShare(a, board) {
+  const p = (a.popped ?? []).find((x) => x.board === board)
+  return Number.isFinite(p?.share) && p.share > 0 ? p.share : 1
+}
+
+/** width:40% on a board in a window with others: its share of that window (C286 (k)). */
+function planWidthInWindow(a, board, percent, named) {
+  const w = windowWith(a, board)
+  if (!w || w.boards.length === 1) return refuse('widthPopped', { board })
+  if (!(percent >= WIDTH_RANGE.low && percent <= WIDTH_RANGE.high)) return refuse('widthRange', WIDTH_RANGE)
+  const shares = w.boards.map((b) => windowShare(a, b))
+  const k = w.boards.indexOf(board)
+  const others = shares.reduce((sum, x, i) => (i === k ? sum : sum + x), 0)
+  if (Math.abs((shares[k] / (shares[k] + others)) * 100 - percent) < 0.5) return refuse('widthThere')
+  const share = (percent / (100 - percent)) * others
+  const next = copy(a)
+  next.popped = next.popped.map((x) => (x.board === board ? { ...x, share } : x))
+  next.addressed = board
+  if (named && isRoom(board)) return go(next, 'widthRoom', { board, percent })
+  return go(next, named ? 'widthSet' : 'widthIt', { board, percent })
+}
+
 export function planWidth(a, board, percent, named = false, layout = null) {
-  if (!isOnPage(a, board)) return refuse(isPopped(a, board) ? 'widthPopped' : 'closeNotHere', { board })
+  if (isPopped(a, board)) return planWidthInWindow(a, board, percent, named)
+  if (!isOnPage(a, board)) return refuse('closeNotHere', { board })
   if (a.columns.length === 1) return refuse('widthAlone')
   if (!(percent >= WIDTH_RANGE.low && percent <= WIDTH_RANGE.high)) return refuse('widthRange', WIDTH_RANGE)
   const shares = columnShares(a)
@@ -677,8 +704,12 @@ export function planWidth(a, board, percent, named = false, layout = null) {
 
 /** width:even. Every board back to its usual share. */
 export function planWidthEven(a) {
-  if (!Object.keys(a.widths ?? {}).length) return refuse('widthEvenAlready')
-  return go({ ...copy(a), widths: {} }, 'widthEven')
+  const inWindows = (a.popped ?? []).some((p) => p.share != null)
+  if (!Object.keys(a.widths ?? {}).length && !inWindows) return refuse('widthEvenAlready')
+  const next = { ...copy(a), widths: {} }
+  // Boards in windows too (C286 (k)).
+  next.popped = next.popped.map(({ share, ...rest }) => (void share, rest))
+  return go(next, 'widthEven')
 }
 
 // ── focus: (welcome spec §7; stage 5, piece 6) ──────────

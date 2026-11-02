@@ -41,6 +41,29 @@ export function copyStyles(from, to, { dev = Boolean(import.meta.env?.DEV) } = {
   return counts
 }
 
+// How long a window waits for its stylesheets before it shows the board anyway.
+export const STYLED_MOST_MS = 3000
+
+/**
+ * Keeps a window's board hidden until the stylesheets copied into it have
+ * loaded, so it never shows unstyled for a moment (C286 (i)); at most
+ * STYLED_MOST_MS, and at once when there are none to wait for.
+ */
+export function showWhenStyled(doc, container, most = STYLED_MOST_MS) {
+  const waiting = [...(doc.head?.querySelectorAll?.('link[rel="stylesheet"]') ?? [])].filter((l) => !l.sheet)
+  if (!waiting.length) return 0
+  container.hidden = true
+  let left = waiting.length
+  const show = () => { container.hidden = false }
+  const one = () => { left -= 1; if (left <= 0) show() }
+  for (const l of waiting) {
+    l.addEventListener('load', one, { once: true })
+    l.addEventListener('error', one, { once: true })
+  }
+  ;(doc.defaultView ?? globalThis).setTimeout(show, most)
+  return waiting.length
+}
+
 function prepare(win, { title, from }) {
   const doc = win.document
   doc.title = title
@@ -51,6 +74,7 @@ function prepare(win, { title, from }) {
   const container = doc.createElement('div')
   container.className = 'ch-window-root'
   doc.body.appendChild(container)
+  showWhenStyled(doc, container)
   return { win, container }
 }
 
@@ -97,6 +121,28 @@ export function placePopout({ win }, side, screen = null) {
 /** Moves a popped window to a place on a screen (C259 (e)), where the browser allows it. */
 export function movePopout({ win }, at) {
   try { if (at) win.moveTo(Math.round(at.left), Math.round(at.top)) } catch { /* the browser decides where windows go */ }
+}
+
+/** Moves a window to an edge of the screen it is on, top, bottom, left, right or centre, where the browser allows it (C286 (n)). */
+export function popoutToEdge({ win }, place) {
+  try {
+    const s = win.screen ?? {}
+    const left0 = s.availLeft ?? 0
+    const top0 = s.availTop ?? 0
+    const width = win.outerWidth || SIZES.bar.width
+    const height = win.outerHeight || SIZES.bar.height
+    let left = win.screenX ?? left0
+    let top = win.screenY ?? top0
+    if (place === 'top') top = top0
+    else if (place === 'bottom') top = top0 + (s.availHeight ?? height) - height
+    else if (place === 'left') left = left0
+    else if (place === 'right') left = left0 + (s.availWidth ?? width) - width
+    else left = left0 + Math.round(((s.availWidth ?? width) - width) / 2)
+    win.moveTo(Math.round(left), Math.round(top))
+    return true
+  } catch {
+    return false
+  }
 }
 
 /** Closes a popped window, if it is still open. */

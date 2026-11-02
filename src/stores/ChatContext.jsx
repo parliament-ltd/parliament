@@ -9,7 +9,7 @@ import { useSettings } from './SettingsContext'
 import { gateway, destination, runClientTool, continueInstruction, providerOf, modelsOf, modelFacts } from '../net'
 import {
   startStream, appendStream, showStreamText, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
-  isStreaming as streamingIn, streamingIds, addNotice, noteCut, watch, watched,
+  isStreaming as streamingIn, streamingIds, addNotice, noteCut, watch, watched, startSending, doneStarting,
   getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
@@ -318,7 +318,7 @@ export function ChatProvider({ children }) {
   // group: the branches a prompt to several went to (C172 (b)); describe:
   // whether a first answer asks for the chat's title (C62), once per prompt
   // to several, not once per branch (C172 (e)).
-  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null, into = null } = {}) => {
+  const sendNow = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null, into = null } = {}) => {
     // into: the messages a prompt and reply were joined from, whose edits
     // went into this prompt's words and are not told again (C214 (c)).
     // One reply at a time in a chat; other chats are free.
@@ -563,6 +563,18 @@ export function ChatProvider({ children }) {
       endStream(conversationId)
     }
   }, [persistEvery, keepPartial, describeNewChat, updateConversation, holdTell])
+
+  // A chat takes one send at a time from the moment it is asked, not only
+  // once its reply starts: a second Enter while the first is still being
+  // put together is not sent again.
+  const sendMessage = useCallback(async (conversationId, ...rest) => {
+    if (!startSending(conversationId)) return undefined
+    try {
+      return await sendNow(conversationId, ...rest)
+    } finally {
+      doneStarting(conversationId)
+    }
+  }, [sendNow])
 
   // Sends a chat's last prompt again without streaming, after its reply
   // stalled behind a network that holds streamed replies (C114). Only on the

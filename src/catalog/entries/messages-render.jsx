@@ -56,6 +56,7 @@ import { useConversationId } from '../../stores/ConversationScope'
 import { useStreamText, useStreamMessageId, useHiddenIds, usePendingDeletes, useStreamThinking, useStreamAnswering } from '../../stores/chatHooks'
 import { getStream } from '../../stores/chatStore'
 import { hideMessage, showAllMessages, scheduleDelete, undoDelete } from '../../stores/chatStore'
+import { DELETE_UNDO_MS } from '../../lib/messageVerbs'
 import { COPY } from '../../copy'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
@@ -111,7 +112,6 @@ function useBranchMembers(ids, watchConversation) {
   }, [key, watchConversation])
   return members
 }
-const DELETE_UNDO_MS = 20_000
 
 // Why a reply stopped short, said on the reply (C109; stage 4).
 const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, error: COPY.chat.cutError }
@@ -137,8 +137,8 @@ export default function MessagesRender() {
   const { i18n } = useLingui()
   const { settings } = useSettings()
   const {
-    favorites, notes, highlights, showNotes,
-    toggleFavorite, toggleNotePanel, saveNote, addHighlight,
+    notes, highlights, showNotes,
+    toggleNotePanel, saveNote, addHighlight,
   } = useAnnotations()
   // The room board this draws in: its chat's frameworks and reply language,
   // for Continue (stage 13, piece 8; C251 (d)).
@@ -472,7 +472,6 @@ export default function MessagesRender() {
       ? (streamingThinking ? { text: streamingThinking, live: true, answering: streamingAnswering, since: getStream(activeConversationId)?.thinkingAt ?? null } : null)
       : (msg.role === 'assistant' && msg.thinking ? { text: msg.thinking, ms: msg.thinkingMs ?? null } : null)
     const noteRecord = notes.get(msg.id)
-    const isFav = favorites.has(msg.id)
     // A finished reply from a model is edited in place (stage 11, piece 1);
     // one still arriving, cut off, or from a source is not.
     const editable = !isGhost && editableReply(msg, isLatestAssistantStreaming ? msg.id : null)
@@ -496,7 +495,6 @@ export default function MessagesRender() {
       tells: msg.role === 'user' ? tellsOf(msg.told) : null,
       summary: summaryInfo(msg),
       thinking,
-      isFavorited: isFav,
       showNotes: showNotes.has(msg.id),
       savedNoteText: noteRecord?.text || '',
       // A card shows its own message's highlights only (C285).
@@ -506,7 +504,6 @@ export default function MessagesRender() {
       onPopoverChange: (active) => setActivePopoverMsgId(active ? msg.id : null),
       onContinue: isGhost ? () => handleContinue(msg.id) : undefined,
       onCopyText: () => handleCopyText(msg.content),
-      onFavorite: () => toggleFavorite(msg.id),
       onNote: () => toggleNotePanel(msg.id),
       onNoteSave: (text) => saveNote(msg.id, text),
       onHighlight: (text, color, nth) => addHighlight(msg.id, text, color, nth),
@@ -533,9 +530,9 @@ export default function MessagesRender() {
     saveEditedReply, settings.markup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
-    favorites, notes, highlights, showNotes,
+    notes, highlights, showNotes,
     handleContinue, handleCopyText,
-    toggleFavorite, toggleNotePanel, saveNote, addHighlight,
+    toggleNotePanel, saveNote, addHighlight,
     handleHide, handleDelete, handleSendToBranch, handlePinForReference,
     handleQuote, quotesByMessage, summaryInfo, branchFrom,
   ])

@@ -35,6 +35,9 @@ export const BOARDS = Object.freeze({
   // beside the work or pop into a window. Off the strip; open:commandmenu or
   // pop:commandmenu brings it.
   commands: { title: null, resting: 'search', can: [], closable: true, strip: null },
+  // The letter (C279 (c)) as a board since 2 November (C286 (q)): letter:
+  // brings it, and it moves, pops and closes like any board. Off the strip.
+  letter: { title: null, resting: 'search', can: [], closable: true, strip: null },
   // The welcome page's card: not a board in the documents, but it sits in
   // the space like one. tour: brings it, close: takes it away (C125).
   welcome: { title: null, resting: 'search', can: [], closable: true, strip: null },

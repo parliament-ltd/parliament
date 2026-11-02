@@ -62,6 +62,18 @@ function withCommand(i18n, descriptor, command, onWrite) {
   )
 }
 
+// A line with several commands in it, each a link that writes it in the bar.
+function withCommands(i18n, descriptor, commands, onWrite) {
+  const names = Object.keys(commands)
+  const marks = Object.fromEntries(names.map((n, i) => [n, `${MARK}${i}${MARK}`]))
+  const parts = i18n._(descriptor, marks).split(new RegExp(`${MARK}([0-9]+)${MARK}`))
+  return parts.map((part, i) => {
+    if (i % 2 === 0) return part
+    const command = commands[names[Number(part)]]
+    return <button key={i} type="button" className="c" dir="ltr" onClick={() => onWrite(command.startsWith('>') ? command : `>${command}`)}>{command}</button>
+  })
+}
+
 /**
  * @param {{ welcome: import('../shell/welcome').Welcome, addressed: boolean, onAddress: (board: string) => void,
  *   onWrite: (text: string) => void, barSlot: (el: HTMLElement|null) => void,
@@ -156,9 +168,10 @@ export function StartBoard({ addressed, onAddress, onWrite, barSlot, languages =
           <BirdsMark className="ch-slogo" />
           <div className="ch-wbar" ref={barSlot} />
           <ul className="ch-shint">
-            <li>{withCommand(i18n, COPY.welcome.startRoom, 'p>', onWrite)}</li>
-            <li>{withCommand(i18n, COPY.welcome.startOpen, 'open:records', onWrite)}</li>
-            <li>{withCommand(i18n, COPY.welcome.startTour, 'tour:', onWrite)}</li>
+            {/* Stefan's words, 2 November (C286 (e)): one line each. */}
+            <li>{withCommand(i18n, COPY.welcome.startPrompt, 'p>', onWrite)}</li>
+            <li>{withCommands(i18n, COPY.welcome.startCommands, { first: '>', second: '?' }, onWrite)}</li>
+            <li>{withCommand(i18n, COPY.welcome.startHistory, 'open:records', onWrite)}</li>
           </ul>
         </div>
       </div>

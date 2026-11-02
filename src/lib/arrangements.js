@@ -58,6 +58,8 @@ export function cleanArrangement(record) {
       side: SIDES.has(p.side) ? p.side : null,
       from: Number.isInteger(p.from) && p.from >= 0 ? p.from : columns.length,
       window: Number.isInteger(p.window) && p.window > 1 && p.window < 100 ? p.window : null,
+      // Its share of its window's width, set by width: (C286 (k)); none is an even share.
+      ...(Number.isFinite(p.share) && p.share > 0 && p.share <= 1000 ? { share: p.share } : {}),
     }))
   // A window holds one board or several (C283). One kept before C283 has no
   // number: it takes one of its own, so it opens alone, as it did. The

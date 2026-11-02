@@ -71,8 +71,8 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
     parts = [{ key: 'does', now: true, text: say(speaker, says.message, says.values), lang }, ...also]
     if (resting !== 'search') parts.push(leave)
   } else if (mode === 'search' && welcome && empty) {
-    // At rest on the welcome page, one line only (W §2).
-    parts = [{ key: 'begin', now: true, text: i18n._(COPY.enter.toBegin, { leader: '>' }) }]
+    // At rest on the welcome page, nothing: how to begin is in the field (C286 (h)).
+    parts = []
   } else if (mode === 'search') {
     parts = empty
       ? [

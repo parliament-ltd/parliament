@@ -147,6 +147,18 @@ export const streamMessageId = (id) => streams.get(id)?.messageId ?? null
 export const isStreaming = (id) => streams.has(id)
 export const streamingIds = () => [...streams.keys()]
 
+// Chats with a send being put together, before its reply starts: one send
+// at a time from the moment it is asked, so a second Enter is not sent too.
+const starting = new Set()
+export const isStarting = (id) => starting.has(id)
+export const busySending = (id) => starting.has(id) || streams.has(id)
+export function startSending(id) {
+  if (busySending(id)) return false
+  starting.add(id)
+  return true
+}
+export const doneStarting = (id) => { starting.delete(id) }
+
 // ── Who shows a chat (stage 8, piece 2; C109, C173) ──
 //
 // A chat is left, and a reply being written in it stopped (C109), when
@@ -313,6 +325,7 @@ export function sendableOf(messages, hiddenSet, pending = NONE) {
 export function _reset() {
   watchers.clear()
   streams.clear()
+  starting.clear()
   listeners.clear()
   waiting.clear()
   if (timer) clearTimeout(timer)

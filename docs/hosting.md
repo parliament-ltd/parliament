@@ -15,7 +15,7 @@ every record below can be read by anyone with a DNS lookup.
 | Mail | Proton Mail | |
 | Code | GitHub, `parliament-ltd/parliament`, public | Under the organization `parliament-ltd`. `main` cannot be force pushed or deleted. Each release is immutable and carries its two archives and `SHA256SUMS` (C276) |
 | Code mirror | Bitbucket, `parliament-ltd/parliament`, public | Two-factor on. Each release is pushed to it with GitHub (C264 (i)) |
-| Standby site | Cloudflare Pages | Two-factor on. The site is made from the public repository in stage 15, piece 8 |
+| Standby site | Cloudflare Pages, projects `parliament` and `parliament-keys` | Two-factor on. Built from the public repository's `main`, with the same headers (C286 (o)); no address points at it until a move |
 
 ## Records
 
@@ -49,13 +49,40 @@ every record below can be read by anyone with a DNS lookup.
    data, that is safe only in the first minutes, since upgraded data does not
    open in the older version.
 
+## The standby on Cloudflare Pages
+
+Set up once (C286 (o)). Each build writes Cloudflare's `_headers` file from
+`netlify.toml` (`scripts/standby.mjs`), so the standby serves the same
+security policy; a test keeps the two equal.
+
+1. In Cloudflare, Workers & Pages, create a Pages project from Git. Install
+   Cloudflare's GitHub app on `parliament-ltd` with access to the
+   `parliament` repository only.
+2. The app, project `parliament`: production branch `main`, no framework
+   preset, build command `npm run build:standby`, output directory `dist`,
+   environment variable `NODE_VERSION` = `24`.
+3. The vault, project `parliament-keys`: the same repository and branch,
+   build command `npm run build:vault:standby`, output directory
+   `vault/dist`, `NODE_VERSION` = `24`.
+4. In each project's build settings, turn preview deployments off, so only
+   `main` builds. `main` is pushed only at a release, so the standby always
+   holds the released version.
+5. Check the app at its Pages address (`parliament.pages.dev`, or the name
+   Cloudflare gave): it loads, and its responses carry the
+   Content-Security-Policy. Keys do not work there, since the vault lets only
+   `www.parliament.ltd` frame it; that is expected.
+6. No custom domain yet. Adding one is the move itself, below.
+
 ## If the site has to move
 
-1. Deploy the same builds to the standby host, with the same headers: the app,
-   and the vault as a site of its own.
-2. At deSEC, point the A record for `parliament.ltd` and the CNAMEs for `www`
-   and `keys` at the standby.
-3. Check that the standby has issued a certificate for all three names before
+1. On Cloudflare Pages, add `www.parliament.ltd` as a custom domain of
+   `parliament`, and `keys.parliament.ltd` of `parliament-keys`. Each
+   shows the address its record should point at.
+2. At deSEC, point the CNAMEs for `www` and `keys` at those addresses. The
+   bare `parliament.ltd` only sends people on to `www`; Pages cannot serve
+   it while DNS stays at deSEC, so it stays with Netlify, and `www` is the
+   address to give out meanwhile.
+3. Check that the standby has issued a certificate for both names before
    announcing anything. The page frames only `keys.parliament.ltd`, and the
    vault lets only `www.parliament.ltd` frame it, so both move together.
 

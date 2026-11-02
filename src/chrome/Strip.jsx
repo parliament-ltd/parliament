@@ -49,6 +49,8 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
           className={`ch-btitle${b.here ? ' here' : ''}`}
           aria-current={b.addressed ? 'true' : undefined}
           aria-label={[i18n._(COPY.boards[isRoom(b.board) ? 'room' : b.board]), b.context].filter((x) => x != null).join(' ')}
+          // The command a click is the same as, on hover (C286 (d)).
+          title={i18n._(COPY.shell.focusRuns, { command: isRoom(b.board) ? 'room:' : `open:${wordFor(b.board)}` })}
           onClick={() => onPick(b.board, Boolean(b.exact))}
         >
           <span dir="ltr">{b.title}</span>
@@ -58,7 +60,7 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
       {onRun && (
         <span className="ch-marg ch-scalm">
           <button type="button" className={calm ? 'on' : undefined} aria-pressed={calm}
-            title={i18n._(COPY.shell.focusRuns, { command: calm ? 'calm:off' : 'calm:' })}
+            title={i18n._(COPY.shell.calmTitle, { command: calm ? 'calm:off' : 'calm:' })}
             onClick={() => onRun(calm ? 'calm:off' : 'calm:')}>
             {i18n._(calm ? COPY.shell.calmOn : COPY.shell.calmOff)}
           </button>
@@ -67,7 +69,7 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
       {onRun && !phone && (
         <span className="ch-marg ch-sfocus">
           <button type="button" className={on ? 'on' : undefined} aria-pressed={on}
-            title={i18n._(COPY.shell.focusRuns, { command: on ? 'focus:off' : 'focus:' })}
+            title={i18n._(COPY.shell.focusTitle, { command: on ? 'focus:off' : 'focus:' })}
             onClick={() => onRun(on ? 'focus:off' : 'focus:')}>
             {i18n._(on ? COPY.shell.focusOn : COPY.shell.focusOff)}
           </button>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { copyStyles, openPopout, closePopout, fitSize } from './popout'
+import { copyStyles, openPopout, closePopout, fitSize, showWhenStyled } from './popout'
 
 // Small stand-ins for documents and windows, enough for what popout.js does.
 function fakeDoc(nodes = []) {
@@ -20,6 +20,37 @@ describe('styles in a popped window', () => {
     expect(copyStyles(page, built, { dev: false })).toEqual({ links: 2, inline: 0 })
     expect(built.head.children.every((n) => n.tagName === 'LINK')).toBe(true)
     expect(copyStyles(page, fakeDoc(), { dev: true })).toEqual({ links: 2, inline: 1 })
+  })
+})
+
+describe('a popped board waits for its styles (C286 (i))', () => {
+  const link = () => {
+    const on = {}
+    return { sheet: null, on, addEventListener: (type, fn) => { on[type] = fn } }
+  }
+  it('is hidden until every stylesheet has loaded or failed', () => {
+    const a = link()
+    const b = link()
+    const doc = { head: { querySelectorAll: () => [a, b] }, defaultView: { setTimeout: () => {} } }
+    const container = { hidden: false }
+    expect(showWhenStyled(doc, container)).toBe(2)
+    expect(container.hidden).toBe(true)
+    a.on.load()
+    expect(container.hidden).toBe(true)
+    b.on.error()
+    expect(container.hidden).toBe(false)
+  })
+  it('shows at once with nothing to wait for, and after the longest wait regardless', () => {
+    const container = { hidden: false }
+    expect(showWhenStyled({ head: { querySelectorAll: () => [{ sheet: {} }] } }, container)).toBe(0)
+    expect(container.hidden).toBe(false)
+    let later = null
+    const doc = { head: { querySelectorAll: () => [link()] }, defaultView: { setTimeout: (fn, ms) => { later = { fn, ms } } } }
+    showWhenStyled(doc, container)
+    expect(container.hidden).toBe(true)
+    expect(later.ms).toBe(3000)
+    later.fn()
+    expect(container.hidden).toBe(false)
   })
 })
 

@@ -1162,6 +1162,18 @@ export async function removeOwnNote(db, { id, num, text }) {
   })
 }
 
+/** A quote made by quote: or tagadd:… reply (C286 (b)), taken out by undo:, unless changed since. */
+export async function removeMadeQuote(db, { id, num, content, tags = [] }) {
+  return write(db, ['pins'], async (tx) => {
+    const store = tx.objectStore('pins')
+    const now = await store.get(id)
+    if (!now) return { result: null, changes: [] }
+    if (now.num !== num || now.content !== content || JSON.stringify(now.tags ?? []) !== JSON.stringify(tags)) throw new Changed([num])
+    await store.delete(id)
+    return { result: null, changes: [{ kind: 'quote', op: 'removed', id, num }] }
+  })
+}
+
 // ── Plans ahead of a run (stage 10, piece 1; C196) ──────
 //
 // A plan's steps can be written before anything runs; a run can be made from

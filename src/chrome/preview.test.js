@@ -105,10 +105,10 @@ describe('one space: records: and room: bring boards beside what is here (C125, 
     expect(at('>letter:').next).toBeNull()
   })
 
-  it('close:letter closes the letter, as Escape does', () => {
-    expect(at('>close:letter').text).toBe('Enter closes the letter')
-    expect(at('>close:letter').act).toEqual({ kind: 'letterClose' })
-    expect(at('>close:letter').next).toBeNull()
+  it('the letter is a board: letter: plans it, close:letter closes it like any board (C286 (q))', () => {
+    expect(at('>letter:').act).toMatchObject({ kind: 'letter' })
+    expect(at('>close:letter').text).toBe('Letter is not open')
+    expect(at('>pop:letter').text).not.toMatch(/not built/)
   })
 
   it('open:commandmenu and pop:commandmenu bring the command menu as a board (C280)', () => {

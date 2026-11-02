@@ -176,6 +176,10 @@
 .ch-letterp-list { list-style: none; margin: 8px 0 0; padding: 0; }
 .ch-shell .ch-letterp-list button { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); text-align: start; font: 400 13px var(--ch-serif); color: var(--ch-ink); }
 .ch-shell .ch-letterp-list button:hover { background: var(--ch-wash); }
+/* The letter as a board (C286 (q)): the letter at reading size, in the card. */
+.ch-letterb .ch-cbody { padding: 18px 22px 22px; }
+.ch-letterb .ch-letter { margin: 0; max-width: 62ch; font-size: 15px; line-height: 1.7; }
+.ch-letterb .ch-letter p + p { margin-top: 12px; }
 .ch-dock.bottom .ch-letterp { position: absolute; inset-inline: 0; bottom: 100%; margin: 0 0 10px; }
 .ch-inspect blockquote { margin: 0 0 6px; padding-inline-start: 10px; border-inline-start: 2px solid var(--ch-ink); font-style: italic; font-size: 14px; white-space: pre-wrap; }
 .ch-inspect p { margin: 6px 0; white-space: pre-wrap; }
@@ -337,7 +341,7 @@
 /* The panels under the field open above it too, with the bar at the bottom: the
    keys (api:) and backups, inspect: and compare:, and the letter (31 October).
    The bar stays where it is. */
-.ch-dock.bottom :is(.ch-keys, .ch-inspect, .ch-letterp) { position: absolute; inset-inline: clamp(16px, 4vw, 32px); bottom: calc(100% - 12px); margin: 0 0 10px; max-height: 58vh; z-index: 2; }
+.ch-dock.bottom :is(.ch-keys, .ch-inspect, .ch-letterp) { position: absolute; inset-inline: clamp(16px, 4vw, 32px); bottom: 100%; margin: 0 0 10px; max-height: 58vh; z-index: 2; }
 .ch-shell.size-phone .ch-ref { --ch-ref-edge: 10px; }
 /* The languages opened from the globe: a panel right under it, in its
    corner, one column (30 October). */
@@ -398,6 +402,8 @@
 .ch-in-window { min-height: 100vh; }
 .ch-in-window .ch-stage { padding: 12px; }
 .ch-in-window .ch-col > * { flex: 1 1 auto; }
+/* A window's boards share its width as width: set them (C286 (k)). */
+.ch-in-window .ch-stage > .ch-col { flex-grow: var(--share, 1); }
 /* A window's full screen mark, in its corner (C283). */
 .ch-shell .ch-winfull { position: fixed; bottom: 4px; inset-inline-end: 14px; z-index: 5; color: var(--ch-marg); }
 .ch-shell .ch-winfull:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
@@ -495,9 +501,9 @@
 .ch-fmarg.pick::after { content: "\25BE"; font-style: normal; font-size: 7px; margin-inline-start: 3px; opacity: 0; transition: opacity var(--ch-dur-fade); }
 .ch-fmarg.pick:hover::after, .ch-fmarg.pick[aria-expanded="true"]::after { opacity: .5; }
 /* The frameworks sit before who answers, a dot between (C164). */
-.ch-fmarg.fw { margin-inline-end: 0; padding-inline-end: 0; }
+.ch-fmarg.fw { margin-inline-end: 0; padding-inline-end: 3px; }
 /* Features of input in the field (stage 13, piece 6; C248): words, held ones in ink. */
-.ch-fmarg.feat { margin-inline-end: 0; padding-inline-end: 0; }
+.ch-fmarg.feat { margin-inline-end: 0; padding-inline-end: 3px; } /* room for an italic last letter, which overflow would clip (C286) */
 .ch-shell .ch-field .ch-fmarg.feat, .ch-shell .ch-field .ch-fmarg.feat + .ch-fmarg { padding-inline-start: 12px; }
 .ch-fmarg.feat::after { display: none; }
 .ch-shell .ch-fmarg.feat.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
@@ -642,9 +648,8 @@
 .ch-dock.card { position: static; padding: 0; background: transparent; }
 .ch-dock.card .ch-dock-in { max-width: none; margin: 0; }
 .ch-dock.card .ch-frow { justify-content: flex-start; }
-.ch-dock.card .ch-field.search { background: transparent; box-shadow: none; border-radius: 8px; }
-.ch-dock.card .ch-field.search::after { content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px; background: rgba(25, 25, 25, .12); }
-.ch-dock.card .ch-field.search:focus-within { box-shadow: 0 0 0 1px var(--ch-focus-ink); }
+/* The field in the welcome card has its usual outline, and says how to
+   begin in grey inside it (C286 (h); Stefan, 2 November). */
 
 /* The foot of the welcome page, outside the card (W §9; C123). */
 .ch-foot { position: fixed; inset-inline: 0; bottom: 0; height: var(--welcome-foot, 40px); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0 5px; padding: 0 16px; }

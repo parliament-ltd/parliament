@@ -8,6 +8,8 @@
     "dev:vault": "vite --config vite.vault.config.js",
     "build": "vite build",
     "build:vault": "vite build --config vite.vault.config.js",
+    "build:standby": "vite build && node scripts/standby.mjs netlify.toml dist",
+    "build:vault:standby": "vite build --config vite.vault.config.js && node scripts/standby.mjs vault/netlify.toml vault/dist",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

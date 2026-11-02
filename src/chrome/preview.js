@@ -25,6 +25,7 @@ import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView,
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
 import { planNew, planAdd, planRm, planClear, planHeading, planMoveCard, planNameCollection, planForgetCollection, collectionNamed, planCollectionView } from '../lib/collectionVerbs'
 import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
+import { isMessageWord, planQuoteMessage, planCopyMessage, planDeleteMessage, planNoteMessage, planTagMessage } from '../lib/messageVerbs'
 import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
@@ -53,7 +54,7 @@ import { searchWords } from '../lib/searchWords'
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
 // Verbs that bring an arrangement, or a board, into the space (C95, C125).
-const BRINGS = Object.freeze(['records', 'room', 'library', 'plan', 'settings'])
+const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan', 'settings'])
 // Verbs that act on what the bar points at, rather than only on the space:
 // name: (C40), tour:, which also shows the welcome steps (A20), and
 // inspect:, which shows one thing in detail under the bar, and api:, which
@@ -67,7 +68,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan', 'settings'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange'])
+const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -123,6 +124,7 @@ function planSave(a, step, screens = {}) {
 
 /** copy:207, one thing as Markdown (C143 (f)). The shell builds it from what is stored. */
 function planCopyStep(a, step, screens = {}) {
+  if (isMessageWord(step.match?.values?.[0])) return planCopyMessage(step, screens)
   const p = planCopy(step.match?.values ?? [], screens.records?.rows ?? [])
   if (p.bad) return { says: p.bad, act: null }
   return { says: p.says, act: { kind: 'copy', num: p.row.num } }
@@ -176,6 +178,8 @@ function planExportStep(a, step, screens = {}) {
  */
 function planDeleteStep(a, step, screens = {}) {
   const vals = step.match?.values ?? []
+  // delete:reply, one message (C286 (b)).
+  if (vals.length === 1 && isMessageWord(vals[0])) return planDeleteMessage(step, screens)
   if (!vals.length || (vals.length === 1 && vals[0].kind === 'word' && vals[0].value === 'everything')) {
     return { says: { message: 'deleteEverything', values: { board: 'settings' } }, next: planOpenSettings(a, 'data').next }
   }
@@ -253,8 +257,14 @@ const newStep = (a, step, screens) => {
   if (what === 'framework') return planNewFramework(step, screens)
   // new:room (stage 13, piece 1; C238): a room, in the Lab. The guide comes with piece 4.
   // new:room guided (piece 4; C244 (f)): with the guide.
-  // new:room builds a room in the Lab, which waits for a later release (C279 (a)).
-  if (what === 'room' && !LAB) return { says: { message: 'notOffered', values: { verb: 'new:room' } }, next: null }
+  // new:chat, and new:room while the Lab waits (C279 (a)): an empty room
+  // beside what is here, the bar ready for its first prompt (C286 (c)).
+  if (what === 'chat' || (what === 'room' && !LAB && !second)) {
+    if (second) return null
+    const p = planRoom(a, null)
+    return { ...p, after: p.next ? 'prompt' : null }
+  }
+  if (what === 'room' && !LAB) return { says: { message: 'notOffered', values: { verb: 'new:room guided' } }, next: null }
   if (what === 'room') return !second ? planNewRoom() : second.value === 'guided' ? planNewRoom(true) : null
   if (what === 'branch') {
     // On the Plan board, or with a name: a branch with no chat until it
@@ -266,7 +276,7 @@ const newStep = (a, step, screens) => {
   if (what === 'plan') return planNewPlan(step)
   if (what === 'step') return planNewStep(step, screens)
   if (what === 'run') return planNewRun(screens)
-  return planNew(step)
+  return planNew(step, screens)
 }
 
 // open:"Water tower": a saved search by name (C140 (e)), or null when the
@@ -388,6 +398,8 @@ function focusSetLine(a, step, screens = {}) {
 function bring(a, step, screens = {}) {
   const named = Boolean(step.match?.values?.length)
   if (step.verb === 'records') return planBring(a, 'almanac')
+  // collection: (C286 (d)): the Collection alone, as open:collection.
+  if (step.verb === 'collection') return planOpen(a, 'collection')
   if (step.verb === 'room') return named ? null : planRoom(a, screens.lastRoom?.id ?? null)
   if (step.verb === 'library') return named ? null : planOpen(a, 'library')
   if (step.verb === 'plan') return planOpen(a, 'docket')
@@ -681,6 +693,16 @@ function planApi(a, step, screens = {}) {
 // The words of an argument as typed: quoted text without its quotes, or a
 // word as written (the parser lower-cases words).
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
+// note:reply "…" or note:reply alone; note:reply to Sam, unquoted, is a note of its own.
+const notesMessage = (step) => {
+  const args = step.args ?? []
+  return isMessageWord(args[0]) && (args.length === 1 || (args.length === 2 && args[1].kind === 'text'))
+}
+// tagadd:favorite reply: the word after the tag.
+const tagsMessage = (step) => {
+  const vals = step.match?.values ?? []
+  return vals.length === 2 && isMessageWord(vals[1])
+}
 
 /**
  * framework: the standing instructions that go with every prompt in the
@@ -919,6 +941,12 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     return { answer, says, next: null, act: { kind: 'collectionView', view } }
   }
 
+  // tagadd:favorite reply: one message, by tagging its quote (C286 (b); C147).
+  if (only?.verb === 'tagadd' && tagsMessage(only)) {
+    const p = planTagMessage(only, screens)
+    return { answer, says: p.says, next: null, act: p.act }
+  }
+
   // Row commands (C143): they share a line with each other (C99), and
   // undo: takes the line back whole.
   const rowSteps = answer.steps.filter(isRowStep)
@@ -965,7 +993,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       tour: planTour, letter: planLetter, name: nameIt, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo,
       delete: planDeleteStep, export: planExportStep, new: newStep, add: addStep, rm: rmStep, heading: headingStep,
       // The four acts, compare: and jump: (piece 7; C145).
-      note: (a1, s1, sc) => planNote(s1, sc, a1.addressed),
+      // note:reply "…" quotes one message (C286 (b)).
+      note: (a1, s1, sc) => (notesMessage(s1) ? planNoteMessage(s1, sc) : planNote(s1, sc, a1.addressed)),
+      quote: (a1, s1, sc) => planQuoteMessage(s1, sc),
       summarize: (a1, s1, sc) => planSummarize(s1, sc, a1.addressed),
       compare: (a1, s1, sc) => planCompare(s1, sc),
       jump: (a1, s1, sc) => planJump(s1, sc, a1.addressed),
@@ -1037,7 +1067,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     if (helperHeld) return { answer, says: helperHeld, next: null }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
-    return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
+    return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null, after: p.after ?? null }
   }
 
   let a = arrangement
@@ -1075,8 +1105,6 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       viewAlso.push(...(p.also ?? []))
       continue
     }
-    // close:letter closes the letter under the bar, as Escape does (29 October).
-    if (step.verb === 'close' && step.match?.values?.[0]?.value === 'letter') return { answer, says: { message: 'letterClose' }, next: null, act: { kind: 'letterClose' } }
     // close:204 and width:204 40%: the room showing that chat (C146 (c)).
     const byRoom = (step.verb === 'close' || step.verb === 'width') ? roomByNumber(a, step, screens) : null
     if (byRoom?.bad) return { answer, says: byRoom.bad, next: null }

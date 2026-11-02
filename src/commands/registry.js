@@ -10,7 +10,7 @@
 // registry never reaches the database, the providers or the keys. Until a
 // verb's action exists, its Enter line says it is not built yet.
 
-import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS } from './verbs'
+import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES } from './verbs'
 import { parseCommand, readField, shapedLikeKey } from './parse'
 import { offered } from '../lib/release'
 
@@ -261,5 +261,6 @@ export function reference(board = null) {
       .map((v) => ({ verb: v.verb, example: v.example, forms: v.forms ?? [v.example], gloss: v.gloss, spends: v.spends, on: shownOn(v.on), here: worksOn(v, board) })),
   })).filter((g) => g.rows.length)
   const leaders = LEADERS.rows.map((r) => ({ ...r, on: 'everywhere', here: true }))
-  return [{ group: 'leaders', title: LEADERS.title, rows: leaders }, ...groups]
+  const lines = LINES.rows.map((r) => ({ ...r, forms: [r.example], on: 'everywhere', here: true }))
+  return [{ group: 'leaders', title: LEADERS.title, rows: leaders }, { group: 'lines', title: LINES.title, rows: lines }, ...groups]
 }

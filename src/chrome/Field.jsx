@@ -21,7 +21,7 @@ import { CommandFill, PromptFill, Magnifier, Quill, MoonMark } from './Fills'
 // place of its words (Stefan, 29 October), as the bar reference draws a
 // prompt's placeholder in the field ("Reply to 201a").
 
-const Field = forwardRef(function Field({ state, folded, win, marginalia = null, onMarginalia = null, marginaliaOpen = false, frameworks = null, onFrameworks = null, frameworksOpen = false, features = [], ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
+const Field = forwardRef(function Field({ state, folded, win, hint = null, marginalia = null, onMarginalia = null, marginaliaOpen = false, frameworks = null, onFrameworks = null, frameworksOpen = false, features = [], ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
   const { i18n } = useLingui()
   const { mode } = state
   const held = showsHeld(state)
@@ -35,7 +35,7 @@ const Field = forwardRef(function Field({ state, folded, win, marginalia = null,
       <input
         ref={ref}
         value={shownValue(state)}
-        placeholder={held ? i18n._(COPY.field.heldPrompt) : undefined}
+        placeholder={held ? i18n._(COPY.field.heldPrompt) : hint ?? undefined}
         onChange={(e) => onInput(e.target.value)}
         onKeyDown={onKeyDown}
         onFocus={onFocus}

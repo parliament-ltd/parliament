@@ -14,7 +14,7 @@ export const LETTERS = Object.freeze([
   Object.freeze({
     n: 1,
     date: '2026-10-28T12:00:00',
-    paragraphs: Object.freeze([COPY.welcome.letter1, COPY.welcome.letter2, COPY.welcome.letter3, COPY.welcome.letter4, COPY.welcome.letter5]),
+    paragraphs: Object.freeze([COPY.welcome.letter1, COPY.welcome.letter2, COPY.welcome.letter3, COPY.welcome.letter4]),
     closing: COPY.welcome.closing,
     signature: COPY.welcome.signature,
   }),

@@ -6,7 +6,7 @@ describe('the letters (C279 (c))', () => {
   it('are numbered from one, and letter one is the welcome page\'s letter, word for word (C265)', () => {
     expect(LETTERS.map((l) => l.n)).toEqual(LETTERS.map((_, i) => i + 1))
     const one = letterOf(1)
-    expect(one.paragraphs.map((p) => p.id)).toEqual(['welcome.letter.1', 'welcome.letter.2', 'welcome.letter.3', 'welcome.letter.4', 'welcome.letter.5'])
+    expect(one.paragraphs.map((p) => p.id)).toEqual(['welcome.letter.1', 'welcome.letter.2', 'welcome.letter.3', 'welcome.letter.4'])
     expect(one.signature).toBe(COPY.welcome.signature)
     expect(newestLetter()).toBe(LETTERS[LETTERS.length - 1])
     expect(letterOf(99)).toBeNull()

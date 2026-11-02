@@ -3,7 +3,7 @@
 // does. The `?` reference in the bar is drawn from the same list.
 // `npm run reference` writes it; a test fails when it is out of date.
 
-import { GROUPS, LEADERS, VERBS } from './verbs'
+import { GROUPS, LEADERS, LINES, VERBS } from './verbs'
 import { offered } from '../lib/release'
 import { COPY } from '../copy'
 
@@ -33,6 +33,12 @@ export function verbsMarkdown(built) {
   out.push('| Type | What it does |')
   out.push('| --- | --- |')
   for (const r of LEADERS.rows) out.push(`| ${(r.forms ?? [r.example]).map(code).join(', ')} | ${cell(r.gloss.message)} |`)
+  out.push('')
+  out.push(`## ${LINES.title.message}`)
+  out.push('')
+  out.push('| Type | What it does |')
+  out.push('| --- | --- |')
+  for (const r of LINES.rows) out.push(`| ${code(r.example)} | ${cell(r.gloss.message)} |`)
   const later = []
   const held = VERBS.filter((v) => !offered(v.verb))
   for (const g of GROUPS) {

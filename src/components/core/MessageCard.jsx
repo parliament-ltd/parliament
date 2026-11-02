@@ -59,13 +59,13 @@ export default function MessageCard({
   included = null, // answers from sources brought into this prompt (C176)
   tells = null, // the tell: notes this prompt carried, in the person's words (C225 (d))
   thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
-  isFavorited = false, showNotes = false,
+  showNotes = false,
   savedNoteText = '',
   highlights = [],
   // Passages of this message kept as quotes, each { num, text } (C145 (a), (b)).
   quotes = NO_QUOTES,
   isPopoverActive = false, onPopoverChange,
-  onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
+  onNote, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
   onHide, onCopyText, onMoveToBranch, onPinForReference, onQuote,
   attachmentMeta,
   // A finished reply is edited in place (stage 11, piece 1; C210, C212):
@@ -122,7 +122,6 @@ export default function MessageCard({
     setTimeout(() => setCopied(false), 1500)
   }
 
-  const handleFavoriteClick = () => { onFavorite?.() }
 
   const handleMouseUp = useCallback(() => {
     const selection = window.getSelection()
@@ -376,25 +375,14 @@ export default function MessageCard({
             <span className="text-xs font-mono text-[var(--p-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity">
               #{number}
             </span>
-            {(isFavorited || savedNoteText) && (
+            {/* The heart retired into the tag favorite (R6; C286 (m)). */}
+            {savedNoteText && (
               <div className="flex items-center gap-1.5">
-                {isFavorited && (
-                  <Star
-                    className="w-3 h-3"
-                    style={{ fill: DUSTY_GOLD, color: DUSTY_GOLD, strokeLinejoin: 'round' }}
-                  />
-                )}
-                {savedNoteText && <StickyNote className="w-3 h-3 text-[#D9730D]" />}
+                <StickyNote className="w-3 h-3 text-[#D9730D]" />
               </div>
             )}
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <MsgIconButton onClick={handleFavoriteClick} active={isFavorited} title="Favorite">
-              <Star
-                className="w-3.5 h-3.5"
-                style={isFavorited ? { fill: DUSTY_GOLD, color: DUSTY_GOLD, strokeLinejoin: 'round' } : {}}
-              />
-            </MsgIconButton>
             <MsgIconButton onClick={onNote} active={showNotes} title="Add note">
               <StickyNote className="w-3.5 h-3.5" />
             </MsgIconButton>

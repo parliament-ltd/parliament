@@ -13,11 +13,21 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `s>`, `search>` | Search |
 | `?`, `help`, `?open` | Every command, or how one works |
 
+## Lines of several commands
+
+| Type | What it does |
+| --- | --- |
+| `open:202 203 records spread arrange:save "morning"` | Open two chats and Records across your screens, and keep that as morning |
+| `close:records pop:collection display 2` | Close Records and put the Collection on your second screen |
+| `pin:207 tagadd:essay 207` | Pin a chat and tag it. undo: takes back the whole line |
+| `type:chat tag:essay since:7d` | Chats tagged essay from the last seven days, in Records |
+
 ## Go to
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `records:` | Bring Records and the Collection beside what is on screen | `records:` | everywhere | no |
+| `collection:` | Bring the Collection beside what is on screen | `collection:` | everywhere | no |
 | `plan:` | Bring the Plan board beside what is on screen | `plan:` | everywhere | no |
 | `library:` | Bring the Library beside what is on screen, or one shelf of it | `library:`, `library:themes` | everywhere | no |
 | `settings:` | Bring Settings beside what is on screen, or one section of it | `settings:`, `settings:data` | everywhere | no |
@@ -76,7 +86,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `tagadd:essay 207, 216` | Tag things, or what is selected | `tagadd:essay 207, 216` | Records, Collection | yes |
+| `tagadd:essay 207, 216` | Tag things, what is selected, or the reply you are in | `tagadd:essay 207, 216`, `tagadd:favorite reply` | Records, Collection, Rooms | yes |
 | `retag:essay to "Long form"` | Rename a tag everywhere | `retag:essay to "Long form"` | Records, Collection | yes |
 | `untag:essay 207` | Remove a tag from some things, or from everything | `untag:essay 207` | Records, Collection | yes |
 
@@ -87,10 +97,11 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `inspect:207` | Look at one thing in detail, where you are | `inspect:207`, `inspect:highlights` | everywhere | no |
 | `pin:207` | Keep something at the top of its list | `pin:207`, `pin:201b`, `pin:"Rail candidates"` | everywhere | yes |
 | `archive:209` | Put something away without deleting it | `archive:209`, `archive:off 209` | everywhere | yes |
-| `copy:207` | Copy something as Markdown | `copy:207` | everywhere | no |
+| `copy:207` | Copy something as Markdown, or the reply you are in | `copy:207`, `copy:reply` | everywhere | no |
+| `quote:reply` | Keep a quote of the whole reply you are in, beside its chat or in another. It is never sent | `quote:reply`, `quote:prompt`, `quote:reply 207` | everywhere | yes |
 | `export:md 201` | Download as Markdown or JSONL to read elsewhere. It cannot be restored | `export:md 201`, `export:jsonl 207, 216`, `export:md records` | Records, Collection | no |
-| `note:203 "Try it without the ending"` | Write a note for people. It is never sent | `note:203 "Try it without the ending"`, `note:"Check the dates"` | everywhere | yes |
-| `delete:207` | Delete something by its number. What has been sent goes for good, after a second Enter Asks for a second Enter. | `delete:207`, `delete:207, 216`, `delete:201c`, `delete:201c all`, `delete:201a 2` | everywhere | no |
+| `note:203 "Try it without the ending"` | Write a note for people. It is never sent | `note:203 "Try it without the ending"`, `note:"Check the dates"`, `note:reply "Check this figure"` | everywhere | yes |
+| `delete:207` | Delete something by its number. What has been sent goes for good, after a second Enter Asks for a second Enter. | `delete:207`, `delete:207, 216`, `delete:201c`, `delete:201c all`, `delete:201a 2`, `delete:reply` | everywhere | no |
 | `undo:` | Take back the last command, or one edit. It stops at a run | `undo:`, `undo:242` | everywhere | no |
 
 ## Editing
@@ -104,7 +115,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `accept:244` | Accept a suggestion | `accept:244`, `accept:all` | Rooms, Plan, Reflection, Collection | yes |
 | `reject:244` | Turn down a suggestion | `reject:244`, `reject:all` | Rooms, Plan, Reflection, Collection | yes |
 | `hold:242` | Keep a branch or an edit from going until you say | `hold:242`, `hold:201c`, `hold:off 242` | Rooms, Plan, Reflection, Collection | yes |
-| `markup:off` | Show replies marked up, or clean | `markup:on`, `markup:off` | Rooms, Plan, Reflection, Collection | yes |
+| `markup:off` | Markup: show your edits in replies, or show replies clean | `markup:on`, `markup:off` | Rooms, Plan, Reflection, Collection | yes |
 | `by:haiku` | Choose who answers in this chat: a model, or a source with no tokens | `by:`, `by:haiku`, `by:mistral small`, `by:wikipedia` | everywhere | yes |
 | `thinking:off` | Let models that can think do so before answering, shown as they go, or not | `thinking:`, `thinking:on`, `thinking:off` | everywhere | yes |
 | `framework:pushback` | Choose the frameworks that shape every reply: standing instructions sent with each prompt | `framework:pushback`, `framework:pushback, uncertain`, `framework:off` | everywhere | yes |
@@ -132,8 +143,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `reset:` | Put the boards back as shipped and close the windows | `reset:` | everywhere | yes |
 | `width:60%` | Choose how much of the width a board takes, or put every width back | `width:60%`, `width:library 30%`, `width:204 40%`, `width:even` | everywhere | yes |
 | `cols:-room +created` | Hide or show columns of the table | `cols:-room +created`, `cols:` | Records | yes |
-| `focus:` | Clear the screen to your chosen boards, keep that set, or come back | `focus:`, `focus:sym col`, `focus:save`, `focus:off` | everywhere | yes |
-| `calm:` | Show less detail until you come near it, or all of it again | `calm:`, `calm:off` | everywhere | yes |
+| `focus:` | Close every board but the chat, or but the boards you name. focus:off brings the rest back | `focus:`, `focus:sym col`, `focus:save`, `focus:off` | everywhere | yes |
+| `calm:` | Hide markup and the details on boards until you come near them. calm:off shows them | `calm:`, `calm:off` | everywhere | yes |
 | `arrange:"Review desk"` | Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning" | `arrange:`, `arrange:"Review desk"`, `arrange:save "Review desk"`, `arrange:"Review desk" 207` | everywhere | yes |
 
 ## Building rooms

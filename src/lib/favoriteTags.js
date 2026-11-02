@@ -49,6 +49,19 @@ export function withFavorite(record, on) {
   return on ? { tags: [...tags, FAVORITE_TAG], tagsMine: [...mine, FAVORITE_TAG] } : { tags, tagsMine: mine }
 }
 
+/** A record with a tag added, as tagadd: writes it; favorite in any case is the one word (C147 (e)). */
+export function withTag(record, tag) {
+  const word = String(tag).toLocaleLowerCase() === FAVORITE_TAG ? FAVORITE_TAG : String(tag)
+  const same = (t) => String(t).toLocaleLowerCase() === word.toLocaleLowerCase()
+  return {
+    tags: [...(record.tags ?? []).filter((t) => !same(t)), word],
+    tagsMine: [...(record.tagsMine ?? []).filter((t) => !same(t)), word],
+  }
+}
+
+/** Whether a record carries a tag, in any case. */
+export const carriesTag = (record, tag) => (record?.tags ?? []).some((t) => String(t).toLocaleLowerCase() === String(tag).toLocaleLowerCase())
+
 /**
  * The dry run: what becomes of each old favourite (C147 (c)).
  * @param {{ favorites: object[], messages: object[], pins: object[] }} snap

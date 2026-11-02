@@ -398,6 +398,8 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
                 <span className="ch-leaves">{(abilities ?? []).map((a) => (
                   <span key={a.id} className="ch-leave"><b>{say(COPY.settings[ABILITY_WORDS[a.id][0]])}.</b> {a.works ? say(COPY.settings.browserWorks) : say(COPY.settings[ABILITY_WORDS[a.id][1]])}</span>
                 ))}</span>
+                {/* Every browser compared, on the site (C286 (l)). */}
+                <a className="ch-leave" href="/browsers.html" target="_blank" rel="noopener">{say(COPY.settings.browserCompare)}</a>
               </>}
             />
             <Row {...rowProps('about', 'network')} label={say(COPY.settings.networkLabel)} stack

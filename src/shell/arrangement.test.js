@@ -7,7 +7,7 @@ import {
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
-  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread,
+  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -399,13 +399,18 @@ describe('widths (C126)', () => {
 })
 
 describe('bar: and reset:', () => {
-  it('bar: moves the bar on the page, and brings it back from a window', () => {
+  it('bar: moves the bar on the page, or its window when it has one (C286 (n))', () => {
     expect(keep(planBar(almanac(), 'bottom')).bar).toEqual({ at: 'bottom', side: 'center', popped: false })
     // Left and right are the other axis: where the field sits and folds (C106).
     expect(keep(planBar(keep(planBar(almanac(), 'bottom')), 'left')).bar).toEqual({ at: 'bottom', side: 'left', popped: false })
     expect(planBar(almanac(), 'center')).toMatchObject({ next: null, says: { message: 'barThere', values: { place: 'center' } } })
     expect(planBar(almanac(), 'top')).toMatchObject({ next: null, says: { message: 'barThere', values: { place: 'top' } } })
-    expect(keep(planBar(keep(planPopBar(almanac(), true)), 'top')).bar.popped).toBe(false)
+    // In a window of its own, bar:bottom moves that window, and the bar stays out.
+    const popped = keep(planPopBar(almanac(), true))
+    const moved = planBar(popped, 'bottom')
+    expect(moved.says).toMatchObject({ message: 'barWindowMove', values: { place: 'bottom' } })
+    expect(keep(moved).bar).toMatchObject({ at: 'bottom', popped: true, moved: 1 })
+    expect(keep(planBar(keep(moved), 'bottom')).bar.moved).toBe(2)
   })
 
   it('reset: puts the arrangement back as shipped, closing its windows, and keeps what boards show', () => {
@@ -584,5 +589,28 @@ describe('spread (C284)', () => {
     const again = keep(planSpread(two, ['almanac', 'library', 'collection', 'docket'], [1, 2]))
     expect(again.columns.flat()).toEqual(['almanac', 'library'])
     expect(boardsIn(again)).toEqual([[['collection', 'docket'], 2]])
+  })
+})
+
+describe('width: inside a window (C286 (k))', () => {
+  const twoInOne = () => {
+    const a = shipped(SPACE)
+    return { ...a, popped: [{ board: 'almanac', window: 2, display: null, side: null }, { board: 'collection', window: 2, display: null, side: null }] }
+  }
+  it('sets a board\'s share of its window, the others keeping theirs', () => {
+    const p = planWidth(twoInOne(), 'collection', 25, true)
+    expect(p.next.popped.find((x) => x.board === 'collection').share).toBeCloseTo(1 / 3)
+    expect(windowShare(p.next, 'almanac')).toBe(1)
+    expect(p.says.message).toBe('widthSet')
+  })
+  it('says a board alone in its window takes the window\'s width', () => {
+    const a = { ...shipped(SPACE), popped: [{ board: 'library', window: 2, display: null, side: null }] }
+    expect(planWidth(a, 'library', 40, true).says.message).toBe('widthPopped')
+  })
+  it('width:even puts the windows back to even shares too', () => {
+    const set = planWidth(twoInOne(), 'collection', 25, true).next
+    const even = planWidthEven(set)
+    expect(even.next.popped.every((x) => x.share == null)).toBe(true)
+    expect(planWidthEven(even.next).says.message).toBe('widthEvenAlready')
   })
 })

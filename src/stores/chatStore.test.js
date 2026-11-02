@@ -6,6 +6,19 @@ beforeEach(() => {
   vi.useRealTimers()
 })
 
+describe('one send at a time in a chat', () => {
+  it('holds a chat from the moment a send is asked until it is done, as a reply does', () => {
+    expect(S.startSending('a')).toBe(true)
+    expect(S.busySending('a')).toBe(true)
+    expect(S.startSending('a')).toBe(false) // the second Enter
+    expect(S.startSending('b')).toBe(true) // other chats are free
+    S.doneStarting('a')
+    expect(S.busySending('a')).toBe(false)
+    S.startStream('a', { messageId: 'm1' })
+    expect(S.startSending('a')).toBe(false) // a reply still arriving
+  })
+})
+
 describe('a stream per conversation', () => {
   it('keeps each conversation apart, so two can stream at once', () => {
     S.startStream('a', { messageId: 'm1' })

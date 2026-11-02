@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat, getPins, addPin, deleteMessage as dbDeleteMessage } from '../lib/db'
 import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
 import { TEMPLATES } from '../lib/seedTemplates'
 import { openSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arrangements'
@@ -11,11 +11,11 @@ import { savedOf } from '../lib/savedArrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
+import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
-import { openPopout, closePopout, placePopout, movePopout, onPopoutClosed } from '../shell/popout'
+import { openPopout, closePopout, placePopout, movePopout, popoutToEdge, onPopoutClosed } from '../shell/popout'
 import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../shell/screens'
 import { mapOf, mapFoot, savedNow as savedOnScreen } from '../shell/screensMap'
 import ScreensMap from './ScreensMap'
@@ -39,7 +39,9 @@ import { useSettings } from '../stores/SettingsContext'
 import { frameworkList, frameworksOf, instructionsOf, recordOf } from '../lib/frameworks'
 import { readOwnFrameworks, keepOwnFramework, removeOwnFramework, restoreOwnFramework } from '../lib/frameworkStore'
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd, useMessages } from '../stores/chatHooks'
-import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, stopStream, streamingIds } from '../stores/chatStore'
+import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, busySending, stopStream, streamingIds, getMessages as heldMessagesOf, scheduleDelete } from '../stores/chatStore'
+import { messageInHand, DELETE_UNDO_MS } from '../lib/messageVerbs'
+import { wholeQuoteOf, withTag, carriesTag } from '../lib/favoriteTags'
 import { fromSource } from '../stores/sendHistory'
 import { useChatEdits } from '../stores/useChatEdits'
 import { noteFor, tellNote, waiting as editWaits, waitingAsk } from '../editing/told'
@@ -75,7 +77,7 @@ import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
 import { searchTerms } from '../lib/recordsFilter'
 import CollectionBoard from './CollectionBoard'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
@@ -97,7 +99,7 @@ import BlocksBoard from './BlocksBoard'
 import { guideAfter } from '../lib/labGuide'
 import { TRIED_TAG, localOf } from '../lib/lab'
 import { featuresOf, packFiles, isTextFile, MOST_FILES } from '../lib/inputFeatures'
-import { readUploadedFile, categorizeFile, ACCEPTED_FILE_TYPES } from '../lib/fileUpload'
+import { readUploadedFile, categorizeFile, ACCEPTED_FILE_TYPES, stripAttachedFileBlocks } from '../lib/fileUpload'
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
@@ -105,7 +107,8 @@ import { LAB } from '../lib/release'
 
 // The margin round a board in a window of its own (chrome.css, .ch-in-window).
 const POPPED_MARGIN = 12
-import { LETTERS_SETTING, cleanRead, markRead } from './letters'
+import { LETTERS_SETTING, cleanRead, markRead, newestLetter } from './letters'
+import { LetterBoard } from './Letter'
 import CommandsBoard from './CommandsBoard'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
@@ -226,12 +229,15 @@ function windowChanges(from, to) {
   const close = [...before.keys()].filter((k) => !after.has(k))
   if (to.bar.popped && !from.bar.popped) open.push(BAR)
   if (!to.bar.popped && from.bar.popped) close.push(BAR)
+  // bar:bottom with the bar in its window: the window moves (C286 (n)).
+  const barTo = to.bar.popped && from.bar.popped && (to.bar.moved ?? 0) !== (from.bar.moved ?? 0)
+    ? (to.bar.at !== from.bar.at ? to.bar.at : to.bar.side) : null
   // A window moved to its side, or to another screen (a saved arrangement, C259 (e)).
   const place = [...after.values()].filter((w) => {
     const q = before.get(w.key)
     return q && ((w.side && q.side !== w.side) || (q.display ?? null) !== (w.display ?? null))
   })
-  return { open, close, place }
+  return { open, close, place, barTo }
 }
 
 // What was popped comes back to the page: windows need a click to open.
@@ -576,8 +582,15 @@ export default function Shell() {
       if (p.side) placePopout(handle, p.side, screen)
       else if (screen) movePopout(handle, placeOn(shown.list, p.display))
     }
+    if (changes.barTo && handles.current[BAR]) popoutToEdge(handles.current[BAR], changes.barTo)
     setWindows({ ...handles.current })
     commit(next)
+    // A browser set to send new windows to tabs opens a tab, whose toolbar
+    // shows; a window opened for a board has none. Said under the bar, with
+    // the way out: drag the tab from its window (C286 (j)).
+    if (opened.some(([key, h]) => key !== BAR && h.win?.toolbar?.visible === true)) {
+      setTimeout(() => setBarSaid({ says: { message: 'popInTab' } }), 0)
+    }
     if (db.current && body) {
       keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
     }
@@ -1245,6 +1258,63 @@ export default function Shell() {
       const also = made.hidden ? [{ message: 'copyHidden', values: { count: made.hidden } }] : []
       return { done: true, says: { message: 'copied', values: { num: what.num }, also } }
     }
+    // One message by command (C286 (b)): the message as the line named it,
+    // read again, so nothing goes that changed since.
+    if (['copyMessage', 'deleteMessage', 'quoteMessage', 'noteMessage'].includes(what.kind)) {
+      const now = heldMessagesOf(what.chatId).find((m) => m.id === what.messageId)
+      if (!now || now.content !== what.content) return 'messageFailed'
+    }
+    if (what.kind === 'copyMessage') {
+      try {
+        await navigator.clipboard.writeText(stripAttachedFileBlocks(what.content).trim())
+      } catch {
+        return 'copyFailed'
+      }
+      remember(body)
+      return { done: true, says: { message: 'copiedMessage', values: { part: what.part } } }
+    }
+    if (what.kind === 'deleteMessage') {
+      // As the card's button did: gone from the chat at once, from storage
+      // after 20 seconds, with the chat offering to bring it back meanwhile.
+      scheduleDelete(what.chatId, what.messageId, { remove: dbDeleteMessage, ms: DELETE_UNDO_MS })
+      remember(body)
+      return { done: true, says: { message: 'deletedMessage' } }
+    }
+    if (what.kind === 'quoteMessage' || what.kind === 'noteMessage') {
+      // A quote of the whole message, the one there already or a new one,
+      // tagged when the line named a tag (C147); a note quotes it.
+      const into = what.into ?? what.chatId
+      const tag = what.kind === 'quoteMessage' ? what.tag : null
+      let quote
+      try {
+        quote = wholeQuoteOf(await getPins(into), into, what.messageId, what.content)
+        if (quote && tag && !carriesTag(quote, tag)) {
+          const done = await changeRecords(db.current, [{ store: 'pins', id: quote.id, num: quote.num, set: withTag(quote, tag), expect: { tags: quote.tags ?? [], tagsMine: quote.tagsMine ?? [] } }])
+          touched.current?.records.push(...done)
+        } else if (!quote) {
+          quote = await addPin({ targetConversationId: into, sourceConversationId: what.chatId, sourceMessageId: what.messageId, content: what.content, tag })
+          touched.current?.created.push({ store: 'pins', id: quote.id, num: quote.num, content: quote.content, tags: quote.tags ?? [] })
+        } else if (what.kind === 'quoteMessage') {
+          return { done: true, says: { message: tag ? 'tagMessageAlready' : 'quoteAlready', values: { num: quote.num, tag: tag ?? '' } } }
+        }
+      } catch {
+        return 'messageFailed'
+      }
+      if (what.kind === 'quoteMessage') {
+        remember(body)
+        return { done: true, says: { message: tag ? 'tagMessageDone' : 'quoteKept', values: { num: quote.num, tag: tag ?? '' } } }
+      }
+      const at = new Date().toISOString()
+      let note
+      try {
+        note = await addOwnNote(db.current, { id: crypto.randomUUID(), text: what.text, quotes: [quote.num], now: at })
+      } catch {
+        return 'noteFailed'
+      }
+      touched.current?.created.push({ store: 'notes', id: note.id, num: note.num, text: note.text })
+      remember(body)
+      return { done: true, says: { message: 'noteDone', values: { num: note.num } } }
+    }
     if (what.kind === 'tourOn' || what.kind === 'tourOff') {
       // tour: may bring the welcome card back into the space first.
       if (next) { const refused = await run(next, null); if (refused) return refused }
@@ -1260,7 +1330,13 @@ export default function Shell() {
     if (what.kind === 'letter') {
       setInspected(null)
       setCompared(null)
-      setLetterShown(what.all ? { all: true } : { n: what.n })
+      // The letter is a board (C286 (q)): brought beside the work, or the bar
+      // pointed at it where it is, showing the letter asked for.
+      const a = current.current
+      const here = a.columns.flat().includes('letter') || a.popped.some((p) => p.board === 'letter')
+      const base = here ? address(a, 'letter') : planOpen(a, 'letter').next ?? a
+      const refused = await run({ ...base, context: { ...base.context, letter: what.all ? 'all' : what.n } }, null)
+      if (refused) return refused
       const read = what.all ? lettersReadRef.current : markRead(lettersReadRef.current, what.n)
       if (read !== lettersReadRef.current) {
         lettersReadRef.current = read
@@ -1344,7 +1420,13 @@ export default function Shell() {
       const change = what.kind === 'newCollection'
         ? { id: crypto.randomUUID(), before: null, after: null }
         : { id: what.id, before: what.before, after: what.after }
-      if (what.kind === 'newCollection') change.after = newCollection({ id: change.id, now: new Date().toISOString() })
+      if (what.kind === 'newCollection') {
+        const at = new Date().toISOString()
+        change.after = newCollection({ id: change.id, now: at })
+        // Holding the room's chat, as the line said (C286 (f)).
+        const row = what.num != null ? numberedNow.current.get(what.num) : null
+        if (row) change.after = withRows(change.after, [row], at).next
+      }
       try {
         await writeCollection(db.current, change)
       } catch (err) {
@@ -2031,7 +2113,7 @@ export default function Shell() {
     if (entry.created) {
       // A note written by note: or summarize: (C145): taken out, unless changed since.
       try {
-        for (const c of [...entry.created].reverse()) await removeOwnNote(db.current, c)
+        for (const c of [...entry.created].reverse()) await (c.store === 'pins' ? removeMadeQuote(db.current, c) : removeOwnNote(db.current, c))
       } catch (err) {
         return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
       }
@@ -2176,6 +2258,34 @@ export default function Shell() {
   useMemo(() => setRegion('mistral', region), [region])
 
   const roomId = roomOnScreen(arrangement) // the chat in the space's room; null in an empty room; undefined with no room
+
+  // The message in hand (C286 (b)): the prompt or reply the caret or a
+  // selection was last in. Moving into the bar keeps it, so quote:reply,
+  // copy:reply, delete:reply, note:reply and tagadd:… reply act on it.
+  const [heldMessage, setHeldMessage] = useState(null)
+  useEffect(() => {
+    const cardOf = (node) => (node?.nodeType === 1 ? node : node?.parentElement)?.closest?.('.p-msg[id^="msg-"]') ?? null
+    const note = () => {
+      const sel = document.getSelection()
+      const card = cardOf(sel?.focusNode) ?? cardOf(sel?.anchorNode) ?? cardOf(document.activeElement)
+      if (!card) return
+      const id = card.id.slice(4)
+      setHeldMessage((was) => (was === id ? was : id))
+    }
+    document.addEventListener('selectionchange', note)
+    document.addEventListener('focusin', note)
+    return () => {
+      document.removeEventListener('selectionchange', note)
+      document.removeEventListener('focusin', note)
+    }
+  }, [])
+  // What the Enter line reads: the message a part names in the room's chat.
+  const handOf = useCallback((part) => {
+    if (!roomId) return { room: false }
+    const shown = sendableOf(heldMessagesOf(roomId) ?? [], hiddenIds(roomId), pendingDeletes(roomId))
+    const found = messageInHand(shown, heldMessage, part)
+    return { room: true, chatId: roomId, message: found?.message ?? null, inHand: found?.inHand ?? false }
+  }, [roomId, heldMessage])
 
   // The Collection beside a room (C220 (a2)): when the bar moves to another
   // room, a collection that holds its chat or plan is shown; the one on
@@ -3139,7 +3249,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3364,6 +3474,8 @@ export default function Shell() {
     const moveTo = toIds && toIds.length === 1 && toIds[0] !== roomChat ? toIds[0] : null
     const chatId = moveTo ?? roomChat
     if (creating.current) return { refused: 'promptBusy' }
+    // A send to this chat still on its way: this one waits in the field.
+    if (chatId && busySending(chatId)) return { refused: 'promptBusy' }
     // The line named a recipient; if that has changed since, say so first.
     const fresh = await keyedProviders().catch(() => ({}))
     if (JSON.stringify(fresh) !== JSON.stringify(shown?.keyedBy ?? null)) { setKeyedBy(fresh); return { refused: 'promptChanged' } }
@@ -4012,6 +4124,11 @@ export default function Shell() {
         />
       )
     }
+    if (board === 'letter') {
+      // The letter as a board (C286 (q)): the one letter: asked for, else the newest.
+      const which = arrangement.context?.letter ?? newestLetter().n
+      return <LetterBoard key="letter" which={which} read={lettersRead} addressed={arrangement.addressed === 'letter'} onAddress={focusBoard} onPick={(form) => writeField(`>${form}`)} />
+    }
     if (board === 'commands') {
       // The command menu (C280): its fainter rows follow the board the bar points at.
       return <CommandsBoard key="commands" board={arrangement.addressed === 'commands' ? null : arrangement.addressed} addressed={arrangement.addressed === 'commands'} onAddress={focusBoard} onPick={(form) => writeField(`>${form}`)} />
@@ -4175,7 +4292,7 @@ export default function Shell() {
           <FullScreenMark win={windows[w.key].win} />
           <main className="ch-stage">
             {w.boards.map((b) => (
-              <div key={b} className="ch-col main">
+              <div key={b} className="ch-col main" style={{ '--share': windowShare(arrangement, b) }}>
                 {drawBoard(b, true)}
               </div>
             ))}

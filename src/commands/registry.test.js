@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { setupI18n } from '@lingui/core'
-import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, BOARD_NAMES } from './verbs'
+import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES, BOARD_NAMES } from './verbs'
 import { lookup, parse, matchForm, verbEntry, nearest, enterLine, complete, reference } from './registry'
 import { COPY } from '../copy'
 import { boardFor } from '../shell/boards'
@@ -52,7 +52,7 @@ describe('the verb list', () => {
   })
 
   it('never applies on a click what undo cannot take back, apart from screen-only moves', () => {
-    const SCREEN_ONLY = ['records', 'plan', 'library', 'settings', 'letter', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
+    const SCREEN_ONLY = ['records', 'collection', 'plan', 'library', 'settings', 'letter', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
     // Filters only change the view, and clear:filters puts it back.
     for (const v of VERBS.filter((x) => x.click === 'apply' && !x.undoable && x.group !== 'filters')) expect(SCREEN_ONLY, v.verb).toContain(v.verb)
     expect(verbEntry('delete').click).toBe('fill')
@@ -62,7 +62,7 @@ describe('the verb list', () => {
 })
 
 describe('the glosses', () => {
-  const glosses = [...VERBS.map((v) => ({ where: v.verb, ...v.gloss })), ...GROUPS.map((g) => ({ where: g.key, ...g.title })), { where: 'leaders', ...LEADERS.title }, ...LEADERS.rows.map((r) => ({ where: r.example, ...r.gloss }))]
+  const glosses = [...VERBS.map((v) => ({ where: v.verb, ...v.gloss })), ...GROUPS.map((g) => ({ where: g.key, ...g.title })), { where: 'leaders', ...LEADERS.title }, ...LEADERS.rows.map((r) => ({ where: r.example, ...r.gloss })), { where: 'lines', ...LINES.title }, ...LINES.rows.map((r) => ({ where: r.example, ...r.gloss }))]
   // Names that keep their capital in a sentence: boards, formats and a key.
   const PROPER = new Set(['Parliament', 'Records', 'Plan', 'Collection', 'Library', 'Settings', 'Lab', 'Markdown', 'JSONL', 'Enter', 'English'])
 
@@ -247,8 +247,9 @@ describe('the reference', () => {
   it('leads with the bar, then every group', () => {
     const all = reference()
     expect(all[0].group).toBe('leaders')
-    expect(all.slice(1).map((g) => g.group)).toEqual(GROUPS.map((g) => g.key))
-    expect(all.flatMap((g) => g.rows).length).toBe(VERBS.filter((v) => offered(v.verb)).length + LEADERS.rows.length)
+    // Then the lines of several commands (C286 (g)).
+    expect(all.slice(2).map((g) => g.group)).toEqual(GROUPS.map((g) => g.key))
+    expect(all.flatMap((g) => g.rows).length).toBe(VERBS.filter((v) => offered(v.verb)).length + LEADERS.rows.length + LINES.rows.length)
   })
 
   it('leaves out the commands of the Lab while it waits, and the bar says so (C279 (a))', () => {
@@ -281,5 +282,21 @@ describe('the reference', () => {
     // While the Lab waits, the boards a command works on leave it out (C279 (a)).
     expect(on('room', 'add').on).toEqual(['almanac', 'collection'])
     expect(on('room', 'set').on).toEqual(['room', 'settings'])
+  })
+})
+
+describe('lines of several commands in the menu (C286 (g))', () => {
+  it('each parses whole, every command in it a real one', async () => {
+    const { BUILT } = await import('../chrome/preview')
+    for (const r of LINES.rows) {
+      const got = enterLine(`>${r.example}`, { mode: 'command', board: 'almanac', built: BUILT })
+      expect(got.state, r.example).toBe('ready')
+      expect(got.steps.length, r.example).toBeGreaterThan(1)
+    }
+  })
+
+  it('come right after the bar\'s leaders', () => {
+    const groups = reference()
+    expect(groups.map((g) => g.group).slice(0, 2)).toEqual(['leaders', 'lines'])
   })
 })

@@ -1,12 +1,12 @@
 // AnnotationsContext — shared per-conversation annotation state for the
 // V2 RoomShell chat path (PR-10a.6).
 //
-// Watches useChat().activeConversationId and (re)loads favorites,
+// Watches useChat().activeConversationId and (re)loads
 // notes, and highlights from IndexedDB whenever the active conversation
 // changes. Consumers — messages@1.0's render, the right-rail
 // highlights@1.0 / notes@1.0, the per-message Star/StickyNote
 // handlers — all see the same in-memory copy. A write through this
-// context's mutators (toggleFavorite, addNote, addHighlight, etc.)
+// context's mutators (addNote, addHighlight, etc.)
 // updates IndexedDB AND the in-memory state, so other consumers
 // observe the change immediately without polling.
 //
@@ -31,12 +31,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
-  getFavorites,
-  deleteFavorite as dbDeleteFavorite,
-  getPins,
-  getSetting,
-  addFavoriteQuote,
-  setFavoriteTag,
   getNotes,
   addNote as dbAddNote,
   updateNote as dbUpdateNote,
@@ -48,7 +42,6 @@ import {
 import { useChat } from './ChatContext'
 import { useMessages } from './chatHooks'
 import { includesWord } from '../lib/textUtils'
-import { favoritesOf, wholeQuoteOf, FAVORITES_TAGGED_SETTING } from '../lib/favoriteTags'
 
 const AnnotationsContext = createContext(null)
 
@@ -67,10 +60,11 @@ export function AnnotationsProvider({ children, conversationId = null }) {
   const activeConversationId = conversationId ?? chat.activeConversationId
   const messages = useMessages(activeConversationId)
 
-  // favorites/notes are keyed by messageId → record. highlights is a
+  // notes are keyed by messageId → record. highlights is a
   // flat list because a highlight is identified by (term, message) and
-  // navigation needs all message ids that contain a term.
-  const [favorites, setFavorites] = useState(new Map())
+  // navigation needs all message ids that contain a term. Favourites
+  // retired into the tag favorite (R6, approved 2 November; C286 (m)):
+  // tagadd:favorite reply does what the heart did.
   const [notes, setNotes] = useState(new Map())
   const [highlights, setHighlights] = useState([])
   // showNotes is per-conversation UI state — which note panels are
@@ -96,16 +90,10 @@ export function AnnotationsProvider({ children, conversationId = null }) {
     if (!activeConversationId) return undefined
     let cancelled = false
     Promise.all([
-      getFavorites(activeConversationId),
       getNotes(activeConversationId),
       getHighlights(activeConversationId),
-      getPins(activeConversationId),
-      getSetting(FAVORITES_TAGGED_SETTING),
-    ]).then(([favs, ns, hls, pins, converted]) => {
+    ]).then(([ns, hls]) => {
       if (cancelled) return
-      // A favourite is a quote tagged favorite; old favourite records count
-      // until they have been turned into such quotes (C147).
-      setFavorites(favoritesOf({ pins, oldFavorites: favs, conversationId: activeConversationId, converted: Boolean(converted) }))
       setNotes(new Map(ns.map(n => [n.messageId, n])))
       setHighlights(hls)
       setShowNotes(new Set())
@@ -124,34 +112,6 @@ export function AnnotationsProvider({ children, conversationId = null }) {
   // currently-active conversation. Consumers check this to avoid
   // rendering stale annotations during a conversation switch.
   const loaded = activeConversationId != null && loadedFor === activeConversationId
-
-  // ─── Favorites ───────────────────────────────────────────
-  // The heart (C147): a quote of the whole message, kept beside its chat and
-  // tagged favorite, or the tag on the whole-message quote already there. A
-  // second click takes the tag off; the quote stays, and erase: removes it.
-  // An old favourite record is taken back as before.
-  const toggleFavorite = useCallback(async (messageId) => {
-    if (!activeConversationId) return
-    const existing = favorites.get(messageId)
-    const drop = () => setFavorites(prev => { const n = new Map(prev); n.delete(messageId); return n })
-    try {
-      if (existing?.kind === 'tag') {
-        await setFavoriteTag(existing.pin, false)
-        drop()
-      } else if (existing?.kind === 'old') {
-        await dbDeleteFavorite(existing.record.id)
-        drop()
-      } else {
-        const message = messages.find(m => m.id === messageId)
-        if (!message?.content) return
-        const whole = wholeQuoteOf(await getPins(activeConversationId), activeConversationId, messageId, message.content)
-        const pin = whole
-          ? await setFavoriteTag(whole, true)
-          : await addFavoriteQuote({ conversationId: activeConversationId, messageId, content: message.content })
-        setFavorites(prev => new Map(prev).set(messageId, { kind: 'tag', pin }))
-      }
-    } catch { /* tolerate: the heart shows what is stored */ }
-  }, [favorites, activeConversationId, messages])
 
   // ─── Notes ───────────────────────────────────────────────
   const toggleNotePanel = useCallback((messageId) => {
@@ -301,14 +261,12 @@ export function AnnotationsProvider({ children, conversationId = null }) {
   // available; calling them while !loaded is a no-op (the
   // activeConversationId guard inside each mutator prevents writes
   // against the wrong conversation).
-  const exposedFavorites = loaded ? favorites : EMPTY_MAP
   const exposedNotes = loaded ? notes : EMPTY_MAP
   const exposedHighlights = loaded ? highlights : EMPTY_ARRAY
   const exposedShowNotes = loaded ? showNotes : EMPTY_SET
 
   const value = {
     // State
-    favorites: exposedFavorites,
     notes: exposedNotes,
     highlights: exposedHighlights,
     showNotes: exposedShowNotes,
@@ -316,7 +274,6 @@ export function AnnotationsProvider({ children, conversationId = null }) {
     loaded,
 
     // Mutators
-    toggleFavorite,
     toggleNotePanel,
     saveNote,
     deleteNote,

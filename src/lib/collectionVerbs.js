@@ -24,9 +24,13 @@ function shownOr(screens) {
 }
 
 /** new:collection: an empty one, kept at once, shown on the Collection (C139). */
-export function planNew(step) {
+export function planNew(step, screens = {}) {
   const [what] = step.match?.values ?? []
   if (what?.value !== 'collection' || (step.match?.values ?? []).length > 1) return null
+  // With a chat in the room on screen, the collection starts holding it (C286 (f)).
+  const chatId = screens.roomChat ?? null
+  const row = chatId ? (screens.records?.rows ?? []).find((r) => r.kind === 'chat' && r.chatId === chatId) ?? null : null
+  if (row) return { says: { message: 'collectionNewWith', values: { num: row.num } }, act: { kind: 'newCollection', num: row.num } }
   return { says: { message: 'collectionNew' }, act: { kind: 'newCollection' } }
 }
 

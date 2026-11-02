@@ -70,6 +70,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   const [reference, setReference] = useState(null) // { topic } while ? is open
   const [notice, setNotice] = useState(null) // a key of COPY.enter, or { message, values }
   const walk = useRef({ lines: [], index: -1, draft: '' })
+  const sendingNow = useRef(false) // a prompt on its way from this bar
   const input = useRef(null)
   const reply = useRef(null) // the reply being edited, to return the caret to
   const hover = useRef(0)
@@ -303,8 +304,16 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     : undefined
 
   async function send() {
-    if (!promptView?.ready || !onPrompt) return
-    const out = await onPrompt(field.text.prompt.trim(), prompt)
+    // One Enter, one send: a second Enter while the first is still on its
+    // way does nothing, however slow the way is.
+    if (!promptView?.ready || !onPrompt || sendingNow.current) return
+    sendingNow.current = true
+    let out
+    try {
+      out = await onPrompt(field.text.prompt.trim(), prompt)
+    } finally {
+      sendingNow.current = false
+    }
     if (out?.refused) { setNotice(out.refused); return }
     dispatch({ type: 'sent' })
     const failed = await out?.done
@@ -324,7 +333,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     if (!next && !go && !act) return
     if (act?.confirm && armed !== value) {
       setArmed(value)
-      setNotice({ message: 'deleteAgain', values: { count: act.nums?.length ?? 1 } })
+      setNotice(act.again ?? { message: 'deleteAgain', values: { count: act.nums?.length ?? 1 } })
       return
     }
     setArmed(null)
@@ -415,6 +424,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           state={field}
           folded={folded}
           win={win}
+          // At rest on the welcome page, how to begin, in the field (C286 (h)).
+          hint={welcome && field.mode === 'search' ? i18n._(COPY.field.toBegin, { leader: '>' }) : null}
           marginalia={marginalia}
           onMarginalia={onPicker}
           marginaliaOpen={Boolean(picker)}

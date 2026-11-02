@@ -40,6 +40,7 @@ export const COPY = {
     start: /*i18n*/ { id: 'board.start', message: 'Start', comment: 'The card with the bar, shown before anything is open' },
     oneRoom: /*i18n*/ { id: 'board.oneRoom', message: 'Room', comment: 'One room, as a board in a sentence: Enter moves Room to the left' },
     welcome: /*i18n*/ { id: 'board.welcome', message: 'Welcome page' },
+    letter: /*i18n*/ { id: 'board.letter', message: 'Letter', comment: 'The board a letter from the maker of Parliament opens on (letter:)' },
     commands: /*i18n*/ { id: 'board.commands', message: 'Command menu', comment: 'Every command, as a board to keep open or pop out (open:commandmenu)' },
   },
 
@@ -197,6 +198,11 @@ export const COPY = {
       id: 'enter.barThere',
       message: '{place, select, top {The bar is at the top already} bottom {The bar is at the bottom already} left {The bar is on the left already} right {The bar is on the right already} other {The bar is in the centre already}}',
     },
+    barWindowMove: /*i18n*/ {
+      id: 'enter.barWindowMove',
+      message: '{place, select, top {Enter moves the bar’s window to the top of its screen} bottom {Enter moves the bar’s window to the bottom of its screen} left {Enter moves the bar’s window to the left of its screen} right {Enter moves the bar’s window to the right of its screen} other {Enter moves the bar’s window to the centre of its screen}}, where the browser allows it. pop:back command brings the bar to the page',
+      comment: 'Commands stay English',
+    },
     barMove: /*i18n*/ {
       id: 'enter.barMove',
       message: '{place, select, top {Enter moves the bar to the top} bottom {Enter moves the bar to the bottom} left {Enter moves the bar to the left} right {Enter moves the bar to the right} other {Enter moves the bar to the centre}}',
@@ -206,6 +212,7 @@ export const COPY = {
       id: 'enter.resetArrangement',
       message: '{count, plural, =0 {Enter puts this screen back as shipped} one {Enter puts this screen back as shipped and closes # window} other {Enter puts this screen back as shipped and closes # windows}}',
     },
+    popInTab: /*i18n*/ { id: 'enter.popInTab', message: 'It opened as a tab, since this browser sends new windows to tabs. Drag the tab out of its window to make it a window of its own' },
     popBlocked: /*i18n*/ { id: 'enter.popBlocked', message: 'The browser did not open the window. Allow pop-ups for this site, then try again' },
     popOrdinary: /*i18n*/ { id: 'enter.popOrdinary', message: 'It opens as an ordinary window, since this browser cannot keep one on top', comment: 'Added to the Enter line for pop: where the always-on-top window is missing (C94)' },
     key: /*i18n*/ { id: 'enter.key', message: 'No keys in the command line, for security. Delete it, and api: opens the key field' },
@@ -315,6 +322,27 @@ export const COPY = {
     rowsFailed: /*i18n*/ { id: 'enter.rowsFailed', message: 'The change was not kept. Try again' },
     copyOne: /*i18n*/ { id: 'enter.copyOne', message: 'Enter copies {num} as Markdown' },
     copied: /*i18n*/ { id: 'enter.copied', message: 'Copied {num} as Markdown' },
+    // One message by command (C286 (b)): {part} is reply or prompt, {opening} the words it begins with.
+    messageNoRoom: /*i18n*/ { id: 'enter.messageNoRoom', message: 'No room is on screen, so there is no {part, select, prompt {prompt} other {reply}} to take. room: brings one back', comment: 'Commands stay English' },
+    messageNone: /*i18n*/ { id: 'enter.messageNone', message: 'The chat here has no {part, select, prompt {prompt} other {reply}} yet' },
+    messageLast: /*i18n*/ { id: 'enter.messageLast', message: 'It is the last {part, select, prompt {prompt} other {reply}}. Click in another to take that one instead' },
+    quoteMessage: /*i18n*/ { id: 'enter.quoteMessage', message: 'Enter keeps a quote of the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, beside its chat' },
+    quoteMessageInto: /*i18n*/ { id: 'enter.quoteMessageInto', message: 'Enter keeps a quote of the {part, select, prompt {prompt} other {reply}} that begins “{opening}” in {into}' },
+    quoteIntoWhich: /*i18n*/ { id: 'enter.quoteIntoWhich', message: '{said} is not a chat. quote:reply takes a chat’s number, as 207', comment: 'Commands stay English' },
+    quoteNeverSent: /*i18n*/ { id: 'enter.quoteNeverSent', message: 'A quote is for people and is never sent' },
+    quoteKept: /*i18n*/ { id: 'enter.quoteKept', message: 'Kept as {num}' },
+    quoteAlready: /*i18n*/ { id: 'enter.quoteAlready', message: 'It is kept already, as {num}' },
+    copyMessage: /*i18n*/ { id: 'enter.copyMessage', message: 'Enter copies the {part, select, prompt {prompt} other {reply}} that begins “{opening}” as Markdown' },
+    copiedMessage: /*i18n*/ { id: 'enter.copiedMessage', message: 'Copied the {part, select, prompt {prompt} other {reply}} as Markdown' },
+    deleteMessage: /*i18n*/ { id: 'enter.deleteMessage', message: 'Enter twice deletes the {part, select, prompt {prompt} other {reply}} that begins “{opening}”' },
+    deleteMessageAgain: /*i18n*/ { id: 'enter.deleteMessageAgain', message: 'Enter again deletes it. Escape keeps it' },
+    deleteMessageUndo: /*i18n*/ { id: 'enter.deleteMessageUndo', message: 'For 20 seconds the chat offers to bring it back' },
+    deletedMessage: /*i18n*/ { id: 'enter.deletedMessage', message: 'Deleted. For 20 seconds the chat offers to bring it back' },
+    noteOnMessage: /*i18n*/ { id: 'enter.noteOnMessage', message: 'Enter writes a note on the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, quoting it' },
+    tagMessage: /*i18n*/ { id: 'enter.tagMessage', message: 'Enter tags the {part, select, prompt {prompt} other {reply}} that begins “{opening}” {tag}, through a quote of it beside its chat' },
+    tagMessageAlready: /*i18n*/ { id: 'enter.tagMessageAlready', message: 'It carries {tag} already, as {num}' },
+    tagMessageDone: /*i18n*/ { id: 'enter.tagMessageDone', message: 'Tagged {tag}, as {num}' },
+    messageFailed: /*i18n*/ { id: 'enter.messageFailed', message: 'That could not be done. The message may have changed since' },
     copyHidden: /*i18n*/ { id: 'enter.copyHidden', message: '{count, plural, one {# hidden message left out} other {# hidden messages left out}}' },
     copyFailed: /*i18n*/ { id: 'enter.copyFailed', message: 'The browser did not allow copying. Click into the page and try again' },
     undoLine: /*i18n*/ { id: 'enter.undoLine', message: 'Enter takes back {line}' },
@@ -326,6 +354,7 @@ export const COPY = {
     // or the copy table's word for it; {heading} the person's words.
     collectionNone: /*i18n*/ { id: 'enter.collectionNone', message: 'No collection is on {board} yet. new:collection makes one' },
     collectionNew: /*i18n*/ { id: 'enter.collectionNew', message: 'Enter makes a new collection and shows it' },
+    collectionNewWith: /*i18n*/ { id: 'enter.collectionNewWith', message: 'Enter makes a new collection holding {num}, the chat in the room, and shows it' },
     collectionAdd: /*i18n*/ { id: 'enter.collectionAdd', message: 'Enter puts {nums} in {name}' },
     collectionAlready: /*i18n*/ { id: 'enter.collectionAlready', message: 'Those are in {name} already' },
     collectionRm: /*i18n*/ { id: 'enter.collectionRm', message: 'Enter takes {nums} out of {name}. The things themselves stay' },
@@ -710,10 +739,10 @@ export const COPY = {
     arrangeNameSame: /*i18n*/ { id: 'enter.arrangeNameSame', message: "It is called {to} already" },
     nameWhichKindAll: /*i18n*/ { id: 'enter.nameWhichKindAll', message: "{name} names more than one thing. Add search, collection, framework or arrangement after it", comment: 'Commands stay English' },
     // calm: (stage 14, piece 2; C255).
-    calmOn: /*i18n*/ { id: 'enter.calmOn', message: "Enter calms the screen: details wait until you are near them" },
-    calmOff: /*i18n*/ { id: 'enter.calmOff', message: "Enter shows every detail again" },
-    calmSameOn: /*i18n*/ { id: 'enter.calmSameOn', message: "The screen is calm already. calm:off shows every detail", comment: 'Commands stay English' },
-    calmSameOff: /*i18n*/ { id: 'enter.calmSameOff', message: "Every detail shows already. calm: calms the screen", comment: 'Commands stay English' },
+    calmOn: /*i18n*/ { id: 'enter.calmOn', message: "Enter hides markup and the details on boards until you come near them" },
+    calmOff: /*i18n*/ { id: 'enter.calmOff', message: "Enter shows markup and every detail again" },
+    calmSameOn: /*i18n*/ { id: 'enter.calmSameOn', message: "Markup and details are hidden already. calm:off shows them", comment: 'Commands stay English' },
+    calmSameOff: /*i18n*/ { id: 'enter.calmSameOff', message: "Markup and details show already. calm: hides them until you come near", comment: 'Commands stay English' },
     // Focus sets, kept with a room (stage 14, piece 1; C253).
     focusTheChat: /*i18n*/ { id: 'enter.focusTheChat', message: "the chat" },
     focusInLab: /*i18n*/ { id: 'enter.focusInLab', message: "focus: works outside the Lab. done: leaves it first", comment: 'Commands stay English' },
@@ -1637,6 +1666,7 @@ export const COPY = {
     leavesFoot: /*i18n*/ { id: 'settings.leavesFoot', message: 'Settings lists every provider and source Parliament can reach, under API keys. A new one appears there, and in the security policy the site publishes, before it can be used.' },
     // This browser (stage 15, piece 5; C272 (f)): found by trying each thing, naming no browser (C94).
     browserLabel: /*i18n*/ { id: 'settings.browserLabel', message: "This browser" },
+    browserCompare: /*i18n*/ { id: 'settings.browserCompare', message: "Every browser compared, on the site" },
     browserHelp: /*i18n*/ { id: 'settings.browserHelp', message: "What Parliament uses, and whether it works in the browser you are using now. Each is found by trying it." },
     browserWorks: /*i18n*/ { id: 'settings.browserWorks', message: "Works here." },
     browserOnTop: /*i18n*/ { id: 'settings.browserOnTop', message: "A window that stays on top" },
@@ -1739,6 +1769,7 @@ export const COPY = {
     held: /*i18n*/ { id: 'field.held', message: 'With your next prompt' },
     answeredHelp: /*i18n*/ { id: 'field.answeredHelp', message: 'Choose who answers here (by:)', comment: 'Shown on hover over who answers, in the prompt field' },
     // A prompt edited in the chat, held in the field instead of its words (Stefan, 29 October).
+    toBegin: /*i18n*/ { id: 'field.toBegin', message: 'Type {leader} to begin', comment: 'Grey text in the empty field on the welcome page. {leader} is >, the command leader' },
     heldPrompt: /*i18n*/ { id: 'field.heldPrompt', message: 'Your edited prompt', comment: 'Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words' },
   },
 
@@ -1770,22 +1801,23 @@ export const COPY = {
     stepHighlightHow: /*i18n*/ { id: 'welcome.step.highlightHow', message: 'select words in a reply, then pick a colour' },
     stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
     stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
-    // The letter, in Stefan's own words, as he wrote it (C265): not edited.
+    // The letter, in Stefan's own words, as he wrote it (C265; rewritten by him
+    // on 2 November, C286 (p)): not edited. letter5 is no longer in it.
     letter1: /*i18n*/ {
       id: 'welcome.letter.1',
       message: "Parliament is an attempt to rethink how we interact with AI. To take part more in the work and conversation. I didn't want a handful of companies deciding how that goes. And yes, I see the irony of building this with Claude.",
     },
     letter2: /*i18n*/ {
       id: 'welcome.letter.2',
-      message: "I'm scared of AI too. It's a marvel I don't know how to feel about. But I didn't want to sit there and do nothing. So, after months of chatting and reading, I've tried to put together an app you can use offline. An app where you can search sources without AI first. An app that hopes to empower through active participation. Perhaps that's too bold of me... while I've coded a couple web applications in Ruby, I'd still classify myself as a \"designer\". Building is hard, especially when you're learning as you go and the pace feels like drinking from a fire hose. The code is open, I've run through Claude Code security checks, and plan to do more 3rd-party security checks. I will do my best to keep you posted. I've been wondering how I could make the code accessible... maybe I could turn it into a novel.",
+      message: "I'm scared of AI too. It's a marvel I don't know how to feel about. But I didn't want to sit there and do nothing. So, I've tried to put together an app you can use offline with local models. An app where you can search sources without AI first. An app that hopes to empower through more active participation. Perhaps that's too bold of me...",
     },
     letter3: /*i18n*/ {
       id: 'welcome.letter.3',
-      message: "So what is Parliament? In Parliament, you can create rooms, a space where you can chat with one AI model, several, or none. Rooms are built from blocks you can edit and change, and you can make your own layouts, themes, and arrangements.",
+      message: "The code is open, I've run through Claude Code security checks, and plan to do more 3rd-party security checks. I will do my best to keep you posted.",
     },
     letter4: /*i18n*/ {
       id: 'welcome.letter.4',
-      message: "Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours.",
+      message: "What is Parliament? In Parliament, is a space where you can chat with one AI model, several, or none. You can build rooms with blocks you can edit and change, and you can make your own layouts, themes, and arrangements. Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours. The Lab for editing rooms is coming soon!",
     },
     letter5: /*i18n*/ {
       id: 'welcome.letter.5',
@@ -1795,9 +1827,9 @@ export const COPY = {
     signature: /*i18n*/ { id: 'welcome.signature', message: 'Stef', comment: 'The name the letter is signed with, under the closing line' },
     // The ending (W §7): the letter gives way to one line. {command} is focus:, drawn as a link that writes it in the bar.
     // The start card, when the welcome page closes with nothing else open (30 October; C282).
-    startRoom: /*i18n*/ { id: 'welcome.start.room', message: '{command} and a question opens a room', comment: '{command} is p>, which stays English' },
-    startOpen: /*i18n*/ { id: 'welcome.start.open', message: '{command} lists what you have made, and open: with its number opens one again', comment: '{command} is open:records, which stays English, as does open:' },
-    startTour: /*i18n*/ { id: 'welcome.start.tour', message: '{command} brings the steps back', comment: '{command} is tour:, which stays English' },
+    startPrompt: /*i18n*/ { id: 'welcome.start.prompt', message: 'Type {command} to start a prompt.', comment: '{command} is p>, which stays English' },
+    startCommands: /*i18n*/ { id: 'welcome.start.commands', message: 'Use the command bar for actions. Type {first} and then {second} to see what’s live.', comment: '{first} is > and {second} is ?, which stay as they are' },
+    startHistory: /*i18n*/ { id: 'welcome.start.history', message: 'To see your history, type {command} in the command bar.', comment: '{command} is open:records, which stays English' },
     now: /*i18n*/ { id: 'welcome.now', message: 'Now, let’s {command}', comment: '{command} is focus:, which stays English' },
     // On narrow or touch-only screens only (W §12.4).
     // In the page's foot with the other marginalia, on every screen (29 October).
@@ -2628,6 +2660,9 @@ export const COPY = {
     focusRuns: /*i18n*/ { id: 'shell.focusRuns', message: 'Runs {command}', comment: 'Commands stay English' },
     focusPick: /*i18n*/ { id: 'shell.focusPick', message: 'Choose the boards of your focus' },
     focusPickHead: /*i18n*/ { id: 'shell.focusPickHead', message: 'left to right:' },
+    // The strip's calm and focus on hover, so the two read apart (C286 (e)).
+    calmTitle: /*i18n*/ { id: 'shell.calmTitle', message: 'Markup and the details on boards wait until you come near them. Runs {command}', comment: 'Commands stay English' },
+    focusTitle: /*i18n*/ { id: 'shell.focusTitle', message: 'Only the chat, or the boards you pick, stay on screen. Runs {command}', comment: 'Commands stay English' },
     calmOff: /*i18n*/ { id: 'shell.calmOff', message: 'calm: off', comment: 'calm is the command word, kept English' },
     calmOn: /*i18n*/ { id: 'shell.calmOn', message: 'calm: on', comment: 'calm is the command word, kept English' },
     boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },

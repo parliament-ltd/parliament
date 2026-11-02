@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browsers · Parliament</title>
+<meta name="description" content="Which browsers Parliament works in, and what happens where a feature is missing.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/browsers.css">
+</head>
+<body>
+<!-- The browser support table (refactor-plan.md, stage 15; C94; C286 (l)).
+     Kept from docs/spec/browsers.md. A static page: no scripts, its styles
+     from the site, so the site's security policy holds here too. -->
+<main>
+  <p class="back"><a href="/">Parliament</a></p>
+  <h1>Parliament in your browser</h1>
+  <p class="lede">Parliament checks what your browser can do, never which browser it is. In Parliament, Settings, under This browser, says what works in yours. This page compares the browsers it has been tried in.</p>
+
+  <div class="scroll">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Chrome, Edge and other Chromium browsers</th>
+        <th scope="col">Firefox and Zen</th>
+        <th scope="col">LibreWolf</th>
+        <th scope="col">Safari</th>
+        <th scope="col">Phones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Chats, rooms, boards, backups</th>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">Built for a computer for now</td>
+      </tr>
+      <tr>
+        <th scope="row">Boards in windows of their own (<code>pop:</code>)</th>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Opened as tabs, by LibreWolf’s own setting. Drag a tab out of its window to make it one, or set <code>browser.link.open_newwindow.restriction</code> to 2 in <code>about:config</code></td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">No</td>
+      </tr>
+      <tr>
+        <th scope="row">A window that stays on top (<code>pop:command</code>)</th>
+        <td>Yes</td>
+        <td>An ordinary window, which can go behind others</td>
+        <td>An ordinary window, or a tab</td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">No</td>
+      </tr>
+      <tr>
+        <th scope="row">Boards on other screens (<code>display</code>, <code>spread</code>)</th>
+        <td>Yes, once the browser asks you</td>
+        <td>They open on this screen</td>
+        <td>They open on this screen</td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">No</td>
+      </tr>
+      <tr>
+        <th scope="row">Voice input, on your computer</th>
+        <td>Chrome on a computer</td>
+        <td>Off, since it would send your audio away</td>
+        <td>Off</td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">No</td>
+      </tr>
+      <tr>
+        <th scope="row">Keeping what you make</th>
+        <td>The browser decides, without asking</td>
+        <td>The browser asks you</td>
+        <td>Deleted when LibreWolf closes, unless you allow the site: Settings, Privacy and security, Cookies and site data, Manage exceptions</td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">Not tried yet</td>
+      </tr>
+      <tr>
+        <th scope="row">Your language and time zone</th>
+        <td>As set</td>
+        <td>As set</td>
+        <td>Reported as US English and UTC, so choose your language with <code>language:</code></td>
+        <td class="soft">Not tried yet</td>
+        <td class="soft">Not tried yet</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Where something is missing</h2>
+  <p>Nothing stops working: Parliament does the next best thing and says so in the line under the bar. Popped boards open as ordinary windows, or on this screen. Backups are written uncompressed where the browser cannot compress them. Another tab shows a change when it is reloaded. Outside text is always shown as text only.</p>
+
+  <h2>Not tried yet</h2>
+  <p>Firefox, Zen and LibreWolf are known from the features they offer; a full run in each is still to come. Safari waits, and phones come later. If something here is wrong for your browser, write to <a href="mailto:support@parliament.ltd">support@parliament.ltd</a>.</p>
+
+  <p class="foot">Last checked 2 November 2026.</p>
+</main>
+</body>
+</html>

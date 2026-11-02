@@ -15,7 +15,7 @@ import {
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
 } from './records'
-import { withFavorite } from './favoriteTags'
+import { withFavorite, withTag } from './favoriteTags'
 
 export { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, lastUpgradeFailure } from './schema'
 
@@ -630,7 +630,7 @@ export async function deleteFavorite(id) {
 
 // ─── Pins (branch transfer references) ──────────────────
 
-export async function addPin({ targetConversationId, sourceConversationId, sourceMessageId, content }) {
+export async function addPin({ targetConversationId, sourceConversationId, sourceMessageId, content, tag = null }) {
   const db = await initDB()
   return addNumbered(db, 'pins', {
     id: generateId(),
@@ -639,6 +639,8 @@ export async function addPin({ targetConversationId, sourceConversationId, sourc
     sourceMessageId,
     content,
     createdAt: new Date().toISOString(),
+    // tagadd:favorite reply tags the quote it makes (C286 (b)).
+    ...(tag ? withTag({}, tag) : {}),
   })
 }
 
