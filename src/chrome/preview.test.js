@@ -39,7 +39,6 @@ describe('what Enter would do', () => {
 
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
     expect(words('>resources:').text).toBe('resources: is not built yet')
-    expect(words('>tour:advanced').text).toBe('tour: is not built yet')
   })
 
   it('plans pop:, which opens windows', () => {
@@ -431,6 +430,30 @@ describe('the welcome page (stage 5)', () => {
     expect(at('>tour:off').act).toEqual({ kind: 'tourOff' })
     expect(at('>tour:off', welcome(), { stepsOff: true }).text).toBe('The steps are put away already')
     expect(at('>tour:off', shipped(SPACE)).text).toBe('The steps are put away already')
+  })
+
+  it('tour:advanced shows the second list in the first one’s place, and tour: the first again (W §13; A20)', () => {
+    // From anywhere: the welcome page comes back, with the second list.
+    const p = at('>tour:advanced', shipped(SPACE))
+    expect(p.text).toBe('Enter brings the welcome page beside what is here, with its second list')
+    expect(p.next.columns).toEqual([['welcome'], ['almanac'], ['collection']])
+    expect(p.act).toEqual({ kind: 'tourOn', advanced: true })
+    expect(words('>tour:advanced').act).toEqual({ kind: 'tourOn', advanced: true })
+    // On the page, with the first list showing, finished or put away.
+    expect(at('>tour:advanced').text).toBe('Enter shows the second list. tour: brings back the first')
+    expect(at('>tour:advanced').act).toEqual({ kind: 'tourOn', advanced: true })
+    expect(at('>tour:advanced').next).toBeNull()
+    expect(at('>tour:advanced', welcome(), { stepsOff: true }).act).toEqual({ kind: 'tourOn', advanced: true })
+    // Showing already.
+    const here = at('>tour:advanced', welcome(), { stepsAdvanced: true })
+    expect([here.text, here.act]).toEqual(['The second list is here already', null])
+    expect(at('>tour:advanced', welcome(), { stepsAdvanced: true, stepsOff: true }).act).toEqual({ kind: 'tourOn', advanced: true })
+    // tour: brings back the first; tour:off puts either away.
+    expect(at('>tour:', welcome(), { stepsAdvanced: true }).text).toBe('Enter shows the steps again')
+    expect(at('>tour:', welcome(), { stepsAdvanced: true }).act).toEqual({ kind: 'tourOn' })
+    expect(at('>tour:off', welcome(), { stepsAdvanced: true }).act).toEqual({ kind: 'tourOff' })
+    // A line of its own, as tour: is.
+    expect(at('>tour:advanced bar:bottom').text).toBe('tour: runs on a line of its own for now')
   })
 })
 

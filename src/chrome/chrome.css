@@ -569,7 +569,7 @@
 /* One column since the letter left the page (C279 (d)): the heading, the
    steps, the field, then the ending and the note on keeping data. */
 .ch-wgrid { width: 100%; max-width: 520px; margin: auto; display: grid; grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "top" "list" "bar" "now" "keep"; align-items: start; }
+  grid-template-areas: "top" "list" "bar" "now" "further" "keep"; align-items: start; }
 .ch-wtop { grid-area: top; }
 .ch-wh { position: relative; display: flex; flex-direction: column; margin: 0; padding: 0 2px; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); }
 /* Parliament's mark hangs before "Welcome", in the card's margin, so the
@@ -586,6 +586,16 @@
 .ch-steps li.done .t { text-decoration-color: var(--ch-ink-3); color: var(--ch-ink-3); }
 .ch-steps li.done .c { opacity: .6; }
 .ch-steps li.next .n { color: var(--ch-ink); }
+/* The second list (welcome spec §13; tour:advanced): the same lines under
+   three short headings in the same serif, so it reads as small lists. */
+.ch-asteps ol { list-style: none; margin: 0; padding: 0; }
+.ch-asteps section + section { margin-top: 10px; }
+.ch-stepsh { margin: 0 0 2px; font: italic 400 13px/1.6 var(--ch-serif); color: var(--ch-ink-2); }
+/* "or go further": one quiet line under the steps, or under the ending,
+   that writes tour:advanced in the bar. Offered, never pushed. */
+.ch-wfurther { grid-area: further; margin: 14px 2px 0; }
+.ch-shell .ch-wfurther button { color: var(--ch-marg); }
+.ch-shell .ch-wfurther button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-wbar { grid-area: bar; margin-top: 22px; min-width: 0; }
 .ch-letter { grid-area: letter; margin: 22px 2px 0; max-width: 46ch; font: 400 13px/1.7 var(--ch-serif); color: var(--ch-ink-2); transition: opacity .6s; }
 .ch-letter p { margin: 0; }

@@ -435,20 +435,23 @@ const hasWelcome = (a) => a.columns.some((c) => c.includes('welcome'))
 
 /**
  * tour: brings the welcome card back and shows its steps, from anywhere;
- * tour:off puts the steps away (A20). tour:advanced, the second list,
- * comes later. screens.stepsOff says whether the steps are put away now.
+ * tour:off puts the steps away (A20); tour:advanced shows the second list
+ * in their place (welcome spec §13), and tour: the first again.
+ * screens.stepsOff says whether the steps are put away now, and
+ * screens.stepsAdvanced whether the second list is the one shown.
  * @returns {{ says: object, next?: object|null, act?: object|null }|null}
  */
 function planTour(a, step, screens = {}) {
   const word = step.match?.values?.[0]?.value ?? null
-  if (word === 'advanced') return null
   if (word === 'off') {
     if (!hasWelcome(a) || screens.stepsOff) return { says: { message: 'tourOffAlready' }, act: null }
     return { says: { message: 'tourOff' }, act: { kind: 'tourOff' } }
   }
-  if (!hasWelcome(a)) return { says: { message: 'goWelcome' }, next: planBring(a, 'welcome').next, act: { kind: 'tourOn' } }
-  if (screens.stepsOff) return { says: { message: 'tourOn' }, act: { kind: 'tourOn' } }
-  return { says: { message: 'tourHere' }, act: null }
+  const advanced = word === 'advanced'
+  const act = advanced ? { kind: 'tourOn', advanced: true } : { kind: 'tourOn' }
+  if (!hasWelcome(a)) return { says: { message: advanced ? 'goWelcomeAdvanced' : 'goWelcome' }, next: planBring(a, 'welcome').next, act }
+  if (screens.stepsOff || Boolean(screens.stepsAdvanced) !== advanced) return { says: { message: advanced ? 'tourAdvanced' : 'tourOn' }, act }
+  return { says: { message: advanced ? 'tourAdvancedHere' : 'tourHere' }, act: null }
 }
 
 // letter: the newest letter, letter:2 one by its number, letter:all the
@@ -910,7 +913,7 @@ function planName(a, step, screens = {}) {
 /**
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
- *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean,
+ *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean, stepsAdvanced?: boolean,
  *     measure?: () => object|null, numbered?: Map<number, object>, keys?: object[], noKey?: string[],
  *     records?: { rows: object[], view: object, rooms?: object[], collections?: object[], now?: number, locale?: string, ctx?: object } } }} ctx
  *   measure: the space as drawn, for width: (C126); numbered: the Almanac's rows by number, for open: and

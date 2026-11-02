@@ -1,7 +1,8 @@
 import { useLingui } from '@lingui/react'
 import Globe from './Globe'
 import { COPY } from '../copy'
-import { STEPS, nextStep } from '../shell/welcome'
+import { STEPS, nextStep, ADVANCED_STEPS, ADVANCED_GROUPS, nextAdvanced } from '../shell/welcome'
+import { actCommand } from '../lib/cardActs'
 import { useNarrower } from './useNarrower'
 import { modKey } from '../shell/keys'
 import BirdsMark from './BirdsMark'
@@ -47,6 +48,57 @@ function howOf(i18n, s, keyed, roomNum = null) {
   return s.shows
 }
 
+// The second list (welcome spec §13; tour:advanced): its headings and steps.
+const HEADINGS = {
+  sources: COPY.welcome.advancedSources,
+  collection: COPY.welcome.advancedCollection,
+  space: COPY.welcome.advancedSpace,
+}
+const ADVANCED_TITLES = {
+  sources: COPY.welcome.stepSources,
+  compare: COPY.welcome.stepCompare,
+  highlight: COPY.welcome.stepPassage,
+  collection: COPY.welcome.stepCollection,
+  noteQuotes: COPY.welcome.stepNoteQuotes,
+  summary: COPY.welcome.stepSummary,
+  arrange: COPY.welcome.stepArrange,
+}
+
+// What a step of the second list says beside it, and what a click writes.
+// compare: and note: carry the numbers they would take, where they are known
+// (welcome.js, advancedNumbers), as name: carries the room's number.
+function advancedHow(i18n, s, nums) {
+  if (s.id === 'sources') return { how: i18n._(COPY.welcome.stepSourcesHow, { command: s.shows }), writes: s.writes }
+  if (s.id === 'compare') {
+    if (nums?.compare) return { how: `compare:${nums.compare.join(' ')}`, writes: `>compare:${nums.compare.join(' ')}` }
+    return { how: i18n._(COPY.welcome.stepCompareHow, { quote: 'quote:reply', command: s.shows }), writes: s.writes }
+  }
+  if (s.id === 'highlight') return { how: i18n._(COPY.welcome.stepHighlightHow), writes: null }
+  if (s.id === 'noteQuotes') {
+    if (nums?.quotes?.length) return { how: `note:${nums.quotes.join(', ')} "…"`, writes: actCommand.note(nums.quotes) }
+    return { how: i18n._(COPY.welcome.stepNoteQuotesHow, { command: s.shows }), writes: s.writes }
+  }
+  if (s.id === 'summary') return { how: i18n._(COPY.welcome.stepSummaryHow, { command: s.shows }), writes: s.writes }
+  return { how: s.shows, writes: s.writes }
+}
+
+// One step, in either list: its number, what to do, then the command, which
+// a click writes in the bar. A step no command does yet says what to do,
+// and writes nothing (C282).
+function StepRow({ n, title, how, writes, done, next, onWrite }) {
+  return (
+    <li className={done ? 'done' : next ? 'next' : undefined}>
+      <span className="n">{n}</span>
+      <span>
+        <span className="t">{title}</span>
+        {writes
+          ? <button type="button" className="c" dir="ltr" onClick={() => onWrite(writes)}>{how}</button>
+          : <span className="c">{how}</span>}
+      </span>
+    </li>
+  )
+}
+
 // A line with a command in it, where the command is a link that writes it
 // in the bar: the sentence is translated whole, and split where the command
 // goes, so a language can put it anywhere.
@@ -79,11 +131,18 @@ function withCommands(i18n, descriptor, commands, onWrite) {
  *   onWrite: (text: string) => void, barSlot: (el: HTMLElement|null) => void,
  *   keep?: { asking: boolean, onAsk: () => void }|null }} props
  *   keep: when the browser has not agreed to keep Parliament's data and there is something to lose (C94)
+ *   advancedNums: the numbers the second list's compare: and note: are shown with, where known
  */
-export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage, keyed = false, roomNum = null }) {
+export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage, keyed = false, roomNum = null, advancedNums = null }) {
   const { i18n } = useLingui()
   const next = nextStep(welcome)
-  const steps = !welcome.off && !welcome.finished
+  // One list at a time: the second in the first's place (tour:advanced),
+  // offered by one quiet line under the first, or under the ending once it
+  // is done (W §13). tour:off puts either away, and the offer with it.
+  const advanced = !welcome.off && welcome.advanced
+  const steps = !welcome.off && !welcome.advanced && !welcome.finished
+  const offer = !welcome.off && !welcome.advanced
+  const nextFurther = nextAdvanced(welcome)
   const [cardRef, narrow] = useNarrower(CARD_WIDE)
   return (
     <article
@@ -105,29 +164,46 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
           </div>
           {steps && (
             <ol className="ch-steps" aria-label={i18n._(COPY.welcome.steps)}>
-              {STEPS.map((s, i) => {
-                const done = welcome.done.includes(s.id)
-                const how = howOf(i18n, s, keyed, roomNum)
-                const writes = s.id === 'name' && roomNum ? `>name:${roomNum} ""` : s.writes
-                return (
-                  <li key={s.id} className={done ? 'done' : next?.id === s.id ? 'next' : undefined}>
-                    <span className="n">{i + 1}</span>
-                    <span>
-                      <span className="t">{i18n._(TITLES[s.id], { board: i18n._(COPY.boards.collection) })}</span>
-                      {/* A step no command does yet says what to do, and writes nothing (C282). */}
-                      {s.writes
-                        ? <button type="button" className="c" dir="ltr" onClick={() => onWrite(writes)}>{how}</button>
-                        : <span className="c">{how}</span>}
-                    </span>
-                  </li>
-                )
-              })}
+              {STEPS.map((s, i) => (
+                <StepRow
+                  key={s.id} n={i + 1} title={i18n._(TITLES[s.id], { board: i18n._(COPY.boards.collection) })}
+                  how={howOf(i18n, s, keyed, roomNum)} writes={s.writes && (s.id === 'name' && roomNum ? `>name:${roomNum} ""` : s.writes)}
+                  done={welcome.done.includes(s.id)} next={next?.id === s.id} onWrite={onWrite}
+                />
+              ))}
             </ol>
+          )}
+          {/* The second list: the same lines, numbered on through three short
+              headings in the same serif, so it reads as small lists (W §13). */}
+          {advanced && (
+            <div className="ch-steps ch-asteps" role="group" aria-label={i18n._(COPY.welcome.advancedSteps)}>
+              {ADVANCED_GROUPS.map((g) => (
+                <section key={g}>
+                  <h2 className="ch-stepsh">{i18n._(HEADINGS[g])}</h2>
+                  <ol>
+                    {ADVANCED_STEPS.filter((s) => s.group === g).map((s) => {
+                      const { how, writes } = advancedHow(i18n, s, advancedNums)
+                      return (
+                        <StepRow
+                          key={s.id} n={ADVANCED_STEPS.indexOf(s) + 1} title={i18n._(ADVANCED_TITLES[s.id])} how={how} writes={writes}
+                          done={(welcome.advancedDone ?? []).includes(s.id)} next={nextFurther?.id === s.id} onWrite={onWrite}
+                        />
+                      )
+                    })}
+                  </ol>
+                </section>
+              ))}
+            </div>
           )}
           <div className="ch-wbar" ref={barSlot} />
           {/* The ending (W §7): one line once the steps are done. The letter
               is letter one, opened by letter: rather than drawn here (C279 (d)). */}
           {welcome.finished && <p className="ch-wnow">{withCommand(i18n, COPY.welcome.now, 'focus:', onWrite)}</p>}
+          {offer && (
+            <p className="ch-wfurther ch-marg">
+              <button type="button" onClick={() => onWrite('>tour:advanced')}>{i18n._(COPY.welcome.further)}</button>
+            </p>
+          )}
           {keep && (
             <div className="ch-wkeep" role="note">
               <p>{i18n._(COPY.welcome.keepNot)}</p>
