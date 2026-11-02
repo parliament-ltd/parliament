@@ -431,7 +431,7 @@ msgstr "このルームにあるスプレッドシートなどのデータファ
 
 #. js-lingui-explicit-id
 msgid "blockAbout.highlights"
-msgstr "チャットのどこに出てきても、それぞれの色で強調される語句。クリックで箇所から箇所へ移動します。"
+msgstr "チャットでハイライトした箇所を、マークしたその場所にそれぞれの色で示します。クリックで箇所から箇所へ移動します。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.input"
