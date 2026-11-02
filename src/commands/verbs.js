@@ -383,6 +383,9 @@ export const VERBS = Object.freeze([
   // Settings and data
   v({ verb: 'api', group: 'settings', example: 'api:', forms: ['api:', 'api:mistral', 'api:new'], takes: [[], [['new']], ['word']], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.api', message: 'Add or replace a key, in its own field. Never type a key here' } }),
+  // install: (C287): Parliament as an app on this computer, where the browser offers it.
+  v({ verb: 'install', group: 'settings', example: 'install:', takes: [[]], stage: 15, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.install', message: 'Install Parliament as an app on this computer, where the browser can. Your work stays the same' } }),
   v({ verb: 'backup', group: 'settings', example: 'backup:', takes: [[]], stage: 9,
     gloss: /*i18n*/ { id: 'verb.backup', message: 'Download a backup of everything but your keys' } }),
   v({ verb: 'restore', group: 'settings', example: 'restore:', takes: [[]], stage: 9,
@@ -416,7 +419,8 @@ export const RENAMED = Object.freeze({
   refresh: { to: 'reset' }, // one word per act (C97)
   source: { to: 'from' }, // one word per act (C97)
   erase: { to: 'delete' }, // C199, replacing the ruling of 15 October
-  drop: { to: 'delete' }, // C199, replacing the bar decisions' drop: (7 October)
+  drop: { to: 'delete' },
+  download: { to: 'install' }, // Stefan's word for it (C287); install: is the one the browsers use // C199, replacing the bar decisions' drop: (7 October)
 })
 
 // Verbs that are gone, with what to use instead, or null. What to use is a

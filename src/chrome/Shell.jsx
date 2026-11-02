@@ -34,6 +34,7 @@ import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useChat } from '../stores/ChatContext'
+import { usePWA } from '../stores/PWAContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { frameworkList, frameworksOf, instructionsOf, recordOf } from '../lib/frameworks'
@@ -663,6 +664,8 @@ export default function Shell() {
     const timer = setTimeout(() => done(null), 8000)
     rowWaiters.current.add(check)
   }), [])
+  // install: (C287): the browser's offer to install Parliament as an app.
+  const { canInstall, installed: appInstalled, triggerInstallPrompt: installApp } = usePWA()
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
   // letter: under the bar, and which letters were read, on this device only (C279 (c)).
   const [lettersRead, setLettersRead] = useState([])
@@ -1290,6 +1293,12 @@ export default function Shell() {
     if (['copyMessage', 'deleteMessage', 'quoteMessage', 'noteMessage'].includes(what.kind)) {
       const now = heldMessagesOf(what.chatId).find((m) => m.id === what.messageId)
       if (!now || now.content !== what.content) return 'messageFailed'
+    }
+    if (what.kind === 'install') {
+      // install: (C287): the browser asks; Parliament only passes the request on.
+      const outcome = await installApp().catch(() => null)
+      remember(body)
+      return { done: true, says: { message: outcome === 'accepted' ? 'installDone' : outcome === 'dismissed' ? 'installDismissed' : 'installNotOffered' } }
     }
     if (what.kind === 'copyMessage') {
       try {
@@ -2046,7 +2055,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, showCollectionView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
+  }, [installApp, readKeys, remember, run, showView, showCollectionView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -3288,7 +3297,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).

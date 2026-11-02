@@ -1449,3 +1449,16 @@ describe('inspect:highlights (C287)', () => {
     expect(go('>inspect:highlights', undefined).says.message).toBe('inspectNoRoom')
   })
 })
+
+describe('install: (C287)', () => {
+  const go = (line, install) => preview(line, { mode: 'command', arrangement: shipped(SPACE), screens: { install } })
+  it('passes the browser\'s offer on at Enter, says when there is none, and when this is the app already', () => {
+    expect(go('>install:', { can: true, installed: false })).toMatchObject({ says: { message: 'installGo' }, act: { kind: 'install' } })
+    expect(go('>install:', { can: false, installed: false })).toMatchObject({ says: { message: 'installNotOffered' }, act: null })
+    expect(go('>install:', { can: false, installed: true }).says.message).toBe('installAlready')
+  })
+  it('takes download: as the word for it, and writes install: in', () => {
+    const p = go('>download:', { can: true, installed: false })
+    expect(p.answer).toMatchObject({ state: 'renamed', values: { now: 'install:' } })
+  })
+})

@@ -157,6 +157,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `api:` | Add or replace a key, in its own field. Never type a key here | `api:`, `api:mistral`, `api:new` | everywhere | no |
+| `install:` | Install Parliament as an app on this computer, where the browser can. Your work stays the same | `install:` | everywhere | no |
 | `backup:` | Download a backup of everything but your keys | `backup:` | everywhere | no |
 | `restore:` | Bring a backup back | `restore:` | everywhere | no |
 | `import:` | Open a file made elsewhere. It says what the file is before anything happens | `import:` | everywhere | no |

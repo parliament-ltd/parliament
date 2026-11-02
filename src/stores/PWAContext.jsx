@@ -69,19 +69,27 @@ export function PWAProvider({ children }) {
   const installPromptRef  = useRef(null)
   const messageCountRef   = useRef(0)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
+  // install: in the bar (C287): whether the browser has offered to install
+  // Parliament here, and whether this is the installed app already.
+  const [canInstall, setCanInstall] = useState(false)
+  const [installed, setInstalled] = useState(() => Boolean(window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone))
 
   useEffect(() => {
     const handleBeforeInstallPrompt = async (e) => {
       e.preventDefault()
+      // Kept for install:, which the person asks for, whatever the banner was told.
+      installPromptRef.current = e
+      setCanInstall(true)
       const dismissed = await getSetting('installPromptDismissed')
       if (dismissed) return
-      installPromptRef.current = e
       // Don't show the banner yet — wait until 3 messages have been sent.
     }
 
     const handleAppInstalled = () => {
       setShowInstallBanner(false)
       installPromptRef.current = null
+      setCanInstall(false)
+      setInstalled(true)
       console.log('[PWA] App installed successfully')
     }
 
@@ -114,12 +122,14 @@ export function PWAProvider({ children }) {
 
   const triggerInstallPrompt = useCallback(async () => {
     const prompt = installPromptRef.current
-    if (!prompt) return
+    if (!prompt) return null
     prompt.prompt()
     const { outcome } = await prompt.userChoice
-    console.log('[PWA] Install prompt outcome:', outcome)
+    // The browser offers once: after an answer, it may offer again later.
     installPromptRef.current = null
+    setCanInstall(false)
     setShowInstallBanner(false)
+    return outcome
   }, [])
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -135,6 +145,8 @@ export function PWAProvider({ children }) {
       dismissUpdate,
 
       // Install prompt
+      canInstall,
+      installed,
       showInstallBanner,
       trackMessageSent,
       dismissInstallBanner,

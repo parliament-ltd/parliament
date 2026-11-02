@@ -70,7 +70,7 @@ const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan'
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange'])
+const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -1173,6 +1173,10 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       diff: (a1, s1, sc) => planDiff(a1, s1, sc),
       // Backups from the bar (stage 9, piece 2; A21; C182): a panel under the
       // field, or a file picker first. Nothing changes before a choice there.
+      // install: (C287): the browser's own offer, asked for at Enter.
+      install: (a1, s1, sc) => (sc.install?.installed ? { says: { message: 'installAlready' }, act: null }
+        : sc.install?.can ? { says: { message: 'installGo', also: [{ message: 'installSame' }] }, act: { kind: 'install' } }
+          : { says: { message: 'installNotOffered' }, act: null }),
       backup: () => ({ says: { message: 'backupOpen' }, act: { kind: 'backupPanel' } }),
       restore: () => ({ says: { message: 'restoreOpen' }, act: { kind: 'filePick', then: 'restore' } }),
       import: () => ({ says: { message: 'importOpen' }, act: { kind: 'filePick', then: 'import' } }),
