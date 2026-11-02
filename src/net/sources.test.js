@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import wikipedia from './sources/wikipedia.json'
 import hn from './sources/hackernews.json'
 import oa from './sources/openalex.json'
-import { createSource, sourceLanguage, SourceError, read } from './sources'
+import { createSource, sourceLanguage, SourceError, read, readList } from './sources'
 import { destination } from './list'
 
 const origins = destination('wikipedia').origins
@@ -71,6 +71,48 @@ describe('Wikipedia, from its manifest', () => {
     const deeper = { ...wikipedia, request: { ...wikipedia.request, url: 'https://a.{lang}.wikipedia.org/w/api.php' } }
     await expect(createSource(deeper, { origins, fetch }).answer('x')).rejects.toBeInstanceOf(SourceError)
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('asks for the titles of the pages an article links to in the same request, articles only (C287)', async () => {
+    const fetch = vi.fn(async () => reply({ query: { pages: [page] } }))
+    await createSource(wikipedia, { origins, fetch }).answer('when was nintendo founded')
+    expect(fetch).toHaveBeenCalledTimes(1)
+    const u = new URL(fetch.mock.calls[0][0])
+    expect(u.searchParams.get('prop').split('|')).toEqual(['extracts', 'info', 'revisions', 'links'])
+    expect(u.searchParams.get('plnamespace')).toBe('0')
+    expect(u.searchParams.get('pllimit')).toBe('500')
+    expect(fetch.mock.calls[0][1].method).toBe('GET')
+  })
+
+  it('gives the titles it links to as plain strings, short ones only, and none when it has none (C287)', async () => {
+    const linked = {
+      ...page,
+      title: 'Nintendo',
+      extract: 'Nintendo Co., Ltd. is a Japanese video game company.\nList of Nintendo arcade video games\nList of Nintendo home video games',
+      links: [
+        { ns: 0, title: 'List of Nintendo arcade video games' },
+        { ns: 0, title: 'List of Nintendo home video games' },
+        { ns: 0, title: `${'x'.repeat(301)}` },
+        { ns: 0, title: { html: '<b>no</b>' } },
+        { ns: 0 },
+        null,
+      ],
+    }
+    const a = await createSource(wikipedia, { origins, fetch: async () => reply({ query: { pages: [linked] } }) }).answer('nintendo')
+    expect(a.links).toEqual(['List of Nintendo arcade video games', 'List of Nintendo home video games'])
+    expect(a.text).toBe(linked.extract)
+    const none = await createSource(wikipedia, { origins, fetch: async () => reply({ query: { pages: [page] } }) }).answer('barn owl')
+    expect(none).not.toHaveProperty('links')
+  })
+
+  it('keeps at most the titles its manifest allows, and never more than five hundred', async () => {
+    const many = { ...page, links: Array.from({ length: 700 }, (_, i) => ({ ns: 0, title: `Page ${i}` })) }
+    const a = await createSource(wikipedia, { origins, fetch: async () => reply({ query: { pages: [many] } }) }).answer('x')
+    expect(a.links).toHaveLength(500)
+    const fewer = { ...wikipedia, limits: { ...wikipedia.limits, links: 3 } }
+    expect((await createSource(fewer, { origins, fetch: async () => reply({ query: { pages: [many] } }) }).answer('x')).links).toEqual(['Page 0', 'Page 1', 'Page 2'])
+    const greedy = { ...wikipedia, limits: { ...wikipedia.limits, links: 100_000 } }
+    expect((await createSource(greedy, { origins, fetch: async () => reply({ query: { pages: [many] } }) }).answer('x')).links).toHaveLength(500)
   })
 
   it('reports a refusal or an unreachable source, and passes an abort through', async () => {
@@ -149,6 +191,15 @@ describe('the readers a manifest may name', () => {
   it('reads nothing it does not know, and never an object as text', () => {
     expect(read(item, { run: 'alert(1)' })).toBeNull()
     expect(read(item, 'a')).toBeNull()
+  })
+  it('reads every value at a path in a list as text, and nothing else (C287)', () => {
+    expect(readList(item, { each: 'list', path: 'n' })).toEqual(['One', 'Two'])
+    expect(readList({ list: ['A', ' B ', '', 3, {}, null] }, { each: 'list' })).toEqual(['A', 'B', '3'])
+    expect(readList(item, { each: 'list', path: 'n' }, { max: 1 })).toEqual(['One'])
+    expect(readList({ list: [{ n: 'abcd' }, { n: 'ab' }] }, { each: 'list', path: 'n' }, { chars: 3 })).toEqual(['ab'])
+    expect(readList(item, { each: 'a' })).toEqual([])
+    expect(readList(item, { names: 'list' })).toEqual([])
+    expect(readList(item, null)).toEqual([])
   })
 })
 

@@ -14,6 +14,8 @@ import { COPY } from '../../copy'
 import ChartRenderer from './ChartRenderer'
 import EditableReply from './EditableReply'
 import CitationLink from './CitationLink'
+import { lineTitle } from '../../lib/linkedTitles'
+import { askInBar } from '../../editing/titles'
 import { modelFacts } from '../../net'
 import { instructionLike } from '../../lib/injection'
 import { CARD_HEAD } from '../../lib/release'
@@ -106,6 +108,13 @@ export default function MessageCard({
   // A translated answer shows its translation; one click shows the source's own words.
   const [original, setOriginal] = useState(false)
   const translated = Boolean(source && translation && !original)
+  // A line of a source's own words that is the title of a page it links to
+  // has "ask" after it, writing the title into the bar (C287).
+  const titles = source && !translated && Array.isArray(source.links) && source.links.length ? source.links : null
+  const titleWords = useMemo(() => ({
+    ask: i18n._(COPY.chat.titleAsk),
+    help: (title) => i18n._(COPY.chat.titleAskHelp, { title }),
+  }), [i18n])
 
   useEffect(() => {
     setNoteText(savedNoteText)
@@ -213,6 +222,8 @@ export default function MessageCard({
           sugInfo={sugInfo}
           onSettleSuggestion={onSettleSuggestion}
           sugWords={sugWords}
+          titles={titles ?? undefined}
+          titleWords={titleWords}
         />
       )
     }
@@ -229,7 +240,11 @@ export default function MessageCard({
     }
     if (source) {
       const text = translated && typeof translation.text === 'string' ? translation.text : displayContent
-      return <p className="parliament-md whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>{text}</p>
+      return (
+        <p className="parliament-md whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>
+          {titles ? <TitledLines text={text} titles={titles} words={titleWords} /> : text}
+        </p>
+      )
     }
 
     function highlightString(text) {
@@ -352,7 +367,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords])
 
   return (
     <motion.div
@@ -790,6 +805,32 @@ function SourceResults({ items }) {
       ))}
     </ol>
   )
+}
+
+// A source's answer, drawn outside the editor (another branch's, under its
+// tab): each line as text, and a line that is the title of a page the
+// answer links to with "ask" after it, as in the editor (C287). The title
+// goes to the bar as a prompt, to send with Enter; nothing is sent here.
+function TitledLines({ text, titles, words }) {
+  const known = useMemo(() => new Set(titles), [titles])
+  const lines = String(text ?? '').split('\n')
+  return lines.map((line, i) => {
+    const title = lineTitle(line, known)
+    const help = title ? words.help(title) : ''
+    return (
+      <React.Fragment key={i}>
+        {line}
+        {title && (
+          <span className="p-title-ask">
+            <button type="button" title={help} aria-label={help} onMouseDown={(e) => e.preventDefault()} onClick={() => askInBar(title)}>
+              {words.ask}<span className="p-title-arrow" aria-hidden="true">→</span>
+            </button>
+          </span>
+        )}
+        {i < lines.length - 1 ? '\n' : null}
+      </React.Fragment>
+    )
+  })
 }
 
 // "Answered from Wikipedia · Barn owl · revision 1381083335 · CC BY-SA 4.0",

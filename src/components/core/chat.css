@@ -66,6 +66,13 @@
 .p-results { list-style: none; margin: 0; padding: 0; }
 .p-results > li + li { margin-top: .85em; }
 .p-results .p-marg { display: block; margin: 0; }
+/* After a line that is the title of a page the answer links to (C287): a
+   quiet "ask", in the marginalia's type, that writes the title into the bar. */
+.p-title-ask { margin-inline-start: 8px; font: italic 400 var(--ch-t-marg)/1 var(--ch-serif); color: var(--ch-marg); white-space: nowrap; user-select: none; }
+.p-title-ask button { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+.p-title-ask button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.p-title-ask .p-title-arrow { margin-inline-start: 3px; font-style: normal; }
+.p-copying .p-title-ask { display: none; }
 /* Nothing where words would be. */
 .p-msg-empty { font-style: italic; color: var(--ch-ink-3); }
 

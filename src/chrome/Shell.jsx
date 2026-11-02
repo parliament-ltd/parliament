@@ -884,7 +884,9 @@ export default function Shell() {
       joinedDraft.current = Array.isArray(e.detail?.from) ? { value, from: e.detail.from.filter((x) => typeof x === 'string') } : null
       setJoinedNow(joinedDraft.current)
       // Joined by typing, the cursor stays where the person is typing.
-      setWrite({ value: value.slice(0, 200_000), mode: 'prompt', focus: e.detail?.focus !== false, n: ++writes.current })
+      // held: false, a title written in from an answer (C287): shown as
+      // it is, not held behind the placeholder.
+      setWrite({ value: value.slice(0, 200_000), mode: 'prompt', focus: e.detail?.focus !== false, held: e.detail?.held !== false, n: ++writes.current })
     }
     window.addEventListener('parliament-prompt-draft', onDraft)
     return () => window.removeEventListener('parliament-prompt-draft', onDraft)

@@ -24,6 +24,9 @@ export const FIELDS = Object.freeze({
   // thinking, thinkingMs: what a model thought before answering, and for how long (C165).
   // translation, asked: an answer from a source translated on request, and a
   // question translated before it went to a source (stage 7, piece 6; C166).
+  // source: where an answer from a source came from, kept whole and checked
+  // by validate.js; since C287 it may hold links, the answer's lines that
+  // are titles of pages it links to. A backup without them reads as before.
   messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks', 'thinking', 'thinkingMs', 'translation', 'asked',
     // citations: the sources a reply cited from a web search (piece 7; C167).
     // from: the message a branch's copy came from; group: the branches a
