@@ -4551,7 +4551,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **What a highlight is called** (C282): still "keyword" in Records and the Collection.
   - Still open from C281 and C282: Settings' model with no key while another provider has one (C150); a second Enter on a slow send sends twice; removing the unused copy and the old step 9's check, each on your yes.
 
-**C284. spread, saving at the end of a line, the language in the header** (1 November; **ruled by Stefan, 1 November:** "spread is fine let's go with that", "we could also tie in save:arrangement in the initial open command", "update the footer text to be consistent", "move the language setting to the header, and not on the welcome page board"). **Built on `claude/after-0.8`, not released.**
+**C284. spread, saving at the end of a line, the language in the header** (1 November; **ruled by Stefan, 1 November:** "spread is fine let's go with that", "we could also tie in save:arrangement in the initial open command", "update the footer text to be consistent", "move the language setting to the header, and not on the welcome page board"). **Built on `claude/after-0.9`, not released.**
 - **Ruled and built:**
   - **`spread`.** A word that ends `open:` or `pop:`: `open:202 203 205 208 collection records spread` opens them all and spreads them across every screen attached, in equal groups in the order named. The first group goes on the page; each next group goes in one window on the next screen, which it fills (C283). A chat no room shows opens in a room of its own. `spread:` alone spreads everything open again. With one screen, or a browser that will not place windows, they all open on the page, and the line under the bar says so before Enter. The screens are read at Enter, the browser asking once (C259 (d)), so the line before Enter says how many screens it knows of, or that it will ask.
   - **`open:` with a list.** `open:202 203 collection` opens each on the page, beside what is there.
@@ -4565,6 +4565,18 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
     1. The colour picker makes a highlight: marked only where it was selected, called a highlight everywhere. New marks are kept with the kind `highlight`, a new value in a field marks already have; nothing is converted.
     2. A keyword as a kind of its own retires (R44, item by item): a tag labels a chat or card, and search finds every place a word appears, so a keyword adds a third way to say one thing. Keywords already kept stay, shown as highlights; nothing is deleted.
   - **Help with lines of several commands:** beyond the line above, a short group in the command menu of lines to copy (`open:202 203 records spread arrange:save "morning"`, `pin:207 tagadd:essay 207`). **Suggestion:** that, and no new syntax.
+
+**C285. Highlights where they were made; keywords retired** (1 November; **ruled by Stefan, 1 November: "Yes, both"**, to C284's two suggestions; R44 approved; replaces C57 and C78's "a term is today's highlight" as something shown). **Built on `claude/after-0.9`, not released.**
+- **Ruled and built:**
+  - **A highlight is marked only where it was selected.** The colour picker's mark keeps which time its words come in that message (`nth`), and the room marks that one place, in that message only. Until now every place the words came, anywhere in the chat, was marked.
+  - **Kept before:** a mark with no place of its own marks the first time its words come in its own message. Nothing stored is converted.
+  - **Keywords retire (R44).** Everything once called a keyword is a highlight:
+    - on cards and rows, the Collection's tab ("Highlights"), the room block's name, the export headings, the Reflection counts, the backup groups and two room templates' descriptions;
+    - `has:highlight` and `type:highlight` find them. `keyword` still reads in `has:` and `type:`, for searches kept before, but the command menu no longer offers it.
+  - Tags label a chat or card and search finds a word everywhere, so nothing a keyword did is lost.
+  - **Stored data:** marks are still kept with the kind `term`, so nothing is converted. A new highlight also keeps `nth`, and backups now keep that field. A backup without it reads as before: the first place. An older Parliament restoring a newer backup drops `nth` and marks the first place.
+  - A card drawn outside the room's editor (rare now) marks its own message's highlights wherever their words come, not only at the one place.
+  - The changed lines are in all four languages. Tests: 1,453. Lint: 30 warnings, all older. Both builds pass. Tried in the room: a highlight on the third time "owls" comes marked only that one, and an older mark only its first place.
 
 ## Proposed CLAUDE.md rewrite
 
