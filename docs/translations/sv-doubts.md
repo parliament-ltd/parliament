@@ -356,3 +356,9 @@ Each: id, the English, the draft, and why I was unsure.
 - pinned (a collection, in the line of collections) → fäst; pin at the top of the collections → fästa överst bland samlingarna.
 - oldest first → de äldsta först, as enter.collectionSort.
 - put away (archive:) → lägga undan, as verb.archive.
+
+## compare: with branches, drafted 2 November 2026 (C289)
+
+- enter.compareMixed: "inte en av varje" for "not one of each". It is the everyday idiom and reads right here; "inte en av vardera" is more exact (one from each of the two groups) but stiffer.
+- enter.compareReplies, enter.comparePlan, verb.compare: "de senaste svaren i …" for "the last replies in/of …", as enter.sweepGo ("det senaste svaret i {address}"), with "i" since a branch holds its replies. Like the English plural, it does not say outright that it is one reply from each side.
+- verb.compare: no comma before "eller de senaste svaren", as Swedish lists go; the English has one.

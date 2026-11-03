@@ -1720,6 +1720,16 @@ msgstr ""
 msgid "compare.legend"
 msgstr ""
 
+#. Names one side for screen readers; {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "compare.reply"
+msgstr ""
+
+#. The small label over a reply set beside another
+#. js-lingui-explicit-id
+msgid "compare.replyKind"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr ""
@@ -2512,15 +2522,35 @@ msgstr ""
 msgid "enter.compareKinds"
 msgstr ""
 
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareMixed"
+msgstr ""
+
+#. {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "enter.compareNoReply"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
+msgstr ""
+
+#. {example} is a command like compare:201a 201b, which stays English
+#. js-lingui-explicit-id
+msgid "enter.comparePlan"
+msgstr ""
+
+#. {a} and {b} are branches like 201a, or chat numbers
+#. js-lingui-explicit-id
+msgid "enter.compareReplies"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
 msgstr ""
 
-#. compare: stays English
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
 msgstr ""
@@ -9871,7 +9901,7 @@ msgstr ""
 msgid "welcome.step.compare"
 msgstr ""
 
-#. {quote} is quote:reply and {command} is compare:, which stay English
+#. {command} is compare: and {example} a command like compare:201a 201b, which stay English
 #. js-lingui-explicit-id
 msgid "welcome.step.compareHow"
 msgstr ""

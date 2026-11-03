@@ -379,3 +379,11 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - cards shown → 表示中のカード, カード#枚を表示中.
 - ask (the link after a page title) → 尋ねる.
 - tick (in a menu) → チェックを入れる; the menu of who answers → 答えるものを選ぶメニュー.
+
+## compare: with branches, drafted 2 November 2026 (C289)
+
+- `enter.compareMixed`: 両方から1つずつは指定できません for "not one of each" (you cannot take one from each group). It only reads right because the sentence before names the two groups (メモ、ハイライト、引用から2つ / チャットかブランチから2つ). チャットかブランチ uses か, not 、, so the second group does not run into the first list.
+- `welcome.step.compareHow`: {example} のように、{command} にブランチを2つ指定する. The example comes first because Japanese puts "like X" before the verb. The other How lines start with the command, so this one starts differently. The alternative is {command} にブランチを2つ指定する（例：{example}）.
+- `enter.compareKinds`: dropped the old line's 今のところ because the new English no longer says "for now". この5つ counts the five kinds, as the old line said この3つ.
+- `enter.compareReplies`: no 、 after Enterで, to match its sibling `enter.compare`, though the glossary's pattern is Enterで、Xします.
+- 語ごとに (word by word, as `enter.compare` has it): the open question in the README matters more now. Replies are long Japanese text with no spaces, so if the comparison splits on spaces, a Japanese reply compares as a few very long "words".

@@ -73,7 +73,7 @@ import { offeredLanguages, isDraft, isBeta, languageRows, COMING_LANGUAGES, star
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows, pinnedFirst } from '../lib/collections'
-import { aboutText, WORDED } from '../lib/cardActs'
+import { aboutText, WORDED, replySide } from '../lib/cardActs'
 import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCards'
 import CollectionBoard from './CollectionBoard'
@@ -670,7 +670,7 @@ export default function Shell() {
   // letter: under the bar, and which letters were read, on this device only (C279 (c)).
   const [lettersRead, setLettersRead] = useState([])
   const lettersReadRef = useRef([])
-  const [compared, setCompared] = useState(null) // the two numbers compare: shows under the bar
+  const [compared, setCompared] = useState(null) // what compare: shows under the bar: two numbers, or two replies (C289)
 
   // ── What Records shows (stage 6, piece 1; C132) ───────
   // The search, typed in the bar while it points at Records, and the
@@ -996,6 +996,8 @@ export default function Shell() {
       ? { list: inspected.list, chatNum: (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === inspected.chatId)?.num ?? null, rows: (almanacRows ?? []).filter((r) => r.chatId === inspected.chatId && (r.kind === 'highlight' || r.kind === 'term')) }
       : numbered.get(inspected) ?? null
   const comparedRows = useMemo(() => {
+    // Two branches' last replies, as read at Enter (C289), or two numbered cards.
+    if (compared?.replies) return { a: compared.replies[0], b: compared.replies[1] }
     const [a, b] = (compared ?? []).map((n) => numbered.get(n))
     return a && b ? { a, b } : null
   }, [compared, numbered])
@@ -1390,6 +1392,24 @@ export default function Shell() {
       setInspected(null)
       setCompared(what.nums)
       // It leaves nothing stored, so the second list's step crosses off here (W §13).
+      updateWelcome((w) => tick(w, 'compare'))
+      remember(body)
+      return null
+    }
+    if (what.kind === 'compareReplies') {
+      // compare:201a 201b (C289): each one's last reply, as it reads now,
+      // read here at Enter, side by side under the bar. Nothing is sent.
+      const sides = []
+      for (const s of what.sides) {
+        const [all, chat] = await Promise.all([getMessages(s.chatId).catch(() => []), getConversation(s.chatId).catch(() => null)])
+        const shown = sendableOf(all, hiddenIds(s.chatId), pendingDeletes(s.chatId))
+        const whoOf = (m) => m.source?.name ?? modelFacts(m.model)?.name ?? modelFacts(chat?.answerer)?.name ?? destination(chat?.answerer)?.name ?? null
+        const side = replySide(s.address, shown, promptNow, whoOf)
+        if (!side) return { message: 'compareNoReply', values: { address: s.address } }
+        sides.push(side)
+      }
+      setInspected(null)
+      setCompared({ replies: sides })
       updateWelcome((w) => tick(w, 'compare'))
       remember(body)
       return null

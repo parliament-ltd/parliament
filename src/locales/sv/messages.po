@@ -1720,6 +1720,16 @@ msgstr "{a} och {b} sida vid sida"
 msgid "compare.legend"
 msgstr "genomstruket: bara i {a} · understruket: bara i {b}"
 
+#. Names one side for screen readers; {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "compare.reply"
+msgstr "det senaste svaret i {address}"
+
+#. The small label over a reply set beside another
+#. js-lingui-explicit-id
+msgid "compare.replyKind"
+msgstr "Svar"
+
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "Samma ord"
@@ -2510,20 +2520,40 @@ msgstr "Enter ställer {a} och {b} sida vid sida, ord för ord"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} är inte en anteckning, en markering eller ett citat, som är det compare: tar än så länge"
+msgstr "{num} är inte en anteckning, en markering, ett citat, en chatt eller en gren, som är det compare: tar"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareMixed"
+msgstr "compare: tar två anteckningar, markeringar eller citat, eller två chattar eller grenar, inte en av varje"
+
+#. {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "enter.compareNoReply"
+msgstr "{address} har inget svar att jämföra än"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
 msgstr "Inget skickas"
 
+#. {example} is a command like compare:201a 201b, which stays English
+#. js-lingui-explicit-id
+msgid "enter.comparePlan"
+msgstr "{num} är en plan. {example} jämför de senaste svaren i två av dess grenar"
+
+#. {a} and {b} are branches like 201a, or chat numbers
+#. js-lingui-explicit-id
+msgid "enter.compareReplies"
+msgstr "Enter ställer de senaste svaren i {a} och {b} sida vid sida, ord för ord"
+
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
 msgstr "Det är samma sak två gånger"
 
-#. compare: stays English
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
-msgstr "compare: tar två nummer, som compare:218 231"
+msgstr "compare: tar två, som compare:218 231 eller compare:201a 201b"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9391,7 +9421,7 @@ msgstr "Dölj eller visa kolumner i tabellen"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Ställ två eller fler sida vid sida. Inget skickas"
+msgstr "Ställ två sida vid sida, ord för ord: anteckningar, markeringar, citat eller de senaste svaren i två grenar. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9871,10 +9901,10 @@ msgstr "{keys} och sedan {command}"
 msgid "welcome.step.compare"
 msgstr "Jämför deras svar"
 
-#. {quote} is quote:reply and {command} is compare:, which stay English
+#. {command} is compare: and {example} a command like compare:201a 201b, which stay English
 #. js-lingui-explicit-id
 msgid "welcome.step.compareHow"
-msgstr "{quote} i varje svar och sedan {command}"
+msgstr "{command} med två grenar, som {example}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id

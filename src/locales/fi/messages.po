@@ -1720,6 +1720,16 @@ msgstr "{a} ja {b} rinnakkain"
 msgid "compare.legend"
 msgstr "yliviivattu: vain kohteessa {a} · alleviivattu: vain kohteessa {b}"
 
+#. Names one side for screen readers; {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "compare.reply"
+msgstr "keskustelun {address} viimeisin vastaus"
+
+#. The small label over a reply set beside another
+#. js-lingui-explicit-id
+msgid "compare.replyKind"
+msgstr "Vastaus"
+
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "Samat sanat"
@@ -2510,20 +2520,40 @@ msgstr "Enter asettaa rinnakkain sana sanalta: {a} ja {b}"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} ei ole muistiinpano, korostus tai lainaus, ja vain niitä compare: toistaiseksi hyväksyy"
+msgstr "{num} ei ole muistiinpano, korostus, lainaus, keskustelu tai haara, ja vain niitä compare: hyväksyy"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareMixed"
+msgstr "compare: hyväksyy joko kaksi muistiinpanoa, korostusta tai lainausta tai kaksi keskustelua tai haaraa, ei yhtä kumpaakin"
+
+#. {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "enter.compareNoReply"
+msgstr "Keskustelussa {address} ei ole vielä vastausta vertailtavaksi"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
 msgstr "Mitään ei lähetetä"
 
+#. {example} is a command like compare:201a 201b, which stays English
+#. js-lingui-explicit-id
+msgid "enter.comparePlan"
+msgstr "{num} on suunnitelma. {example} vertaa sen kahden haaran viimeisimpiä vastauksia"
+
+#. {a} and {b} are branches like 201a, or chat numbers
+#. js-lingui-explicit-id
+msgid "enter.compareReplies"
+msgstr "Enter asettaa keskustelujen {a} ja {b} viimeisimmät vastaukset rinnakkain sana sanalta"
+
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
 msgstr "Ne ovat sama asia kahdesti"
 
-#. compare: stays English
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
-msgstr "compare: tarvitsee kaksi numeroa, esimerkiksi compare:218 231"
+msgstr "compare: tarvitsee kaksi, esimerkiksi compare:218 231 tai compare:201a 201b"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9391,7 +9421,7 @@ msgstr "Piilota tai näytä taulukon sarakkeita"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Aseta kaksi tai useampia rinnakkain. Mitään ei lähetetä"
+msgstr "Aseta kaksi rinnakkain sana sanalta: muistiinpanot, korostukset, lainaukset tai kahden haaran viimeisimmät vastaukset. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9871,10 +9901,10 @@ msgstr "{keys} ja sitten {command}"
 msgid "welcome.step.compare"
 msgstr "Vertaa niiden vastauksia"
 
-#. {quote} is quote:reply and {command} is compare:, which stay English
+#. {command} is compare: and {example} a command like compare:201a 201b, which stay English
 #. js-lingui-explicit-id
 msgid "welcome.step.compareHow"
-msgstr "{quote} kummassakin vastauksessa ja sitten {command}"
+msgstr "{command} ja kaksi haaraa, esimerkiksi {example}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id

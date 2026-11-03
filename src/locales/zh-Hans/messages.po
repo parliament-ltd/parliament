@@ -1720,6 +1720,16 @@ msgstr "{a} 与 {b} 并排对照"
 msgid "compare.legend"
 msgstr "删除线：仅见于 {a} · 下划线：仅见于 {b}"
 
+#. Names one side for screen readers; {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "compare.reply"
+msgstr "{address} 的最后一条回复"
+
+#. The small label over a reply set beside another
+#. js-lingui-explicit-id
+msgid "compare.replyKind"
+msgstr "回复"
+
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "文字完全相同"
@@ -2510,20 +2520,40 @@ msgstr "按 Enter 将 {a} 和 {b} 逐词并排对照"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} 不是笔记、高亮或摘录，而 compare: 目前只支持这几种"
+msgstr "{num} 不是笔记、高亮、摘录、对话或分支，而 compare: 只支持这几种"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareMixed"
+msgstr "compare: 需要两条笔记、高亮或摘录，或者两个对话或分支，不能各取其一"
+
+#. {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "enter.compareNoReply"
+msgstr "{address} 还没有可对照的回复"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
 msgstr "不会发送任何内容"
 
+#. {example} is a command like compare:201a 201b, which stays English
+#. js-lingui-explicit-id
+msgid "enter.comparePlan"
+msgstr "{num} 是一个计划。{example} 可对照其中两个分支的最后一条回复"
+
+#. {a} and {b} are branches like 201a, or chat numbers
+#. js-lingui-explicit-id
+msgid "enter.compareReplies"
+msgstr "按 Enter 将 {a} 和 {b} 各自的最后一条回复逐词并排对照"
+
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
 msgstr "这两个是同一项"
 
-#. compare: stays English
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
-msgstr "compare: 需要两个编号，例如 compare:218 231"
+msgstr "compare: 需要两项，例如 compare:218 231 或 compare:201a 201b"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9391,7 +9421,7 @@ msgstr "隐藏或显示表格的列"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "将两项或多项并排对照。不会发送任何内容"
+msgstr "将两项逐词并排对照：笔记、高亮、摘录，或两个分支各自的最后一条回复。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9871,10 +9901,10 @@ msgstr "按 {keys}，再输入 {command}"
 msgid "welcome.step.compare"
 msgstr "比较它们的回答"
 
-#. {quote} is quote:reply and {command} is compare:, which stay English
+#. {command} is compare: and {example} a command like compare:201a 201b, which stay English
 #. js-lingui-explicit-id
 msgid "welcome.step.compareHow"
-msgstr "对每个回答执行 {quote}，再执行 {command}"
+msgstr "对两个分支执行 {command}，例如 {example}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id

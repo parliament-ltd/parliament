@@ -942,8 +942,28 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
   it('compare: takes two with words, and sends nothing', () => {
     expect(at('>compare:214 219')).toMatchObject({ text: 'Enter sets 214 and 219 side by side, word by word · Nothing is sent', act: { kind: 'compare', nums: [214, 219] } })
     expect(at('>compare:214, 219').act.nums).toEqual([214, 219])
-    expect(at('>compare:214').text).toBe('compare: takes two numbers, like compare:218 231')
-    expect(at('>compare:214 202').text).toBe('202 is not a note, highlight or quote, which are what compare: takes for now')
+    expect(at('>compare:214').text).toBe('compare: takes two, like compare:218 231 or compare:201a 201b')
+    expect(at('>compare:214 202').text).toBe('compare: takes two notes, highlights or quotes, or two chats or branches, not one of each')
+  })
+
+  it('compare: takes two branches, or two chats, by their last replies (C289)', () => {
+    const plan = [row(229, 'docket', { docketNum: 229, chatId: 'chat-230' }), row(230, 'chat', { docketNum: 229, branch: 'a' }), row(231, 'chat', { docketNum: 229, branch: 'c' })]
+    const withPlan = (value) => {
+      const p = preview(value, { mode: 'command', arrangement: { ...almanac(), addressed: 'almanac' }, screens: { records: { rows: [...rows, ...plan], view: { search: '', filters: [], sort: { by: 'active', asc: false } } } } })
+      const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+      return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+    }
+    expect(withPlan('>compare:229a 229c')).toMatchObject({
+      text: 'Enter sets the last replies in 229a and 229c side by side, word by word · Nothing is sent',
+      act: { kind: 'compareReplies', sides: [{ chatId: 'chat-230', address: '229a' }, { chatId: 'chat-231', address: '229c' }] },
+    })
+    // A chat on its own, by its number; letters read in either case.
+    expect(withPlan('>compare:202 229C').act.sides).toEqual([{ chatId: 'chat-202', address: '202' }, { chatId: 'chat-231', address: '229c' }])
+    expect(withPlan('>compare:229a 229A').text).toBe('Those are the same thing twice')
+    // The plan's number alone names its branches to pick from.
+    expect(withPlan('>compare:229 229a').text).toBe('229 is a plan. compare:229a 229c compares the last replies of two of its branches')
+    expect(withPlan('>compare:229a 214').text).toBe('compare: takes two notes, highlights or quotes, or two chats or branches, not one of each')
+    expect(withPlan('>compare:229b 229a').text).toBe('Nothing here has the number 229b')
   })
 
   it('jump: finds a number on the board the bar points at', () => {

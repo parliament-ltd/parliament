@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectionOf, actCommand, aboutText } from './cardActs'
+import { selectionOf, actCommand, aboutText, replySide, chatAddress } from './cardActs'
 import { cardsOf } from './collectionCards'
 import { newCollection } from './collections'
 
@@ -40,5 +40,29 @@ describe('cards for notes of their own (C145 (e), (g))', () => {
     const { cards } = cardsOf(c, rows)
     expect(cards[0]).toMatchObject({ num: 231, quotes: [214, 217], own: true, summary: null })
     expect(cards[1]).toMatchObject({ num: 234, summary: { from: [214] }, own: true })
+  })
+})
+
+describe('compare: with branches (C289)', () => {
+  const wordsNow = (m) => m.content
+  const whoOf = (m) => m.source?.name ?? m.model ?? null
+  it('reads a branch by its last reply as it stands, and says who gave it', () => {
+    const messages = [
+      { id: 'u1', role: 'user', content: 'Where do owls nest?' },
+      { id: 'r1', role: 'assistant', content: 'In hollows.', model: 'claude-sonnet-5-5' },
+      { id: 'u2', role: 'user', content: 'And barn owls?' },
+      { id: 'r2', role: 'assistant', content: 'In barns and old trees.', source: { name: 'Wikipedia' } },
+      { id: 'r3', role: 'assistant', content: 'Still arri', incomplete: true },
+    ]
+    expect(replySide('201a', messages, wordsNow, whoOf)).toEqual({ kind: 'reply', address: '201a', who: 'Wikipedia', text: 'In barns and old trees.' })
+    expect(replySide('201b', messages.slice(0, 2), wordsNow, whoOf).who).toBe('claude-sonnet-5-5')
+  })
+  it('has nothing to set beside another before a reply has come', () => {
+    expect(replySide('201a', [{ id: 'u1', role: 'user', content: 'Hello' }], wordsNow, whoOf)).toBeNull()
+    expect(replySide('201a', [], wordsNow, whoOf)).toBeNull()
+  })
+  it('names a chat by its branch, else its number', () => {
+    expect(chatAddress({ num: 230, docketNum: 229, branch: 'b' })).toBe('229b')
+    expect(chatAddress({ num: 202, docketNum: null, branch: null })).toBe('202')
   })
 })

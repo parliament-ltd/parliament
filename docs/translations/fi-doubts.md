@@ -352,3 +352,12 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 - a card shown → näkyvä kortti, # korttia näkyvissä.
 - at {section} (pop:settings) → avaa sen kohdasta {section}, as in enter.openSettingsAt.
 - "Save your screen" → Tallenna näkymäsi. Screen as an arrangement is näkymä, as in enter.resetArrangement. Näyttö stays for the display.
+
+## compare: with branches, drafted 2 November 2026 (C289)
+
+- `enter.compareReplies`, `enter.compareNoReply`, `compare.reply`: the placeholder can be a branch (201a) or a chat number (218), and Finnish needs a head noun to carry the case, so I used keskustelu ("keskustelujen {a} ja {b}", "Keskustelussa {address}", "keskustelun {address}"). A branch is a plan's chat, so this fits both. The catch is that elsewhere a branch is always haara {address}, so a Finnish reader sees "keskustelu 201a" here. haara would be wrong for 218, and kohde (the glossary's word for an unknown kind) reads stiffer.
+- `compare.reply` is set inside `compare.label` ("{a} ja {b} rinnakkain"), so the screen reader hears "keskustelun 201a viimeisin vastaus ja keskustelun 201b viimeisin vastaus rinnakkain". That is long but clear, and it starts in lower case as the English does.
+- "the last reply" → viimeisin vastaus, as in `enter.messageLast`. "Viimeinen" would also work; "viimeisin" means the most recent, which is the sense here.
+- `enter.compareMixed`: I added "joko" because "kaksi … tai …" alone chains three "tai" and the two groups blur. "ei yhtä kumpaakin" is "not one of each".
+- `enter.compareTwo`: "tarvitsee kaksi" has no noun after it, as the English "takes two" has none. The old line said "kaksi numeroa", which 201a no longer fits. "kaksi kohdetta" would be the fuller option.
+- `verb.compare`: the kinds after the colon are in the nominative plural ("muistiinpanot, korostukset, lainaukset"), to keep the English's colon list. "Aseta kaksi muistiinpanoa, korostusta … rinnakkain" would read more smoothly but changes the line's shape.

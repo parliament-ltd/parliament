@@ -435,9 +435,14 @@ export const COPY = {
     noteDone: /*i18n*/ { id: 'enter.noteDone', message: 'Wrote {num}' },
     compare: /*i18n*/ { id: 'enter.compare', message: 'Enter sets {a} and {b} side by side, word by word' },
     compareNothingSent: /*i18n*/ { id: 'enter.compareNothingSent', message: 'Nothing is sent' },
-    compareTwo: /*i18n*/ { id: 'enter.compareTwo', message: 'compare: takes two numbers, like compare:218 231', comment: 'compare: stays English' },
+    compareTwo: /*i18n*/ { id: 'enter.compareTwo', message: 'compare: takes two, like compare:218 231 or compare:201a 201b', comment: 'Commands stay English' },
     compareSame: /*i18n*/ { id: 'enter.compareSame', message: 'Those are the same thing twice' },
-    compareKinds: /*i18n*/ { id: 'enter.compareKinds', message: '{num} is not a note, highlight or quote, which are what compare: takes for now', comment: 'compare: stays English' },
+    compareKinds: /*i18n*/ { id: 'enter.compareKinds', message: '{num} is not a note, highlight, quote, chat or branch, which are what compare: takes', comment: 'compare: stays English' },
+    // compare: with branches (C289): each one's last reply.
+    compareReplies: /*i18n*/ { id: 'enter.compareReplies', message: 'Enter sets the last replies in {a} and {b} side by side, word by word', comment: '{a} and {b} are branches like 201a, or chat numbers' },
+    comparePlan: /*i18n*/ { id: 'enter.comparePlan', message: '{num} is a plan. {example} compares the last replies of two of its branches', comment: '{example} is a command like compare:201a 201b, which stays English' },
+    compareMixed: /*i18n*/ { id: 'enter.compareMixed', message: 'compare: takes two notes, highlights or quotes, or two chats or branches, not one of each', comment: 'compare: stays English' },
+    compareNoReply: /*i18n*/ { id: 'enter.compareNoReply', message: '{address} has no reply yet to compare', comment: '{address} is a branch like 201a, or a chat number' },
     jumpCard: /*i18n*/ { id: 'enter.jumpCard', message: 'Enter finds {num} here' },
     jumpPassage: /*i18n*/ { id: 'enter.jumpPassage', message: 'Enter finds {num} in its chat' },
     jumpRow: /*i18n*/ { id: 'enter.jumpRow', message: 'Enter scrolls to {num}' },
@@ -1845,7 +1850,7 @@ export const COPY = {
     stepSources: /*i18n*/ { id: 'welcome.step.sources', message: 'Ask two sources at once' },
     stepSourcesHow: /*i18n*/ { id: 'welcome.step.sourcesHow', message: '{command}, then tick two in the menu of who answers', comment: '{command} is p>, which stays English. The menu opens from who answers, in the prompt field' },
     stepCompare: /*i18n*/ { id: 'welcome.step.compare', message: 'Compare their answers' },
-    stepCompareHow: /*i18n*/ { id: 'welcome.step.compareHow', message: '{quote} in each answer, then {command}', comment: '{quote} is quote:reply and {command} is compare:, which stay English' },
+    stepCompareHow: /*i18n*/ { id: 'welcome.step.compareHow', message: '{command} with two branches, like {example}', comment: '{command} is compare: and {example} a command like compare:201a 201b, which stay English' },
     stepPassage: /*i18n*/ { id: 'welcome.step.passage', message: 'Highlight a passage' },
     stepCollection: /*i18n*/ { id: 'welcome.step.collection', message: 'Start a collection' },
     stepNoteQuotes: /*i18n*/ { id: 'welcome.step.noteQuotes', message: 'Write a note that quotes them' },
@@ -2639,6 +2644,9 @@ export const COPY = {
     counts: /*i18n*/ { id: 'compare.counts', message: '{gone, plural, one {# word out} other {# words out}}, {added, plural, one {# word in} other {# words in}}' },
     same: /*i18n*/ { id: 'compare.same', message: 'The same words' },
     close: /*i18n*/ { id: 'compare.close', message: 'Nothing was sent. Escape closes this' },
+    // compare:201a 201b (C289): a side that is a branch's last reply.
+    reply: /*i18n*/ { id: 'compare.reply', message: 'the last reply in {address}', comment: 'Names one side for screen readers; {address} is a branch like 201a, or a chat number' },
+    replyKind: /*i18n*/ { id: 'compare.replyKind', message: 'Reply', comment: 'The small label over a reply set beside another' },
   },
 
   // letter: under the bar (C279 (c)).

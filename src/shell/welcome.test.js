@@ -190,15 +190,19 @@ describe('the second list, tour:advanced (welcome spec §13; A20)', () => {
     expect(advancedNumbers([])).toEqual({ compare: null, quotes: [] })
     const mark = (num, kind, docketNum, branch, createdAt, extra = {}) => ({ num, kind, docketNum, branch, createdAt, ...extra })
     const rows = [
-      { kind: 'chat', num: 202, docketNum: 201, branch: 'a' },
+      mark(202, 'chat', 201, 'a', '2026-11-02T10:00:00Z'),
+      mark(203, 'chat', 201, 'b', '2026-11-02T10:00:00Z'),
       mark(221, 'quote', 201, 'b', '2026-11-02T10:02:00Z'),
       mark(222, 'term', 201, 'a', '2026-11-02T10:01:00Z'),
       mark(223, 'note', 201, 'a', '2026-11-02T10:03:00Z'),
       mark(224, 'quote', 201, 'a', '2026-11-02T09:00:00Z', { archived: true }),
     ]
-    // One from each branch, in the branches' order; notes and archived rows left out.
-    expect(advancedNumbers(rows)).toEqual({ compare: [222, 221], quotes: [221, 222] })
-    // Both in one branch: nothing to compare across, but something to quote.
-    expect(advancedNumbers([mark(221, 'quote', 201, 'a', 'x'), mark(222, 'term', 201, 'a', 'y')])).toEqual({ compare: null, quotes: [221, 222] })
+    // compare: the plan's first two branches (C289); note: the newest highlights and quotes, archived ones left out.
+    expect(advancedNumbers(rows)).toEqual({ compare: ['201a', '201b'], quotes: [221, 222] })
+    // The newest plan with two branches, in its letters' order: z before aa; archived ones left out.
+    const later = [mark(240, 'chat', 239, 'aa', '2026-11-03T10:00:00Z'), mark(241, 'chat', 239, 'z', '2026-11-03T10:00:00Z'), mark(242, 'chat', 239, 'b', '2026-11-03T11:00:00Z', { archived: true })]
+    expect(advancedNumbers([...rows, ...later]).compare).toEqual(['239z', '239aa'])
+    // A plan of one branch has nothing to compare across.
+    expect(advancedNumbers([mark(202, 'chat', 201, 'a', 'x'), mark(221, 'quote', 201, 'a', 'x')])).toEqual({ compare: null, quotes: [221] })
   })
 })

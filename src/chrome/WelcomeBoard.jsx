@@ -71,7 +71,7 @@ function advancedHow(i18n, s, nums) {
   if (s.id === 'sources') return { how: i18n._(COPY.welcome.stepSourcesHow, { command: s.shows }), writes: s.writes }
   if (s.id === 'compare') {
     if (nums?.compare) return { how: `compare:${nums.compare.join(' ')}`, writes: `>compare:${nums.compare.join(' ')}` }
-    return { how: i18n._(COPY.welcome.stepCompareHow, { quote: 'quote:reply', command: s.shows }), writes: s.writes }
+    return { how: i18n._(COPY.welcome.stepCompareHow, { command: s.shows, example: 'compare:201a 201b' }), writes: s.writes }
   }
   if (s.id === 'highlight') return { how: i18n._(COPY.welcome.stepHighlightHow), writes: null }
   if (s.id === 'noteQuotes') {

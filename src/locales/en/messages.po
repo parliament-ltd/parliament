@@ -1720,6 +1720,16 @@ msgstr "{a} and {b} side by side"
 msgid "compare.legend"
 msgstr "struck: only in {a} · underlined: only in {b}"
 
+#. Names one side for screen readers; {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "compare.reply"
+msgstr "the last reply in {address}"
+
+#. The small label over a reply set beside another
+#. js-lingui-explicit-id
+msgid "compare.replyKind"
+msgstr "Reply"
+
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "The same words"
@@ -2510,20 +2520,40 @@ msgstr "Enter sets {a} and {b} side by side, word by word"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} is not a note, highlight or quote, which are what compare: takes for now"
+msgstr "{num} is not a note, highlight, quote, chat or branch, which are what compare: takes"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareMixed"
+msgstr "compare: takes two notes, highlights or quotes, or two chats or branches, not one of each"
+
+#. {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "enter.compareNoReply"
+msgstr "{address} has no reply yet to compare"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
 msgstr "Nothing is sent"
 
+#. {example} is a command like compare:201a 201b, which stays English
+#. js-lingui-explicit-id
+msgid "enter.comparePlan"
+msgstr "{num} is a plan. {example} compares the last replies of two of its branches"
+
+#. {a} and {b} are branches like 201a, or chat numbers
+#. js-lingui-explicit-id
+msgid "enter.compareReplies"
+msgstr "Enter sets the last replies in {a} and {b} side by side, word by word"
+
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
 msgstr "Those are the same thing twice"
 
-#. compare: stays English
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
-msgstr "compare: takes two numbers, like compare:218 231"
+msgstr "compare: takes two, like compare:218 231 or compare:201a 201b"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9391,7 +9421,7 @@ msgstr "Hide or show columns of the table"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Set two or more side by side. Nothing is sent"
+msgstr "Set two side by side, word by word: notes, highlights, quotes, or the last replies of two branches. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9871,10 +9901,10 @@ msgstr "{keys} then {command}"
 msgid "welcome.step.compare"
 msgstr "Compare their answers"
 
-#. {quote} is quote:reply and {command} is compare:, which stay English
+#. {command} is compare: and {example} a command like compare:201a 201b, which stay English
 #. js-lingui-explicit-id
 msgid "welcome.step.compareHow"
-msgstr "{quote} in each answer, then {command}"
+msgstr "{command} with two branches, like {example}"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id

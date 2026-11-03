@@ -63,8 +63,7 @@ const IDS = new Set(STEPS.map((s) => s.id))
 export const ADVANCED_STEPS = Object.freeze([
   // Several at once make branches, one each (C172).
   { id: 'sources', group: 'sources', shows: 'p>', writes: 'p>' },
-  // compare: takes notes, highlights and quotes for now, not branches
-  // (C145 (i)): a quote of each answer (quote:reply) is what it compares.
+  // compare:201a 201b sets the two answers side by side (C289).
   { id: 'compare', group: 'sources', shows: 'compare:', writes: '>compare:' },
   { id: 'highlight', group: 'collection', shows: null, writes: null },
   { id: 'collection', group: 'collection', shows: 'new:collection', writes: '>new:collection' },
@@ -192,30 +191,33 @@ export function stepsKept({ collections = [], arrangements = [] } = {}) {
   return out
 }
 
-// What compare: and note: take besides notes (C145): highlights and quotes.
+// What note: quotes besides notes (C145): highlights and quotes.
 const KEPT_WORDS = new Set(['quote', 'term', 'highlight'])
+// A branch's letters in their order: b before c, z before aa.
+const byLetters = (x, y) => x.branch.length - y.branch.length || x.branch.localeCompare(y.branch)
 const newestFirst = (a, b) => String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? '')) || b.num - a.num
 
 /**
  * The numbers the second list's commands are shown with, where they are
  * known, as the first list shows name: with the room's number. compare: the
- * newest highlight or quote in each of two branches of one plan, in the
- * branches' order (compare: takes those, not branches, for now; C145 (i));
+ * first two branches of the newest plan that has two (C289), as 201a 201b;
  * note: the newest two highlights or quotes, to quote.
  * @param {Array<{ kind: string, num: number, archived?: boolean, docketNum?: number|null, branch?: string|null, createdAt?: string|null }>} rows
- * @returns {{ compare: number[]|null, quotes: number[] }}
+ * @returns {{ compare: string[]|null, quotes: number[] }}
  */
 export function advancedNumbers(rows) {
-  const kept = (rows ?? []).filter((r) => KEPT_WORDS.has(r?.kind) && Number.isInteger(r.num) && !r.archived).sort(newestFirst)
-  let compare = null
-  for (const r of kept) {
-    if (r.docketNum == null || !r.branch) continue
-    const other = kept.find((o) => o.docketNum === r.docketNum && o.branch && o.branch !== r.branch)
-    if (other) {
-      compare = [r, other].sort((x, y) => x.branch.localeCompare(y.branch)).map((x) => x.num)
-      break
-    }
+  const all = rows ?? []
+  const kept = all.filter((r) => KEPT_WORDS.has(r?.kind) && Number.isInteger(r.num) && !r.archived).sort(newestFirst)
+  const plans = new Map()
+  for (const r of all) {
+    if (r?.kind !== 'chat' || r.archived || r.docketNum == null || !r.branch) continue
+    if (!plans.has(r.docketNum)) plans.set(r.docketNum, [])
+    plans.get(r.docketNum).push(r)
   }
+  const newest = (list) => list.reduce((t, r) => (String(r.createdAt ?? '') > t ? String(r.createdAt ?? '') : t), '')
+  const plan = [...plans.entries()].filter(([, list]) => list.length > 1)
+    .sort(([na, a], [nb, b]) => newest(b).localeCompare(newest(a)) || nb - na)[0]
+  const compare = plan ? plan[1].sort(byLetters).slice(0, 2).map((r) => `${plan[0]}${r.branch}`) : null
   return { compare, quotes: kept.slice(0, 2).map((r) => r.num).sort((a, b) => a - b) }
 }
 

@@ -1720,6 +1720,16 @@ msgstr "{a}と{b}を並べて比較"
 msgid "compare.legend"
 msgstr "取り消し線：{a}のみ・下線：{b}のみ"
 
+#. Names one side for screen readers; {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "compare.reply"
+msgstr "{address}の最後の返答"
+
+#. The small label over a reply set beside another
+#. js-lingui-explicit-id
+msgid "compare.replyKind"
+msgstr "返答"
+
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "文面は同じです"
@@ -2510,20 +2520,40 @@ msgstr "Enterで{a}と{b}を並べ、語ごとに比較します"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num}はメモ、ハイライト、引用のいずれでもありません。今のところ compare: で比べられるのはこの3つです"
+msgstr "{num}はメモ、ハイライト、引用、チャット、ブランチのいずれでもありません。compare: で比べられるのはこの5つです"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareMixed"
+msgstr "compare: には、メモ、ハイライト、引用から2つ、またはチャットかブランチから2つを指定します。両方から1つずつは指定できません"
+
+#. {address} is a branch like 201a, or a chat number
+#. js-lingui-explicit-id
+msgid "enter.compareNoReply"
+msgstr "{address}には、比較できる返答がまだありません"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
 msgstr "何も送信されません"
 
+#. {example} is a command like compare:201a 201b, which stays English
+#. js-lingui-explicit-id
+msgid "enter.comparePlan"
+msgstr "{num}はプランです。{example} で、その中の2つのブランチの最後の返答を比較します"
+
+#. {a} and {b} are branches like 201a, or chat numbers
+#. js-lingui-explicit-id
+msgid "enter.compareReplies"
+msgstr "Enterで{a}と{b}の最後の返答を並べ、語ごとに比較します"
+
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
 msgstr "同じものが2回指定されています"
 
-#. compare: stays English
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
-msgstr "compare: には compare:218 231 のように番号を2つ指定します"
+msgstr "compare: には compare:218 231 や compare:201a 201b のように2つ指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9391,7 +9421,7 @@ msgstr "表の列を隠す、または表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "2つ以上を並べて比べる。何も送信されません"
+msgstr "2つを並べて語ごとに比べる：メモ、ハイライト、引用、または2つのブランチの最後の返答。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9871,10 +9901,10 @@ msgstr "{keys}、続けて {command}"
 msgid "welcome.step.compare"
 msgstr "それぞれの回答を比べる"
 
-#. {quote} is quote:reply and {command} is compare:, which stay English
+#. {command} is compare: and {example} a command like compare:201a 201b, which stay English
 #. js-lingui-explicit-id
 msgid "welcome.step.compareHow"
-msgstr "それぞれの回答で {quote}、続けて {command}"
+msgstr "{example} のように、{command} にブランチを2つ指定する"
 
 #. {board} is the Collection board
 #. js-lingui-explicit-id

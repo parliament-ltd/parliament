@@ -409,3 +409,11 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - every kind of card → 所有类型的卡片
 - a note of its own → 独立笔记, as enter.noteAlone
 - put away (archive:) → 归档
+
+## compare: with branches, drafted 2 November 2026 (C289)
+
+- `enter.compareMixed`: "not one of each" is 不能各取其一 (you may not take one from each group). It is a set phrase and short; the plainer alternative is 两类不能混用 ("the two kinds cannot be mixed"), which names the rule more directly but has to lean on 两类 for the two groups just listed.
+- `compare.reply`: "the last reply in {address}" is {address} 的最后一条回复 (的, not 中的), since 201a 的最后一条回复 is how a branch's reply is usually said. It is read inside `compare.label`, so a screen reader hears 201a 的最后一条回复 与 201b 的最后一条回复 并排对照.
+- `enter.compareTwo`: "takes two" is 需要两项. The old line said 两个编号 (two numbers), which no longer fits once a branch like 201a counts. 两项 matches the older `verb.compare` (将两项或多项).
+- `enter.compareReplies`, `verb.compare`: "the last replies in {a} and {b}" is {a} 和 {b} 各自的最后一条回复 ("the last reply of each"). Without 各自的 it could read as the last reply of the two taken together.
+- `enter.compareReplies`, `verb.compare`: "word by word" is 逐词, as `enter.compare` already has it. The open point in the translations README still applies: Chinese puts no spaces between words, so a diff that splits on spaces would compare a whole Chinese reply as one run, and 逐词 would then promise more than the screen shows.

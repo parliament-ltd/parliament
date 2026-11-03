@@ -75,7 +75,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `add:207, 216` | Put things into the collection, or blocks into a room | `add:207, 216`, `add:highlights, notes` | Records, Collection, Lab | yes |
 | `rm:207` | Take things out of the collection, or blocks out of a room | `rm:207`, `rm:notes` | Records, Collection, Lab | yes |
 | `clear:` | Empty the collection, remove every filter, or one kind of filter | `clear:`, `clear:filters`, `clear:tag`, `clear:search` | Records, Collection | yes |
-| `compare:201a 201b` | Set two or more side by side. Nothing is sent | `compare:201a 201b`, `compare:201, 207` | Records, Collection, Library, Rooms | no |
+| `compare:201a 201b` | Set two side by side, word by word: notes, highlights, quotes, or the last replies of two branches. Nothing is sent | `compare:201a 201b`, `compare:218 231` | Records, Collection, Library, Rooms | no |
 | `name:"Q2 evidence"` | Name what the bar is pointed at: a room, a collection or a chat. With two names, rename a saved arrangement | `name:"Q2 evidence"`, `name:207 "New title"`, `name:"Review desk" "Two screens"` | everywhere | yes |
 | `heading:"Sources"` | Add a heading to a collection in your own order | `heading:"Sources"`, `heading:"Sources" before 215` | Collection | yes |
 | `summarize:207, 216` | Write a dated summary of some cards as a note. One model call Costs: the line names the model and the price first. | `summarize:207, 216` | Records, Collection | yes |

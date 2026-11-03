@@ -103,17 +103,62 @@ export function planSummarize(step, screens = {}, addressed = null) {
   return { says: { ...says, also }, act: { kind: 'summarize', nums, collection: shown.id } }
 }
 
-/** compare:218 231: two side by side under the bar, word by word (C145 (i)). */
+/** A chat's address: a branch's plan and letter (201a), else its number. */
+export const chatAddress = (row) => (row.docketNum != null && row.branch ? `${row.docketNum}${row.branch}` : String(row.num))
+
+/** The addresses of a plan's branches, in their letters' order: for an example. */
+function branchesOf(plan, rows) {
+  return rows.filter((r) => r.kind === 'chat' && r.docketNum === plan.num && r.branch)
+    .sort((x, y) => x.branch.length - y.branch.length || x.branch.localeCompare(y.branch))
+    .map(chatAddress)
+}
+
+/**
+ * compare:218 231: two notes, highlights or quotes side by side under the
+ * bar, word by word (C145 (i)). compare:201a 201b: the last reply of each of
+ * two branches, or of two chats, the same way (C289). Nothing is sent.
+ */
 export function planCompare(step, screens = {}) {
   const args = flat(step.match?.values ?? [])
   if (args.length !== 2) return { says: { message: 'compareTwo' }, act: null }
-  const t = targetsOf(args, screens.records?.rows ?? [])
+  const rows = screens.records?.rows ?? []
+  const t = targetsOf(args, rows)
   if (t.bad) return { says: t.bad, act: null }
   if (t.rows.length !== 2) return { says: { message: 'compareSame' }, act: null }
-  const odd = t.rows.find((r) => !WORDED.has(r.kind))
+  // A plan's number alone: name two of its branches.
+  const plan = t.rows.find((r) => r.kind === 'docket')
+  if (plan) {
+    const [x = `${plan.num}a`, y = `${plan.num}b`] = branchesOf(plan, rows)
+    return { says: { message: 'comparePlan', values: { num: plan.num, example: `compare:${x} ${y}` } }, act: null }
+  }
+  const odd = t.rows.find((r) => !WORDED.has(r.kind) && r.kind !== 'chat')
   if (odd) return { says: { message: 'compareKinds', values: { num: odd.num } }, act: null }
+  const chats = t.rows.filter((r) => r.kind === 'chat')
+  if (chats.length === 1) return { says: { message: 'compareMixed' }, act: null }
+  if (chats.length === 2) {
+    // Read at Enter: each one's last reply, as it reads now.
+    const sides = chats.map((r) => ({ chatId: r.chatId, address: chatAddress(r) }))
+    return {
+      says: { message: 'compareReplies', values: { a: sides[0].address, b: sides[1].address }, also: [{ message: 'compareNothingSent' }] },
+      act: { kind: 'compareReplies', sides },
+    }
+  }
   const [a, b] = t.rows
   return { says: { message: 'compare', values: { a: a.num, b: b.num }, also: [{ message: 'compareNothingSent' }] }, act: { kind: 'compare', nums: [a.num, b.num] } }
+}
+
+/**
+ * One side of compare:201a 201b, from its chat's messages as shown: its last
+ * reply, as it reads now, and who gave it. null when it has none yet.
+ * @param {object[]} messages the chat's messages, without hidden ones or ones being deleted
+ * @param {(message: object) => string} wordsNow a message's words as they stand, edits and all
+ * @param {(message: object) => string|null} whoOf who gave a reply, by name
+ */
+export function replySide(address, messages, wordsNow, whoOf) {
+  const list = (messages ?? []).filter((m) => m && m.role === 'assistant' && m.content && !m.incomplete)
+  const last = list[list.length - 1]
+  if (!last) return null
+  return { kind: 'reply', address, who: whoOf(last) ?? null, text: wordsNow(last) }
 }
 
 /**
