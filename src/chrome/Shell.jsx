@@ -103,7 +103,7 @@ import { readUploadedFile, categorizeFile, ACCEPTED_FILE_TYPES, stripAttachedFil
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
-import { LAB } from '../lib/release'
+import { LAB, newChatTemplate } from '../lib/release'
 
 // The margin round a board in a window of its own (chrome.css, .ch-in-window).
 const POPPED_MARGIN = 12
@@ -2856,7 +2856,7 @@ export default function Shell() {
           pinned: false, storageBytes: 0, createdAt: now, updatedAt: now,
         }
         const chat = await createPlanChat(db.current, { docketId, n, letter, conversation })
-        if (!room) await assignDefaultRoom(chat.id, s.newChatRoom ?? undefined).catch(() => {})
+        if (!room) await assignDefaultRoom(chat.id, newChatTemplate(s.newChatRoom)).catch(() => {})
         loadConversations().catch(() => {})
         return chat.id
       },
@@ -3232,7 +3232,7 @@ export default function Shell() {
         defaultModel: settings.defaultModel, storageMode: settings.storageMode, describeNewChats: settings.describeNewChats !== false,
         finishRepliesOnLeave: Boolean(settings.finishRepliesOnLeave), fontSize: settings.fontSize ?? 'default', mistralRegion: settings.mistralRegion ?? 'global',
         thinking: settings.thinking === true, privacyFilter: settings.privacyFilter ?? 'off', translateQueries: settings.translateQueries === true,
-        newChatRoom: settings.newChatRoom ?? null, backupReminder: settings.backupReminder ?? 'monthly', interfaceLanguage: settings.interfaceLanguage ?? null,
+        newChatRoom: newChatTemplate(settings.newChatRoom) ?? null, backupReminder: settings.backupReminder ?? 'monthly', interfaceLanguage: settings.interfaceLanguage ?? null,
         runWarn: settings.runWarn ?? null,
       },
       providers: keyInfo.keys,
@@ -3639,7 +3639,7 @@ export default function Shell() {
           moveTell('', chat.id)
           setPendingAnswerer(null)
           setPendingFrameworks(null)
-          await assignDefaultRoom(chat.id, latest.current.settings.newChatRoom ?? undefined)
+          await assignDefaultRoom(chat.id, newChatTemplate(latest.current.settings.newChatRoom))
           id = chat.id
           const placed = planRoom(current.current, id)
           if (placed.next) await run(placed.next, null)
@@ -3783,7 +3783,7 @@ export default function Shell() {
         moveTell('', chat.id)
         setPendingAnswerer(null)
         setPendingFrameworks(null)
-        await assignDefaultRoom(chat.id, latest.current.settings.newChatRoom ?? undefined)
+        await assignDefaultRoom(chat.id, newChatTemplate(latest.current.settings.newChatRoom))
         id = chat.id
         const placed = planRoom(current.current, id)
         if (placed.next) await run(placed.next, null)

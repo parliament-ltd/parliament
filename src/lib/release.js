@@ -34,6 +34,23 @@ export const LAB_SHELVES = Object.freeze(['layout', 'block', 'theme'])
 /** Whether this release offers a command. */
 export const offered = (verb, lab = LAB) => lab || !LAB_VERBS.includes(verb)
 
+// Rooms hidden though someone made them (C288 (a); Stefan, 2 November:
+// "let's hide drafting desk for now"): Drafting Desk waits for a room design
+// that brings a document back (R39). Its chats still open, as their chat,
+// and nothing of it is deleted.
+export const HIDDEN_TEMPLATES = Object.freeze(['drafting-desk@1.0'])
+
+/** The template a room someone made came from, as far as its name or description tells. */
+const madeFrom = (item) => item?.name?.template ?? item?.aboutTemplate ?? null
+
 /** Whether this release shows an item of the Library's catalogue. */
 export const shownInLibrary = (item, lab = LAB) => lab
-  || (!LAB_SHELVES.includes(item?.shelf) && (!item?.template || item.template === DEFAULT_TEMPLATE))
+  || (!LAB_SHELVES.includes(item?.shelf) && (!item?.template || item.template === DEFAULT_TEMPLATE)
+    && !(item?.mine && HIDDEN_TEMPLATES.includes(madeFrom(item))))
+
+/**
+ * The template a new chat starts in: the one chosen in Settings while this
+ * release offers it, else the default room (C288 (a)). A choice kept from
+ * before stays stored, and counts again once the Lab is back.
+ */
+export const newChatTemplate = (chosen, lab = LAB) => (typeof chosen === 'string' && chosen && (lab || chosen === DEFAULT_TEMPLATE) ? chosen : undefined)
