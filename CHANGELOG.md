@@ -3,6 +3,17 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.11.0, 2 November 2026
+
+- Any key you add answers: a chat with no model of its own goes to the first provider you have a key for, and to Wikipedia only with no key at all.
+- new:chat opens another room beside what is here, and room:"Owl notes" opens a chat by its name.
+- One message by command: quote:reply, copy:reply, delete:reply, note:reply and tagadd:favorite reply act on the message you are in. A favourite is now the tag favorite.
+- The Collection takes filters, export:md and pin:"name", as Records does.
+- open: with a note's, highlight's or quote's number opens it where it is. inspect:highlights lists a room's highlights, and pop:settings keys opens Settings in a window at its keys.
+- tour:advanced is the welcome page's second list. letter: is a board you can move, and the command menu shows lines of several commands.
+- install: installs Parliament as an app where the browser offers it, with everything you have here.
+- A line of a Wikipedia answer that names a page it links to can be asked about next. A popped board shows the birds until it is ready, and a second Enter no longer sends a prompt twice.
+
 ## 0.10.0, 2 November 2026
 
 - spread: open:202 203 205 collection records spread opens them all across your screens, in equal groups in the order named. spread: alone spreads what is open again.
