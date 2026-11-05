@@ -2768,8 +2768,6 @@ export const COPY = {
     focusOff: /*i18n*/ { id: 'shell.focusOff', message: 'focus: off', comment: 'focus is the command word, kept English' },
     focusOn: /*i18n*/ { id: 'shell.focusOn', message: 'focus: on', comment: 'focus is the command word, kept English' },
     focusRuns: /*i18n*/ { id: 'shell.focusRuns', message: 'Runs {command}', comment: 'Commands stay English' },
-    focusPick: /*i18n*/ { id: 'shell.focusPick', message: 'Choose the boards of your focus' },
-    focusPickHead: /*i18n*/ { id: 'shell.focusPickHead', message: 'left to right:' },
     // The strip's calm and focus on hover, so the two read apart (C286 (e)).
     calmTitle: /*i18n*/ { id: 'shell.calmTitle', message: 'Markup and the details on boards wait until you come near them. Runs {command}', comment: 'Commands stay English' },
     focusTitle: /*i18n*/ { id: 'shell.focusTitle', message: 'Only the chat, or the boards you pick, stay on screen. Runs {command}', comment: 'Commands stay English' },

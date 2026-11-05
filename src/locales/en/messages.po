@@ -9314,14 +9314,6 @@ msgstr "focus: off"
 msgid "shell.focusOn"
 msgstr "focus: on"
 
-#. js-lingui-explicit-id
-msgid "shell.focusPick"
-msgstr "Choose the boards of your focus"
-
-#. js-lingui-explicit-id
-msgid "shell.focusPickHead"
-msgstr "left to right:"
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"

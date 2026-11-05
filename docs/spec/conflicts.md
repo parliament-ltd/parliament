@@ -4720,6 +4720,11 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **The start card.** Keep your three lines, or one ("p> starts a chat · ? lists every command"). **Suggestion:** keep yours; they are the page someone sees after closing the welcome page, and they are short.
   - **Ruled 5 November: keep both** ("Keep both"). `tour:off` stays a form of `tour:`, putting the steps away and keeping the page; the start card keeps its three lines (C286 (e)). C291 (i) and (o) stand as built.
 
+**C292. focus on the strip: marginalia, with no menu** (5 November; **asked for by Stefan, 5 November:** "the focus off button doesn't seem to work. also, let's keep it as marginalia and not a button. let's not have focus open a menu in the bar, that seems too much", then "it never turns to focus on, just stays focus off"; replaces C291 (n)'s focus control and C253's caret and picker). Built on `claude/after-0.10`, not released.
+- **What went wrong:** since 0.13.0, C291 (n) drew "focus: off" and its ▾ inside one rounded hairline. A click on the right part of it landed on the ▾, which opened the picker of boards (writing `focus:room …` into the bar) instead of turning focus on, so it seemed never to turn on. A click on the word itself did work, and said "Ran focus:".
+- **Now:** "focus: off" is a word in the margin, as "calm: off" is: no outline, no ▾, no picker. A click turns focus on or off at once, as `focus:` and `focus:off` do, and says what ran under the bar, with `undo:`. A set of boards is typed (`focus:room collection`), as before. The picker's two lines (`shell.focusPick`, `shell.focusPickHead`) and its styles go.
+- Tried in the app with real clicks: off to on (the welcome page and Settings closed, "Ran focus:. undo: takes it back"), on to off (they came back, "Ran focus:off").
+
 
 ## Proposed CLAUDE.md rewrite
 

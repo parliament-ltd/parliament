@@ -4409,7 +4409,7 @@ export default function Shell() {
     <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
       {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
-      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}
+      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}
       {welcomeAlone && globe && <div className="ch-headcorner">{globe}</div>}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}

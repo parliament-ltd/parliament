@@ -9314,14 +9314,6 @@ msgstr "focus: av"
 msgid "shell.focusOn"
 msgstr "focus: på"
 
-#. js-lingui-explicit-id
-msgid "shell.focusPick"
-msgstr "Välj tavlorna för ditt fokus"
-
-#. js-lingui-explicit-id
-msgid "shell.focusPickHead"
-msgstr "från vänster till höger:"
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"

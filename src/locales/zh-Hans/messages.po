@@ -9314,14 +9314,6 @@ msgstr "focus: off"
 msgid "shell.focusOn"
 msgstr "focus: on"
 
-#. js-lingui-explicit-id
-msgid "shell.focusPick"
-msgstr "选择要专注的面板"
-
-#. js-lingui-explicit-id
-msgid "shell.focusPickHead"
-msgstr "从左到右："
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"

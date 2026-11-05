@@ -9314,14 +9314,6 @@ msgstr ""
 msgid "shell.focusOn"
 msgstr ""
 
-#. js-lingui-explicit-id
-msgid "shell.focusPick"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "shell.focusPickHead"
-msgstr ""
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.focusRuns"
