@@ -5,10 +5,18 @@
 // Words are matched, not the spaces between them, so two unrelated texts
 // read as one taken out and one put in rather than shuffled together. The
 // spaces are kept as typed: the parts put together give back each text.
-// Pure.
+//
+// Languages written without spaces (Chinese, Japanese, Thai and others) are
+// split into words by the browser's own dictionary, Intl.Segmenter, which
+// works offline (C290). Splitting only decides where the marks fall: the
+// texts are never changed, and every difference is still marked. A browser
+// without it compares their runs whole, and wordsFound says so.
+// Pure, but for the browser's dictionary.
 
 // A word with the space after it, or space at the very start.
 const TOKENS = /\S+\s*|\s+/g
+// Scripts written without spaces between words.
+const UNSPACED = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u
 // Past this many words on a side, the two are shown whole, one gone and one
 // added, rather than holding the page while the table fills.
 const MOST = 4000
@@ -16,14 +24,51 @@ const MOST = 4000
 const wordOf = (t) => t.trim()
 const spaceOf = (t) => t.slice(t.trimEnd().length)
 
+let segmenter
+function words() {
+  if (segmenter === undefined) {
+    try {
+      segmenter = typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'word' }) : null
+    } catch {
+      segmenter = null
+    }
+  }
+  return segmenter
+}
+
+/** For tests: a dictionary to split words with, or null for a browser with none. */
+export function _useSegmenter(s) {
+  segmenter = s
+}
+
+/** A text's words, each with the space after it; unspaced runs split by the dictionary. */
+export function tokensOf(text) {
+  const tokens = String(text ?? '').match(TOKENS) ?? []
+  const seg = words()
+  if (!seg) return tokens
+  return tokens.flatMap((t) => {
+    if (!UNSPACED.test(t)) return [t]
+    const word = t.trimEnd()
+    const pieces = Array.from(seg.segment(word), (s) => s.segment)
+    pieces[pieces.length - 1] += t.slice(word.length)
+    return pieces
+  })
+}
+
+/**
+ * Whether a text's words can be told apart here: false only for a language
+ * written without spaces, in a browser with no dictionary to split it.
+ */
+export const wordsFound = (text) => Boolean(words()) || !UNSPACED.test(String(text ?? ''))
+
 /**
  * @param {string} before
  * @param {string} after
  * @returns {Array<{ op: 'same'|'gone'|'added', text: string }>}
  */
 export function wordDiff(before, after) {
-  const a = String(before ?? '').match(TOKENS) ?? []
-  const b = String(after ?? '').match(TOKENS) ?? []
+  const a = tokensOf(before)
+  const b = tokensOf(after)
   if (a.length > MOST || b.length > MOST) return merge([...(a.length ? [{ op: 'gone', text: a.join('') }] : []), ...(b.length ? [{ op: 'added', text: b.join('') }] : [])])
 
   // The longest run of words they share, from the end, one row at a time.
@@ -71,11 +116,18 @@ function merge(parts) {
   return out
 }
 
-/** How many words were taken out and put in. */
+/** How many words were taken out, put in, and kept: a word has a letter or a number. */
 export function diffCounts(parts) {
-  const words = (t) => (t.match(/[^\s]+/g) ?? []).length
-  return {
-    gone: parts.filter((p) => p.op === 'gone').reduce((n, p) => n + words(p.text), 0),
-    added: parts.filter((p) => p.op === 'added').reduce((n, p) => n + words(p.text), 0),
-  }
+  const count = (t) => tokensOf(t).filter((w) => /[\p{L}\p{N}]/u.test(w)).length
+  const of = (op) => parts.filter((p) => p.op === op).reduce((n, p) => n + count(p.text), 0)
+  return { gone: of('gone'), added: of('added'), same: of('same') }
+}
+
+/**
+ * How much of the longer text the two share, from 0 to 1 (C290): below a
+ * third, the marks say little about how they differ.
+ */
+export function sharedShare({ gone, added, same }) {
+  const most = Math.max(same + gone, same + added)
+  return most ? same / most : 1
 }

@@ -1706,11 +1706,26 @@ msgstr "colours ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "Nothing was sent. Escape closes this"
+msgstr "Nothing was sent to an AI model. Escape closes this"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.closeMeaning"
+msgstr "Sent once to {model}, for the reading above. Escape closes this"
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
 msgstr "{gone, plural, one {# word out} other {# words out}}, {added, plural, one {# word in} other {# words in}}"
+
+#. Under a side that is empty, such as a source that found nothing
+#. js-lingui-explicit-id
+msgid "compare.empty"
+msgstr "No words in this reply"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "compare.fewShared"
+msgstr "These share few words, so the marks say little about how they differ. Adding meaning asks a model"
 
 #. js-lingui-explicit-id
 msgid "compare.label"
@@ -1719,6 +1734,30 @@ msgstr "{a} and {b} side by side"
 #. js-lingui-explicit-id
 msgid "compare.legend"
 msgstr "struck: only in {a} · underlined: only in {b}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningAsking"
+msgstr "Asking {model} how they differ…"
+
+#. js-lingui-explicit-id
+msgid "compare.meaningCheck"
+msgstr "A model's reading. Check it against the texts above"
+
+#. {address} is a branch like 201a, a chat number, or a note, highlight or quote
+#. js-lingui-explicit-id
+msgid "compare.meaningCut"
+msgstr "{address} was read only in part: its first {count, number} characters"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningFailed"
+msgstr "No reading came back from {model}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningHead"
+msgstr "How they differ, as {model} reads them"
 
 #. Names one side for screen readers; {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -1733,6 +1772,19 @@ msgstr "Reply"
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "The same words"
+
+#. js-lingui-explicit-id
+msgid "compare.wholeSentences"
+msgstr "This browser can't find words in this language, so whole sentences are compared"
+
+#. js-lingui-explicit-id
+msgid "compare.wordsOnly"
+msgstr "Words compared, not meaning"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "compare.writes"
+msgstr "Writes {command} in the bar"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -2515,12 +2567,52 @@ msgstr "No column is called {word}. Try {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.compare"
-msgstr "Enter sets {a} and {b} side by side, word by word"
+msgstr "Enter sets {a} and {b} side by side and marks the words that differ"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
 msgstr "{num} is not a note, highlight, quote, chat or branch, which are what compare: takes"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningAsking"
+msgstr "Asking {model} how they differ"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningDone"
+msgstr "{model} has read them: how they differ is under the bar"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningFailed"
+msgstr "No reading came back from {model}. The words are still compared"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGo"
+msgstr "Enter marks the words that differ between {a} and {b}, and asks {model} how they differ in meaning: one call, about {cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoCheap"
+msgstr "Enter marks the words that differ between {a} and {b}, and asks {model} how they differ in meaning: one call, under {cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoUnpriced"
+msgstr "Enter marks the words that differ between {a} and {b}, and asks {model} how they differ in meaning: one call, about {tokens} tokens"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningNoKey"
+msgstr "Comparing meaning needs a model. api: adds a key for one, or helper: picks one on this computer"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningSends"
+msgstr "Both are sent to {model} in this call"
 
 #. compare: stays English
 #. js-lingui-explicit-id
@@ -2534,7 +2626,7 @@ msgstr "{address} has no reply yet to compare"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
-msgstr "Nothing is sent"
+msgstr "Nothing is sent to an AI model"
 
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
@@ -2544,7 +2636,7 @@ msgstr "{num} is a plan. {example} compares the last replies of two of its branc
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
 msgid "enter.compareReplies"
-msgstr "Enter sets the last replies in {a} and {b} side by side, word by word"
+msgstr "Enter sets the last replies in {a} and {b} side by side and marks the words that differ"
 
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
@@ -2554,6 +2646,11 @@ msgstr "Those are the same thing twice"
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
 msgstr "compare: takes two, like compare:218 231 or compare:201a 201b"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "enter.compareWordsOnly"
+msgstr "Words, not meaning. Add meaning at the end to ask a model how they differ"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9421,7 +9518,7 @@ msgstr "Hide or show columns of the table"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Set two side by side, word by word: notes, highlights, quotes, or the last replies of two branches. Nothing is sent"
+msgstr "Set two side by side and mark the words that differ: notes, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9781,10 +9878,10 @@ msgstr "MIT licensed, source on GitHub"
 msgid "welcome.foot.made"
 msgstr "Created with Claude Code"
 
-#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. One quiet link under the steps, by their numbers; a click writes tour:advanced in the bar, for the second list of steps
 #. js-lingui-explicit-id
 msgid "welcome.further"
-msgstr "or go further"
+msgstr "Advanced"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"

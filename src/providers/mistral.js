@@ -1,6 +1,6 @@
 import { BaseProvider } from './base'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded, asCheckText } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, COMPARE_SYSTEM_PROMPT, COMPARE_MAX_TOKENS, COMPARE_MAX_CHARS, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded, asCheckText } from './shared'
 import { CHECK_SYSTEM_PROMPT, readCheck } from '../lib/injection'
 
 // Mistral (refactor-plan.md, stage 7, piece 3; LPN §7.1; C82, C159).
@@ -290,6 +290,14 @@ export class MistralProvider extends BaseProvider {
     const said = readCheck(await this._lightweightCall(apiKey, CHECK_SYSTEM_PROMPT, [{ role: 'user', content: asCheckText(text) }], 200, model))
     if (!said) throw new Error('The check came back unreadable')
     return said
+  }
+
+  // compare: … meaning (C290): how two texts differ in what they say, by
+  // the model named (the helper).
+  async compareMeaning(apiKey, items, { model = LIGHT_MODEL } = {}) {
+    const text = String(await this._lightweightCall(apiKey, COMPARE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], COMPARE_MAX_TOKENS, model) ?? '').trim()
+    if (!text) throw new Error('No reading came back')
+    return text.slice(0, COMPARE_MAX_CHARS)
   }
 
   // open:203b summary (C175), as Anthropic's.

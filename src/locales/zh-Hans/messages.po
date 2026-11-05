@@ -1706,11 +1706,26 @@ msgstr "颜色 ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "未发送任何内容。按 Escape 关闭"
+msgstr "未向 AI 模型发送任何内容。按 Escape 关闭"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.closeMeaning"
+msgstr "已向 {model} 发送一次，以得到上方的解读。按 Escape 关闭"
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
 msgstr "{gone, plural, other {删去 # 个词}}，{added, plural, other {新增 # 个词}}"
+
+#. Under a side that is empty, such as a source that found nothing
+#. js-lingui-explicit-id
+msgid "compare.empty"
+msgstr "这条回复中没有文字"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "compare.fewShared"
+msgstr "两者相同的词很少，因此标出的差异说明不了多少。在命令末尾加上 meaning，则会请模型比较含义"
 
 #. js-lingui-explicit-id
 msgid "compare.label"
@@ -1719,6 +1734,30 @@ msgstr "{a} 与 {b} 并排对照"
 #. js-lingui-explicit-id
 msgid "compare.legend"
 msgstr "删除线：仅见于 {a} · 下划线：仅见于 {b}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningAsking"
+msgstr "正在询问 {model} 两者的含义有何不同…"
+
+#. js-lingui-explicit-id
+msgid "compare.meaningCheck"
+msgstr "这是模型的解读。请对照上方的文字核对"
+
+#. {address} is a branch like 201a, a chat number, or a note, highlight or quote
+#. js-lingui-explicit-id
+msgid "compare.meaningCut"
+msgstr "{address} 只读取了一部分：开头的 {count, number} 个字符"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningFailed"
+msgstr "{model} 没有返回解读"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningHead"
+msgstr "{model} 对两者含义差异的解读"
 
 #. Names one side for screen readers; {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -1733,6 +1772,19 @@ msgstr "回复"
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "文字完全相同"
+
+#. js-lingui-explicit-id
+msgid "compare.wholeSentences"
+msgstr "此浏览器无法识别这种语言的词语，因此按整句比较"
+
+#. js-lingui-explicit-id
+msgid "compare.wordsOnly"
+msgstr "只比较词语，不比较含义"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "compare.writes"
+msgstr "在输入栏中写入 {command}"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -2515,12 +2567,52 @@ msgstr "没有名为 {word} 的列。试试 {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.compare"
-msgstr "按 Enter 将 {a} 和 {b} 逐词并排对照"
+msgstr "按 Enter 将 {a} 和 {b} 并排对照，并标出不同的词"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
 msgstr "{num} 不是笔记、高亮、摘录、对话或分支，而 compare: 只支持这几种"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningAsking"
+msgstr "正在询问 {model} 两者的含义有何不同"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningDone"
+msgstr "{model} 已读完两者：含义上的不同显示在输入栏下方"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningFailed"
+msgstr "{model} 没有返回解读。词语的比较仍照常显示"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGo"
+msgstr "按 Enter 标出 {a} 和 {b} 之间不同的词，并询问 {model} 两者的含义有何不同：调用一次，约 {cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoCheap"
+msgstr "按 Enter 标出 {a} 和 {b} 之间不同的词，并询问 {model} 两者的含义有何不同：调用一次，不到 {cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoUnpriced"
+msgstr "按 Enter 标出 {a} 和 {b} 之间不同的词，并询问 {model} 两者的含义有何不同：调用一次，约 {tokens} 个 token"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningNoKey"
+msgstr "比较含义需要一个模型。api: 可为模型添加密钥，也可以用 helper: 指定一个本机模型"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningSends"
+msgstr "这次调用会把两者都发送给 {model}"
 
 #. compare: stays English
 #. js-lingui-explicit-id
@@ -2534,7 +2626,7 @@ msgstr "{address} 还没有可对照的回复"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
-msgstr "不会发送任何内容"
+msgstr "不会向 AI 模型发送任何内容"
 
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
@@ -2544,7 +2636,7 @@ msgstr "{num} 是一个计划。{example} 可对照其中两个分支的最后�
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
 msgid "enter.compareReplies"
-msgstr "按 Enter 将 {a} 和 {b} 各自的最后一条回复逐词并排对照"
+msgstr "按 Enter 将 {a} 和 {b} 各自的最后一条回复并排对照，并标出不同的词"
 
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
@@ -2554,6 +2646,11 @@ msgstr "这两个是同一项"
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
 msgstr "compare: 需要两项，例如 compare:218 231 或 compare:201a 201b"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "enter.compareWordsOnly"
+msgstr "只比较词语，不比较含义。在命令末尾加上 meaning，可请模型说明两者含义上的不同"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9421,7 +9518,7 @@ msgstr "隐藏或显示表格的列"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "将两项逐词并排对照：笔记、高亮、摘录，或两个分支各自的最后一条回复。不会发送任何内容"
+msgstr "将两项并排对照，并标出不同的词：笔记、高亮、摘录，或两个分支各自的最后一条回复。不会向 AI 模型发送任何内容。在末尾加上 meaning，则会请模型说明两者含义上的不同"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9781,10 +9878,10 @@ msgstr "MIT 许可证，源代码在 GitHub 上"
 msgid "welcome.foot.made"
 msgstr "使用 Claude Code 创建"
 
-#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. One quiet link under the steps, by their numbers; a click writes tour:advanced in the bar, for the second list of steps
 #. js-lingui-explicit-id
 msgid "welcome.further"
-msgstr "或者更进一步"
+msgstr "进阶"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"

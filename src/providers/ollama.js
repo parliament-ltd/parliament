@@ -1,5 +1,5 @@
 import { BaseProvider } from './base'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, COMPARE_SYSTEM_PROMPT, COMPARE_MAX_TOKENS, COMPARE_MAX_CHARS, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded } from './shared'
 import { NAMES_SYSTEM_PROMPT, CHECK_SYSTEM_PROMPT, readNames, readCheck } from '../lib/injection'
 
 // Text for one of the checks below, in its tag, any such tag inside taken out.
@@ -295,6 +295,14 @@ export class OllamaProvider extends BaseProvider {
     const said = readCheck(raw)
     if (!said) throw new Error('The check came back unreadable')
     return said
+  }
+
+  // compare: … meaning (C290): how two texts differ in what they say, by
+  // the model named (the helper).
+  async compareMeaning(items, { model } = {}) {
+    const text = String(await this._lightweightCall(COMPARE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], COMPARE_MAX_TOKENS, model) ?? '').trim()
+    if (!text) throw new Error('No reading came back')
+    return text.slice(0, COMPARE_MAX_CHARS)
   }
 
   // open:203b summary (C175) by a model on this computer: free, and nothing leaves it.

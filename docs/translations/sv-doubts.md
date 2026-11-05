@@ -362,3 +362,16 @@ Each: id, the English, the draft, and why I was unsure.
 - enter.compareMixed: "inte en av varje" for "not one of each". It is the everyday idiom and reads right here; "inte en av vardera" is more exact (one from each of the two groups) but stiffer.
 - enter.compareReplies, enter.comparePlan, verb.compare: "de senaste svaren i …" for "the last replies in/of …", as enter.sweepGo ("det senaste svaret i {address}"), with "i" since a branch holds its replies. Like the English plural, it does not say outright that it is one reply from each side.
 - verb.compare: no comma before "eller de senaste svaren", as Swedish lists go; the English has one.
+
+## Words, not meaning, drafted 4 November 2026 (C290)
+
+- All lines: "meaning" (the idea, not the typed word) is "innebörd". "Betydelse" is the everyday alternative but also means importance, and "mening" is a false friend (it means sentence, as in compare.wholeSentences "hela meningar"). So the typed English word `meaning` and the Swedish "innebörd" never look alike, which keeps words and meaning apart.
+- compare.closeMeaning, compare.meaningCheck, compare.meaningFailed, enter.compareMeaningFailed: "reading" (a model's interpretation) is "tolkning", not "läsning", which in Swedish is mostly the act of reading. Where the English means literal reading it stays "läsa" (enter.compareMeaningDone "har läst dem", compare.meaningCut "lästes bara delvis").
+- compare.meaningHead: "as {model} reads them" is "enligt {model}" ("Hur de skiljer sig åt, enligt {model}"), the plain way a Swedish heading credits a view. "som {model} läser dem" is closer but stiff.
+- compare.closeMeaning: "Skickat till {model} en gång", with "en gång" after the name, because "en gång till" means "once more" in Swedish.
+- compare.fewShared: "the marks" is "det som är markerat", since "markeringar" is the highlights' word. "säger inte mycket om" for "say little about", because "säger lite om" reads as "says a bit about".
+- verb.compare: ends "hur de skiljer sig i innebörd", adding "i innebörd" that the English leaves implied, so the line says outright what the typed `meaning` does. Drop it to stay strictly with the English.
+- enter.compareWordsOnly: "Add meaning at the end" is "Skriv meaning sist", so it reads as a word to type ("sist" as in enter.spreadLast). compare.fewShared and verb.compare, which do not say "at the end", have "Lägg till meaning".
+- compare.wordsOnly: "Orden jämförs, inte innebörden", present passive, because "Jämför orden, inte innebörden" would read as an order to the reader.
+- compare.wholeSentences: "can't find words" is "kan inte dela upp text på det här språket i ord", since "hitta ord" could read as finding no words at all.
+- welcome.further: "Advanced" is "Avancerat", as Swedish settings screens write it.

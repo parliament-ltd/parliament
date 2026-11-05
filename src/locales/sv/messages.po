@@ -1706,11 +1706,26 @@ msgstr "färger ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "Inget skickades. Escape stänger det här"
+msgstr "Inget skickades till en AI-modell. Escape stänger det här"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.closeMeaning"
+msgstr "Skickat till {model} en gång, för tolkningen ovan. Escape stänger det här"
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
 msgstr "{gone, plural, one {# ord borttaget} other {# ord borttagna}}, {added, plural, one {# ord tillagt} other {# ord tillagda}}"
+
+#. Under a side that is empty, such as a source that found nothing
+#. js-lingui-explicit-id
+msgid "compare.empty"
+msgstr "Inga ord i det här svaret"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "compare.fewShared"
+msgstr "De här har få ord gemensamt, så det som är markerat säger inte mycket om hur de skiljer sig åt. Lägg till meaning för att fråga en modell"
 
 #. js-lingui-explicit-id
 msgid "compare.label"
@@ -1719,6 +1734,30 @@ msgstr "{a} och {b} sida vid sida"
 #. js-lingui-explicit-id
 msgid "compare.legend"
 msgstr "genomstruket: bara i {a} · understruket: bara i {b}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningAsking"
+msgstr "Frågar {model} hur de skiljer sig åt…"
+
+#. js-lingui-explicit-id
+msgid "compare.meaningCheck"
+msgstr "En modells tolkning. Kontrollera den mot texterna ovan"
+
+#. {address} is a branch like 201a, a chat number, or a note, highlight or quote
+#. js-lingui-explicit-id
+msgid "compare.meaningCut"
+msgstr "{address} lästes bara delvis: de första {count, number} tecknen"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningFailed"
+msgstr "Ingen tolkning kom tillbaka från {model}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningHead"
+msgstr "Hur de skiljer sig åt, enligt {model}"
 
 #. Names one side for screen readers; {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -1733,6 +1772,19 @@ msgstr "Svar"
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "Samma ord"
+
+#. js-lingui-explicit-id
+msgid "compare.wholeSentences"
+msgstr "Den här webbläsaren kan inte dela upp text på det här språket i ord, så hela meningar jämförs"
+
+#. js-lingui-explicit-id
+msgid "compare.wordsOnly"
+msgstr "Orden jämförs, inte innebörden"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "compare.writes"
+msgstr "Skriver {command} i fältet"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -2515,12 +2567,52 @@ msgstr "Ingen kolumn heter {word}. Försök med {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.compare"
-msgstr "Enter ställer {a} och {b} sida vid sida, ord för ord"
+msgstr "Enter ställer {a} och {b} sida vid sida och markerar orden som skiljer sig åt"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
 msgstr "{num} är inte en anteckning, en markering, ett citat, en chatt eller en gren, som är det compare: tar"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningAsking"
+msgstr "Frågar {model} hur de skiljer sig åt"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningDone"
+msgstr "{model} har läst dem: hur de skiljer sig åt står under fältet"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningFailed"
+msgstr "Ingen tolkning kom tillbaka från {model}. Orden är ändå jämförda"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGo"
+msgstr "Enter markerar orden som skiljer sig åt mellan {a} och {b}, och frågar {model} hur de skiljer sig i innebörd: ett anrop, cirka {cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoCheap"
+msgstr "Enter markerar orden som skiljer sig åt mellan {a} och {b}, och frågar {model} hur de skiljer sig i innebörd: ett anrop, under {cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoUnpriced"
+msgstr "Enter markerar orden som skiljer sig åt mellan {a} och {b}, och frågar {model} hur de skiljer sig i innebörd: ett anrop, cirka {tokens} tokens"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningNoKey"
+msgstr "Att jämföra innebörd kräver en modell. api: lägger till en nyckel för en modell, eller helper: väljer en på den här datorn"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningSends"
+msgstr "Båda skickas till {model} i det här anropet"
 
 #. compare: stays English
 #. js-lingui-explicit-id
@@ -2534,7 +2626,7 @@ msgstr "{address} har inget svar att jämföra än"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
-msgstr "Inget skickas"
+msgstr "Inget skickas till en AI-modell"
 
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
@@ -2544,7 +2636,7 @@ msgstr "{num} är en plan. {example} jämför de senaste svaren i två av dess g
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
 msgid "enter.compareReplies"
-msgstr "Enter ställer de senaste svaren i {a} och {b} sida vid sida, ord för ord"
+msgstr "Enter ställer de senaste svaren i {a} och {b} sida vid sida och markerar orden som skiljer sig åt"
 
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
@@ -2554,6 +2646,11 @@ msgstr "Det är samma sak två gånger"
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
 msgstr "compare: tar två, som compare:218 231 eller compare:201a 201b"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "enter.compareWordsOnly"
+msgstr "Ord, inte innebörd. Skriv meaning sist för att fråga en modell hur de skiljer sig åt"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9421,7 +9518,7 @@ msgstr "Dölj eller visa kolumner i tabellen"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Ställ två sida vid sida, ord för ord: anteckningar, markeringar, citat eller de senaste svaren i två grenar. Inget skickas"
+msgstr "Ställ två sida vid sida och markera orden som skiljer sig åt: anteckningar, markeringar, citat eller de senaste svaren i två grenar. Inget skickas till en AI-modell. Lägg till meaning för att fråga en modell hur de skiljer sig i innebörd"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9781,10 +9878,10 @@ msgstr "MIT-licens, källkoden på GitHub"
 msgid "welcome.foot.made"
 msgstr "Skapat med Claude Code"
 
-#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. One quiet link under the steps, by their numbers; a click writes tour:advanced in the bar, for the second list of steps
 #. js-lingui-explicit-id
 msgid "welcome.further"
-msgstr "eller gå vidare"
+msgstr "Avancerat"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"

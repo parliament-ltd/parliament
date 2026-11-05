@@ -940,7 +940,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
   })
 
   it('compare: takes two with words, and sends nothing', () => {
-    expect(at('>compare:214 219')).toMatchObject({ text: 'Enter sets 214 and 219 side by side, word by word · Nothing is sent', act: { kind: 'compare', nums: [214, 219] } })
+    expect(at('>compare:214 219')).toMatchObject({ text: 'Enter sets 214 and 219 side by side and marks the words that differ · Words, not meaning. Add meaning at the end to ask a model how they differ · Nothing is sent to an AI model', act: { kind: 'compare', nums: [214, 219] } })
     expect(at('>compare:214, 219').act.nums).toEqual([214, 219])
     expect(at('>compare:214').text).toBe('compare: takes two, like compare:218 231 or compare:201a 201b')
     expect(at('>compare:214 202').text).toBe('compare: takes two notes, highlights or quotes, or two chats or branches, not one of each')
@@ -948,13 +948,13 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
 
   it('compare: takes two branches, or two chats, by their last replies (C289)', () => {
     const plan = [row(229, 'docket', { docketNum: 229, chatId: 'chat-230' }), row(230, 'chat', { docketNum: 229, branch: 'a' }), row(231, 'chat', { docketNum: 229, branch: 'c' })]
-    const withPlan = (value) => {
-      const p = preview(value, { mode: 'command', arrangement: { ...almanac(), addressed: 'almanac' }, screens: { records: { rows: [...rows, ...plan], view: { search: '', filters: [], sort: { by: 'active', asc: false } } } } })
+    const withPlan = (value, more = {}) => {
+      const p = preview(value, { mode: 'command', arrangement: { ...almanac(), addressed: 'almanac' }, screens: { records: { rows: [...rows, ...plan], view: { search: '', filters: [], sort: { by: 'active', asc: false } } }, ...more } })
       const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
       return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
     }
     expect(withPlan('>compare:229a 229c')).toMatchObject({
-      text: 'Enter sets the last replies in 229a and 229c side by side, word by word · Nothing is sent',
+      text: 'Enter sets the last replies in 229a and 229c side by side and marks the words that differ · Words, not meaning. Add meaning at the end to ask a model how they differ · Nothing is sent to an AI model',
       act: { kind: 'compareReplies', sides: [{ chatId: 'chat-230', address: '229a' }, { chatId: 'chat-231', address: '229c' }] },
     })
     // A chat on its own, by its number; letters read in either case.
@@ -964,6 +964,21 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
     expect(withPlan('>compare:229 229a').text).toBe('229 is a plan. compare:229a 229c compares the last replies of two of its branches')
     expect(withPlan('>compare:229a 214').text).toBe('compare: takes two notes, highlights or quotes, or two chats or branches, not one of each')
     expect(withPlan('>compare:229b 229a').text).toBe('Nothing here has the number 229b')
+
+    // meaning at the end asks the helper how they differ: one call, named and priced first (C290).
+    const helper = { id: 'claude-haiku-5-5', provider: 'anthropic', name: 'Haiku 5.5', price: { inputPerMillion: 1 } }
+    expect(withPlan('>compare:229a 229c meaning', { rippling: { helper } })).toMatchObject({
+      text: 'Enter marks the words that differ between 229a and 229c, and asks Haiku 5.5 how they differ in meaning: one call, under $0.01 · Both are sent to Haiku 5.5 in this call',
+      act: { kind: 'compareMeaning', sides: [{ chatId: 'chat-230', address: '229a' }, { chatId: 'chat-231', address: '229c' }], helper: { id: 'claude-haiku-5-5', provider: 'anthropic', name: 'Haiku 5.5' } },
+    })
+    // Two cards, a quote among them: its words go this once (C78).
+    expect(withPlan('>compare:214, 217 meaning', { rippling: { helper } })).toMatchObject({
+      text: 'Enter marks the words that differ between 214 and 217, and asks Haiku 5.5 how they differ in meaning: one call, under $0.01 · Both are sent to Haiku 5.5 in this call · 217 is a quote, kept from models until now: its words go in this call',
+      act: { kind: 'compareMeaning', sides: [{ num: 214 }, { num: 217 }] },
+    })
+    expect(withPlan('>compare:229a 229c meaning', { rippling: { helper: { ...helper, price: null, name: 'llama3' } } }).text).toBe('Enter marks the words that differ between 229a and 229c, and asks llama3 how they differ in meaning: one call, about 1275 tokens · Both are sent to llama3 in this call')
+    expect(withPlan('>compare:229a 229c meaning', { rippling: { helper: { ...helper, needsKey: true } } }).text).toBe('Comparing meaning needs a model. api: adds a key for one, or helper: picks one on this computer')
+    expect(withPlan('>compare:229a 229c meaning').text).toBe('Comparing meaning needs a model. api: adds a key for one, or helper: picks one on this computer')
   })
 
   it('jump: finds a number on the board the bar points at', () => {

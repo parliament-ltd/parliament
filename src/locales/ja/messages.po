@@ -1706,11 +1706,26 @@ msgstr "色 ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "何も送信していません。Escapeで閉じます"
+msgstr "AIモデルには何も送信していません。Escapeで閉じます"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.closeMeaning"
+msgstr "上の解釈のために、{model}に1回送信しました。Escapeで閉じます"
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
 msgstr "{gone, plural, other {#語削除}}、{added, plural, other {#語追加}}"
+
+#. Under a side that is empty, such as a source that found nothing
+#. js-lingui-explicit-id
+msgid "compare.empty"
+msgstr "この返答には言葉がありません"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "compare.fewShared"
+msgstr "共通する語が少ないため、印からは違いがあまり分かりません。meaning と書き足すと、意味の違いをモデルに尋ねます"
 
 #. js-lingui-explicit-id
 msgid "compare.label"
@@ -1719,6 +1734,30 @@ msgstr "{a}と{b}を並べて比較"
 #. js-lingui-explicit-id
 msgid "compare.legend"
 msgstr "取り消し線：{a}のみ・下線：{b}のみ"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningAsking"
+msgstr "{model}に意味の違いを尋ねています…"
+
+#. js-lingui-explicit-id
+msgid "compare.meaningCheck"
+msgstr "モデルによる解釈です。上の文面と見比べて確かめてください"
+
+#. {address} is a branch like 201a, a chat number, or a note, highlight or quote
+#. js-lingui-explicit-id
+msgid "compare.meaningCut"
+msgstr "{address}は一部しか読まれていません：最初の{count, number}文字"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningFailed"
+msgstr "{model}から解釈が返ってきませんでした"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningHead"
+msgstr "{model}が読み取った意味の違い"
 
 #. Names one side for screen readers; {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -1733,6 +1772,19 @@ msgstr "返答"
 #. js-lingui-explicit-id
 msgid "compare.same"
 msgstr "文面は同じです"
+
+#. js-lingui-explicit-id
+msgid "compare.wholeSentences"
+msgstr "このブラウザはこの言語を語に区切れないため、文単位で比較しています"
+
+#. js-lingui-explicit-id
+msgid "compare.wordsOnly"
+msgstr "比べたのは語で、意味ではありません"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "compare.writes"
+msgstr "バーに {command} と入力します"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -2515,12 +2567,52 @@ msgstr "{word} という列はありません。{words} を試してください
 
 #. js-lingui-explicit-id
 msgid "enter.compare"
-msgstr "Enterで{a}と{b}を並べ、語ごとに比較します"
+msgstr "Enterで{a}と{b}を並べ、違う語に印を付けます"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
 msgstr "{num}はメモ、ハイライト、引用、チャット、ブランチのいずれでもありません。compare: で比べられるのはこの5つです"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningAsking"
+msgstr "{model}に意味の違いを尋ねています"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningDone"
+msgstr "{model}が読みました：意味の違いはバーの下にあります"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningFailed"
+msgstr "{model}から解釈が返ってきませんでした。語の比較はそのまま表示しています"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGo"
+msgstr "Enterで、{a}と{b}で違う語に印を付け、意味の違いを{model}に尋ねます：呼び出し1回、約{cost}"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoCheap"
+msgstr "Enterで、{a}と{b}で違う語に印を付け、意味の違いを{model}に尋ねます：呼び出し1回、{cost}未満"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoUnpriced"
+msgstr "Enterで、{a}と{b}で違う語に印を付け、意味の違いを{model}に尋ねます：呼び出し1回、約{tokens}トークン"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningNoKey"
+msgstr "意味を比べるには、モデルが必要です。api: でモデルのキーを追加するか、helper: でこのコンピュータ上のモデルを選んでください"
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningSends"
+msgstr "この呼び出しで、両方が{model}に送信されます"
 
 #. compare: stays English
 #. js-lingui-explicit-id
@@ -2534,7 +2626,7 @@ msgstr "{address}には、比較できる返答がまだありません"
 
 #. js-lingui-explicit-id
 msgid "enter.compareNothingSent"
-msgstr "何も送信されません"
+msgstr "AIモデルには何も送信されません"
 
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
@@ -2544,7 +2636,7 @@ msgstr "{num}はプランです。{example} で、その中の2つのブラン�
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
 msgid "enter.compareReplies"
-msgstr "Enterで{a}と{b}の最後の返答を並べ、語ごとに比較します"
+msgstr "Enterで{a}と{b}の最後の返答を並べ、違う語に印を付けます"
 
 #. js-lingui-explicit-id
 msgid "enter.compareSame"
@@ -2554,6 +2646,11 @@ msgstr "同じものが2回指定されています"
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
 msgstr "compare: には compare:218 231 や compare:201a 201b のように2つ指定します"
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "enter.compareWordsOnly"
+msgstr "比べるのは語で、意味ではありません。末尾に meaning と書き足すと、意味の違いをモデルに尋ねます"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -9421,7 +9518,7 @@ msgstr "表の列を隠す、または表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "2つを並べて語ごとに比べる：メモ、ハイライト、引用、または2つのブランチの最後の返答。何も送信されません"
+msgstr "2つを並べて、違う語に印を付ける：メモ、ハイライト、引用、または2つのブランチの最後の返答。AIモデルには何も送信されません。meaning と書き足すと、意味の違いをモデルに尋ねます"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9781,10 +9878,10 @@ msgstr "MITライセンス、ソースコードはGitHubで公開"
 msgid "welcome.foot.made"
 msgstr "Claude Codeで作成"
 
-#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. One quiet link under the steps, by their numbers; a click writes tour:advanced in the bar, for the second list of steps
 #. js-lingui-explicit-id
 msgid "welcome.further"
-msgstr "または、さらに先へ"
+msgstr "応用編"
 
 #. js-lingui-explicit-id
 msgid "welcome.heading"

@@ -73,7 +73,7 @@ import { offeredLanguages, isDraft, isBeta, languageRows, COMING_LANGUAGES, star
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows, pinnedFirst } from '../lib/collections'
-import { aboutText, WORDED, replySide } from '../lib/cardActs'
+import { aboutText, WORDED, replySide, COMPARE_READS } from '../lib/cardActs'
 import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCards'
 import CollectionBoard from './CollectionBoard'
@@ -996,8 +996,9 @@ export default function Shell() {
       ? { list: inspected.list, chatNum: (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === inspected.chatId)?.num ?? null, rows: (almanacRows ?? []).filter((r) => r.chatId === inspected.chatId && (r.kind === 'highlight' || r.kind === 'term')) }
       : numbered.get(inspected) ?? null
   const comparedRows = useMemo(() => {
-    // Two branches' last replies, as read at Enter (C289), or two numbered cards.
-    if (compared?.replies) return { a: compared.replies[0], b: compared.replies[1] }
+    // Two sides as read at Enter (C289), with any reading of their meaning
+    // (C290), or two numbered cards, live.
+    if (compared?.sides) return { a: compared.sides[0], b: compared.sides[1], meaning: compared.meaning ?? null }
     const [a, b] = (compared ?? []).map((n) => numbered.get(n))
     return a && b ? { a, b } : null
   }, [compared, numbered])
@@ -1396,23 +1397,56 @@ export default function Shell() {
       remember(body)
       return null
     }
-    if (what.kind === 'compareReplies') {
+    if (what.kind === 'compareReplies' || what.kind === 'compareMeaning') {
       // compare:201a 201b (C289): each one's last reply, as it reads now,
-      // read here at Enter, side by side under the bar. Nothing is sent.
+      // read here at Enter, side by side under the bar. A card is its words.
       const sides = []
       for (const s of what.sides) {
+        if (s.chatId == null) {
+          const row = numberedNow.current.get(s.num)
+          if (!row) return { message: 'numNone', values: { num: String(s.num) } }
+          sides.push(row)
+          continue
+        }
         const [all, chat] = await Promise.all([getMessages(s.chatId).catch(() => []), getConversation(s.chatId).catch(() => null)])
-        const shown = sendableOf(all, hiddenIds(s.chatId), pendingDeletes(s.chatId))
+        // As shown, but keeping a reply with no words: a source that found nothing.
+        const hidden = hiddenIds(s.chatId)
+        const going = new Set(pendingDeletes(s.chatId).map((d) => d.messageId))
+        const shown = all.filter((m) => m && !hidden.has(m.id) && !going.has(m.id))
         const whoOf = (m) => m.source?.name ?? modelFacts(m.model)?.name ?? modelFacts(chat?.answerer)?.name ?? destination(chat?.answerer)?.name ?? null
         const side = replySide(s.address, shown, promptNow, whoOf)
         if (!side) return { message: 'compareNoReply', values: { address: s.address } }
         sides.push(side)
       }
       setInspected(null)
-      setCompared({ replies: sides })
       updateWelcome((w) => tick(w, 'compare'))
       remember(body)
-      return null
+      if (what.kind === 'compareReplies') {
+        // Nothing is sent to a model.
+        setCompared({ sides })
+        return null
+      }
+      // compare: … meaning (C290): the one call the line named, to the
+      // helper, with each side labelled and read up to COMPARE_READS. Its
+      // answer comes into the panel, labelled as the model's reading, and is
+      // not kept. Closing the panel first drops it.
+      const model = what.helper.name
+      const asked = crypto.randomUUID()
+      const nameOf = (x) => (x.kind === 'reply' ? i18n._(COPY.compare.reply, { address: x.address }) : i18n._(COPY.collections.card, { kind: x.kind, num: x.num }))
+      const items = sides.map((x) => ({ label: x.who ? `${nameOf(x)} (${x.who})` : nameOf(x), text: String(x.text ?? '').slice(0, COMPARE_READS) }))
+      const cut = sides.filter((x) => String(x.text ?? '').length > COMPARE_READS).map((x) => (x.kind === 'reply' ? x.address : String(x.num)))
+      setCompared({ sides, meaning: { asked, model, state: 'asking' } })
+      const later = (async () => {
+        let text = null
+        try {
+          text = await gateway.call(what.helper.provider, 'compareMeaning', [items, { model: what.helper.id }], { label: 'compare meaning' })
+        } catch {
+          text = null
+        }
+        setCompared((c) => (c?.meaning?.asked === asked ? { ...c, meaning: text ? { asked, model, state: 'done', text, cut } : { asked, model, state: 'failed' } } : c))
+        return { message: text ? 'compareMeaningDone' : 'compareMeaningFailed', values: { model } }
+      })()
+      return { done: true, says: { message: 'compareMeaningAsking', values: { model } }, later }
     }
     if (what.kind === 'find') {
       // jump: (C145 (c)): its card, its passage or its row.

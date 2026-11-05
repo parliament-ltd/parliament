@@ -59,7 +59,10 @@ cannot judge the language itself; that is the review.
   the sentence after it, the sort labels) cannot be reordered by a
   translation. They should become one entry with a placeholder.
 - **`compare:` on Japanese and Chinese:** it compares word by word, and these
-  languages put no spaces between words.
+  languages put no spaces between words. **Answered 4 November (C290):** the
+  browser's own word dictionary (`Intl.Segmenter`) splits them into words,
+  offline, so "word by word" (語ごとに, 逐词) is accurate. A browser without it
+  compares whole sentences, and the panel says so.
 
 ## Shipping a language
 

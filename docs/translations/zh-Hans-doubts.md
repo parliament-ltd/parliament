@@ -417,3 +417,14 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - `enter.compareTwo`: "takes two" is 需要两项. The old line said 两个编号 (two numbers), which no longer fits once a branch like 201a counts. 两项 matches the older `verb.compare` (将两项或多项).
 - `enter.compareReplies`, `verb.compare`: "the last replies in {a} and {b}" is {a} 和 {b} 各自的最后一条回复 ("the last reply of each"). Without 各自的 it could read as the last reply of the two taken together.
 - `enter.compareReplies`, `verb.compare`: "word by word" is 逐词, as `enter.compare` already has it. The open point in the translations README still applies: Chinese puts no spaces between words, so a diff that splits on spaces would compare a whole Chinese reply as one run, and 逐词 would then promise more than the screen shows.
+
+## Words, not meaning, drafted 4 November 2026 (C290)
+
+- `enter.compareWordsOnly`, `compare.fewShared`, `verb.compare`: the typed word stays bare (在命令末尾加上 meaning), as the older keyword lines write spread and beside, rather than in quotes. 命令末尾 says it is a word typed into the command; quotes “meaning” would follow the convention for names people give, not for keywords.
+- Words against meaning: 词语 / 词 for words, 含义 for meaning throughout (只比较词语，不比较含义). 意思 is plainer but also means "intent" or "interest"; 含义 is unambiguous. Lines that ask the model add 含义 even where the English says only "how they differ" (`compare.meaningAsking`, `enter.compareMeaningAsking`, `compare.meaningHead`, `enter.compareMeaningDone`), so a model line never reads as the word marking.
+- `compare.fewShared`: "the marks" is 标出的差异, not 标记, which the glossary keeps for the markings (notes, highlights, quotes).
+- `enter.compare`, `enter.compareReplies`: the old lines said 逐词并排对照; the new English drops "word by word", so 逐词 is gone and 标出不同的词 carries it.
+- `compare.meaningCheck`, `compare.closeMeaning`: "reading" (a model's account of the difference) is 解读.
+- `enter.compareMeaningGo` (and Cheap, Unpriced): the sweep lines say 调用 {model} 一次; here {model} is already named in the sentence, so it is 调用一次, keeping {model} once as in the English.
+- `enter.compareMeaningNoKey`: "adds a key for one" is 可为模型添加密钥; "picks one on this computer" is 用 helper: 指定一个本机模型, as `enter.localOnlyHelper` has it.
+- `welcome.further`: "Advanced" is 进阶 (as in a second, more advanced set of steps), not 高级, which in Chinese interfaces mostly labels advanced settings.

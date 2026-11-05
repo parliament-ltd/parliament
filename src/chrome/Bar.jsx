@@ -475,7 +475,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           </p>
         )}
         {!reference && inspect && <Inspect row={inspect} onPick={pick} />}
-        {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
+        {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} meaning={compare.meaning ?? null} onWrite={pick} />}
         {!reference && !inspect && !compare && !keyPanel && backupPanel && (
           <BackupPanel
             mode={backupPanel.mode} file={backupPanel.file}

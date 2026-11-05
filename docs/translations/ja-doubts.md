@@ -387,3 +387,13 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - `enter.compareKinds`: dropped the old line's 今のところ because the new English no longer says "for now". この5つ counts the five kinds, as the old line said この3つ.
 - `enter.compareReplies`: no 、 after Enterで, to match its sibling `enter.compare`, though the glossary's pattern is Enterで、Xします.
 - 語ごとに (word by word, as `enter.compare` has it): the open question in the README matters more now. Replies are long Japanese text with no spaces, so if the comparison splits on spaces, a Japanese reply compares as a few very long "words".
+
+## Words, not meaning, drafted 4 November 2026 (C290)
+
+- **welcome.further**: 応用編 ("the advanced part"), the usual pair to a basics list, and it fits the second list's name さらに試してみること. 上級者向け ("for experts") sounds daunting; 詳細 (Apple's "Advanced" in settings) reads as "details" for a list of steps.
+- **Typed word meaning** (compare.fewShared, enter.compareWordsOnly, verb.compare): written bare with half-width spaces, as the glossary has the keywords beside and spread, followed by the quoting particle と (meaning と書き足すと, "if you add the word meaning"), so it reads as a word to type. 「meaning」 would be the alternative if it still reads as prose.
+- **意味 added where the English says only "how they differ"** (compare.fewShared, compare.meaningAsking, enter.compareMeaningAsking, compare.meaningHead, enter.compareMeaningDone): 意味の違い ("the difference in meaning"). These lines appear only around the meaning reading, and a bare どう違うか, right next to the word marks, could be taken for the word differences.
+- **"reading"** (a model's reading): 解釈 ("interpretation") as the noun throughout; the verb "reads them" is 読み取った in compare.meaningHead. 読み取り as a noun reads awkwardly here.
+- **enter.compareMeaningGo, GoCheap, GoUnpriced**: the cost part follows the shape of enter.reflectTalkGo (呼び出し1回、約{cost}), not the sweep lines' {model}を1回呼び出し, since the English already names {model} as the one asked.
+- **"marks the words that differ"** (enter.compare, enter.compareReplies, verb.compare): 違う語に印を付ける, taking 印 from the glossary's 違うところに印. It replaces the earlier 語ごとに比較します, as the English was reworded.
+- **compare.empty**: 言葉 instead of 語 for "words" (この返答には言葉がありません). 語がありません on its own reads stiffly, and this line is not one of the words or meaning contrasts.

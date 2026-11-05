@@ -569,7 +569,7 @@
 /* One column since the letter left the page (C279 (d)): the heading, the
    steps, the field, then the ending and the note on keeping data. */
 .ch-wgrid { width: 100%; max-width: 520px; margin: auto; display: grid; grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "top" "list" "bar" "now" "further" "keep"; align-items: start; }
+  grid-template-areas: "top" "list" "further" "bar" "now" "furtherdone" "keep"; align-items: start; }
 .ch-wtop { grid-area: top; }
 .ch-wh { position: relative; display: flex; flex-direction: column; margin: 0; padding: 0 2px; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); }
 /* Parliament's mark hangs before "Welcome", in the card's margin, so the
@@ -591,9 +591,11 @@
 .ch-asteps ol { list-style: none; margin: 0; padding: 0; }
 .ch-asteps section + section { margin-top: 10px; }
 .ch-stepsh { margin: 0 0 2px; font: italic 400 13px/1.6 var(--ch-serif); color: var(--ch-ink-2); }
-/* "or go further": one quiet line under the steps, or under the ending,
-   that writes tour:advanced in the bar. Offered, never pushed. */
-.ch-wfurther { grid-area: further; margin: 14px 2px 0; }
+/* "Advanced": one quiet line right under the steps, in line with their
+   numbers, or under the ending once they are done, that writes
+   tour:advanced in the bar. Offered, never pushed. */
+.ch-wfurther { grid-area: further; margin: 6px 2px 0; }
+.ch-wfurther.after { grid-area: furtherdone; margin-top: 14px; }
 .ch-shell .ch-wfurther button { color: var(--ch-marg); }
 .ch-shell .ch-wfurther button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-wbar { grid-area: bar; margin-top: 22px; min-width: 0; }
@@ -763,6 +765,14 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-compare-diff { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ch-divider); white-space: pre-wrap; }
 .ch-compare-diff del { color: var(--ch-ink-3); text-decoration: line-through; }
 .ch-compare-diff ins { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+/* Words, not meaning (C290): said first, in the margin's voice; said plainly
+   when the two share little; a model's reading below, under its own line. */
+.ch-compare-what { margin: 0 0 10px; }
+.ch-shell .ch-compare-ask { padding: 0; font: inherit; font-style: normal; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-compare-few { margin: 8px 0 0; color: var(--ch-ink); }
+.ch-compare-meaning { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ch-divider); }
+.ch-compare-meaning h3 { margin-bottom: 6px; }
+.ch-compare-reading { margin: 0 0 6px; white-space: pre-wrap; }
 
 /* The replies to a prompt sent to several, as tabs (stage 8; slider v9; C173). */
 .ch-branches { margin: 4px 0 8px; }

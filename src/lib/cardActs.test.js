@@ -66,3 +66,15 @@ describe('compare: with branches (C289)', () => {
     expect(chatAddress({ num: 202, docketNum: null, branch: null })).toBe('202')
   })
 })
+
+describe('a branch whose last reply has no words (C290)', () => {
+  it('is that empty reply, not an earlier one to another prompt', () => {
+    const messages = [
+      { id: 'u1', role: 'user', content: 'barn owl' },
+      { id: 'r1', role: 'assistant', content: 'The barn owls are owls.', source: { name: 'Wikipedia' } },
+      { id: 'u2', role: 'user', content: 'p>barn owl' },
+      { id: 'r2', role: 'assistant', content: '', source: { name: 'Wikipedia' } },
+    ]
+    expect(replySide('201a', messages, (m) => m.content, (m) => m.source.name)).toEqual({ kind: 'reply', address: '201a', who: 'Wikipedia', text: '' })
+  })
+})

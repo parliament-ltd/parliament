@@ -1708,8 +1708,23 @@ msgstr ""
 msgid "compare.close"
 msgstr ""
 
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.closeMeaning"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "compare.counts"
+msgstr ""
+
+#. Under a side that is empty, such as a source that found nothing
+#. js-lingui-explicit-id
+msgid "compare.empty"
+msgstr ""
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "compare.fewShared"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1718,6 +1733,30 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "compare.legend"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningAsking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.meaningCheck"
+msgstr ""
+
+#. {address} is a branch like 201a, a chat number, or a note, highlight or quote
+#. js-lingui-explicit-id
+msgid "compare.meaningCut"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningFailed"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "compare.meaningHead"
 msgstr ""
 
 #. Names one side for screen readers; {address} is a branch like 201a, or a chat number
@@ -1732,6 +1771,19 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "compare.same"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.wholeSentences"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.wordsOnly"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "compare.writes"
 msgstr ""
 
 #. A message's attachments, by name only; {names} is a list
@@ -2522,6 +2574,46 @@ msgstr ""
 msgid "enter.compareKinds"
 msgstr ""
 
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningAsking"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningDone"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningFailed"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGo"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoCheap"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningGoUnpriced"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningNoKey"
+msgstr ""
+
+#. {model} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.compareMeaningSends"
+msgstr ""
+
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareMixed"
@@ -2553,6 +2645,11 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.compareTwo"
+msgstr ""
+
+#. meaning is a word added to the command, and stays English
+#. js-lingui-explicit-id
+msgid "enter.compareWordsOnly"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9781,7 +9878,7 @@ msgstr ""
 msgid "welcome.foot.made"
 msgstr ""
 
-#. One quiet line under the steps; a click writes tour:advanced in the bar, for the second list
+#. One quiet link under the steps, by their numbers; a click writes tour:advanced in the bar, for the second list of steps
 #. js-lingui-explicit-id
 msgid "welcome.further"
 msgstr ""

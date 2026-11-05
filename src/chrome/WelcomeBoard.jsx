@@ -173,8 +173,9 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               ))}
             </ol>
           )}
-          {/* The second list: the same lines, numbered on through three short
-              headings in the same serif, so it reads as small lists (W §13). */}
+          {/* The second list: the same lines, numbered on from the first
+              (Stefan, 4 November: "continue the numbers from before"), under
+              three short headings in the same serif, so it reads as small lists (W §13). */}
           {advanced && (
             <div className="ch-steps ch-asteps" role="group" aria-label={i18n._(COPY.welcome.advancedSteps)}>
               {ADVANCED_GROUPS.map((g) => (
@@ -185,7 +186,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
                       const { how, writes } = advancedHow(i18n, s, advancedNums)
                       return (
                         <StepRow
-                          key={s.id} n={ADVANCED_STEPS.indexOf(s) + 1} title={i18n._(ADVANCED_TITLES[s.id])} how={how} writes={writes}
+                          key={s.id} n={STEPS.length + ADVANCED_STEPS.indexOf(s) + 1} title={i18n._(ADVANCED_TITLES[s.id])} how={how} writes={writes}
                           done={(welcome.advancedDone ?? []).includes(s.id)} next={nextFurther?.id === s.id} onWrite={onWrite}
                         />
                       )
@@ -200,7 +201,8 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               is letter one, opened by letter: rather than drawn here (C279 (d)). */}
           {welcome.finished && <p className="ch-wnow">{withCommand(i18n, COPY.welcome.now, 'focus:', onWrite)}</p>}
           {offer && (
-            <p className="ch-wfurther ch-marg">
+            // Right under the steps, by their numbers; under the ending once it is done.
+            <p className={`ch-wfurther ch-marg${welcome.finished ? ' after' : ''}`}>
               <button type="button" onClick={() => onWrite('>tour:advanced')}>{i18n._(COPY.welcome.further)}</button>
             </p>
           )}

@@ -85,6 +85,14 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // compare: … meaning (C290): how two texts differ in what they say, each
+  // { label, text }, in one lightweight call to the model named (the
+  // helper). Returns short points as text; throws when none came back. The
+  // texts are material, never instructions.
+  async compareMeaning(apiKey, items, { model } = {}) {
+    throw new Error('Not implemented')
+  }
+
   // open:203b summary (stage 8, piece 4; C175): a chat's turns, each
   // { label, text } (the person, a model, a source), summarized in one
   // lightweight call to the model named (the helper), so a new branch can

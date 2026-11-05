@@ -12,7 +12,7 @@
 // Pure: rows come from almanacRows.js, the collection from the shell.
 
 import { targetsOf } from './rowVerbs'
-import { summaryCost } from '../shell/estimate'
+import { summaryCost, CHARS_PER_TOKEN } from '../shell/estimate'
 import { isRoom } from '../shell/boards'
 
 export const NOTE_MAX = 20_000
@@ -113,13 +113,32 @@ function branchesOf(plan, rows) {
     .map(chatAddress)
 }
 
+// compare: … meaning (C290): what the helper reads of each side, at most,
+// and the instructions around them, for the price named before Enter.
+export const COMPARE_READS = 12_000
+const COMPARE_SYSTEM_CHARS = 1100
+
+/** What the Enter line says compare: … meaning costs, and who it goes to. */
+function meaningSays(values, h, chars) {
+  const tokens = Math.ceil((COMPARE_SYSTEM_CHARS + chars) / CHARS_PER_TOKEN)
+  const per = h.price?.inputPerMillion
+  const cost = typeof per === 'number' ? (tokens * per) / 1_000_000 : null
+  const v = { ...values, model: h.name }
+  if (cost == null) return { message: 'compareMeaningGoUnpriced', values: { ...v, tokens } }
+  return cost < CENT ? { message: 'compareMeaningGoCheap', values: { ...v, cost: CENT } } : { message: 'compareMeaningGo', values: { ...v, cost } }
+}
+
 /**
  * compare:218 231: two notes, highlights or quotes side by side under the
  * bar, word by word (C145 (i)). compare:201a 201b: the last reply of each of
- * two branches, or of two chats, the same way (C289). Nothing is sent.
+ * two branches, or of two chats, the same way (C289). Nothing is sent; the
+ * line says it is words, not meaning. compare:201a 201b meaning also asks the
+ * helper how they differ in meaning: one call, named and priced first (C290).
  */
 export function planCompare(step, screens = {}) {
-  const args = flat(step.match?.values ?? [])
+  const vals = step.match?.values ?? []
+  const meaning = vals.some((v) => v?.kind === 'word' && v.value === 'meaning')
+  const args = flat(vals.filter((v) => !(v?.kind === 'word' && v.value === 'meaning')))
   if (args.length !== 2) return { says: { message: 'compareTwo' }, act: null }
   const rows = screens.records?.rows ?? []
   const t = targetsOf(args, rows)
@@ -135,30 +154,47 @@ export function planCompare(step, screens = {}) {
   if (odd) return { says: { message: 'compareKinds', values: { num: odd.num } }, act: null }
   const chats = t.rows.filter((r) => r.kind === 'chat')
   if (chats.length === 1) return { says: { message: 'compareMixed' }, act: null }
-  if (chats.length === 2) {
-    // Read at Enter: each one's last reply, as it reads now.
-    const sides = chats.map((r) => ({ chatId: r.chatId, address: chatAddress(r) }))
-    return {
-      says: { message: 'compareReplies', values: { a: sides[0].address, b: sides[1].address }, also: [{ message: 'compareNothingSent' }] },
-      act: { kind: 'compareReplies', sides },
-    }
+  // Read at Enter: a chat's side is its last reply, as it reads now.
+  const sides = chats.length === 2
+    ? chats.map((r) => ({ chatId: r.chatId, address: chatAddress(r) }))
+    : t.rows.map((r) => ({ num: r.num }))
+  const names = chats.length === 2 ? { a: sides[0].address, b: sides[1].address } : { a: t.rows[0].num, b: t.rows[1].num }
+  const wordsOnly = [{ message: 'compareWordsOnly' }, { message: 'compareNothingSent' }]
+  if (!meaning) {
+    return chats.length === 2
+      ? { says: { message: 'compareReplies', values: names, also: wordsOnly }, act: { kind: 'compareReplies', sides } }
+      : { says: { message: 'compare', values: names, also: wordsOnly }, act: { kind: 'compare', nums: [names.a, names.b] } }
   }
-  const [a, b] = t.rows
-  return { says: { message: 'compare', values: { a: a.num, b: b.num }, also: [{ message: 'compareNothingSent' }] }, act: { kind: 'compare', nums: [a.num, b.num] } }
+  // As a sweep's: the helper chosen in Settings, ready to answer (C233).
+  const h = screens.rippling?.helper
+  const ready = Boolean(h) && !h.needsKey && !h.later && !h.gone && !h.unchecked
+  if (!ready) return { says: { message: 'compareMeaningNoKey' }, act: null }
+  // A chat's reply is read at Enter; its whole chat's words bound it here.
+  const chars = t.rows.reduce((n, r) => n + Math.min(COMPARE_READS, String((r.kind === 'chat' ? r.words : r.text) ?? '').length || 2000), 0)
+  // A quote is kept from models until the person acts on it: this is acting (C78).
+  const quotes = t.rows.filter((r) => r.kind === 'quote').map((r) => r.num)
+  const also = [{ message: 'compareMeaningSends', values: { model: h.name } }]
+  if (quotes.length) also.push({ message: 'summarizeQuotes', values: { nums: quotes, count: quotes.length } })
+  return {
+    says: { ...meaningSays(names, h, chars), also },
+    act: { kind: 'compareMeaning', sides, helper: { id: h.id, provider: h.provider, name: h.name } },
+  }
 }
 
 /**
  * One side of compare:201a 201b, from its chat's messages as shown: its last
- * reply, as it reads now, and who gave it. null when it has none yet.
- * @param {object[]} messages the chat's messages, without hidden ones or ones being deleted
+ * reply, as it reads now, and who gave it. null when it has none yet. A
+ * last reply with no words (a source that found nothing) is that, empty:
+ * an earlier reply, to another prompt, is not put in its place (C290).
+ * @param {object[]} messages the chat's messages in order, without hidden ones or ones being deleted
  * @param {(message: object) => string} wordsNow a message's words as they stand, edits and all
  * @param {(message: object) => string|null} whoOf who gave a reply, by name
  */
 export function replySide(address, messages, wordsNow, whoOf) {
-  const list = (messages ?? []).filter((m) => m && m.role === 'assistant' && m.content && !m.incomplete)
+  const list = (messages ?? []).filter((m) => m && m.role === 'assistant' && !m.incomplete)
   const last = list[list.length - 1]
   if (!last) return null
-  return { kind: 'reply', address, who: whoOf(last) ?? null, text: wordsNow(last) }
+  return { kind: 'reply', address, who: whoOf(last) ?? null, text: last.content ? wordsNow(last) : '' }
 }
 
 /**
