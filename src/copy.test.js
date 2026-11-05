@@ -12,6 +12,8 @@ const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikiped
   'Enter', 'Shift', 'Parliament’s', 'Netlify', 'IP', 'GitHub',
   // A passkey's PIN (Lock Parliament).
   'PIN',
+  // The local model's setting, named as the person types it (C293).
+  'OLLAMA_ORIGINS',
   // The welcome letter, in Stefan's own words (C265): I with its contractions, and a language he has written in.
   "I've", "I'm", "I'd", 'Ruby',
   // The format a page is written in, named in This browser (C272 (f)).
