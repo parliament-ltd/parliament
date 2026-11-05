@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.14.0, 5 November 2026
+
+- reset: clears the screen to the start card: every board and window closes. Nothing is deleted.
+- The start card fits its words and sits in the middle of the screen, with the bar at the foot.
+- focus on the strip is one word in the margin, and a click turns it on or off.
+- Setting up a model on your own computer is five numbered steps, with the command for your system.
+- The language selector no longer covers the welcome page, and the installed app's icon has rounded corners.
+
 ## 0.13.0, 5 November 2026
 
 - ? opens with the everyday commands. more shows the rest, and ?all shows every command at once.
