@@ -324,7 +324,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     if (field.mode !== 'command') return
     const { answer, next, go, act } = view
     if (answer.state === 'help') {
-      setReference({ topic: answer.values?.verb ? answer.values.verb.replace(/:$/, '') : null })
+      setReference({ topic: answer.values?.verb ? answer.values.verb.replace(/:$/, '') : null, all: Boolean(answer.values?.all) })
       dispatch({ type: 'ran' })
       return
     }
@@ -499,7 +499,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         )}
       </div>
       {/* The ? reference and the menus: as wide as the stage, not the bar (C279 (f); 29 October). */}
-      {menu === 'reference' && <Reference board={board} topic={reference.topic} onPick={pick} onClose={() => closeMenu('reference', true)} />}
+      {menu === 'reference' && <Reference board={board} topic={reference.topic} all={reference.all} onPick={pick} onClose={() => closeMenu('reference', true)} />}
       {menu === 'picker' && (
         picker.kind === 'reply'
           ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} onClose={() => closeMenu('picker', true)} />

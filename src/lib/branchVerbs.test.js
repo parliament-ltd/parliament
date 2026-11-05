@@ -4,7 +4,7 @@ import { messages as en } from '../locales/en/messages.mjs'
 import { preview, promptPreview } from '../chrome/preview'
 import { say } from '../chrome/say'
 import { shipped } from '../shell/arrangement'
-import { promptNow, promptFacts } from './branchVerbs'
+import { promptNow, promptFacts, planContinue } from './branchVerbs'
 import { replyTargets } from './branchGroups'
 
 // The reply target among a prompt's branches (stage 8, piece 3; C174).
@@ -92,5 +92,25 @@ describe('a prompt edited in place, asked again (stage 11, piece 2)', () => {
     expect(f.text.startsWith('Write the ending.')).toBe(true)
     expect(f.chars).toBe(promptNow(prompt).length)
     expect(f.before).toBe('Before.'.length + 'Reply.'.length)
+  })
+})
+
+describe('continue: (C291 (l))', () => {
+  const step = { match: { values: [] } }
+  const sonnet = { id: 'claude-sonnet-5-5', name: 'Sonnet 5.5', group: 'model', provider: 'anthropic', price: { inputPerMillion: 3 } }
+  const at = (continuing) => planContinue(step, { continuing })
+  it('names the model that wrote the reply and the cost, and carries it on at Enter', () => {
+    const p = at({ room: 'c1', address: '204', cut: { id: 'm9', before: 40_000 }, answerer: sonnet })
+    expect(p.says).toEqual({ message: 'continueGo', values: { address: '204', name: 'Sonnet 5.5', tokens: 10_000, cost: 0.03 } })
+    expect(p.act).toEqual({ kind: 'continue', chatId: 'c1', messageId: 'm9', model: 'claude-sonnet-5-5', name: 'Sonnet 5.5' })
+    expect(at({ room: 'c1', address: '204', cut: { id: 'm9', before: 400 }, answerer: sonnet }).says.message).toBe('continueCheap')
+    expect(at({ room: 'c1', address: '204', cut: { id: 'm9', before: 400 }, answerer: { ...sonnet, group: 'local', price: null } }).says.message).toBe('continueLocal')
+  })
+  it('says why not, and sends nothing', () => {
+    expect(at({ room: undefined }).says.message).toBe('continueNoRoom')
+    expect(at({ room: 'c1', address: '204', streaming: true, cut: { id: 'm9', before: 1 }, answerer: sonnet }).says.message).toBe('promptBusy')
+    expect(at({ room: 'c1', address: '204', cut: null, answerer: null }).says).toEqual({ message: 'continueNone', values: { address: '204' } })
+    expect(at({ room: 'c1', address: '204', cut: { id: 'm9', before: 1 }, answerer: { ...sonnet, needsKey: true, providerName: 'Anthropic' } }).says.message).toBe('byNeedsKey')
+    expect(at({ room: 'c1', address: '204', cut: { id: 'm9', before: 1 }, answerer: { ...sonnet, needsKey: true } }).act).toBeNull()
   })
 })

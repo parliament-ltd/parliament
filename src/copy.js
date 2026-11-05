@@ -72,7 +72,8 @@ export const COPY = {
   // lists the bar joins in the reader's language.
   enter: {
     empty: /*i18n*/ { id: 'enter.empty', message: 'Type a command, or ? for every command' },
-    help: /*i18n*/ { id: 'enter.help', message: 'Enter shows every command' },
+    help: /*i18n*/ { id: 'enter.help', message: 'Enter shows the everyday commands, and every other one under more' },
+    helpAll: /*i18n*/ { id: 'enter.helpAll', message: 'Enter shows every command' },
     helpVerb: /*i18n*/ { id: 'enter.helpVerb', message: 'Enter shows how {verb} works' },
     unknownHelp: /*i18n*/ { id: 'enter.unknownHelp', message: 'No command called {verb}. Enter shows every command' },
     notCommand: /*i18n*/ { id: 'enter.notCommand', message: 'A command starts with a verb and a colon, like open:201' },
@@ -639,6 +640,14 @@ export const COPY = {
     againNotChat: /*i18n*/ { id: 'enter.againNotChat', message: 'again:{num} takes a chat or a branch', comment: 'Commands stay English' },
     againNotOnScreen: /*i18n*/ { id: 'enter.againNotOnScreen', message: 'again:{address} works on a branch on screen. open:{address} shows it', comment: 'Commands stay English' },
     againNothing: /*i18n*/ { id: 'enter.againNothing', message: '{address} has no prompt to ask again' },
+    // continue: (C291 (l)): a cut-off reply carried on, by the model that wrote it.
+    continueGo: /*i18n*/ { id: 'enter.continueGo', message: 'Enter asks {name} to carry on the cut-off reply in {address} from where it stopped: about {tokens, number} tokens, {cost} to send', comment: '{name} is a model name, from the list' },
+    continueCheap: /*i18n*/ { id: 'enter.continueCheap', message: 'Enter asks {name} to carry on the cut-off reply in {address} from where it stopped: about {tokens, number} tokens, under {cost} to send', comment: '{name} is a model name, from the list' },
+    continueUnpriced: /*i18n*/ { id: 'enter.continueUnpriced', message: 'Enter asks {name} to carry on the cut-off reply in {address} from where it stopped: about {tokens, number} tokens', comment: '{name} is a model name, from the list' },
+    continueLocal: /*i18n*/ { id: 'enter.continueLocal', message: 'Enter asks {name} on this computer to carry on the cut-off reply in {address}. Nothing leaves it', comment: '{name} is a model name, from the list' },
+    continueNoRoom: /*i18n*/ { id: 'enter.continueNoRoom', message: 'continue: carries on a cut-off reply in the room on screen', comment: 'Commands stay English' },
+    continueNone: /*i18n*/ { id: 'enter.continueNone', message: 'Nothing in {address} was cut off' },
+    continueGoing: /*i18n*/ { id: 'enter.continueGoing', message: '{name} is carrying on the reply', comment: '{name} is a model name, from the list' },
     againNoOne: /*i18n*/ { id: 'enter.againNoOne', message: '{name} cannot answer in {address} now. by: there chooses another', comment: 'Commands stay English' },
     again: /*i18n*/ { id: 'enter.again', message: 'Enter asks “{prompt}” again as {next}, beside {address}: {name}, about {tokens, number} tokens, {cost} to send' },
     againCheap: /*i18n*/ { id: 'enter.againCheap', message: 'Enter asks “{prompt}” again as {next}, beside {address}: {name}, about {tokens, number} tokens, under {cost} to send' },
@@ -943,6 +952,7 @@ export const COPY = {
     // The Lab (stage 13, piece 1; C238).
     labAlready: /*i18n*/ { id: 'enter.labAlready', message: 'The Lab is open already' },
     roomRan: /*i18n*/ { id: 'enter.roomRan', message: 'Ran {command}. undo: takes it back', comment: 'Commands stay English' },
+    ranOnly: /*i18n*/ { id: 'enter.ranOnly', message: 'Ran {command}', comment: 'Said under the field after a click ran a command that undo: cannot take back. Commands stay English' },
     labOpen: /*i18n*/ { id: 'enter.labOpen', message: 'Enter opens {name} in the Lab. Each change there is saved as you make it, and undo: takes it back', comment: 'Commands stay English' },
     labEmpty: /*i18n*/ { id: 'enter.labEmpty', message: 'Enter opens the Lab with no room in it. Then edit:"a room" or new:room', comment: 'Commands stay English' },
     labOpened: /*i18n*/ { id: 'enter.labOpened', message: 'Enter opens the Lab' },
@@ -2761,7 +2771,11 @@ export const COPY = {
     referenceTitle: /*i18n*/ { id: 'shell.referenceTitle', message: 'Commands', comment: 'The heading of the ? reference, drawn in capitals' },
     referenceFainter: /*i18n*/ { id: 'shell.referenceFainter', message: 'A fainter command works on another board, named beside it', comment: 'Beside the heading of the ? reference' },
     referenceOn: /*i18n*/ { id: 'shell.referenceOn', message: 'Works on {boards}', comment: 'Beside a command in the ? reference that does not work on this board. {boards} is a list of board names, such as Records and Collection' },
-    referenceKeys: /*i18n*/ { id: 'shell.referenceKeys', message: 'A click writes a command into the field, and Enter runs it. {example} shows the forms of one command.', comment: 'The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English' },
+    // ? in two tiers (C291 (a)): the row under Everyday, and the row that folds it again.
+    referenceMore: /*i18n*/ { id: 'shell.referenceMore', message: 'more ▾', comment: 'A row under the everyday commands of the ? reference; a click opens every other command' },
+    referenceMoreCount: /*i18n*/ { id: 'shell.referenceMoreCount', message: '{count, plural, one {# more} other {# more}}, in {groups, plural, one {# group} other {# groups}}. {all} shows them at once', comment: '{all} is ?all, which stays English' },
+    referenceFewer: /*i18n*/ { id: 'shell.referenceFewer', message: 'fewer ▴', comment: 'The same row once every command is open; a click folds them back to the everyday ones' },
+    referenceKeys: /*i18n*/ { id: 'shell.referenceKeys', message: 'A click writes the command into the field, and Enter runs it. {example} shows one command’s forms.', comment: 'The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English' },
     windowTitle: /*i18n*/ { id: 'shell.windowTitle', message: '{board} · Parliament', comment: "A popped window's title: a board name only, never anything someone wrote" },
     // A window's own marks, in its corner (C283): true full screen needs a click in that window.
     fullScreen: /*i18n*/ { id: 'shell.fullScreen', message: 'full screen' },
@@ -2778,6 +2792,9 @@ export const COPY = {
   // A reply being written when its chat is left (C109).
   chat: {
     stoppedOnReply: /*i18n*/ { id: 'chat.stoppedOnReply', message: 'Stopped when you left the chat. What arrived is kept.' },
+    // A cut-off reply's button (C291 (l)): it writes continue:, and Enter sends.
+    continueReply: /*i18n*/ { id: 'chat.continueReply', message: 'Continue', comment: 'A button under a reply that was cut off; it writes continue: into the bar' },
+    continueWrites: /*i18n*/ { id: 'chat.continueWrites', message: 'Writes continue: in the bar, where Enter names the model and the cost first', comment: 'Commands stay English' },
     // A reply cut off (stage 4), marked so it is never taken for a whole answer.
     cutLimit: /*i18n*/ { id: 'chat.cutLimit', message: 'Cut off: the reply reached the length allowed for one reply. What arrived is kept.' },
     cutError: /*i18n*/ { id: 'chat.cutError', message: 'Cut off by an error part way through. What arrived is kept.' },

@@ -590,7 +590,7 @@ export default function MessageCard({
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (
         <p className="p-marg">
-          <button type="button" onClick={onContinue}>Continue</button>
+          <button type="button" title={i18n._(COPY.chat.continueWrites)} onClick={onContinue}>{i18n._(COPY.chat.continueReply)}</button>
         </p>
       )}
       {editedLine}

@@ -334,18 +334,23 @@ export default function MessagesRender() {
     bottomRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' })
   }, [messages, streamingContent, isStreaming])
 
+  // Continue writes continue: into the bar, where Enter names the model
+  // that wrote the reply and the cost first (C291 (l)). Outside a room with
+  // a bar, it carries on at once, by the model that wrote the reply.
   const handleContinue = useCallback(async (incompleteId) => {
+    if (roomHost?.write) { roomHost.write('>continue:'); return }
     try {
       // The gateway picks the key; here only whether there is one (stage 4).
       if (!(await hasKey())) return
       const systemPrompt = roomHost?.systemFor?.(activeConversationId) ?? ''
-      await continueMessage(incompleteId, settings.defaultModel, systemPrompt)
+      const cut = messages.find((m) => m.id === incompleteId)
+      await continueMessage(incompleteId, cut?.model ?? settings.defaultModel, systemPrompt)
     } catch (err) {
       if (err?.name !== 'AbortError' && import.meta.env.DEV) {
         console.warn('[messages@1.0] continueMessage failed:', err)
       }
     }
-  }, [settings.defaultModel, continueMessage, roomHost, activeConversationId])
+  }, [settings.defaultModel, continueMessage, roomHost, activeConversationId, messages])
 
   const handleCopyText = useCallback(async (content) => {
     try {

@@ -139,6 +139,36 @@ export function planAgain(step, screens = {}) {
 }
 
 /**
+ * continue: (C291 (l)): the room's cut-off reply carried on from where it
+ * stopped, by the model that wrote it, priced on the Enter line as again:
+ * is. The reply's Continue writes it; Enter sends. screens.continuing:
+ * { room, address, streaming, cut: { id, before }|null, answerer } for the
+ * room on screen, before the characters a model is sent to carry it on.
+ */
+export function planContinue(step, screens = {}) {
+  const c = screens.continuing
+  if (!c?.room) return { says: { message: 'continueNoRoom' }, act: null }
+  if (c.streaming) return { says: { message: 'promptBusy' }, act: null }
+  if (!c.cut) return { says: { message: 'continueNone', values: { address: c.address } }, act: null }
+  const w = c.answerer
+  if (!w || w.group === 'source') return { says: { message: 'continueNone', values: { address: c.address } }, act: null }
+  if (w.needsKey) return { says: { message: 'byNeedsKey', values: { name: w.name, provider: w.providerName, command: `api:${w.provider}` } }, act: null }
+  if (w.unchecked) return { says: { message: 'helperUnchecked', values: { name: w.name, command: `api:${w.provider}` } }, act: null }
+  if (w.later || w.gone) return { says: { message: 'againNoOne', values: { name: w.name, address: c.address } }, act: null }
+  const values = { address: c.address, name: w.name }
+  let says
+  if (w.group === 'local') says = { message: 'continueLocal', values }
+  else {
+    const tokens = Math.ceil((c.cut.before + (c.systemChars ?? 0)) / CHARS_PER_TOKEN)
+    const cost = inputCost(tokens, w.price?.inputPerMillion)
+    says = cost == null ? { message: 'continueUnpriced', values: { ...values, tokens } }
+      : cost < CENT ? { message: 'continueCheap', values: { ...values, tokens, cost: CENT } }
+        : { message: 'continueGo', values: { ...values, tokens, cost } }
+  }
+  return { says, act: { kind: 'continue', chatId: c.room, messageId: c.cut.id, model: w.id, name: w.name } }
+}
+
+/**
  * to: (C174). screens.branching: { shown, held }: the slider on screen
  * (branchView.lastShown(): its group, chats, line and members, each
  * { chatId, letter, address, name }) and what to: holds now.

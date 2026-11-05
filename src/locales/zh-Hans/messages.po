@@ -1000,6 +1000,16 @@ msgstr "撤销"
 msgid "chat.close"
 msgstr "关闭"
 
+#. A button under a reply that was cut off; it writes continue: into the bar
+#. js-lingui-explicit-id
+msgid "chat.continueReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "chat.continueWrites"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.cutError"
 msgstr "中途因出错而中断。已收到的内容会保留。"
@@ -2652,6 +2662,40 @@ msgstr "compare: 需要两项，例如 compare:218 231 或 compare:201a 201b"
 msgid "enter.compareWordsOnly"
 msgstr "只比较词语，不比较含义。在命令末尾加上 meaning，可请模型说明两者含义上的不同"
 
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueCheap"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGo"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGoing"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.continueNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.continueNoRoom"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueUnpriced"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.copied"
 msgstr "已将 {num} 复制为 Markdown"
@@ -3218,6 +3262,10 @@ msgstr "输入新内容会替换它。按 Escape 清除"
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "按 Enter 显示所有命令"
+
+#. js-lingui-explicit-id
+msgid "enter.helpAll"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4862,6 +4910,11 @@ msgstr "按 Enter 将以“{opening}”开头的{part, select, prompt {提示词
 #. js-lingui-explicit-id
 msgid "enter.quoteNeverSent"
 msgstr "摘录是给人看的，绝不会被发送"
+
+#. Said under the field after a click ran a command that undo: cannot take back. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.ranOnly"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -6537,6 +6590,10 @@ msgstr "合集"
 msgid "group.editing"
 msgstr "编辑"
 
+#. js-lingui-explicit-id
+msgid "group.everyday"
+msgstr ""
+
 #. Several filters can share one line
 #. js-lingui-explicit-id
 msgid "group.filters"
@@ -7118,6 +7175,10 @@ msgstr "两侧各一栏，对话居中。适合需要同时看到很多内容的
 #. js-lingui-explicit-id
 msgid "leader.command"
 msgstr "输入命令。> 会保留在输入栏中"
+
+#. js-lingui-explicit-id
+msgid "leader.escape"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "leader.help"
@@ -9244,10 +9305,25 @@ msgstr "按 Escape 关闭"
 msgid "shell.referenceFainter"
 msgstr "颜色较浅的命令作用于其他面板，面板名称写在旁边"
 
+#. The same row once every command is open; a click folds them back to the everyday ones
+#. js-lingui-explicit-id
+msgid "shell.referenceFewer"
+msgstr ""
+
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
 msgid "shell.referenceKeys"
 msgstr "点击会把命令写入输入栏，按 Enter 即可执行。{example} 可列出一个命令的各种写法。"
+
+#. A row under the everyday commands of the ? reference; a click opens every other command
+#. js-lingui-explicit-id
+msgid "shell.referenceMore"
+msgstr ""
+
+#. {all} is ?all, which stays English
+#. js-lingui-explicit-id
+msgid "shell.referenceMoreCount"
+msgstr ""
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -9519,6 +9595,10 @@ msgstr "隐藏或显示表格的列"
 #. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "将两项并排对照，并标出不同的词：笔记、高亮、摘录，或两个分支各自的最后一条回复。不会向 AI 模型发送任何内容。在末尾加上 meaning，则会请模型说明两者含义上的不同"
+
+#. js-lingui-explicit-id
+msgid "verb.continue"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.copy"

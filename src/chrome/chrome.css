@@ -325,6 +325,11 @@
 .ch-shell .ch-ref .ch-ref-row.away:hover, .ch-ref-row.away:hover .ch-code { color: var(--ch-ink); }
 .ch-ref-row .on { color: var(--ch-marg); }
 .ch-ref-row .on .sep { margin: 0 5px; opacity: .6; }
+/* ? in two tiers (C291 (a)): Esc is a key, said and not clicked; "more"
+   and "fewer" are the one row that opens and folds the rest. */
+.ch-shell .ch-ref .ch-ref-row.ch-ref-key:hover { color: var(--ch-ink-2); background: none; }
+.ch-ref-row.ch-ref-more .ch-code { color: var(--ch-ink-2); }
+.ch-ref-first + .ch-ref-cols { margin-top: 6px; }
 .ch-ref-foot { margin: 4px 0 0; padding-top: 9px; border-top: .5px solid var(--ch-border-2); font: italic 400 var(--ch-t-marg)/1.5 var(--ch-serif); color: var(--ch-marg); }
 /* The command menu as a board (C280): the reference's columns in a card,
    which scrolls; no panel of its own round them. */

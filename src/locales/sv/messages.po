@@ -1000,6 +1000,16 @@ msgstr "ångra"
 msgid "chat.close"
 msgstr "Stäng"
 
+#. A button under a reply that was cut off; it writes continue: into the bar
+#. js-lingui-explicit-id
+msgid "chat.continueReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "chat.continueWrites"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.cutError"
 msgstr "Avbröts av ett fel halvvägs. Det som hann komma sparas."
@@ -2652,6 +2662,40 @@ msgstr "compare: tar två, som compare:218 231 eller compare:201a 201b"
 msgid "enter.compareWordsOnly"
 msgstr "Ord, inte innebörd. Skriv meaning sist för att fråga en modell hur de skiljer sig åt"
 
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueCheap"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGo"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGoing"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.continueNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.continueNoRoom"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueUnpriced"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.copied"
 msgstr "Kopierade {num} som Markdown"
@@ -3218,6 +3262,10 @@ msgstr "Det du skriver ersätter den. Escape rensar den"
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "Enter visar alla kommandon"
+
+#. js-lingui-explicit-id
+msgid "enter.helpAll"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4862,6 +4910,11 @@ msgstr "Enter sparar ett citat av {part, select, prompt {prompten} other {svaret
 #. js-lingui-explicit-id
 msgid "enter.quoteNeverSent"
 msgstr "Ett citat är till för människor och skickas aldrig"
+
+#. Said under the field after a click ran a command that undo: cannot take back. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.ranOnly"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -6537,6 +6590,10 @@ msgstr "Samlingen"
 msgid "group.editing"
 msgstr "Redigering"
 
+#. js-lingui-explicit-id
+msgid "group.everyday"
+msgstr ""
+
 #. Several filters can share one line
 #. js-lingui-explicit-id
 msgid "group.filters"
@@ -7118,6 +7175,10 @@ msgstr "Två sidopaneler med konversationen mellan dem. För arbete där mycket 
 #. js-lingui-explicit-id
 msgid "leader.command"
 msgstr "Skriv ett kommando. > står kvar i fältet"
+
+#. js-lingui-explicit-id
+msgid "leader.escape"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "leader.help"
@@ -9244,10 +9305,25 @@ msgstr "Escape stänger det här"
 msgid "shell.referenceFainter"
 msgstr "Ett blekare kommando fungerar i en annan tavla, som står bredvid"
 
+#. The same row once every command is open; a click folds them back to the everyday ones
+#. js-lingui-explicit-id
+msgid "shell.referenceFewer"
+msgstr ""
+
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
 msgid "shell.referenceKeys"
 msgstr "Ett klick skriver ett kommando i fältet, och Enter kör det. {example} visar formerna för ett kommando."
+
+#. A row under the everyday commands of the ? reference; a click opens every other command
+#. js-lingui-explicit-id
+msgid "shell.referenceMore"
+msgstr ""
+
+#. {all} is ?all, which stays English
+#. js-lingui-explicit-id
+msgid "shell.referenceMoreCount"
+msgstr ""
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -9519,6 +9595,10 @@ msgstr "Dölj eller visa kolumner i tabellen"
 #. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "Ställ två sida vid sida och markera orden som skiljer sig åt: anteckningar, markeringar, citat eller de senaste svaren i två grenar. Inget skickas till en AI-modell. Lägg till meaning för att fråga en modell hur de skiljer sig i innebörd"
+
+#. js-lingui-explicit-id
+msgid "verb.continue"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.copy"

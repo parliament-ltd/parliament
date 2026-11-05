@@ -1000,6 +1000,16 @@ msgstr ""
 msgid "chat.close"
 msgstr ""
 
+#. A button under a reply that was cut off; it writes continue: into the bar
+#. js-lingui-explicit-id
+msgid "chat.continueReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "chat.continueWrites"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.cutError"
 msgstr ""
@@ -2652,6 +2662,40 @@ msgstr ""
 msgid "enter.compareWordsOnly"
 msgstr ""
 
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueCheap"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGo"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGoing"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.continueNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.continueNoRoom"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueUnpriced"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.copied"
 msgstr ""
@@ -3217,6 +3261,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helpAll"
 msgstr ""
 
 #. Commands stay English
@@ -4861,6 +4909,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.quoteNeverSent"
+msgstr ""
+
+#. Said under the field after a click ran a command that undo: cannot take back. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.ranOnly"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6537,6 +6590,10 @@ msgstr ""
 msgid "group.editing"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "group.everyday"
+msgstr ""
+
 #. Several filters can share one line
 #. js-lingui-explicit-id
 msgid "group.filters"
@@ -7117,6 +7174,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "leader.command"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.escape"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9244,9 +9305,24 @@ msgstr ""
 msgid "shell.referenceFainter"
 msgstr ""
 
+#. The same row once every command is open; a click folds them back to the everyday ones
+#. js-lingui-explicit-id
+msgid "shell.referenceFewer"
+msgstr ""
+
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
 msgid "shell.referenceKeys"
+msgstr ""
+
+#. A row under the everyday commands of the ? reference; a click opens every other command
+#. js-lingui-explicit-id
+msgid "shell.referenceMore"
+msgstr ""
+
+#. {all} is ?all, which stays English
+#. js-lingui-explicit-id
+msgid "shell.referenceMoreCount"
 msgstr ""
 
 #. The name of the ? reference, read by screen readers
@@ -9518,6 +9594,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.continue"
 msgstr ""
 
 #. js-lingui-explicit-id

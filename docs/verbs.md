@@ -11,7 +11,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `>` | Type a command. The > stays in the field |
 | `p>`, `prompt>` | Write a prompt. Nothing is sent before Enter |
 | `s>`, `search>` | Search |
-| `?`, `help`, `?open` | Every command, or how one works |
+| `?`, `help`, `?open`, `?all` | The everyday commands, then every one, or how one works |
+| `Esc` | Back one mode, or closes what is open under the bar |
 
 ## Lines of several commands
 
@@ -168,6 +169,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 The bar knows these words and says they come later.
 
 - `resources:`: Open the guides and references, with every command in full
+- `continue:`: Carry a cut-off reply on from where it stopped, by the model that wrote it
 - `rewrite:234`: Write a new dated summary beside the old one
 
 ## In a later release

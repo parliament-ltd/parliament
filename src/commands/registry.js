@@ -10,7 +10,7 @@
 // registry never reaches the database, the providers or the keys. Until a
 // verb's action exists, its Enter line says it is not built yet.
 
-import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES } from './verbs'
+import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES, EVERYDAY } from './verbs'
 import { parseCommand, readField, shapedLikeKey } from './parse'
 import { offered } from '../lib/release'
 
@@ -152,6 +152,8 @@ export function enterLine(value, ctx = {}) {
 
   const { commands, help, loose } = parse(field.body)
   if (help) {
+    // ?all: every command at once, the everyday ones folded (C291 (a)).
+    if (help.topic === 'all') return { state: 'help', message: 'helpAll', values: { all: true } }
     if (help.topic && !BY_VERB.has(help.topic)) return { state: 'unknown', message: 'unknownHelp', values: { verb: `${help.topic}:` } }
     return help.topic
       ? { state: 'help', message: 'helpVerb', values: { verb: `${help.topic}:` } }
@@ -253,6 +255,17 @@ const shownOn = (on) => (on === 'everywhere' ? on : on.filter((b) => b !== 'lab'
  * every row is here.
  * @param {string|null} board
  */
+/**
+ * What ? shows first (C291 (a)): one group, the bar's leaders and Esc, then
+ * the everyday verbs, each as in its own group.
+ */
+export function everyday(board = null) {
+  const leaders = LEADERS.rows.filter((r) => EVERYDAY.leaders.includes(r.example)).map((r) => ({ ...r, on: 'everywhere', here: true }))
+  const verbs = EVERYDAY.verbs.map((verb) => BY_VERB.get(verb)).filter((v) => v && offered(v.verb))
+    .map((v) => ({ verb: v.verb, example: v.example, forms: v.forms ?? [v.example], gloss: v.gloss, spends: v.spends, on: shownOn(v.on), here: worksOn(v, board) }))
+  return { group: 'everyday', title: EVERYDAY.title, rows: [...leaders, ...verbs] }
+}
+
 export function reference(board = null) {
   const groups = GROUPS.map((group) => ({
     group: group.key,

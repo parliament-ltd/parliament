@@ -97,7 +97,7 @@ function Card({ board, addressed, onAddress, title, aside, room, ripple, markup 
  *   named, so it is read again; alone: no other board shares the screen
  *   with it (C279 (b))
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, markup = null, systemFor = null, small = false, alone = false }) {
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, markup = null, systemFor = null, onWrite = null, small = false, alone = false }) {
   const { i18n } = useLingui()
   const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
@@ -161,7 +161,8 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   // systemFor: the chat's frameworks and reply language, for Continue (C251 (d)).
   // On a phone, every room draws its narrow form, a tablet's width included (C261 (f)).
   const form = roomForm({ width: bandWidth(band), alone, phone: phone || small })
-  const host = useMemo(() => ({ narrow: form === 'narrow', form, alone, systemFor }), [form, alone, systemFor])
+  // write: a command into the bar, for an act the bar runs (C291 (l): continue:).
+  const host = useMemo(() => ({ narrow: form === 'narrow', form, alone, systemFor, write: onWrite }), [form, alone, systemFor, onWrite])
   // What the room is called, for its header and the Enter line (C40, C90).
   const named = found.forId === chatId && found.mode ? roomName(found.mode) : null
   const namedKey = JSON.stringify(named)

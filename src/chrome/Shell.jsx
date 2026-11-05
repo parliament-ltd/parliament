@@ -608,7 +608,8 @@ export default function Shell() {
   const [roomRev, setRoomRev] = useState(0)
 
   // A stored form changed from outside its reply reaches the chat on screen (C220 (d)).
-  const { showStoredBlocks, tells, holdTell, tellsFor, moveTell } = useChat()
+  const { showStoredBlocks, tells, holdTell, tellsFor, moveTell, continueMessage } = useChat()
+  const systemForNow = useRef(null) // systemFor, for continue: (C291 (l)), set where it is defined
 
   // ── The Almanac's rows (stage 5, piece 3) ─────────────
   // Everything numbered, read once the database is open and again whenever
@@ -1396,6 +1397,13 @@ export default function Shell() {
       updateWelcome((w) => tick(w, 'compare'))
       remember(body)
       return null
+    }
+    if (what.kind === 'continue') {
+      // continue: (C291 (l)): the cut-off reply carried on by the model that
+      // wrote it, as the line named before Enter; it streams into the chat.
+      remember(body)
+      continueMessage(what.messageId, what.model, systemForNow.current?.(what.chatId) ?? '', what.chatId).catch(() => {})
+      return { done: true, says: { message: 'continueGoing', values: { name: what.name } } }
     }
     if (what.kind === 'compareReplies' || what.kind === 'compareMeaning') {
       // compare:201a 201b (C289): each one's last reply, as it reads now,
@@ -3257,6 +3265,24 @@ export default function Shell() {
       }
     },
   }), [roomId, almanacRows, chatRowsById, conversations, branchShown, roomPrompt, roomSteps, keys, settings.defaultModel])
+  // continue: (C291 (l)): the room's last cut-off reply, what goes to carry
+  // it on, and the model that wrote it (its own, not Settings' default).
+  const continuing = useMemo(() => {
+    if (!roomId) return { room: roomId }
+    const row = chatRowsById.get(roomId)
+    const address = row ? (row.docketNum != null && row.branch ? `${row.docketNum}${row.branch}` : String(row.num)) : ''
+    const at = shown.findLastIndex((m) => m?.role === 'assistant' && m.incomplete && !m.source)
+    const cut = at >= 0 ? shown[at] : null
+    const chat = conversations.find((c) => c.id === roomId)
+    const before = cut ? shown.slice(0, at + 1).reduce((n, m) => n + (typeof m.content === 'string' && !m.source ? m.content.length : 0), 0) : 0
+    return {
+      room: roomId,
+      address,
+      streaming: replyArriving(roomId),
+      cut: cut ? { id: cut.id, before } : null,
+      answerer: cut ? answererOf({ chosen: cut.model ?? chat?.answerer ?? null, keyed: keys, defaultModel: settings.defaultModel }) : null,
+    }
+  }, [roomId, chatRowsById, shown, conversations, keys, settings.defaultModel])
   // ── Settings as a board (stage 9, piece 1; C181) ──────
   // What its sections show: the settings now, the providers and their keys,
   // the models with their marks, this month's spending from Records, the
@@ -3351,7 +3377,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3555,6 +3581,7 @@ export default function Shell() {
     const ids = frameworksOf(conv?.frameworks ?? [], fwListNow.current).map((fw) => fw.id)
     return withReplyLanguage(instructionsOf(ids, fwListNow.current), replyNow.current?.tag ?? null)
   }, [])
+  systemForNow.current = systemFor
   // A chat started by trying a room carries the tag tried, as one of your
   // own tags, so a model's tagging keeps it (C244 (c)).
   const tagTried = useCallback((id) => changeRecords(db.current, [{ store: 'conversations', id, set: { tags: [TRIED_TAG], tagsMine: [TRIED_TAG] }, expect: { tags: [], tagsMine: [] } }]), [])
@@ -3951,26 +3978,36 @@ export default function Shell() {
   useEffect(() => { screensNow.current = screens }, [screens])
   // A control on Settings runs its set: line, as if typed and entered: the
   // same change, said the same way, and the same undo: (C181).
+  // A click that ran a line says so under the field, as the strip's calm:
+  // does (C181 (b); C291 (j)): what ran, and undo: when it can take it back.
+  const sayRan = useCallback((line, out) => {
+    if (out && !out.done) { setBarSaid({ says: typeof out === 'string' ? { message: out } : out }); return }
+    const undoable = undoStack.current.at(-1)?.line === line
+    setBarSaid({ says: { message: undoable ? 'roomRan' : 'ranOnly', values: { command: line } } })
+  }, [])
   const runSetting = useCallback(async (line) => {
     if (current.current.addressed !== 'settings') commit(address(current.current, 'settings'))
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
-    if (p.act) await onRun(p.next ?? null, line, null, p.act)
-  }, [onRun, commit])
+    if (p.act) sayRan(line, await onRun(p.next ?? null, line, null, p.act))
+  }, [onRun, commit, sayRan])
   // A line run as if typed and entered, wherever the bar points: the
   // globe's language: and the picker's choices (C184).
-  const runCommand = useCallback(async (line) => {
+  // say: a person's click, which says what ran (C291 (j)); an address
+  // opening a board does not.
+  const runCommand = useCallback(async (line, { say = false } = {}) => {
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     // An act, or a change to the space (open:settings), as Enter would run it.
-    if (p.act || p.next) await onRun(p.next ?? null, line, null, p.act ?? null)
-  }, [onRun])
+    if (!p.act && !p.next) return
+    const out = await onRun(p.next ?? null, line, null, p.act ?? null)
+    if (say) sayRan(line, out)
+  }, [onRun, sayRan])
   // A click that runs a line at once, as focus: on the strip (C253): what it
   // did, or why not, said under the field.
   const runClicked = useCallback(async (line) => {
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act && !p.next) { setBarSaid({ says: p.says ?? null }); return }
-    await onRun(p.next ?? null, line, null, p.act ?? null)
-    setBarSaid({ says: { message: 'roomRan', values: { command: line } } })
-  }, [onRun])
+    sayRan(line, await onRun(p.next ?? null, line, null, p.act ?? null))
+  }, [onRun, sayRan])
   // An address that asks for a board (/settings, the old page's; R37; C186)
   // opens it once the space is loaded, and the address goes back to /.
   const location = useLocation()
@@ -4008,8 +4045,11 @@ export default function Shell() {
     if (row.later) return
     if (stepPickNow.current || row.needsKey || row.unchecked) return pickAnswererNow.current?.(row)
     setPicking(false)
-    await onPlanDelete(`by:"${row.id}"`)
-  }, [onPlanDelete])
+    const line = `by:"${row.id}"`
+    const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (!p.act) { setBarSaid({ says: p.says ?? null }); return }
+    sayRan(line, await onRun(p.next ?? null, line, null, p.act))
+  }, [onRun, sayRan])
   const pickAnswererNow = useRef(null)
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
@@ -4035,8 +4075,8 @@ export default function Shell() {
     const body = next.length === 1 ? `by:${next[0]}` : `by:${next.map((x) => `"${String(nameOf(x)).replace(/"/g, '')}"`).join(joint)}`
     const p = preview(`>${body}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act) { if (next.length === 1) setPicking(false); return }
-    await onRun(p.next ?? null, body, null, p.act)
-  }, [onRun, writeField])
+    sayRan(body, await onRun(p.next ?? null, body, null, p.act))
+  }, [onRun, writeField, sayRan])
   useEffect(() => { pickAnswererNow.current = pickAnswerer }, [pickAnswerer])
   const toggleFramework = useCallback(async (id) => {
     const fw = frameworkScreens
@@ -4048,8 +4088,8 @@ export default function Shell() {
     const line = ids.length ? `>framework:${ids.map(word).join(', ')}` : '>framework:off'
     const p = preview(line, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act) return
-    await onRun(p.next ?? null, line.slice(1), null, p.act)
-  }, [frameworkScreens, onRun])
+    sayRan(line.slice(1), await onRun(p.next ?? null, line.slice(1), null, p.act))
+  }, [frameworkScreens, onRun, sayRan])
   const frameworkItems = useMemo(() => fwList.map((fw) => ({
     id: fw.id,
     builtIn: fw.builtIn,
@@ -4221,7 +4261,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} alone={windowed || onlyBoard} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} onWrite={writeField} alone={windowed || onlyBoard} />
     }
     if (board === 'almanac') {
       return (
@@ -4357,7 +4397,7 @@ export default function Shell() {
             : picking && stepPick ? { rows: answerRows, now: stepPick.model ? stepWho : null, picked: null, reference: referenceName, forStep: { ...stepPick, branchName: stepBranchWho?.name ?? null } }
             : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onSwitchAnswerer={switchAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
-          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
+          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`, { say: true })} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

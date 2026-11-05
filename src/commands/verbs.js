@@ -76,8 +76,20 @@ export const LEADERS = Object.freeze({
     { example: '>', gloss: /*i18n*/ { id: 'leader.command', message: 'Type a command. The > stays in the field' } },
     { example: 'p>', forms: ['p>', 'prompt>'], gloss: /*i18n*/ { id: 'leader.prompt', message: 'Write a prompt. Nothing is sent before Enter' } },
     { example: 's>', forms: ['s>', 'search>'], gloss: /*i18n*/ { id: 'leader.search', message: 'Search' } },
-    { example: '?', forms: ['?', 'help', '?open'], gloss: /*i18n*/ { id: 'leader.help', message: 'Every command, or how one works' } },
+    { example: '?', forms: ['?', 'help', '?open', '?all'], gloss: /*i18n*/ { id: 'leader.help', message: 'The everyday commands, then every one, or how one works' } },
+    // Escape, said once here rather than at the foot of every panel (C291 (b)). A key, not a command: a click writes nothing.
+    { example: 'Esc', key: true, gloss: /*i18n*/ { id: 'leader.escape', message: 'Back one mode, or closes what is open under the bar' } },
   ],
+})
+
+// What ? shows first (C291 (a)): the bar's leaders, Esc, and the verbs a
+// person uses most days. The welcome page's nine steps are all among them or
+// are keys, so what the page taught is what ? shows first. The rest are one
+// row away, under "more", every command in its group as C279 (f) has it.
+export const EVERYDAY = Object.freeze({
+  title: /*i18n*/ { id: 'group.everyday', message: 'Everyday' },
+  leaders: ['>', 'p>', '?', 'Esc'],
+  verbs: ['records', 'settings', 'open', 'close', 'new', 'name', 'by', 'api', 'note', 'delete', 'undo', 'pop', 'bar', 'backup'],
 })
 
 // Lines of several commands to copy, in the command menu after the bar's
@@ -152,6 +164,9 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.stop', message: 'Halt a run, or every run in every window' } }),
   v({ verb: 'diff', group: 'run', example: 'diff:', forms: ['diff:', 'diff:1', 'diff:off'], takes: [[], [['off']], ['number']], on: ['docket'], stage: 10, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.diff', message: 'Set two runs of a plan side by side, and mark what differs' } }),
+  // continue: (C291 (l)): what a cut-off reply's Continue writes; Enter names the model and the cost first.
+  v({ verb: 'continue', group: 'run', example: 'continue:', takes: [[]], stage: 15, spends: true, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.continue', message: 'Carry a cut-off reply on from where it stopped, by the model that wrote it' } }),
   v({ verb: 'again', group: 'run', example: 'again:201a', takes: [[], ['address']], stage: 8, spends: true,
     gloss: /*i18n*/ { id: 'verb.again', message: 'Ask again from the edited prompt, as a new branch' } }),
 

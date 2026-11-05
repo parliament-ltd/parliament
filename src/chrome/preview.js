@@ -33,7 +33,7 @@ import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
-import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
+import { planTo, planAgain, planContinue, planNewBranch } from '../lib/branchVerbs'
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
 import { planReflect, reflectTalkPreview } from '../lib/reflection'
@@ -1161,6 +1161,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       to: (a1, s1, sc) => planTo(s1, sc),
       include: (a1, s1, sc) => planInclude(s1, sc),
       again: (a1, s1, sc) => planAgain(s1, sc),
+      continue: (a1, s1, sc) => planContinue(s1, sc),
       // set: on Settings (stage 9; C181), and a block's in the Lab (C240).
       set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : building(a1) ? planSetBlock(s1, sc) : null),
       // hold: and hold:off for a plan's branches (stage 10, piece 2; C198).

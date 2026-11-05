@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { setupI18n } from '@lingui/core'
-import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES, BOARD_NAMES } from './verbs'
-import { lookup, parse, matchForm, verbEntry, nearest, enterLine, complete, reference } from './registry'
+import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES, BOARD_NAMES, EVERYDAY } from './verbs'
+import { lookup, parse, matchForm, verbEntry, nearest, enterLine, complete, reference, everyday } from './registry'
 import { COPY } from '../copy'
 import { boardFor } from '../shell/boards'
 import { offered, LAB_VERBS } from '../lib/release'
@@ -46,7 +46,7 @@ describe('the verb list', () => {
 
   it('marks every verb that sends something, so its Enter line names who and what it costs', () => {
     const spends = VERBS.filter((v) => v.spends).map((v) => v.verb).sort()
-    expect(spends).toEqual(['again', 'reflect', 'rewrite', 'ripple', 'run', 'summarize', 'sweep', 'translate'])
+    expect(spends).toEqual(['again', 'continue', 'reflect', 'rewrite', 'ripple', 'run', 'summarize', 'sweep', 'translate'])
     // Nothing that sends is applied on a click: it waits for Enter.
     for (const v of VERBS.filter((x) => x.spends)) expect(v.click, v.verb).toBe('fill')
   })
@@ -207,6 +207,7 @@ describe('the Enter line', () => {
   it('answers ? and help', () => {
     expect(line('>?')).toMatchObject({ state: 'help', message: 'help' })
     expect(line('>?bar')).toMatchObject({ state: 'help', message: 'helpVerb', values: { verb: 'bar:' } })
+    expect(line('>?all')).toMatchObject({ state: 'help', message: 'helpAll', values: { all: true } })
     expect(line('>help:frob')).toMatchObject({ state: 'unknown', message: 'unknownHelp' })
   })
 
@@ -298,5 +299,18 @@ describe('lines of several commands in the menu (C286 (g))', () => {
   it('come right after the bar\'s leaders', () => {
     const groups = reference()
     expect(groups.map((g) => g.group).slice(0, 2)).toEqual(['leaders', 'lines'])
+  })
+})
+
+describe('? in two tiers (C291 (a))', () => {
+  it('shows Everyday first: the bar\'s leaders, Esc as a key, and the fourteen verbs, all built', () => {
+    const g = everyday('almanac')
+    expect(g.group).toBe('everyday')
+    expect(g.rows.map((r) => r.verb ?? r.example)).toEqual([...EVERYDAY.leaders, ...EVERYDAY.verbs])
+    expect(g.rows.find((r) => r.example === 'Esc').key).toBe(true)
+    for (const v of EVERYDAY.verbs) expect(VERBS.find((x) => x.verb === v), v).toBeDefined()
+  })
+  it('covers what the welcome page teaches, so ? shows it first', () => {
+    for (const v of ['records', 'bar', 'name', 'pop', 'api']) expect(EVERYDAY.verbs).toContain(v)
   })
 })

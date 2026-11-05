@@ -1000,6 +1000,16 @@ msgstr "undo"
 msgid "chat.close"
 msgstr "Close"
 
+#. A button under a reply that was cut off; it writes continue: into the bar
+#. js-lingui-explicit-id
+msgid "chat.continueReply"
+msgstr "Continue"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "chat.continueWrites"
+msgstr "Writes continue: in the bar, where Enter names the model and the cost first"
+
 #. js-lingui-explicit-id
 msgid "chat.cutError"
 msgstr "Cut off by an error part way through. What arrived is kept."
@@ -2652,6 +2662,40 @@ msgstr "compare: takes two, like compare:218 231 or compare:201a 201b"
 msgid "enter.compareWordsOnly"
 msgstr "Words, not meaning. Add meaning at the end to ask a model how they differ"
 
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueCheap"
+msgstr "Enter asks {name} to carry on the cut-off reply in {address} from where it stopped: about {tokens, number} tokens, under {cost} to send"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGo"
+msgstr "Enter asks {name} to carry on the cut-off reply in {address} from where it stopped: about {tokens, number} tokens, {cost} to send"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueGoing"
+msgstr "{name} is carrying on the reply"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueLocal"
+msgstr "Enter asks {name} on this computer to carry on the cut-off reply in {address}. Nothing leaves it"
+
+#. js-lingui-explicit-id
+msgid "enter.continueNone"
+msgstr "Nothing in {address} was cut off"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.continueNoRoom"
+msgstr "continue: carries on a cut-off reply in the room on screen"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "enter.continueUnpriced"
+msgstr "Enter asks {name} to carry on the cut-off reply in {address} from where it stopped: about {tokens, number} tokens"
+
 #. js-lingui-explicit-id
 msgid "enter.copied"
 msgstr "Copied {num} as Markdown"
@@ -3217,6 +3261,10 @@ msgstr "Typing replaces it. Escape clears it"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
+msgstr "Enter shows the everyday commands, and every other one under more"
+
+#. js-lingui-explicit-id
+msgid "enter.helpAll"
 msgstr "Enter shows every command"
 
 #. Commands stay English
@@ -4862,6 +4910,11 @@ msgstr "Enter keeps a quote of the {part, select, prompt {prompt} other {reply}}
 #. js-lingui-explicit-id
 msgid "enter.quoteNeverSent"
 msgstr "A quote is for people and is never sent"
+
+#. Said under the field after a click ran a command that undo: cannot take back. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.ranOnly"
+msgstr "Ran {command}"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -6537,6 +6590,10 @@ msgstr "Collection"
 msgid "group.editing"
 msgstr "Editing"
 
+#. js-lingui-explicit-id
+msgid "group.everyday"
+msgstr "Everyday"
+
 #. Several filters can share one line
 #. js-lingui-explicit-id
 msgid "group.filters"
@@ -7120,8 +7177,12 @@ msgid "leader.command"
 msgstr "Type a command. The > stays in the field"
 
 #. js-lingui-explicit-id
+msgid "leader.escape"
+msgstr "Back one mode, or closes what is open under the bar"
+
+#. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "Every command, or how one works"
+msgstr "The everyday commands, then every one, or how one works"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -9244,10 +9305,25 @@ msgstr "Escape closes this"
 msgid "shell.referenceFainter"
 msgstr "A fainter command works on another board, named beside it"
 
+#. The same row once every command is open; a click folds them back to the everyday ones
+#. js-lingui-explicit-id
+msgid "shell.referenceFewer"
+msgstr "fewer ▴"
+
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
 msgid "shell.referenceKeys"
-msgstr "A click writes a command into the field, and Enter runs it. {example} shows the forms of one command."
+msgstr "A click writes the command into the field, and Enter runs it. {example} shows one command’s forms."
+
+#. A row under the everyday commands of the ? reference; a click opens every other command
+#. js-lingui-explicit-id
+msgid "shell.referenceMore"
+msgstr "more ▾"
+
+#. {all} is ?all, which stays English
+#. js-lingui-explicit-id
+msgid "shell.referenceMoreCount"
+msgstr "{count, plural, one {# more} other {# more}}, in {groups, plural, one {# group} other {# groups}}. {all} shows them at once"
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -9519,6 +9595,10 @@ msgstr "Hide or show columns of the table"
 #. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "Set two side by side and mark the words that differ: notes, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ"
+
+#. js-lingui-explicit-id
+msgid "verb.continue"
+msgstr "Carry a cut-off reply on from where it stopped, by the model that wrote it"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
