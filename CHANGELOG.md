@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.12.0, 4 November 2026
+
+- compare:201a 201b sets the last replies of two branches side by side and marks the words that differ. Nothing is sent to an AI model.
+- compare: compares words, not meaning, and says so. Add meaning at the end, compare:201a 201b meaning, to ask a model how they differ in meaning: one call, its model and cost named before you press Enter.
+- When two texts share few words, compare: says the marks tell you little, and offers to ask about meaning.
+- Japanese and Chinese are compared word by word, split by your browser's own dictionary.
+- The welcome page's advanced steps open from Advanced, right under the steps, and number on from them.
+
 ## 0.11.0, 2 November 2026
 
 - Any key you add answers: a chat with no model of its own goes to the first provider you have a key for, and to Wikipedia only with no key at all.
