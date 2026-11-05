@@ -36,6 +36,31 @@ function covers(origin, host) {
  * @returns {Array<{ host: string, id: string|null, name: string|null, self: boolean, count: number, failed: number,
  *   last: number, labels: Array<{ label: string, count: number }> }>} the busiest host first
  */
+// The labels the gateway records (code's own words, some naming a
+// provider), as a few kinds the copy table words (C291 (m)).
+const KIND_OF = {
+  'prompt': 'prompt', 'chat send': 'prompt', 'chat send without streaming': 'prompt', sendMessage: 'prompt',
+  'continue': 'continue',
+  'title, summary and tags': 'title', 'regenerate title, summary and tags': 'title', generateMetadata: 'title',
+  'translate question': 'translation', 'translate answer': 'translation',
+  'summary': 'summary', 'branch summary': 'summary',
+  'ripple': 'ripple', 'ripple scan': 'ripple', 'sweep': 'sweep',
+  'reflect': 'reflection', 'reflect talk': 'reflection', 'review synthesis': 'reflection',
+  'check key': 'keyCheck', validateKey: 'keyCheck', 'check text': 'textCheck', 'find names': 'nameCheck', 'check Ollama': 'localCheck',
+  'compare meaning': 'compareMeaning', answer: 'answer', search: 'answer',
+}
+export const REQUEST_KINDS = Object.freeze([...new Set([...Object.values(KIND_OF), 'other'])])
+
+/** A host's labels as kinds, counts merged, the most first. */
+export function kindsOf(labels = []) {
+  const counts = new Map()
+  for (const { label, count } of labels) {
+    const kind = KIND_OF[label] ?? 'other'
+    counts.set(kind, (counts.get(kind) ?? 0) + count)
+  }
+  return [...counts].map(([kind, count]) => ({ kind, count })).sort((a, b) => b.count - a.count)
+}
+
 export function requestsByHost({ entries = [], requests = [], destinations, self = null }) {
   const owner = (host) => destinations.find((d) => d.origins.some((o) => covers(o, host))) ?? null
   const groups = new Map()

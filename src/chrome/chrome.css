@@ -46,6 +46,13 @@
 .ch-shell .ch-sfocus button { padding: 0; font: inherit; color: inherit; }
 .ch-shell .ch-sfocus button:hover, .ch-shell .ch-sfocus button.on { color: var(--ch-ink); }
 .ch-shell .ch-sfocus button.car { font-style: normal; font-size: 9px; }
+/* focus as one control (C291 (n)): the word and its caret share one hairline and one hover. */
+.ch-sfocus-one { display: inline-flex; align-items: baseline; gap: 4px; padding: 0 5px; border: 1px solid var(--ch-divider); border-radius: 999px; }
+.ch-shell .ch-sfocus-one:hover button, .ch-shell .ch-sfocus-one.on button { color: var(--ch-ink); }
+/* A Settings switch says its state beside it (C291 (n)). */
+.ch-shell .ch-swc { display: inline-flex; align-items: center; gap: 6px; padding: 0; font: 400 var(--ch-t-marg) var(--ch-sans); color: var(--ch-ink-3); }
+.ch-shell .ch-swc.on { color: var(--ch-ink); }
+.ch-sw-word { min-width: 2.2em; text-align: start; }
 .ch-fpick { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
 .ch-fpick .k { color: var(--ch-ink-3); }
 .ch-fpick .n { display: inline-block; min-width: 12px; margin-inline-end: 3px; font: 600 10.5px var(--ch-sans); font-style: normal; color: var(--ch-ink); }
@@ -840,6 +847,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell .ch-settings .ch-sw { position: relative; width: 30px; height: 17px; border-radius: 9px; border: 1px solid var(--ch-soft) !important; background: transparent; flex-shrink: 0; }
 .ch-shell .ch-settings .ch-sw::after { content: ""; position: absolute; top: 2px; inset-inline-start: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--ch-soft); transition: transform .16s ease, background .16s; }
 .ch-shell .ch-settings .ch-sw.on { background: var(--ch-ink); border-color: var(--ch-ink) !important; }
+.ch-shell .ch-settings span.ch-sw { display: inline-block; }
 .ch-shell .ch-settings .ch-sw.on::after { transform: translateX(13px); background: var(--ch-surface); }
 [dir="rtl"] .ch-shell .ch-settings .ch-sw.on::after { transform: translateX(-13px); }
 @media (prefers-reduced-motion: reduce) { .ch-sw::after { transition: none; } }
@@ -877,6 +885,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-netrow + .ch-netrow { border-top: .5px solid var(--ch-border-2); }
 .ch-netrow .h { font: 500 11px var(--ch-mono); color: var(--ch-ink); overflow: hidden; text-overflow: ellipsis; }
 .ch-netrow .n { text-align: end; font-variant-numeric: tabular-nums; color: var(--ch-ink-2); }
+/* What the requests were, by kind (C291 (m)): a line of its own under the host. */
+.ch-netrow .k { grid-column: 1 / -1; font-size: 11px; }
 .ch-net-empty { display: block; margin-top: 6px; color: var(--ch-ink-3); }
 @container (max-width: 560px) { .ch-set { grid-template-columns: minmax(0, 1fr); } .ch-set-rail { display: none; } }
 /* A narrow card puts each control under its words, and long choices wrap

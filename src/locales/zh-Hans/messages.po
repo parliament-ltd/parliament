@@ -164,9 +164,10 @@ msgstr "房间"
 msgid "backup.catRoomsAbout"
 msgstr "你搭建或修改过的房间"
 
+#. A button that closes the backup panel
 #. js-lingui-explicit-id
 msgid "backup.close"
-msgstr "按 Escape 返回输入栏"
+msgstr "返回输入栏"
 
 #. js-lingui-explicit-id
 msgid "backup.doMerge"
@@ -1003,12 +1004,12 @@ msgstr "关闭"
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
 msgid "chat.continueReply"
-msgstr ""
+msgstr "继续"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "chat.continueWrites"
-msgstr ""
+msgstr "在输入栏中写入 continue:，按 Enter 前会先说明模型和费用"
 
 #. js-lingui-explicit-id
 msgid "chat.cutError"
@@ -1584,10 +1585,6 @@ msgstr "清除"
 msgid "collection.selected"
 msgstr "已选 {count} 项"
 
-#. js-lingui-explicit-id
-msgid "collection.selectNone"
-msgstr "选择卡片后可对其操作，也可以对整个合集操作。"
-
 #. open: stays English
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
@@ -1716,12 +1713,12 @@ msgstr "颜色 ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "未向 AI 模型发送任何内容。按 Escape 关闭"
+msgstr "未向 AI 模型发送任何内容。"
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "compare.closeMeaning"
-msgstr "已向 {model} 发送一次，以得到上方的解读。按 Escape 关闭"
+msgstr "已向 {model} 发送一次，以得到上方的解读。"
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
@@ -1790,11 +1787,6 @@ msgstr "此浏览器无法识别这种语言的词语，因此按整句比较"
 #. js-lingui-explicit-id
 msgid "compare.wordsOnly"
 msgstr "只比较词语，不比较含义"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "compare.writes"
-msgstr "在输入栏中写入 {command}"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -2665,36 +2657,36 @@ msgstr "只比较词语，不比较含义。在命令末尾加上 meaning，可�
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueCheap"
-msgstr ""
+msgstr "按 Enter 让 {name} 从中断处接着写 {address} 中被截断的回复：约 {tokens, number} 个 token，发送费用不到 {cost}"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueGo"
-msgstr ""
+msgstr "按 Enter 让 {name} 从中断处接着写 {address} 中被截断的回复：约 {tokens, number} 个 token，发送费用 {cost}"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueGoing"
-msgstr ""
+msgstr "{name} 正在接着写回复"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueLocal"
-msgstr ""
+msgstr "按 Enter 让本机上的 {name} 接着写 {address} 中被截断的回复。内容不会离开本机"
 
 #. js-lingui-explicit-id
 msgid "enter.continueNone"
-msgstr ""
+msgstr "{address} 中没有被截断的回复"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.continueNoRoom"
-msgstr ""
+msgstr "continue: 可接着写屏幕上房间中被截断的回复"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueUnpriced"
-msgstr ""
+msgstr "按 Enter 让 {name} 从中断处接着写 {address} 中被截断的回复：约 {tokens, number} 个 token"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -3261,11 +3253,11 @@ msgstr "输入新内容会替换它。按 Escape 清除"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "按 Enter 显示所有命令"
+msgstr "按 Enter 显示常用命令，其余命令都在“更多”下"
 
 #. js-lingui-explicit-id
 msgid "enter.helpAll"
-msgstr ""
+msgstr "按 Enter 显示所有命令"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3315,6 +3307,10 @@ msgstr "{name} 在本机上，但打开此页面后还没有检测过。{command
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
 msgstr "按 Enter 查看 {verb} 的用法"
+
+#. js-lingui-explicit-id
+msgid "enter.highlightKept"
+msgstr "已保存高亮 {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditAlready"
@@ -4914,7 +4910,7 @@ msgstr "摘录是给人看的，绝不会被发送"
 #. Said under the field after a click ran a command that undo: cannot take back. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.ranOnly"
-msgstr ""
+msgstr "已执行 {command}"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -4999,6 +4995,11 @@ msgstr "所用框架：{names}"
 #. js-lingui-explicit-id
 msgid "enter.renamed"
 msgstr "这个动词现在是 {now}。按 Enter 将其写入"
+
+#. Commands stay English. Enter puts the new command in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamedForm"
+msgstr "{verb} 现在是 {now}。按 Enter 将其写入"
 
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
@@ -5708,6 +5709,10 @@ msgstr "已作为编辑 {num} 加上删除线。undo:{num} 可撤销"
 #. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr "按 Enter 在“{name}”中写一份 {nums} 的摘要，注明今天的日期：调用 {provider} 一次，最多 {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeAgain"
+msgstr "另写一份新摘要，注明今天的日期；之前写的那份会保留"
 
 #. js-lingui-explicit-id
 msgid "enter.summarizeCheap"
@@ -6554,11 +6559,6 @@ msgstr "内置"
 msgid "frameworkPicker.foot"
 msgstr "它们会按勾选顺序随此对话中的每条提示词发送，直到关闭。"
 
-#. The foot of the frameworks menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "frameworkPicker.keys"
-msgstr "点击某一行或在该行按 Enter，可将它加到末尾，或将它取消。"
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
@@ -6592,7 +6592,7 @@ msgstr "编辑"
 
 #. js-lingui-explicit-id
 msgid "group.everyday"
-msgstr ""
+msgstr "常用"
 
 #. Several filters can share one line
 #. js-lingui-explicit-id
@@ -6807,10 +6807,6 @@ msgid "inspect.active"
 msgstr "最后活跃：{ago}"
 
 #. js-lingui-explicit-id
-msgid "inspect.close"
-msgstr "按 Escape 关闭"
-
-#. js-lingui-explicit-id
 msgid "inspect.created"
 msgstr "创建于 {day}"
 
@@ -6826,11 +6822,12 @@ msgstr "{num} 详情"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.listFoot"
-msgstr "点击一项即在输入栏中写入对应的 jump:。按 Escape 关闭"
+msgstr "点击一项即在输入栏中写入对应的 jump:"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
-msgstr "open:{num} 可将它放到当前内容旁边。按 Escape 关闭"
+msgstr "open:{num} 可将它放到当前内容旁边"
 
 #. js-lingui-explicit-id
 msgid "keys.add"
@@ -6846,7 +6843,7 @@ msgstr "点击“保存”后，会先向 {provider} 发一个简短请求验证
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "点击“保存”后，会先向 {provider} 发一个简短请求验证密钥，然后由密钥库将它加密保存在此浏览器中。"
+msgstr "点击“保存”后，会先向 {provider} 发一个简短请求验证密钥。"
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6862,7 +6859,7 @@ msgstr "{provider} 密钥"
 
 #. js-lingui-explicit-id
 msgid "keys.foot"
-msgstr "按 Escape 返回输入栏。如果密钥泄露，请到对应的服务商处将其吊销，再在这里粘贴新密钥。"
+msgstr "如果密钥泄露，请到对应的服务商处将其吊销，再在这里粘贴新密钥。"
 
 #. js-lingui-explicit-id
 msgid "keys.heading"
@@ -6976,7 +6973,7 @@ msgstr "检查请求未能到达 {provider}。未保存任何内容。"
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "加密保存在此浏览器的密钥库中。每个密钥只会发给它自己的服务商。"
+msgstr "加密保存在密钥库中，每个密钥只会发给它自己的服务商。"
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -7115,11 +7112,6 @@ msgstr "回复和搜索跟随页面语言。reply: 可为回复单独设定语�
 msgid "languagePicker.globe"
 msgstr "语言：{language}"
 
-#. The foot of the languages menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "languagePicker.keys"
-msgstr "点击某一行或在该行按 Enter，即可将页面切换为该语言。"
-
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
 msgstr "语言"
@@ -7178,11 +7170,11 @@ msgstr "输入命令。> 会保留在输入栏中"
 
 #. js-lingui-explicit-id
 msgid "leader.escape"
-msgstr ""
+msgstr "返回上一种模式，或关闭输入栏下方已打开的内容"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "所有命令，或某条命令的用法"
+msgstr "常用命令，然后是全部命令，或某条命令的用法"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -7358,10 +7350,6 @@ msgstr "资源库中没有匹配项。试试更短的词，或清空输入栏。
 #. js-lingui-explicit-id
 msgid "library.onCanvas"
 msgstr "在画布上"
-
-#. js-lingui-explicit-id
-msgid "library.onScreen"
-msgstr "放在屏幕上，与房间并列"
 
 #. Marginalia on a board: writes open:<board> in the bar
 #. js-lingui-explicit-id
@@ -7735,6 +7723,81 @@ msgstr "提示词"
 msgid "mode.search"
 msgstr "搜索"
 
+#. A kind of request in the network log: a source asked
+#. js-lingui-explicit-id
+msgid "netKind.answer"
+msgstr "回答"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.compareMeaning"
+msgstr "比较含义"
+
+#. A kind of request in the network log: a cut-off reply carried on
+#. js-lingui-explicit-id
+msgid "netKind.continue"
+msgstr "续写"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.keyCheck"
+msgstr "密钥验证"
+
+#. A kind of request in the network log: listing the models on this computer
+#. js-lingui-explicit-id
+msgid "netKind.localCheck"
+msgstr "本机模型检测"
+
+#. A kind of request in the network log: the privacy filter finding names
+#. js-lingui-explicit-id
+msgid "netKind.nameCheck"
+msgstr "人名查找"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.other"
+msgstr "其他"
+
+#. A kind of request in the network log, before its count
+#. js-lingui-explicit-id
+msgid "netKind.prompt"
+msgstr "提示词"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.reflection"
+msgstr "反思"
+
+#. A kind of request in the network log; Ripple is a feature name
+#. js-lingui-explicit-id
+msgid "netKind.ripple"
+msgstr "涟漪"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.summary"
+msgstr "摘要"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.sweep"
+msgstr "扫查"
+
+#. A kind of request in the network log: whether text from a source tries to instruct a model
+#. js-lingui-explicit-id
+msgid "netKind.textCheck"
+msgstr "文本检查"
+
+#. A kind of request in the network log: a chat named after its first answer
+#. js-lingui-explicit-id
+msgid "netKind.title"
+msgstr "标题"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.translation"
+msgstr "翻译"
+
 #. js-lingui-explicit-id
 msgid "picker.about.fable"
 msgstr "这里最贵的模型。"
@@ -7829,15 +7892,10 @@ msgstr "留在本机"
 msgid "picker.keptUpTo30"
 msgstr "最多保存 30 天"
 
-#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. The foot of the menu of who answers. api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr "点击某个名称或按 Enter，从现在起只由它回答。点击它的复选框，或按住 Shift 点击，可把它加进来。需要密钥的行则会在输入栏中写入 api:。"
-
-#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "picker.keysStep"
-msgstr "点击某一行或在该行按 Enter，即可选它来回答这一步。"
+msgstr "点击名称，从现在起只由它回答；勾选它的复选框，可把它加到其他回答者旁边。需要密钥的行则改为写入 api:。"
 
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
@@ -8286,11 +8344,6 @@ msgstr "对话只延续一条。勾选其他的，也可以让它们各自在单
 msgid "replyPicker.held"
 msgstr "保持不变，直到你更改。要向新的来源发新提示词：by: 加上它们的名称。"
 
-#. The foot of the menu of where a reply goes, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "replyPicker.keys"
-msgstr "点击某一行或在该行按 Enter，即可勾选或取消勾选。"
-
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
 msgstr "对话从另一条延续。勾选后，这一条也会在它的标签页中延续。"
@@ -8336,6 +8389,10 @@ msgstr "左栏"
 #. js-lingui-explicit-id
 msgid "room.columnRight"
 msgstr "右栏"
+
+#. js-lingui-explicit-id
+msgid "room.editsKept"
+msgstr "{count, plural, other {编辑已保存 · # 处等待随你的下一条提示词发送}}"
 
 #. js-lingui-explicit-id
 msgid "room.empty"
@@ -8421,9 +8478,10 @@ msgstr "无法显示此房间。其中的对话原样保留。"
 msgid "room.unnamed"
 msgstr "未命名房间"
 
+#. A button that closes the map of screens
 #. js-lingui-explicit-id
 msgid "screensMap.back"
-msgstr "按 Escape 返回"
+msgstr "返回"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotBody"
@@ -8558,10 +8616,6 @@ msgstr "宽 {width}，此窗口"
 msgid "screensMap.window"
 msgstr "独立窗口"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutDesc"
-msgstr "隐私和网络日志"
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -8584,10 +8638,6 @@ msgstr "添加密钥后即可使用"
 #. js-lingui-explicit-id
 msgid "settings.apiFrom"
 msgstr "在任何地方都可用 {command} 打开它的密钥输入框"
-
-#. js-lingui-explicit-id
-msgid "settings.appearanceDesc"
-msgstr "文字大小"
 
 #. js-lingui-explicit-id
 msgid "settings.appearanceTitle"
@@ -8682,20 +8732,12 @@ msgid "settings.browserWorks"
 msgstr "可以正常使用。"
 
 #. js-lingui-explicit-id
-msgid "settings.contextDesc"
-msgstr "新对话如何开始"
-
-#. js-lingui-explicit-id
 msgid "settings.contextLede"
 msgstr "新对话如何开始，以及哪些内容会随提示词一起发送。"
 
 #. js-lingui-explicit-id
 msgid "settings.contextTitle"
 msgstr "上下文与默认设置"
-
-#. js-lingui-explicit-id
-msgid "settings.dataDesc"
-msgstr "此浏览器保存的内容"
 
 #. js-lingui-explicit-id
 msgid "settings.dataLede"
@@ -8747,7 +8789,7 @@ msgstr "仅在此标签页中保留。每次访问都要重新输入"
 
 #. js-lingui-explicit-id
 msgid "settings.keepingHelp"
-msgstr "密钥在保存前由此浏览器加密，每个密钥只会发给它所属的服务商。密钥绝不经过会保留历史记录的输入栏。"
+msgstr "加密保存在密钥库中，每个密钥只会发给它自己的服务商。"
 
 #. js-lingui-explicit-id
 msgid "settings.keepingLabel"
@@ -8784,10 +8826,6 @@ msgstr "密钥末尾为 {ending}，仅在此标签页中保留"
 #. js-lingui-explicit-id
 msgid "settings.keyNone"
 msgstr "需要密钥"
-
-#. js-lingui-explicit-id
-msgid "settings.keysDesc"
-msgstr "服务商、密钥和模型"
 
 #. js-lingui-explicit-id
 msgid "settings.keysLede"
@@ -8948,7 +8986,7 @@ msgstr "{count, plural, other {有 # 个对话的费用未知：其中有回复�
 
 #. js-lingui-explicit-id
 msgid "settings.networkHelp"
-msgstr "此页面加载以来发出的请求，按主机分组，并注明由谁发起。每个主机都应是你使用的服务商或来源；如果有一个不是，就说明出了问题。"
+msgstr "此标签页打开以来发出的请求，按主机分组，并注明每个请求的用途。每个主机都应是你使用的服务商或来源；如果有一个不是，就说明出了问题。"
 
 #. js-lingui-explicit-id
 msgid "settings.networkLabel"
@@ -9103,10 +9141,6 @@ msgid "settings.sourcesHelp"
 msgstr "无需密钥。来源收到一次搜索，返回它找到的内容，因此不花钱。"
 
 #. js-lingui-explicit-id
-msgid "settings.spendingDesc"
-msgstr "本月，以美元计"
-
-#. js-lingui-explicit-id
 msgid "settings.spendingLede"
 msgstr "倍数用于挑选模型；本分区以美元计，因为这是实际账单。"
 
@@ -9125,6 +9159,16 @@ msgstr "存储"
 #. js-lingui-explicit-id
 msgid "settings.storageUsed"
 msgstr "已使用 {used}，此浏览器允许的空间约为 {quota}。"
+
+#. Beside a switch in Settings that is off
+#. js-lingui-explicit-id
+msgid "settings.switchOff"
+msgstr "关闭"
+
+#. Beside a switch in Settings that is on
+#. js-lingui-explicit-id
+msgid "settings.switchOn"
+msgstr "开启"
 
 #. js-lingui-explicit-id
 msgid "settings.textCompact"
@@ -9168,7 +9212,7 @@ msgstr "新对话以开头的几个字命名，不发送请求。"
 
 #. js-lingui-explicit-id
 msgid "settings.titleOn"
-msgstr "对话收到首个回答后，会发一个小请求为它命名，发送前会先在输入栏下方说明。"
+msgstr "对话收到首个回答后，会发一个小请求为它命名。"
 
 #. js-lingui-explicit-id
 msgid "settings.translateLabel"
@@ -9296,10 +9340,6 @@ msgstr "全屏"
 msgid "shell.leaveFullScreen"
 msgstr "退出全屏"
 
-#. js-lingui-explicit-id
-msgid "shell.referenceClose"
-msgstr "按 Escape 关闭"
-
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
 msgid "shell.referenceFainter"
@@ -9308,7 +9348,7 @@ msgstr "颜色较浅的命令作用于其他面板，面板名称写在旁边"
 #. The same row once every command is open; a click folds them back to the everyday ones
 #. js-lingui-explicit-id
 msgid "shell.referenceFewer"
-msgstr ""
+msgstr "收起 ▴"
 
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
@@ -9318,12 +9358,12 @@ msgstr "点击会把命令写入输入栏，按 Enter 即可执行。{example} �
 #. A row under the everyday commands of the ? reference; a click opens every other command
 #. js-lingui-explicit-id
 msgid "shell.referenceMore"
-msgstr ""
+msgstr "更多 ▾"
 
 #. {all} is ?all, which stays English
 #. js-lingui-explicit-id
 msgid "shell.referenceMoreCount"
-msgstr ""
+msgstr "{count, plural, other {另有 # 条命令}}，{groups, plural, other {分属 # 个组}}。{all} 可一次全部显示"
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -9598,7 +9638,7 @@ msgstr "将两项并排对照，并标出不同的词：笔记、高亮、摘录
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
-msgstr ""
+msgstr "由原先写下回复的模型，从中断处接着写被截断的回复"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9801,10 +9841,6 @@ msgid "verb.retag"
 msgstr "在所有地方重命名一个标签"
 
 #. js-lingui-explicit-id
-msgid "verb.rewrite"
-msgstr "在旧摘要旁写一份注明日期的新摘要"
-
-#. js-lingui-explicit-id
 msgid "verb.ripple"
 msgstr "将编辑以建议的形式带到其他分支。每次检查都是一次模型调用"
 
@@ -9974,7 +10010,7 @@ msgstr "来到 Parliament"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepAsk"
-msgstr "再次询问浏览器"
+msgstr "请浏览器保留数据"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepAsking"
@@ -9987,7 +10023,7 @@ msgstr "在{board}中备份"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepNot"
-msgstr "此浏览器尚未同意长期保存你在这里创建的内容，因此可能会为节省空间而清除，或在每次关闭时清除。要保留这些内容，请在浏览器设置中允许本网站保存数据，并不时备份。"
+msgstr "此浏览器可能会清除你在这里创建的内容"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"

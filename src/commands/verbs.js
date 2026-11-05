@@ -226,8 +226,6 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.heading', message: 'Add a heading to a collection in your own order' } }),
   v({ verb: 'summarize', group: 'collection', example: 'summarize:207, 216', takes: [[], ['addresses']], on: TABLES, stage: 6, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.summarize', message: 'Write a dated summary of some cards as a note. One model call' } }),
-  v({ verb: 'rewrite', group: 'collection', example: 'rewrite:234', takes: [['address']], on: ['collection'], stage: 6, spends: true, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.rewrite', message: 'Write a new dated summary beside the old one' } }),
   v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection', 'forget:"Editor" framework', 'forget:"Review desk" arrangement'], takes: [['text'], ['text', ['search', 'collection', 'framework', 'arrangement']]], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.forget', message: 'Remove a saved search, collection, framework of yours or arrangement' } }),
 
@@ -441,7 +439,15 @@ export const RENAMED = Object.freeze({
 
 // Verbs that are gone, with what to use instead, or null. What to use is a
 // command, so it stays English.
+// Forms of one command that became another (C291 (o)): the whole command
+// is written anew, as a renamed verb's is. tour:off stays: it puts the steps
+// away and keeps the welcome page, where close:welcome closes the page.
+export const FORM_RENAMED = Object.freeze({
+  'close:tour': 'close:welcome',
+})
+
 export const RETIRED = Object.freeze({
+  rewrite: 'summarize:', // C291 (o): summarize: again writes a new dated summary beside the old one
   strain: null, // A5, C48
   invoke: null, // V2, out of scope
   analyze: null, // V2, out of scope

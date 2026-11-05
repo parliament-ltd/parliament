@@ -30,7 +30,7 @@ export default function ReplyPicker({ members, targets, line, onToggle, onAll, o
       aside={targets.chats.length < members.length && (
         <button type="button" className="ch-menu-aside" onMouseDown={(e) => e.preventDefault()} onClick={onAll}>{i18n._(COPY.replyPicker.all, { count: members.length })}</button>
       )}
-      foot={footOf(i18n._(said), i18n._(COPY.replyPicker.keys), i18n._(COPY.shell.referenceClose))}
+      foot={footOf(i18n._(said))}
       onClose={onClose}
     >
       <MenuColumns>

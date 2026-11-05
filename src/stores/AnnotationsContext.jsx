@@ -179,8 +179,8 @@ export function AnnotationsProvider({ children, conversationId = null }) {
       })
       setHighlights(prev => [...prev, rec])
       // The shell starts a collection with this chat when there is none yet
-      // (31 October; C283). An id only, never the words.
-      window.dispatchEvent(new CustomEvent('parliament-highlighted', { detail: { chatId: activeConversationId } }))
+      // (31 October; C283), and says it is kept, by its number (C291 (k)). An id and a number, never the words.
+      window.dispatchEvent(new CustomEvent('parliament-highlighted', { detail: { chatId: activeConversationId, num: Number.isInteger(rec?.num) ? rec.num : null } }))
     } catch { /* tolerate */ }
   }, [activeConversationId])
 

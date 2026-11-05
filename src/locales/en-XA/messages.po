@@ -164,6 +164,7 @@ msgstr ""
 msgid "backup.catRoomsAbout"
 msgstr ""
 
+#. A button that closes the backup panel
 #. js-lingui-explicit-id
 msgid "backup.close"
 msgstr ""
@@ -1584,10 +1585,6 @@ msgstr ""
 msgid "collection.selected"
 msgstr ""
 
-#. js-lingui-explicit-id
-msgid "collection.selectNone"
-msgstr ""
-
 #. open: stays English
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
@@ -1789,11 +1786,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "compare.wordsOnly"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "compare.writes"
 msgstr ""
 
 #. A message's attachments, by name only; {names} is a list
@@ -3314,6 +3306,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.highlightKept"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5000,6 +4996,11 @@ msgstr ""
 msgid "enter.renamed"
 msgstr ""
 
+#. Commands stay English. Enter puts the new command in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamedForm"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
 msgstr ""
@@ -5707,6 +5708,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeAgain"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6554,11 +6559,6 @@ msgstr ""
 msgid "frameworkPicker.foot"
 msgstr ""
 
-#. The foot of the frameworks menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "frameworkPicker.keys"
-msgstr ""
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
@@ -6807,10 +6807,6 @@ msgid "inspect.active"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "inspect.close"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "inspect.created"
 msgstr ""
 
@@ -6828,6 +6824,7 @@ msgstr ""
 msgid "inspect.listFoot"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
 msgstr ""
@@ -7115,11 +7112,6 @@ msgstr ""
 msgid "languagePicker.globe"
 msgstr ""
 
-#. The foot of the languages menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "languagePicker.keys"
-msgstr ""
-
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
 msgstr ""
@@ -7357,10 +7349,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "library.onCanvas"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "library.onScreen"
 msgstr ""
 
 #. Marginalia on a board: writes open:<board> in the bar
@@ -7735,6 +7723,81 @@ msgstr ""
 msgid "mode.search"
 msgstr ""
 
+#. A kind of request in the network log: a source asked
+#. js-lingui-explicit-id
+msgid "netKind.answer"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.compareMeaning"
+msgstr ""
+
+#. A kind of request in the network log: a cut-off reply carried on
+#. js-lingui-explicit-id
+msgid "netKind.continue"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.keyCheck"
+msgstr ""
+
+#. A kind of request in the network log: listing the models on this computer
+#. js-lingui-explicit-id
+msgid "netKind.localCheck"
+msgstr ""
+
+#. A kind of request in the network log: the privacy filter finding names
+#. js-lingui-explicit-id
+msgid "netKind.nameCheck"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.other"
+msgstr ""
+
+#. A kind of request in the network log, before its count
+#. js-lingui-explicit-id
+msgid "netKind.prompt"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.reflection"
+msgstr ""
+
+#. A kind of request in the network log; Ripple is a feature name
+#. js-lingui-explicit-id
+msgid "netKind.ripple"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.summary"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.sweep"
+msgstr ""
+
+#. A kind of request in the network log: whether text from a source tries to instruct a model
+#. js-lingui-explicit-id
+msgid "netKind.textCheck"
+msgstr ""
+
+#. A kind of request in the network log: a chat named after its first answer
+#. js-lingui-explicit-id
+msgid "netKind.title"
+msgstr ""
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.translation"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "picker.about.fable"
 msgstr ""
@@ -7829,14 +7892,9 @@ msgstr ""
 msgid "picker.keptUpTo30"
 msgstr ""
 
-#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. The foot of the menu of who answers. api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr ""
-
-#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "picker.keysStep"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8286,11 +8344,6 @@ msgstr ""
 msgid "replyPicker.held"
 msgstr ""
 
-#. The foot of the menu of where a reply goes, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "replyPicker.keys"
-msgstr ""
-
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
 msgstr ""
@@ -8335,6 +8388,10 @@ msgstr ""
 #. A room's right column, read aloud
 #. js-lingui-explicit-id
 msgid "room.columnRight"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.editsKept"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8421,6 +8478,7 @@ msgstr ""
 msgid "room.unnamed"
 msgstr ""
 
+#. A button that closes the map of screens
 #. js-lingui-explicit-id
 msgid "screensMap.back"
 msgstr ""
@@ -8558,10 +8616,6 @@ msgstr ""
 msgid "screensMap.window"
 msgstr ""
 
-#. js-lingui-explicit-id
-msgid "settings.aboutDesc"
-msgstr ""
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -8583,10 +8637,6 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "settings.apiFrom"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "settings.appearanceDesc"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8682,19 +8732,11 @@ msgid "settings.browserWorks"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "settings.contextDesc"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "settings.contextLede"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.contextTitle"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "settings.dataDesc"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8783,10 +8825,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.keyNone"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "settings.keysDesc"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9103,10 +9141,6 @@ msgid "settings.sourcesHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "settings.spendingDesc"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "settings.spendingLede"
 msgstr ""
 
@@ -9124,6 +9158,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.storageUsed"
+msgstr ""
+
+#. Beside a switch in Settings that is off
+#. js-lingui-explicit-id
+msgid "settings.switchOff"
+msgstr ""
+
+#. Beside a switch in Settings that is on
+#. js-lingui-explicit-id
+msgid "settings.switchOn"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9294,10 +9338,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "shell.referenceClose"
 msgstr ""
 
 #. Beside the heading of the ? reference
@@ -9798,10 +9838,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.retag"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "verb.rewrite"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -164,9 +164,10 @@ msgstr "Rooms"
 msgid "backup.catRoomsAbout"
 msgstr "Rooms you have built or changed"
 
+#. A button that closes the backup panel
 #. js-lingui-explicit-id
 msgid "backup.close"
-msgstr "Escape goes back to the bar"
+msgstr "Back to the bar"
 
 #. js-lingui-explicit-id
 msgid "backup.doMerge"
@@ -1584,10 +1585,6 @@ msgstr "clear"
 msgid "collection.selected"
 msgstr "{count} selected"
 
-#. js-lingui-explicit-id
-msgid "collection.selectNone"
-msgstr "Select cards to act on them, or act on the whole collection."
-
 #. open: stays English
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
@@ -1716,12 +1713,12 @@ msgstr "colours ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "Nothing was sent to an AI model. Escape closes this"
+msgstr "Nothing was sent to an AI model."
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "compare.closeMeaning"
-msgstr "Sent once to {model}, for the reading above. Escape closes this"
+msgstr "Sent once to {model}, for the reading above."
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
@@ -1790,11 +1787,6 @@ msgstr "This browser can't find words in this language, so whole sentences are c
 #. js-lingui-explicit-id
 msgid "compare.wordsOnly"
 msgstr "Words compared, not meaning"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "compare.writes"
-msgstr "Writes {command} in the bar"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -3315,6 +3307,10 @@ msgstr "{name} is on this computer, but has not been listed since this page open
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
+
+#. js-lingui-explicit-id
+msgid "enter.highlightKept"
+msgstr "Kept highlight {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditAlready"
@@ -5000,6 +4996,11 @@ msgstr "Under {names}"
 msgid "enter.renamed"
 msgstr "That verb is now {now}. Enter writes it in"
 
+#. Commands stay English. Enter puts the new command in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamedForm"
+msgstr "{verb} is now {now}. Enter writes it in"
+
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
 msgstr "The reply broke off part way. What arrived is kept and marked as cut off"
@@ -5708,6 +5709,10 @@ msgstr "Struck as edit {num}. undo:{num} takes it back"
 #. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr "Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, at most {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeAgain"
+msgstr "A new summary, dated today; the one written before stays"
 
 #. js-lingui-explicit-id
 msgid "enter.summarizeCheap"
@@ -6554,11 +6559,6 @@ msgstr "Built in"
 msgid "frameworkPicker.foot"
 msgstr "They go with every prompt in this chat, in the order ticked, until turned off."
 
-#. The foot of the frameworks menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "frameworkPicker.keys"
-msgstr "A click, or Enter on a row, puts it on at the end or takes it off."
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
@@ -6807,10 +6807,6 @@ msgid "inspect.active"
 msgstr "last active {ago}"
 
 #. js-lingui-explicit-id
-msgid "inspect.close"
-msgstr "Escape closes this"
-
-#. js-lingui-explicit-id
 msgid "inspect.created"
 msgstr "created {day}"
 
@@ -6826,11 +6822,12 @@ msgstr "{num} in detail"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.listFoot"
-msgstr "A click writes jump: for one. Escape closes this"
+msgstr "A click writes jump: for one"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
-msgstr "open:{num} brings it beside what is here. Escape closes this"
+msgstr "open:{num} brings it beside what is here"
 
 #. js-lingui-explicit-id
 msgid "keys.add"
@@ -6846,7 +6843,7 @@ msgstr "Save checks it with {provider} first, with one short request, then holds
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "Save checks it with {provider} first, with one short request, then the key vault keeps it, encrypted, in this browser."
+msgstr "Save checks it with {provider} first, with one short request."
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6862,7 +6859,7 @@ msgstr "{provider} key"
 
 #. js-lingui-explicit-id
 msgid "keys.foot"
-msgstr "Escape goes back to the bar. If a key leaks, revoke it at its provider, and paste a new one here."
+msgstr "If a key leaks, revoke it at its provider, and paste a new one here."
 
 #. js-lingui-explicit-id
 msgid "keys.heading"
@@ -6976,7 +6973,7 @@ msgstr "The check did not reach {provider}. Nothing was kept."
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "Kept in the key vault, encrypted, in this browser. Each goes only to its own provider."
+msgstr "Kept in the key vault, encrypted, and sent only to its own provider."
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -7114,11 +7111,6 @@ msgstr "Replies and searches follow the page. reply: gives replies a language of
 #. js-lingui-explicit-id
 msgid "languagePicker.globe"
 msgstr "Language: {language}"
-
-#. The foot of the languages menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "languagePicker.keys"
-msgstr "A click, or Enter on a row, turns the page to that language."
 
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
@@ -7358,10 +7350,6 @@ msgstr "Nothing in the Library matches. Try a shorter word, or clear the field."
 #. js-lingui-explicit-id
 msgid "library.onCanvas"
 msgstr "on the Canvas"
-
-#. js-lingui-explicit-id
-msgid "library.onScreen"
-msgstr "goes on the screen, beside rooms"
 
 #. Marginalia on a board: writes open:<board> in the bar
 #. js-lingui-explicit-id
@@ -7735,6 +7723,81 @@ msgstr "Prompt"
 msgid "mode.search"
 msgstr "Search"
 
+#. A kind of request in the network log: a source asked
+#. js-lingui-explicit-id
+msgid "netKind.answer"
+msgstr "answer"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.compareMeaning"
+msgstr "compare meaning"
+
+#. A kind of request in the network log: a cut-off reply carried on
+#. js-lingui-explicit-id
+msgid "netKind.continue"
+msgstr "continue"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.keyCheck"
+msgstr "key check"
+
+#. A kind of request in the network log: listing the models on this computer
+#. js-lingui-explicit-id
+msgid "netKind.localCheck"
+msgstr "local model check"
+
+#. A kind of request in the network log: the privacy filter finding names
+#. js-lingui-explicit-id
+msgid "netKind.nameCheck"
+msgstr "name check"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.other"
+msgstr "other"
+
+#. A kind of request in the network log, before its count
+#. js-lingui-explicit-id
+msgid "netKind.prompt"
+msgstr "prompt"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.reflection"
+msgstr "reflection"
+
+#. A kind of request in the network log; Ripple is a feature name
+#. js-lingui-explicit-id
+msgid "netKind.ripple"
+msgstr "ripple"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.summary"
+msgstr "summary"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.sweep"
+msgstr "sweep"
+
+#. A kind of request in the network log: whether text from a source tries to instruct a model
+#. js-lingui-explicit-id
+msgid "netKind.textCheck"
+msgstr "text check"
+
+#. A kind of request in the network log: a chat named after its first answer
+#. js-lingui-explicit-id
+msgid "netKind.title"
+msgstr "title"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.translation"
+msgstr "translation"
+
 #. js-lingui-explicit-id
 msgid "picker.about.fable"
 msgstr "The costliest model here."
@@ -7829,15 +7892,10 @@ msgstr "stays on this computer"
 msgid "picker.keptUpTo30"
 msgstr "kept up to 30 days"
 
-#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. The foot of the menu of who answers. api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr "A click on a name, or Enter, answers with it alone from now on. Its box, or Shift and a click, adds it. A row that needs a key writes api: into the field instead."
-
-#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "picker.keysStep"
-msgstr "A click, or Enter on a row, chooses it for this step."
+msgstr "A name answers alone from now on; its box adds it beside the others. A row that needs a key writes api: instead."
 
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
@@ -8286,11 +8344,6 @@ msgstr "The chat carries one line on. Tick others to carry them on too, each in 
 msgid "replyPicker.held"
 msgstr "Held until you change it. A new prompt to new sources: by: and their names."
 
-#. The foot of the menu of where a reply goes, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "replyPicker.keys"
-msgstr "A click, or Enter on a row, ticks it or unticks it."
-
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
 msgstr "The chat carries on from another. Ticked, this one carries on too, in its tab."
@@ -8336,6 +8389,10 @@ msgstr "Left column"
 #. js-lingui-explicit-id
 msgid "room.columnRight"
 msgstr "Right column"
+
+#. js-lingui-explicit-id
+msgid "room.editsKept"
+msgstr "{count, plural, one {edits kept · # waits for your next prompt} other {edits kept · # wait for your next prompt}}"
 
 #. js-lingui-explicit-id
 msgid "room.empty"
@@ -8421,9 +8478,10 @@ msgstr "This room could not be drawn. Its chat is kept as it was."
 msgid "room.unnamed"
 msgstr "unnamed room"
 
+#. A button that closes the map of screens
 #. js-lingui-explicit-id
 msgid "screensMap.back"
-msgstr "Escape goes back"
+msgstr "Back"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotBody"
@@ -8558,10 +8616,6 @@ msgstr "{width} wide, this window"
 msgid "screensMap.window"
 msgstr "its own window"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutDesc"
-msgstr "Privacy and the network log"
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -8584,10 +8638,6 @@ msgstr "add a key to use it"
 #. js-lingui-explicit-id
 msgid "settings.apiFrom"
 msgstr "{command} opens its key field from anywhere"
-
-#. js-lingui-explicit-id
-msgid "settings.appearanceDesc"
-msgstr "Text size"
 
 #. js-lingui-explicit-id
 msgid "settings.appearanceTitle"
@@ -8682,20 +8732,12 @@ msgid "settings.browserWorks"
 msgstr "Works here."
 
 #. js-lingui-explicit-id
-msgid "settings.contextDesc"
-msgstr "How a new chat starts"
-
-#. js-lingui-explicit-id
 msgid "settings.contextLede"
 msgstr "How a new chat starts, and what goes along with your prompts."
 
 #. js-lingui-explicit-id
 msgid "settings.contextTitle"
 msgstr "Context and defaults"
-
-#. js-lingui-explicit-id
-msgid "settings.dataDesc"
-msgstr "What this browser keeps"
 
 #. js-lingui-explicit-id
 msgid "settings.dataLede"
@@ -8747,7 +8789,7 @@ msgstr "Held for this tab only. You enter them again each visit"
 
 #. js-lingui-explicit-id
 msgid "settings.keepingHelp"
-msgstr "Keys are encrypted by this browser before they are kept, and each goes only to the provider it belongs to. They never pass through the bar, which keeps a history."
+msgstr "Kept in the key vault, encrypted, and sent only to its own provider."
 
 #. js-lingui-explicit-id
 msgid "settings.keepingLabel"
@@ -8784,10 +8826,6 @@ msgstr "Key ends {ending}, kept for this tab only"
 #. js-lingui-explicit-id
 msgid "settings.keyNone"
 msgstr "Needs a key"
-
-#. js-lingui-explicit-id
-msgid "settings.keysDesc"
-msgstr "Providers, keys and models"
 
 #. js-lingui-explicit-id
 msgid "settings.keysLede"
@@ -8948,7 +8986,7 @@ msgstr "{count, plural, one {The cost of # chat is not known: a reply recorded n
 
 #. js-lingui-explicit-id
 msgid "settings.networkHelp"
-msgstr "Requests made by this page since it loaded, grouped by host and named by who called them. Every host should be a provider or source you use; if one is not, something is wrong."
+msgstr "Requests made since this tab opened, grouped by host, with what each was for. Every host should be a provider or source you use; if one is not, something is wrong."
 
 #. js-lingui-explicit-id
 msgid "settings.networkLabel"
@@ -9103,10 +9141,6 @@ msgid "settings.sourcesHelp"
 msgstr "No key needed. A source is asked a search and answers with what it finds, so it costs nothing."
 
 #. js-lingui-explicit-id
-msgid "settings.spendingDesc"
-msgstr "This month, in dollars"
-
-#. js-lingui-explicit-id
 msgid "settings.spendingLede"
 msgstr "Marks are for choosing; this section is in dollars, because it is the bill."
 
@@ -9125,6 +9159,16 @@ msgstr "Storage"
 #. js-lingui-explicit-id
 msgid "settings.storageUsed"
 msgstr "{used} used of about {quota} this browser allows."
+
+#. Beside a switch in Settings that is off
+#. js-lingui-explicit-id
+msgid "settings.switchOff"
+msgstr "off"
+
+#. Beside a switch in Settings that is on
+#. js-lingui-explicit-id
+msgid "settings.switchOn"
+msgstr "on"
 
 #. js-lingui-explicit-id
 msgid "settings.textCompact"
@@ -9168,7 +9212,7 @@ msgstr "A new chat is named from its first words, with no request."
 
 #. js-lingui-explicit-id
 msgid "settings.titleOn"
-msgstr "After a chat’s first answer, one small request names it, said first under the bar."
+msgstr "After a chat’s first answer, one small request names it."
 
 #. js-lingui-explicit-id
 msgid "settings.translateLabel"
@@ -9295,10 +9339,6 @@ msgstr "full screen"
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
 msgstr "leave full screen"
-
-#. js-lingui-explicit-id
-msgid "shell.referenceClose"
-msgstr "Escape closes this"
 
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
@@ -9801,10 +9841,6 @@ msgid "verb.retag"
 msgstr "Rename a tag everywhere"
 
 #. js-lingui-explicit-id
-msgid "verb.rewrite"
-msgstr "Write a new dated summary beside the old one"
-
-#. js-lingui-explicit-id
 msgid "verb.ripple"
 msgstr "Carry edits across branches as suggestions. Each check is a model call"
 
@@ -9974,7 +10010,7 @@ msgstr "to Parliament"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepAsk"
-msgstr "ask the browser again"
+msgstr "ask it to keep the data"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepAsking"
@@ -9987,7 +10023,7 @@ msgstr "back up in {board}"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepNot"
-msgstr "This browser has not agreed to keep what you make here, so it may clear it to save space, or each time it closes. To keep it, let this site keep its data in the browser’s settings, and back up now and then."
+msgstr "This browser may clear what you make here"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"

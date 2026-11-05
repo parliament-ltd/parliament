@@ -46,7 +46,7 @@ describe('the verb list', () => {
 
   it('marks every verb that sends something, so its Enter line names who and what it costs', () => {
     const spends = VERBS.filter((v) => v.spends).map((v) => v.verb).sort()
-    expect(spends).toEqual(['again', 'continue', 'reflect', 'rewrite', 'ripple', 'run', 'summarize', 'sweep', 'translate'])
+    expect(spends).toEqual(['again', 'continue', 'reflect', 'ripple', 'run', 'summarize', 'sweep', 'translate'])
     // Nothing that sends is applied on a click: it waits for Enter.
     for (const v of VERBS.filter((x) => x.spends)) expect(v.click, v.verb).toBe('fill')
   })

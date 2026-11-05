@@ -40,9 +40,8 @@ export default function Inspect({ row, onPick = null }) {
       {row.summary && <p dir="auto">{row.summary}</p>}
       {row.kind === 'note' && row.text && row.text !== row.title && <p dir="auto">{row.text}</p>}
       {facts.length > 0 && <p className="ch-marg">{facts.join(' · ')}</p>}
-      <p className="ch-marg ch-inspect-foot">
-        {opens ? i18n._(COPY.inspect.openChat, { num: row.num }) : i18n._(COPY.inspect.close)}
-      </p>
+      {/* Escape is said once, in ? (C291 (b)); what open: does stays. */}
+      {opens && <p className="ch-marg ch-inspect-foot">{i18n._(COPY.inspect.openChat, { num: row.num })}</p>}
     </section>
   )
 }

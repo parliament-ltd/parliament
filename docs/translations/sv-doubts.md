@@ -375,3 +375,16 @@ Each: id, the English, the draft, and why I was unsure.
 - compare.wordsOnly: "Orden jämförs, inte innebörden", present passive, because "Jämför orden, inte innebörden" would read as an order to the reader.
 - compare.wholeSentences: "can't find words" is "kan inte dela upp text på det här språket i ord", since "hitta ord" could read as finding no words at all.
 - welcome.further: "Advanced" is "Avancerat", as Swedish settings screens write it.
+
+## Less said on screen, drafted 5 November 2026 (C291)
+
+- **group.everyday, enter.help, leader.help**: "Vanliga" as the heading and "de vanliga kommandona" in the lines. "Vardagliga" is the dictionary word for everyday but sounds like "mundane"; "Varje dag" reads well as a heading but not inside a sentence.
+- **enter.help**: "alla andra under ”fler”", with the row's name in quotation marks. Without them, "under fler" reads as "under several". The English has no quotes.
+- **shell.referenceMore, shell.referenceFewer, shell.referenceMoreCount**: the row says "fler ▾" / "färre ▴", but the count beside it says "# till" ("41 till, i 9 grupper"), which is the natural Swedish for "N more". "# fler" would match the row's word but sounds stiffer.
+- **welcome.keepAsk**: "be den behålla det" ("ask it to keep it"), where "det" points back to "det du skapar här" on the same line. "the data" is not translated word for word: "datan" is informal, and "dina data" adds "your".
+- **keys.promise, settings.keepingHelp**: "var och en skickas bara till sin egen leverantör" spells out "each". Swedish "sin egen" after an implied plural subject (the keys) would otherwise blur "each to its own" with "all to one shared provider". It is a few words longer than the English.
+- **picker.keys**: "Ett namn svarar ensamt från och med nu" keeps the English's shorthand (a name answers alone, meaning a click on it makes that model the only one answering). It is terse; "Ett klick på ett namn låter bara den svara" would be clearer, but longer.
+- **leader.escape**: "Går tillbaka ett läge, eller stänger …", with two verbs. The English starts with a noun phrase ("Back one mode") and then a verb, which reads as broken in Swedish.
+- **netKind.compareMeaning**: "jämförelse av innebörd", longer than the other labels. It takes "innebörd" from compare.wordsOnly ("Orden jämförs, inte innebörden"). "innebördsjämförelse" is shorter but clumsy.
+- **netKind.localCheck**: "lokal modellkontroll" ("local model check"). The other lines say "på den här datorn" instead of "lokal", but that is too long for a label before a count.
+- **room.editsKept**: "redigeringar sparade" for "edits kept", where "kept" means saved as they are made. The one and other branches are the same, since "väntar" does not change with number.

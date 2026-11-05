@@ -94,12 +94,11 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
     )
     : null
   const marks = reference ? i18n._(COPY.picker.marks, { reference }) : null
-  const close = i18n._(COPY.shell.referenceClose)
   return (
     <MenuPanel
       className="ch-menu"
       title={forStep ? i18n._(COPY.picker.forStep, { index: forStep.index, address: forStep.address }) : i18n._(COPY.picker.title)}
-      foot={forStep ? footOf(marks, i18n._(COPY.picker.keysStep), close) : footOf(marks, i18n._(COPY.picker.several), i18n._(COPY.picker.keys), close)}
+      foot={forStep ? footOf(marks) : footOf(marks, i18n._(COPY.picker.several), i18n._(COPY.picker.keys))}
       onClose={onClose}
     >
       <MenuColumns>

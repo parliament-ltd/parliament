@@ -164,9 +164,10 @@ msgstr "Huoneet"
 msgid "backup.catRoomsAbout"
 msgstr "Rakentamasi tai muuttamasi huoneet"
 
+#. A button that closes the backup panel
 #. js-lingui-explicit-id
 msgid "backup.close"
-msgstr "Escape palaa palkkiin"
+msgstr "Takaisin palkkiin"
 
 #. js-lingui-explicit-id
 msgid "backup.doMerge"
@@ -1003,12 +1004,12 @@ msgstr "Sulje"
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
 msgid "chat.continueReply"
-msgstr ""
+msgstr "Jatka"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "chat.continueWrites"
-msgstr ""
+msgstr "Kirjoittaa continue: palkkiin, jossa Enter-rivi kertoo ensin mallin ja hinnan"
 
 #. js-lingui-explicit-id
 msgid "chat.cutError"
@@ -1584,10 +1585,6 @@ msgstr "tyhjennä"
 msgid "collection.selected"
 msgstr "{count} valittu"
 
-#. js-lingui-explicit-id
-msgid "collection.selectNone"
-msgstr "Valitse kortteja käsitelläksesi niitä, tai käsittele koko kokoelmaa."
-
 #. open: stays English
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
@@ -1716,12 +1713,12 @@ msgstr "värit ▾"
 
 #. js-lingui-explicit-id
 msgid "compare.close"
-msgstr "Mitään ei lähetetty tekoälymallille. Escape sulkee tämän"
+msgstr "Mitään ei lähetetty tekoälymallille."
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "compare.closeMeaning"
-msgstr "Lähetetty kertaalleen mallille {model} yllä olevaa tulkintaa varten. Escape sulkee tämän"
+msgstr "Lähetetty kertaalleen mallille {model} yllä olevaa tulkintaa varten."
 
 #. js-lingui-explicit-id
 msgid "compare.counts"
@@ -1790,11 +1787,6 @@ msgstr "Tämä selain ei osaa erottaa tämän kielen sanoja toisistaan, joten ve
 #. js-lingui-explicit-id
 msgid "compare.wordsOnly"
 msgstr "Verrattu sanoja, ei merkitystä"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "compare.writes"
-msgstr "Kirjoittaa palkkiin {command}"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -2665,36 +2657,36 @@ msgstr "Sanoja verrataan, ei merkitystä. Lisää loppuun sana meaning, niin kys
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueCheap"
-msgstr ""
+msgstr "Enter pyytää mallia {name} jatkamaan keskustelun {address} katkennutta vastausta siitä, mihin se pysähtyi: noin {tokens, number} tokenia, hinta alle {cost}"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueGo"
-msgstr ""
+msgstr "Enter pyytää mallia {name} jatkamaan keskustelun {address} katkennutta vastausta siitä, mihin se pysähtyi: noin {tokens, number} tokenia, hinta {cost}"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueGoing"
-msgstr ""
+msgstr "{name} jatkaa vastausta"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueLocal"
-msgstr ""
+msgstr "Enter pyytää tällä koneella olevaa mallia {name} jatkamaan keskustelun {address} katkennutta vastausta. Mitään ei lähde koneelta"
 
 #. js-lingui-explicit-id
 msgid "enter.continueNone"
-msgstr ""
+msgstr "Keskustelussa {address} ei ole katkennutta vastausta"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.continueNoRoom"
-msgstr ""
+msgstr "continue: jatkaa näytöllä olevan huoneen katkennutta vastausta"
 
 #. {name} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "enter.continueUnpriced"
-msgstr ""
+msgstr "Enter pyytää mallia {name} jatkamaan keskustelun {address} katkennutta vastausta siitä, mihin se pysähtyi: noin {tokens, number} tokenia"
 
 #. js-lingui-explicit-id
 msgid "enter.copied"
@@ -3261,11 +3253,11 @@ msgstr "Kirjoittaminen korvaa sen. Escape tyhjentää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
-msgstr "Enter näyttää kaikki komennot"
+msgstr "Enter näyttää arkikomennot ja kaikki muut kohdan ”enemmän” alla"
 
 #. js-lingui-explicit-id
 msgid "enter.helpAll"
-msgstr ""
+msgstr "Enter näyttää kaikki komennot"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3315,6 +3307,10 @@ msgstr "{name} on tällä koneella, mutta sitä ei ole listattu sivun avaamisen 
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
 msgstr "Enter näyttää, miten {verb} toimii"
+
+#. js-lingui-explicit-id
+msgid "enter.highlightKept"
+msgstr "Säilytetty korostuksena {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.holdEditAlready"
@@ -4914,7 +4910,7 @@ msgstr "Lainaus on ihmisille, eikä sitä koskaan lähetetä"
 #. Said under the field after a click ran a command that undo: cannot take back. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.ranOnly"
-msgstr ""
+msgstr "Suoritettu: {command}"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -4999,6 +4995,11 @@ msgstr "Kehyksin: {names}"
 #. js-lingui-explicit-id
 msgid "enter.renamed"
 msgstr "Verbi on nyt {now}. Enter kirjoittaa sen kenttään"
+
+#. Commands stay English. Enter puts the new command in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamedForm"
+msgstr "{verb} on nyt {now}. Enter kirjoittaa sen kenttään"
 
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
@@ -5708,6 +5709,10 @@ msgstr "Yliviivattu muokkauksena {num}. undo:{num} kumoaa sen"
 #. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr "Enter kirjoittaa kokoelmaan {name} tämän päivän päiväyksellä yhteenvedon kohteista {nums}: yksi kutsu palveluun {provider}, hinta enintään {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeAgain"
+msgstr "Uusi yhteenveto tämän päivän päiväyksellä; aiemmin kirjoitettu säilyy"
 
 #. js-lingui-explicit-id
 msgid "enter.summarizeCheap"
@@ -6554,11 +6559,6 @@ msgstr "Valmiit"
 msgid "frameworkPicker.foot"
 msgstr "Ne kulkevat tämän keskustelun jokaisen kehotteen mukana valintajärjestyksessä, kunnes poistat ne käytöstä."
 
-#. The foot of the frameworks menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "frameworkPicker.keys"
-msgstr "Napsautus tai Enter rivillä ottaa sen käyttöön viimeisenä tai poistaa sen käytöstä."
-
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
@@ -6592,7 +6592,7 @@ msgstr "Muokkaus"
 
 #. js-lingui-explicit-id
 msgid "group.everyday"
-msgstr ""
+msgstr "Arkikäyttö"
 
 #. Several filters can share one line
 #. js-lingui-explicit-id
@@ -6807,10 +6807,6 @@ msgid "inspect.active"
 msgstr "viimeksi käytetty {ago}"
 
 #. js-lingui-explicit-id
-msgid "inspect.close"
-msgstr "Escape sulkee tämän"
-
-#. js-lingui-explicit-id
 msgid "inspect.created"
 msgstr "luotu {day}"
 
@@ -6826,11 +6822,12 @@ msgstr "Kohteen {num} tiedot"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.listFoot"
-msgstr "Napsauta yhtä, niin palkkiin tulee komento jump: sen numerolla. Escape sulkee tämän"
+msgstr "Napsautus kirjoittaa palkkiin jump: kohteen numerolla"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
-msgstr "open:{num} tuo sen näkyvien rinnalle. Escape sulkee tämän"
+msgstr "open:{num} tuo sen näkyvien rinnalle"
 
 #. js-lingui-explicit-id
 msgid "keys.add"
@@ -6846,7 +6843,7 @@ msgstr "Tallennettaessa avain tarkistetaan ensin palvelusta {provider} yhdellä 
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "Tallennettaessa avain tarkistetaan ensin palvelusta {provider} yhdellä lyhyellä pyynnöllä, ja sitten avainsäilö säilyttää sen salattuna tässä selaimessa."
+msgstr "Tallennettaessa avain tarkistetaan ensin palvelusta {provider} yhdellä lyhyellä pyynnöllä."
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6862,7 +6859,7 @@ msgstr "Avain: {provider}"
 
 #. js-lingui-explicit-id
 msgid "keys.foot"
-msgstr "Escape palaa palkkiin. Jos avain vuotaa, mitätöi se palveluntarjoajalla ja liitä uusi tähän."
+msgstr "Jos avain vuotaa, mitätöi se palveluntarjoajalla ja liitä uusi tähän."
 
 #. js-lingui-explicit-id
 msgid "keys.heading"
@@ -6976,7 +6973,7 @@ msgstr "Tarkistus ei tavoittanut palvelua {provider}. Mitään ei tallennettu."
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "Säilytetään salattuna avainsäilössä tässä selaimessa. Kukin avain menee vain omalle palveluntarjoajalleen."
+msgstr "Säilytetään salattuina avainsäilössä, ja kukin lähetetään vain omalle palveluntarjoajalleen."
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -7115,11 +7112,6 @@ msgstr "Vastaukset ja haut noudattavat sivun kieltä. reply: antaa vastauksille 
 msgid "languagePicker.globe"
 msgstr "Kieli: {language}"
 
-#. The foot of the languages menu, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "languagePicker.keys"
-msgstr "Napsautus tai Enter rivillä vaihtaa sivun sille kielelle."
-
 #. js-lingui-explicit-id
 msgid "languagePicker.title"
 msgstr "Kielet"
@@ -7178,11 +7170,11 @@ msgstr "Kirjoita komento. > pysyy kentässä"
 
 #. js-lingui-explicit-id
 msgid "leader.escape"
-msgstr ""
+msgstr "Palaa yhden tilan taaksepäin tai sulkee sen, mikä on auki palkin alla"
 
 #. js-lingui-explicit-id
 msgid "leader.help"
-msgstr "Kaikki komennot tai yhden komennon toiminta"
+msgstr "Arkikomennot, sitten kaikki, tai yhden komennon toiminta"
 
 #. js-lingui-explicit-id
 msgid "leader.prompt"
@@ -7358,10 +7350,6 @@ msgstr "Kirjastossa ei ole osumia. Kokeile lyhyempää sanaa tai tyhjennä kentt
 #. js-lingui-explicit-id
 msgid "library.onCanvas"
 msgstr "Alustalla"
-
-#. js-lingui-explicit-id
-msgid "library.onScreen"
-msgstr "sijoitetaan näytölle huoneiden rinnalle"
 
 #. Marginalia on a board: writes open:<board> in the bar
 #. js-lingui-explicit-id
@@ -7735,6 +7723,81 @@ msgstr "Kehote"
 msgid "mode.search"
 msgstr "Haku"
 
+#. A kind of request in the network log: a source asked
+#. js-lingui-explicit-id
+msgid "netKind.answer"
+msgstr "vastaus"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.compareMeaning"
+msgstr "merkityksen vertailu"
+
+#. A kind of request in the network log: a cut-off reply carried on
+#. js-lingui-explicit-id
+msgid "netKind.continue"
+msgstr "jatko"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.keyCheck"
+msgstr "avaimen tarkistus"
+
+#. A kind of request in the network log: listing the models on this computer
+#. js-lingui-explicit-id
+msgid "netKind.localCheck"
+msgstr "paikallisten mallien tarkistus"
+
+#. A kind of request in the network log: the privacy filter finding names
+#. js-lingui-explicit-id
+msgid "netKind.nameCheck"
+msgstr "nimien tarkistus"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.other"
+msgstr "muu"
+
+#. A kind of request in the network log, before its count
+#. js-lingui-explicit-id
+msgid "netKind.prompt"
+msgstr "kehote"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.reflection"
+msgstr "pohdinta"
+
+#. A kind of request in the network log; Ripple is a feature name
+#. js-lingui-explicit-id
+msgid "netKind.ripple"
+msgstr "ripple"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.summary"
+msgstr "yhteenveto"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.sweep"
+msgstr "läpikäynti"
+
+#. A kind of request in the network log: whether text from a source tries to instruct a model
+#. js-lingui-explicit-id
+msgid "netKind.textCheck"
+msgstr "tekstin tarkistus"
+
+#. A kind of request in the network log: a chat named after its first answer
+#. js-lingui-explicit-id
+msgid "netKind.title"
+msgstr "otsikko"
+
+#. A kind of request in the network log
+#. js-lingui-explicit-id
+msgid "netKind.translation"
+msgstr "käännös"
+
 #. js-lingui-explicit-id
 msgid "picker.about.fable"
 msgstr "Kallein malli täällä."
@@ -7829,15 +7892,10 @@ msgstr "pysyy tällä koneella"
 msgid "picker.keptUpTo30"
 msgstr "säilytetään enintään 30 päivää"
 
-#. The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English
+#. The foot of the menu of who answers. api: is a command, kept English
 #. js-lingui-explicit-id
 msgid "picker.keys"
-msgstr "Napsautus nimeen tai Enter tekee siitä ainoan vastaajan tästä eteenpäin. Sen valintaruutu tai Shift ja napsautus lisää sen. Rivi, joka tarvitsee avaimen, kirjoittaa sen sijaan kenttään api:."
-
-#. The foot of the menu of who answers one step of a plan, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "picker.keysStep"
-msgstr "Napsautus tai Enter rivillä valitsee sen tähän vaiheeseen."
+msgstr "Napsautus nimeen tekee siitä ainoan vastaajan tästä eteenpäin; nimen valintaruutu lisää sen muiden rinnalle. Rivi, joka tarvitsee avaimen, kirjoittaa sen sijaan api:."
 
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
@@ -8286,11 +8344,6 @@ msgstr "Keskustelu jatkaa yhtä linjaa. Valitse muita jatkaaksesi myös niitä, 
 msgid "replyPicker.held"
 msgstr "Pysyy, kunnes muutat sitä. Uusi kehote uusille lähteille: by: ja niiden nimet."
 
-#. The foot of the menu of where a reply goes, before "Escape closes this"
-#. js-lingui-explicit-id
-msgid "replyPicker.keys"
-msgstr "Napsautus tai Enter rivillä valitsee sen tai poistaa valinnan."
-
 #. js-lingui-explicit-id
 msgid "replyPicker.ownRoom"
 msgstr "Keskustelu jatkuu toisesta. Valittuna myös tämä jatkuu omassa välilehdessään."
@@ -8336,6 +8389,10 @@ msgstr "Vasen palsta"
 #. js-lingui-explicit-id
 msgid "room.columnRight"
 msgstr "Oikea palsta"
+
+#. js-lingui-explicit-id
+msgid "room.editsKept"
+msgstr "{count, plural, one {muokkaukset tallessa · # odottaa seuraavaa kehotettasi} other {muokkaukset tallessa · # odottaa seuraavaa kehotettasi}}"
 
 #. js-lingui-explicit-id
 msgid "room.empty"
@@ -8421,9 +8478,10 @@ msgstr "Tätä huonetta ei voitu piirtää. Sen keskustelu on tallessa ennallaan
 msgid "room.unnamed"
 msgstr "nimetön huone"
 
+#. A button that closes the map of screens
 #. js-lingui-explicit-id
 msgid "screensMap.back"
-msgstr "Escape palaa takaisin"
+msgstr "Takaisin"
 
 #. js-lingui-explicit-id
 msgid "screensMap.cannotBody"
@@ -8558,10 +8616,6 @@ msgstr "leveys {width}, tämä ikkuna"
 msgid "screensMap.window"
 msgstr "oma ikkuna"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutDesc"
-msgstr "Tietosuoja ja verkkoloki"
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -8584,10 +8638,6 @@ msgstr "lisää avain käyttääksesi sitä"
 #. js-lingui-explicit-id
 msgid "settings.apiFrom"
 msgstr "{command} avaa sen avainkentän mistä tahansa"
-
-#. js-lingui-explicit-id
-msgid "settings.appearanceDesc"
-msgstr "Tekstin koko"
 
 #. js-lingui-explicit-id
 msgid "settings.appearanceTitle"
@@ -8682,20 +8732,12 @@ msgid "settings.browserWorks"
 msgstr "Toimii täällä."
 
 #. js-lingui-explicit-id
-msgid "settings.contextDesc"
-msgstr "Miten uusi keskustelu alkaa"
-
-#. js-lingui-explicit-id
 msgid "settings.contextLede"
 msgstr "Miten uusi keskustelu alkaa ja mitä kehotteidesi mukana lähtee."
 
 #. js-lingui-explicit-id
 msgid "settings.contextTitle"
 msgstr "Konteksti ja oletukset"
-
-#. js-lingui-explicit-id
-msgid "settings.dataDesc"
-msgstr "Mitä tämä selain säilyttää"
 
 #. js-lingui-explicit-id
 msgid "settings.dataLede"
@@ -8747,7 +8789,7 @@ msgstr "Säilytetään vain tässä välilehdessä. Syötät ne uudelleen joka k
 
 #. js-lingui-explicit-id
 msgid "settings.keepingHelp"
-msgstr "Tämä selain salaa avaimet ennen tallentamista, ja kukin menee vain omalle palveluntarjoajalleen. Ne eivät koskaan kulje palkin kautta, sillä palkki pitää historiaa."
+msgstr "Säilytetään salattuina avainsäilössä, ja kukin lähetetään vain omalle palveluntarjoajalleen."
 
 #. js-lingui-explicit-id
 msgid "settings.keepingLabel"
@@ -8784,10 +8826,6 @@ msgstr "Avaimen loppu {ending}, säilytetään vain tässä välilehdessä"
 #. js-lingui-explicit-id
 msgid "settings.keyNone"
 msgstr "Tarvitsee avaimen"
-
-#. js-lingui-explicit-id
-msgid "settings.keysDesc"
-msgstr "Palveluntarjoajat, avaimet ja mallit"
 
 #. js-lingui-explicit-id
 msgid "settings.keysLede"
@@ -8948,7 +8986,7 @@ msgstr "{count, plural, one {# keskustelun hintaa ei tiedetä: vastaus ei kirjan
 
 #. js-lingui-explicit-id
 msgid "settings.networkHelp"
-msgstr "Tämän sivun latautumisen jälkeen tekemät pyynnöt palvelimen mukaan ryhmiteltyinä ja kutsujan mukaan nimettyinä. Jokaisen palvelimen pitäisi olla käyttämäsi palveluntarjoaja tai lähde; jos jokin ei ole, jokin on vialla."
+msgstr "Tämän välilehden avaamisen jälkeen tehdyt pyynnöt palvelimen mukaan ryhmiteltyinä ja tarkoituksen mukaan nimettyinä. Jokaisen palvelimen pitäisi olla käyttämäsi palveluntarjoaja tai lähde; jos jokin ei ole, jokin on vialla."
 
 #. js-lingui-explicit-id
 msgid "settings.networkLabel"
@@ -9103,10 +9141,6 @@ msgid "settings.sourcesHelp"
 msgstr "Avainta ei tarvita. Lähteelle lähetetään haku, ja se vastaa löytämällään, joten se ei maksa mitään."
 
 #. js-lingui-explicit-id
-msgid "settings.spendingDesc"
-msgstr "Tämä kuukausi dollareina"
-
-#. js-lingui-explicit-id
 msgid "settings.spendingLede"
 msgstr "Kertoimet auttavat valitsemaan; tämä osio on dollareina, koska kyse on laskusta."
 
@@ -9125,6 +9159,16 @@ msgstr "Tallennustila"
 #. js-lingui-explicit-id
 msgid "settings.storageUsed"
 msgstr "Käytössä {used}; tämä selain sallii noin {quota}."
+
+#. Beside a switch in Settings that is off
+#. js-lingui-explicit-id
+msgid "settings.switchOff"
+msgstr "pois"
+
+#. Beside a switch in Settings that is on
+#. js-lingui-explicit-id
+msgid "settings.switchOn"
+msgstr "päällä"
 
 #. js-lingui-explicit-id
 msgid "settings.textCompact"
@@ -9168,7 +9212,7 @@ msgstr "Uusi keskustelu nimetään sen ensimmäisistä sanoista ilman pyyntöä.
 
 #. js-lingui-explicit-id
 msgid "settings.titleOn"
-msgstr "Keskustelun ensimmäisen vastauksen jälkeen yksi pieni pyyntö nimeää sen. Palkin alla oleva rivi kertoo siitä ensin."
+msgstr "Keskustelun ensimmäisen vastauksen jälkeen yksi pieni pyyntö nimeää sen."
 
 #. js-lingui-explicit-id
 msgid "settings.translateLabel"
@@ -9296,10 +9340,6 @@ msgstr "koko näyttö"
 msgid "shell.leaveFullScreen"
 msgstr "poistu koko näytön tilasta"
 
-#. js-lingui-explicit-id
-msgid "shell.referenceClose"
-msgstr "Escape sulkee tämän"
-
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
 msgid "shell.referenceFainter"
@@ -9308,7 +9348,7 @@ msgstr "Himmeämpi komento toimii toisessa taulussa, joka mainitaan sen vieress�
 #. The same row once every command is open; a click folds them back to the everyday ones
 #. js-lingui-explicit-id
 msgid "shell.referenceFewer"
-msgstr ""
+msgstr "vähemmän ▴"
 
 #. The foot of the ? reference, before "Escape closes this". {example} is ?bar, a command kept English
 #. js-lingui-explicit-id
@@ -9318,12 +9358,12 @@ msgstr "Napsautus kirjoittaa komennon kenttään, ja Enter suorittaa sen. {examp
 #. A row under the everyday commands of the ? reference; a click opens every other command
 #. js-lingui-explicit-id
 msgid "shell.referenceMore"
-msgstr ""
+msgstr "enemmän ▾"
 
 #. {all} is ?all, which stays English
 #. js-lingui-explicit-id
 msgid "shell.referenceMoreCount"
-msgstr ""
+msgstr "{count, plural, one {Vielä # komento} other {Vielä # komentoa}} {groups, plural, one {# ryhmässä} other {# ryhmässä}}. {all} näyttää ne kerralla"
 
 #. The name of the ? reference, read by screen readers
 #. js-lingui-explicit-id
@@ -9598,7 +9638,7 @@ msgstr "Aseta rinnakkain kaksi muistiinpanoa, korostusta tai lainausta tai kahde
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
-msgstr ""
+msgstr "Jatka katkennutta vastausta siitä, mihin se pysähtyi, sen kirjoittaneella mallilla"
 
 #. js-lingui-explicit-id
 msgid "verb.copy"
@@ -9801,10 +9841,6 @@ msgid "verb.retag"
 msgstr "Nimeä tunniste uudelleen kaikkialla"
 
 #. js-lingui-explicit-id
-msgid "verb.rewrite"
-msgstr "Kirjoita uusi päivätty yhteenveto vanhan rinnalle"
-
-#. js-lingui-explicit-id
 msgid "verb.ripple"
 msgstr "Vie muokkaukset haarasta toiseen ehdotuksina. Jokainen tarkistus on mallikutsu"
 
@@ -9974,7 +10010,7 @@ msgstr "Parliamentiin"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepAsk"
-msgstr "kysy selaimelta uudelleen"
+msgstr "pyydä sitä säilyttämään tiedot"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepAsking"
@@ -9987,7 +10023,7 @@ msgstr "varmuuskopioi taulussa {board}"
 
 #. js-lingui-explicit-id
 msgid "welcome.keepNot"
-msgstr "Tämä selain ei ole suostunut säilyttämään täällä tekemääsi, joten se voi tyhjentää sen säästääkseen tilaa tai aina sulkeutuessaan. Säilyttääksesi sen anna tämän sivuston säilyttää tietonsa selaimen asetuksissa, ja varmuuskopioi silloin tällöin."
+msgstr "Tämä selain voi tyhjentää täällä tekemäsi"
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"

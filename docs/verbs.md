@@ -170,7 +170,6 @@ The bar knows these words and says they come later.
 
 - `resources:`: Open the guides and references, with every command in full
 - `continue:`: Carry a cut-off reply on from where it stopped, by the model that wrote it
-- `rewrite:234`: Write a new dated summary beside the old one
 
 ## In a later release
 

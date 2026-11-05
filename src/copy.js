@@ -80,6 +80,7 @@ export const COPY = {
     unknown: /*i18n*/ { id: 'enter.unknown', message: 'No command called {verb}. Type ? for every command' },
     didYouMean: /*i18n*/ { id: 'enter.didYouMean', message: 'No command called {verb}. Did you mean {near}?' },
     renamed: /*i18n*/ { id: 'enter.renamed', message: 'That verb is now {now}. Enter writes it in', comment: 'Enter puts the new verb in the field; it does not run it' },
+    renamedForm: /*i18n*/ { id: 'enter.renamedForm', message: '{verb} is now {now}. Enter writes it in', comment: 'Commands stay English. Enter puts the new command in the field; it does not run it' },
     retired: /*i18n*/ { id: 'enter.retired', message: '{verb} is no longer a command' },
     retiredInstead: /*i18n*/ { id: 'enter.retiredInstead', message: '{verb} is no longer a command. Use {instead}' },
     noMinus: /*i18n*/ { id: 'enter.noMinus', message: 'Only a filter takes a minus, like -tag:research' },
@@ -429,6 +430,8 @@ export const COPY = {
     summarize: /*i18n*/ { id: 'enter.summarize', message: 'Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, at most {cost}' },
     summarizeCheap: /*i18n*/ { id: 'enter.summarizeCheap', message: 'Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, under {cost}' },
     summarizeUnpriced: /*i18n*/ { id: 'enter.summarizeUnpriced', message: 'Enter writes a summary of {nums} in {name}, dated today: one call to {provider}' },
+    // summarize: on cards summarized before (C291 (o)): the old summary stays.
+    summarizeAgain: /*i18n*/ { id: 'enter.summarizeAgain', message: 'A new summary, dated today; the one written before stays' },
     summarizeQuotes: /*i18n*/ { id: 'enter.summarizeQuotes', message: '{count, plural, one {{nums} is a quote, kept from models until now: its words go in this call} other {{nums} are quotes, kept from models until now: their words go in this call}}' },
     summarizeWriting: /*i18n*/ { id: 'enter.summarizeWriting', message: 'Writing the summary' },
     summarizeFailed: /*i18n*/ { id: 'enter.summarizeFailed', message: 'No summary came back, so nothing was written' },
@@ -951,6 +954,8 @@ export const COPY = {
     askKept: /*i18n*/ { id: 'enter.askKept', message: 'Kept as an ask. It goes with your next prompt' },
     // The Lab (stage 13, piece 1; C238).
     labAlready: /*i18n*/ { id: 'enter.labAlready', message: 'The Lab is open already' },
+    // A highlight kept on the colour's click (C291 (k)).
+    highlightKept: /*i18n*/ { id: 'enter.highlightKept', message: 'Kept highlight {num}' },
     roomRan: /*i18n*/ { id: 'enter.roomRan', message: 'Ran {command}. undo: takes it back', comment: 'Commands stay English' },
     ranOnly: /*i18n*/ { id: 'enter.ranOnly', message: 'Ran {command}', comment: 'Said under the field after a click ran a command that undo: cannot take back. Commands stay English' },
     labOpen: /*i18n*/ { id: 'enter.labOpen', message: 'Enter opens {name} in the Lab. Each change there is saved as you make it, and undo: takes it back', comment: 'Commands stay English' },
@@ -1495,7 +1500,6 @@ export const COPY = {
     coming: /*i18n*/ { id: 'languagePicker.coming', message: 'coming soon', comment: 'Beside a language listed but not offered yet' },
     foot: /*i18n*/ { id: 'languagePicker.foot', message: 'Replies and searches follow the page. reply: gives replies a language of their own.' },
     // Its keys at the foot, as the ? reference says its own (29 October).
-    keys: /*i18n*/ { id: 'languagePicker.keys', message: 'A click, or Enter on a row, turns the page to that language.', comment: 'The foot of the languages menu, before "Escape closes this"' },
     globe: /*i18n*/ { id: 'languagePicker.globe', message: 'Language: {language}' },
   },
 
@@ -1531,7 +1535,7 @@ export const COPY = {
   backup: {
     titleBackup: /*i18n*/ { id: 'backup.titleBackup', message: 'Back up' },
     titleRestore: /*i18n*/ { id: 'backup.titleRestore', message: 'Bring a backup back' },
-    close: /*i18n*/ { id: 'backup.close', message: 'Escape goes back to the bar' },
+    close: /*i18n*/ { id: 'backup.close', message: 'Back to the bar', comment: 'A button that closes the backup panel' },
     lede: /*i18n*/ { id: 'backup.lede', message: 'One file of what you choose, to keep somewhere else. Your keys are never in it.' },
     catChats: /*i18n*/ { id: 'backup.catChats', message: 'Chats and plans' },
     catChatsAbout: /*i18n*/ { id: 'backup.catChatsAbout', message: 'Every chat with its messages and files, and the plans they belong to' },
@@ -1588,17 +1592,11 @@ export const COPY = {
   settings: {
     rail: /*i18n*/ { id: 'settings.rail', message: 'Settings, by section' },
     keysTitle: /*i18n*/ { id: 'settings.keysTitle', message: 'API keys' },
-    keysDesc: /*i18n*/ { id: 'settings.keysDesc', message: 'Providers, keys and models' },
     spendingTitle: /*i18n*/ { id: 'settings.spendingTitle', message: 'Spending' },
-    spendingDesc: /*i18n*/ { id: 'settings.spendingDesc', message: 'This month, in dollars' },
     contextTitle: /*i18n*/ { id: 'settings.contextTitle', message: 'Context and defaults' },
-    contextDesc: /*i18n*/ { id: 'settings.contextDesc', message: 'How a new chat starts' },
     dataTitle: /*i18n*/ { id: 'settings.dataTitle', message: 'Data and backups' },
-    dataDesc: /*i18n*/ { id: 'settings.dataDesc', message: 'What this browser keeps' },
     appearanceTitle: /*i18n*/ { id: 'settings.appearanceTitle', message: 'Appearance' },
-    appearanceDesc: /*i18n*/ { id: 'settings.appearanceDesc', message: 'Text size' },
     aboutTitle: /*i18n*/ { id: 'settings.aboutTitle', message: 'About and security' },
-    aboutDesc: /*i18n*/ { id: 'settings.aboutDesc', message: 'Privacy and the network log' },
     keysLede: /*i18n*/ { id: 'settings.keysLede', message: 'Each provider’s key sits with the models it unlocks. Pick one as the model for new chats. Marks compare cost against {model}: ×15 costs fifteen times as much per token.' },
     keyHas: /*i18n*/ { id: 'settings.keyHas', message: 'Key ends {ending}' },
     keyHeld: /*i18n*/ { id: 'settings.keyHeld', message: 'Key ends {ending}, kept for this tab only' },
@@ -1620,8 +1618,11 @@ export const COPY = {
     regionEu: /*i18n*/ { id: 'settings.regionEu', message: 'EU' },
     regionUs: /*i18n*/ { id: 'settings.regionUs', message: 'US' },
     keepingLabel: /*i18n*/ { id: 'settings.keepingLabel', message: 'Keeping keys' },
-    keepingHelp: /*i18n*/ { id: 'settings.keepingHelp', message: 'Keys are encrypted by this browser before they are kept, and each goes only to the provider it belongs to. They never pass through the bar, which keeps a history.' },
+    keepingHelp: /*i18n*/ { id: 'settings.keepingHelp', message: 'Kept in the key vault, encrypted, and sent only to its own provider.' },
     keepRemember: /*i18n*/ { id: 'settings.keepRemember', message: 'Remember my keys' },
+    // A switch's state, said beside it (C291 (n)).
+    switchOn: /*i18n*/ { id: 'settings.switchOn', message: 'on', comment: 'Beside a switch in Settings that is on' },
+    switchOff: /*i18n*/ { id: 'settings.switchOff', message: 'off', comment: 'Beside a switch in Settings that is off' },
     keepRememberHelp: /*i18n*/ { id: 'settings.keepRememberHelp', message: 'Kept in this browser, encrypted, until you remove them' },
     keepForget: /*i18n*/ { id: 'settings.keepForget', message: 'Don’t save' },
     keepForgetHelp: /*i18n*/ { id: 'settings.keepForgetHelp', message: 'Held for this tab only. You enter them again each visit' },
@@ -1642,7 +1643,7 @@ export const COPY = {
     untitled: /*i18n*/ { id: 'settings.untitled', message: 'Untitled' },
     contextLede: /*i18n*/ { id: 'settings.contextLede', message: 'How a new chat starts, and what goes along with your prompts.' },
     titleLabel: /*i18n*/ { id: 'settings.titleLabel', message: 'Name new chats' },
-    titleOn: /*i18n*/ { id: 'settings.titleOn', message: 'After a chat’s first answer, one small request names it, said first under the bar.' },
+    titleOn: /*i18n*/ { id: 'settings.titleOn', message: 'After a chat’s first answer, one small request names it.' },
     titleOff: /*i18n*/ { id: 'settings.titleOff', message: 'A new chat is named from its first words, with no request.' },
     finishLabel: /*i18n*/ { id: 'settings.finishLabel', message: 'Finish replies when I leave a chat' },
     finishOn: /*i18n*/ { id: 'settings.finishOn', message: 'A reply goes on writing after you leave its chat.' },
@@ -1746,7 +1747,7 @@ export const COPY = {
     browserHtml: /*i18n*/ { id: 'settings.browserHtml', message: "A check on turning text into HTML" },
     browserHtmlNot: /*i18n*/ { id: 'settings.browserHtmlNot', message: "The browser does not add this check; Parliament still shows outside text as text only." },
     networkLabel: /*i18n*/ { id: 'settings.networkLabel', message: 'Network activity' },
-    networkHelp: /*i18n*/ { id: 'settings.networkHelp', message: 'Requests made by this page since it loaded, grouped by host and named by who called them. Every host should be a provider or source you use; if one is not, something is wrong.' },
+    networkHelp: /*i18n*/ { id: 'settings.networkHelp', message: 'Requests made since this tab opened, grouped by host, with what each was for. Every host should be a provider or source you use; if one is not, something is wrong.' },
     networkNone: /*i18n*/ { id: 'settings.networkNone', message: 'No requests yet.' },
     networkSelf: /*i18n*/ { id: 'settings.networkSelf', message: 'this page' },
     networkUnknown: /*i18n*/ { id: 'settings.networkUnknown', message: 'not a provider or source on the list' },
@@ -1764,7 +1765,6 @@ export const COPY = {
     follows: /*i18n*/ { id: 'replyPicker.follows', message: 'Follows the reply you view until you tick one. A new prompt to new sources: by: and their names.', comment: 'Commands stay English' },
     footCarried: /*i18n*/ { id: 'replyPicker.footCarried', message: 'The chat carries one line on. Tick others to carry them on too, each in its own tab.' },
     // Its keys at the foot, as the ? reference says its own (29 October).
-    keys: /*i18n*/ { id: 'replyPicker.keys', message: 'A click, or Enter on a row, ticks it or unticks it.', comment: 'The foot of the menu of where a reply goes, before "Escape closes this"' },
   },
 
   // The replies to a prompt sent to several, as tabs (stage 8; C173).
@@ -1909,8 +1909,8 @@ export const COPY = {
     // In the page's foot with the other marginalia, on every screen (29 October).
     small: /*i18n*/ { id: 'welcome.small', message: 'Built for computer, phone later', comment: 'In the foot of the welcome page, beside "Created with Claude Code"' },
     // Where the browser has not agreed to keep Parliament's data (C94). Names no browser.
-    keepNot: /*i18n*/ { id: 'welcome.keepNot', message: 'This browser has not agreed to keep what you make here, so it may clear it to save space, or each time it closes. To keep it, let this site keep its data in the browser’s settings, and back up now and then.' },
-    keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask the browser again' },
+    keepNot: /*i18n*/ { id: 'welcome.keepNot', message: 'This browser may clear what you make here' },
+    keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask it to keep the data' },
     keepBackup: /*i18n*/ { id: 'welcome.keepBackup', message: 'back up in {board}', comment: '{board} is Settings, from COPY.boards' },
     keepAsking: /*i18n*/ { id: 'welcome.keepAsking', message: 'asking' },
     footMade: /*i18n*/ { id: 'welcome.foot.made', message: 'Created with Claude Code' },
@@ -1960,6 +1960,8 @@ export const COPY = {
     // left and right column buttons above share.
     showInspector: /*i18n*/ { id: 'room.showInspector', message: 'Show the inspector', comment: "A narrow data room's button for its column inspector, while it is hidden" },
     hideInspector: /*i18n*/ { id: 'room.hideInspector', message: 'Hide the inspector', comment: "A narrow data room's button for its column inspector, while it shows" },
+    // The room's head while edits wait for the next prompt (C291 (k)).
+    editsKept: /*i18n*/ { id: 'room.editsKept', message: '{count, plural, one {edits kept · # waits for your next prompt} other {edits kept · # wait for your next prompt}}' },
     showMargin: /*i18n*/ { id: 'room.showMargin', message: 'Show the margin', comment: "A narrow drafting room's button for its margin notes, while they are hidden" },
     hideMargin: /*i18n*/ { id: 'room.hideMargin', message: 'Hide the margin', comment: "A narrow drafting room's button for its margin notes, while they show" },
     openEditor: /*i18n*/ { id: 'room.openEditor', message: 'Open the editor', comment: "The wrench at the top of a narrow room, outside the shell: it opens the room's editor" },
@@ -2301,7 +2303,6 @@ export const COPY = {
     // Selecting cards and the four acts (piece 7; C145 (d)).
     select: /*i18n*/ { id: 'collection.select', message: 'Select {card}' },
     selected: /*i18n*/ { id: 'collection.selected', message: '{count} selected' },
-    selectNone: /*i18n*/ { id: 'collection.selectNone', message: 'Select cards to act on them, or act on the whole collection.' },
     selectClear: /*i18n*/ { id: 'collection.selectClear', message: 'clear' },
     actNote: /*i18n*/ { id: 'collection.actNote', message: 'Note' },
     actNoteQuoting: /*i18n*/ { id: 'collection.actNoteQuoting', message: 'quoting {count}' },
@@ -2338,7 +2339,6 @@ export const COPY = {
     blocks: /*i18n*/ { id: 'library.blocks', message: '{count, plural, one {# block} other {# blocks}}' },
     places: /*i18n*/ { id: 'library.places', message: '{count, plural, one {# place for blocks} other {# places for blocks}}' },
     inRoom: /*i18n*/ { id: 'library.inRoom', message: 'goes in a room' },
-    onScreen: /*i18n*/ { id: 'library.onScreen', message: 'goes on the screen, beside rooms' },
     themeFact: /*i18n*/ { id: 'library.themeFact', message: 'colour and type for the inside of a room' },
     open: /*i18n*/ { id: 'library.open', message: 'open', comment: 'Marginalia on a board: writes open:<board> in the bar' },
     openHelp: /*i18n*/ { id: 'library.openHelp', message: 'Writes open:{board} in the bar', comment: 'open: and the board stay English' },
@@ -2425,7 +2425,7 @@ export const COPY = {
     regionNote: /*i18n*/ { id: 'keys.regionNote', message: 'Your key, account and billing may still be handled elsewhere.' },
     label: /*i18n*/ { id: 'keys.label', message: 'Your keys' },
     heading: /*i18n*/ { id: 'keys.heading', message: 'API keys' },
-    promise: /*i18n*/ { id: 'keys.promise', message: 'Kept in the key vault, encrypted, in this browser. Each goes only to its own provider.' },
+    promise: /*i18n*/ { id: 'keys.promise', message: 'Kept in the key vault, encrypted, and sent only to its own provider.' },
     needs: /*i18n*/ { id: 'keys.needs', message: 'needs a key' },
     ends: /*i18n*/ { id: 'keys.ends', message: 'key ends {ending}' },
     endsHeld: /*i18n*/ { id: 'keys.endsHeld', message: 'key ends {ending}, for this tab only' },
@@ -2436,7 +2436,7 @@ export const COPY = {
     placeholderNew: /*i18n*/ { id: 'keys.placeholderNew', message: 'paste the new key' },
     save: /*i18n*/ { id: 'keys.save', message: 'Save' },
     checking: /*i18n*/ { id: 'keys.checking', message: 'Checking' },
-    checkThenKeep: /*i18n*/ { id: 'keys.checkThenKeep', message: 'Save checks it with {provider} first, with one short request, then the key vault keeps it, encrypted, in this browser.' },
+    checkThenKeep: /*i18n*/ { id: 'keys.checkThenKeep', message: 'Save checks it with {provider} first, with one short request.' },
     checkThenHold: /*i18n*/ { id: 'keys.checkThenHold', message: 'Save checks it with {provider} first, with one short request, then holds it for this tab only.' },
     problemEmpty: /*i18n*/ { id: 'keys.problemEmpty', message: 'Paste the key first.' },
     problemInvalid: /*i18n*/ { id: 'keys.problemInvalid', message: '{provider} did not accept this key. Check it, and paste it again.' },
@@ -2446,7 +2446,7 @@ export const COPY = {
     ownKey: /*i18n*/ { id: 'keys.ownKey', message: 'is where to make one for Parliament alone, with its own spending limit, and to revoke one that leaks.', comment: 'Follows the link to the key page, in one sentence' },
     vaultUnreached: /*i18n*/ { id: 'keys.vaultUnreached', message: 'the key store did not open; reload to try again', comment: 'The key vault, at its own address, could not be reached (stage 15)' },
     noKeyNeeded: /*i18n*/ { id: 'keys.noKeyNeeded', message: '{count, plural, one {{names} needs no key.} other {{names} need no key.}}' },
-    foot: /*i18n*/ { id: 'keys.foot', message: 'Escape goes back to the bar. If a key leaks, revoke it at its provider, and paste a new one here.' },
+    foot: /*i18n*/ { id: 'keys.foot', message: 'If a key leaks, revoke it at its provider, and paste a new one here.' },
   },
 
   // The catalogue's words (C131, the plain-language pass): what the Library
@@ -2480,8 +2480,7 @@ export const COPY = {
     // the list of providers.
     title: /*i18n*/ { id: 'picker.title', message: 'Who answers', comment: 'The heading of the menu of who answers, drawn in capitals' },
     laterGroup: /*i18n*/ { id: 'picker.laterGroup', message: 'Later', comment: 'A group in the menu of who answers: providers not built yet, one row each' },
-    keys: /*i18n*/ { id: 'picker.keys', message: 'A click on a name, or Enter, answers with it alone from now on. Its box, or Shift and a click, adds it. A row that needs a key writes api: into the field instead.', comment: 'The foot of the menu of who answers, before "Escape closes this". api: is a command, kept English' },
-    keysStep: /*i18n*/ { id: 'picker.keysStep', message: 'A click, or Enter on a row, chooses it for this step.', comment: 'The foot of the menu of who answers one step of a plan, before "Escape closes this"' },
+    keys: /*i18n*/ { id: 'picker.keys', message: 'A name answers alone from now on; its box adds it beside the others. A row that needs a key writes api: instead.', comment: 'The foot of the menu of who answers. api: is a command, kept English' },
     // One after another (branch slider v9; C201).
     order: /*i18n*/ { id: 'picker.order', message: 'Order' },
     together: /*i18n*/ { id: 'picker.together', message: 'All at once' },
@@ -2542,7 +2541,6 @@ export const COPY = {
     noneYet: /*i18n*/ { id: 'frameworkPicker.noneYet', message: 'None of your own yet. new:framework "name" "what it asks" writes one.', comment: 'Commands stay English' },
     unnamed: /*i18n*/ { id: 'frameworkPicker.unnamed', message: 'unnamed', comment: 'A framework of your own with no name, as a persona could be' },
     foot: /*i18n*/ { id: 'frameworkPicker.foot', message: 'They go with every prompt in this chat, in the order ticked, until turned off.' },
-    keys: /*i18n*/ { id: 'frameworkPicker.keys', message: 'A click, or Enter on a row, puts it on at the end or takes it off.', comment: 'The foot of the frameworks menu, before "Escape closes this"' },
   },
 
   // Sources in the picker by the kind of question they answer.
@@ -2658,17 +2656,35 @@ export const COPY = {
   },
 
   // inspect: one thing in detail, under the bar (stage 5, piece 3; v30's peek).
+  // What a request was for, in About's network activity (C291 (m)).
+  netKinds: {
+    prompt: /*i18n*/ { id: 'netKind.prompt', message: 'prompt', comment: 'A kind of request in the network log, before its count' },
+    continue: /*i18n*/ { id: 'netKind.continue', message: 'continue', comment: 'A kind of request in the network log: a cut-off reply carried on' },
+    title: /*i18n*/ { id: 'netKind.title', message: 'title', comment: 'A kind of request in the network log: a chat named after its first answer' },
+    translation: /*i18n*/ { id: 'netKind.translation', message: 'translation', comment: 'A kind of request in the network log' },
+    summary: /*i18n*/ { id: 'netKind.summary', message: 'summary', comment: 'A kind of request in the network log' },
+    ripple: /*i18n*/ { id: 'netKind.ripple', message: 'ripple', comment: 'A kind of request in the network log; Ripple is a feature name' },
+    sweep: /*i18n*/ { id: 'netKind.sweep', message: 'sweep', comment: 'A kind of request in the network log' },
+    reflection: /*i18n*/ { id: 'netKind.reflection', message: 'reflection', comment: 'A kind of request in the network log' },
+    keyCheck: /*i18n*/ { id: 'netKind.keyCheck', message: 'key check', comment: 'A kind of request in the network log' },
+    textCheck: /*i18n*/ { id: 'netKind.textCheck', message: 'text check', comment: 'A kind of request in the network log: whether text from a source tries to instruct a model' },
+    nameCheck: /*i18n*/ { id: 'netKind.nameCheck', message: 'name check', comment: 'A kind of request in the network log: the privacy filter finding names' },
+    localCheck: /*i18n*/ { id: 'netKind.localCheck', message: 'local model check', comment: 'A kind of request in the network log: listing the models on this computer' },
+    compareMeaning: /*i18n*/ { id: 'netKind.compareMeaning', message: 'compare meaning', comment: 'A kind of request in the network log' },
+    answer: /*i18n*/ { id: 'netKind.answer', message: 'answer', comment: 'A kind of request in the network log: a source asked' },
+    other: /*i18n*/ { id: 'netKind.other', message: 'other', comment: 'A kind of request in the network log' },
+  },
+
   // compare: under the bar (stage 6, piece 7; C145 (i)).
   compare: {
     label: /*i18n*/ { id: 'compare.label', message: '{a} and {b} side by side' },
     legend: /*i18n*/ { id: 'compare.legend', message: 'struck: only in {a} · underlined: only in {b}' },
     counts: /*i18n*/ { id: 'compare.counts', message: '{gone, plural, one {# word out} other {# words out}}, {added, plural, one {# word in} other {# words in}}' },
     same: /*i18n*/ { id: 'compare.same', message: 'The same words' },
-    close: /*i18n*/ { id: 'compare.close', message: 'Nothing was sent to an AI model. Escape closes this' },
+    close: /*i18n*/ { id: 'compare.close', message: 'Nothing was sent to an AI model.' },
     // Words, not meaning (C290): said at the top, and loudly when two share little.
     wordsOnly: /*i18n*/ { id: 'compare.wordsOnly', message: 'Words compared, not meaning' },
     empty: /*i18n*/ { id: 'compare.empty', message: 'No words in this reply', comment: 'Under a side that is empty, such as a source that found nothing' },
-    writes: /*i18n*/ { id: 'compare.writes', message: 'Writes {command} in the bar', comment: 'Commands stay English' },
     fewShared: /*i18n*/ { id: 'compare.fewShared', message: 'These share few words, so the marks say little about how they differ. Adding meaning asks a model', comment: 'meaning is a word added to the command, and stays English' },
     wholeSentences: /*i18n*/ { id: 'compare.wholeSentences', message: "This browser can't find words in this language, so whole sentences are compared" },
     // compare: … meaning (C290): a model's reading, labelled as one.
@@ -2677,7 +2693,7 @@ export const COPY = {
     meaningCheck: /*i18n*/ { id: 'compare.meaningCheck', message: "A model's reading. Check it against the texts above" },
     meaningFailed: /*i18n*/ { id: 'compare.meaningFailed', message: 'No reading came back from {model}', comment: '{model} is a model name, from the list' },
     meaningCut: /*i18n*/ { id: 'compare.meaningCut', message: '{address} was read only in part: its first {count, number} characters', comment: '{address} is a branch like 201a, a chat number, or a note, highlight or quote' },
-    closeMeaning: /*i18n*/ { id: 'compare.closeMeaning', message: 'Sent once to {model}, for the reading above. Escape closes this', comment: '{model} is a model name, from the list' },
+    closeMeaning: /*i18n*/ { id: 'compare.closeMeaning', message: 'Sent once to {model}, for the reading above.', comment: '{model} is a model name, from the list' },
     // compare:201a 201b (C289): a side that is a branch's last reply.
     reply: /*i18n*/ { id: 'compare.reply', message: 'the last reply in {address}', comment: 'Names one side for screen readers; {address} is a branch like 201a, or a chat number' },
     replyKind: /*i18n*/ { id: 'compare.replyKind', message: 'Reply', comment: 'The small label over a reply set beside another' },
@@ -2693,11 +2709,10 @@ export const COPY = {
   inspect: {
     created: /*i18n*/ { id: 'inspect.created', message: 'created {day}' },
     active: /*i18n*/ { id: 'inspect.active', message: 'last active {ago}' },
-    openChat: /*i18n*/ { id: 'inspect.openChat', message: 'open:{num} brings it beside what is here. Escape closes this' },
-    close: /*i18n*/ { id: 'inspect.close', message: 'Escape closes this' },
+    openChat: /*i18n*/ { id: 'inspect.openChat', message: 'open:{num} brings it beside what is here', comment: 'Commands stay English' },
     label: /*i18n*/ { id: 'inspect.label', message: '{num} in detail' },
     highlights: /*i18n*/ { id: 'inspect.highlights', message: 'Highlights in {num}', comment: '{num} is the chat\'s number' },
-    listFoot: /*i18n*/ { id: 'inspect.listFoot', message: 'A click writes jump: for one. Escape closes this', comment: 'Commands stay English' },
+    listFoot: /*i18n*/ { id: 'inspect.listFoot', message: 'A click writes jump: for one', comment: 'Commands stay English' },
   },
 
   // The hint line: the keys that open the field where focus is (P2). {key}
@@ -2734,7 +2749,7 @@ export const COPY = {
     onScreenLab: /*i18n*/ { id: 'screensMap.onScreenLab', message: "The Lab, {boards}" },
     save: /*i18n*/ { id: 'screensMap.save', message: "arrange:save \"…\" keeps it", comment: "Commands stay English" },
     reset: /*i18n*/ { id: 'screensMap.reset', message: "reset: returns it to its default", comment: "Commands stay English" },
-    back: /*i18n*/ { id: 'screensMap.back', message: "Escape goes back" },
+    back: /*i18n*/ { id: 'screensMap.back', message: 'Back', comment: 'A button that closes the map of screens' },
     saved: /*i18n*/ { id: 'screensMap.saved', message: "Saved" },
     oneHead: /*i18n*/ { id: 'screensMap.oneHead', message: "No external screen detected." },
     oneBody: /*i18n*/ { id: 'screensMap.oneBody', message: "Connect one and boards can go on it." },
@@ -2763,7 +2778,6 @@ export const COPY = {
     boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },
     sampleReply: /*i18n*/ { id: 'shell.sampleReply', message: 'A stand-in reply until rooms arrive. Click into this line to edit it, and the bar folds into a circle.', comment: 'Editable text on a placeholder board; nothing typed here is kept' },
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },
-    referenceClose: /*i18n*/ { id: 'shell.referenceClose', message: 'Escape closes this' },
     referenceName: /*i18n*/ { id: 'shell.referenceName', message: 'Every command', comment: 'The name of the ? reference, read by screen readers' },
     // The ? reference lists every command on every board (C279 (f)).
     // In a popped board's window, after Ctrl+K or /: the browser keeps that window in front (C280).

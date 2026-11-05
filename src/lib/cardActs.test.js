@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectionOf, actCommand, aboutText, replySide, chatAddress } from './cardActs'
+import { selectionOf, actCommand, aboutText, replySide, chatAddress, planSummarize } from './cardActs'
 import { cardsOf } from './collectionCards'
 import { newCollection } from './collections'
 
@@ -76,5 +76,24 @@ describe('a branch whose last reply has no words (C290)', () => {
       { id: 'r2', role: 'assistant', content: '', source: { name: 'Wikipedia' } },
     ]
     expect(replySide('201a', messages, (m) => m.content, (m) => m.source.name)).toEqual({ kind: 'reply', address: '201a', who: 'Wikipedia', text: '' })
+  })
+})
+
+describe('summarize: again (C291 (o)): rewrite: is summarize: on cards summarized before', () => {
+  const rows = [
+    { num: 214, kind: 'note', text: 'One', tags: [], tagsMine: [] },
+    { num: 217, kind: 'quote', text: 'Two', tags: [], tagsMine: [] },
+    { num: 231, kind: 'note', text: 'Both, in short', summarized: { from: [214, 217], at: '2026-11-04', model: 'claude-haiku-5-5' }, tags: [], tagsMine: [] },
+  ]
+  const screens = {
+    records: { rows },
+    collection: { shown: { id: 'q2' }, label: () => 'Q2', cards: rows.map((r) => ({ num: r.num, kind: r.kind })) },
+    helper: { keyed: true, provider: 'Anthropic', price: { inputPerMillion: 1, outputPerMillion: 5 } },
+  }
+  const step = (nums) => ({ match: { values: nums.map((n) => ({ kind: 'number', value: n })) } })
+  it('says a new summary is dated and the old one stays', () => {
+    expect(planSummarize(step([214, 217]), screens, 'collection').says.also[0]).toEqual({ message: 'summarizeAgain' })
+    expect(planSummarize(step([214]), screens, 'collection').says.also.some((a) => a.message === 'summarizeAgain')).toBe(true)
+    expect(planSummarize(step([231]), screens, 'collection').says.also.some((a) => a.message === 'summarizeAgain')).toBe(false)
   })
 })

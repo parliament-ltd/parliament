@@ -38,19 +38,19 @@ export default function ReflectionBoard({ addressed, onAddress, onWrite, scope, 
         <h2>{i18n._(COPY.boards.reflection)}</h2>
         {scope && <span className="ch-marg ch-aside">{i18n._(C.from, { head })}</span>}
         {scope && <span className="ch-marg ch-aside ch-sep" aria-hidden="true">·</span>}
-        {scope && <span className="ch-marg ch-aside">{i18n._(C.readsOnly)}</span>}
+        {scope && <span className="ch-marg ch-aside">{i18n._(C.readsOnly)} · {i18n._(C.noCall)}</span>}
       </header>
       <div className="ch-cbody ch-reflect">
         {!scope ? <p className="ch-marg">{i18n._(C.noRoom)}</p> : (
           <>
             <section className="ch-ref-sec">
-              <h3>{i18n._(C.marked)} <span className="ch-marg">{i18n._(C.noCall)}</span></h3>
+              <h3>{i18n._(C.marked)}</h3>
               <p dir="auto">{counts.length
                 ? i18n._(C.markedIn, { list: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(counts), branches: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(marked.branches) })
                 : i18n._(C.markedNothing)}</p>
             </section>
             <section className="ch-ref-sec">
-              <h3>{i18n._(C.session)} <span className="ch-marg">{i18n._(C.noCall)}</span></h3>
+              <h3>{i18n._(C.session)}</h3>
               <p>{session
                 ? i18n._(C.sessionIs, { messages: session.messages, tokens: session.tokens, cost: session.cost == null ? i18n._(C.costUnknown) : money(i18n, session.cost) })
                 : i18n._(C.sessionReading)}</p>

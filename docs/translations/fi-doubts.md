@@ -372,3 +372,15 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 - **enter.compare, compare.meaningCut**: "kohteet {a} ja {b}" and "Kohteesta {address}", not "keskustelu". Here the placeholders can be notes, highlights or quotes as well as chats or branches, so these follow the glossary's generic kohde (as compare.legend's "kohteessa {a}"). enter.compareReplies keeps "keskustelujen {a} ja {b}".
 - **reading (a model's)** → tulkinta throughout (compare.closeMeaning, meaningCheck, meaningFailed, meaningHead, enter.compareMeaningFailed). Not yet in the glossary.
 - **AI model** → tekoälymalli, as in the welcome letter ("yhden tekoälymallin kanssa"). The three "Nothing is sent" lines now name it ("Mitään ei lähetetä tekoälymallille").
+
+## Less said on screen, drafted 5 November 2026 (C291)
+
+- **group.everyday, enter.help, leader.help**: Everyday is "Arkikäyttö" as the group's name, a noun like the other groups (Siirtyminen, Ajo), and "arkikomennot" in sentences. That compound is clear but made up. "Tavallisimmat komennot" (most usual) would be the safer Finnish, but it loses "everyday".
+- **shell.referenceMore, shell.referenceFewer**: "enemmän ▾" and "vähemmän ▴", the usual show more / show less pair. I did not use "lisää" because it is the verb add ("lisää avain"). enter.help names the row in quotes, "kohdan ”enemmän” alla", so the reader knows which row to click.
+- **shell.referenceMoreCount**: "Vielä 24 komentoa 9 ryhmässä". I added "komento(a)" and "Vielä" because "24 muuta" alone reads thin. There is no comma before the groups. Finnish keeps the verb and case singular after a number, so both plural branches of groups are the same ("# ryhmässä").
+- **netKind.answer**: "vastaus". Next to "kehote 3" it could be read as a model's response rather than a source being asked. In the log it sits under the source's host, which should keep it apart. "lähteen vastaus" is clearer but longer.
+- **netKind.localCheck**: "paikallisten mallien tarkistus". Most lines say "tällä koneella" rather than "paikallinen", but "tällä koneella olevien mallien tarkistus" is too long for a label. The welcome letter already uses "paikallisten mallien".
+- **enter.continue\***: {address} follows "keskustelun" / "keskustelussa", as the compare lines do, also when it is a branch like 201a.
+- **picker.keys**: I kept "Napsautus nimeen" (a click on a name) from the old line. A literal "Nimi vastaa yksin" says the name answers, which reads oddly in Finnish.
+- **welcome.keepAsk**: "pyydä sitä säilyttämään tiedot". Its existing busy state, welcome.keepAsking, still says "kysytään" from the old "kysy selaimelta uudelleen". "pyydetään" would match better if that line is touched.
+- **room.editsKept, enter.highlightKept**: the room's head says "muokkaukset tallessa", a status phrase. The line under the bar says "Säilytetty korostuksena {num}", built like enter.quoteKept. Both mean kept, in two words.

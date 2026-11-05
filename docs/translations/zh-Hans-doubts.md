@@ -428,3 +428,15 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - `enter.compareMeaningGo` (and Cheap, Unpriced): the sweep lines say 调用 {model} 一次; here {model} is already named in the sentence, so it is 调用一次, keeping {model} once as in the English.
 - `enter.compareMeaningNoKey`: "adds a key for one" is 可为模型添加密钥; "picks one on this computer" is 用 helper: 指定一个本机模型, as `enter.localOnlyHelper` has it.
 - `welcome.further`: "Advanced" is 进阶 (as in a second, more advanced set of steps), not 高级, which in Chinese interfaces mostly labels advanced settings.
+
+## Less said on screen, drafted 5 November 2026 (C291)
+
+- `shell.referenceFewer`: 收起 ▴, not a literal 更少 ▴. 收起 ("fold away") is how Chinese interfaces label the row that folds a list back, and it pairs with 更多 ▾. It says what the click does, not "fewer".
+- `settings.switchOn` / `settings.switchOff`: 开启 / 关闭, as chat.describeSettingHelp already names the two states. 开 / 关 would be shorter, but a lone 关 can also read as "close".
+- `keys.promise` and `settings.keepingHelp`: one line for both, 加密保存在密钥库中，每个密钥只会发给它自己的服务商。 The English no longer says "in this browser", so neither does the Chinese. The glossary's model line (由密钥库加密保存在此浏览器中) does include it. 每个密钥 is added because Chinese needs a subject for "sent only to its own provider".
+- `netKind.textCheck`: 文本检查 stays as close to "text check" as the English is. 指令检查 ("instruction check") would say better what is being checked, if a clearer label is wanted.
+- `netKind.nameCheck`: 人名查找 ("name search"), not 人名检查, to match the existing privacy lines (查找人名).
+- `netKind.title`: 标题 ("title"). 命名 ("naming") would say more clearly that the request names a chat.
+- `chat.continueReply`: 继续 ("continue"), the usual button word. The tooltip (chat.continueWrites) says what it writes. 续写 (the netKind word) would be more exact but less usual on a button.
+- `room.editsKept` / `enter.highlightKept`: "kept" is 已保存 ("saved"), as in enter.quoteKept and enter.askKept, not 已保留 ("retained").
+- `picker.keys`: "beside the others" is 加到其他回答者旁边 ("adds it next to the other answerers"). "A row that needs a key writes api: instead" drops the old 在输入栏中 ("in the bar"), as the English does.

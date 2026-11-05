@@ -28,8 +28,11 @@ function Parts({ parts }) {
  *   where search does not reach yet (C132 (a))
  *   held: the prompt field holds a prompt edited in the chat, shown as a
  *   placeholder; the line says what typing and Escape do to it
+ *   learning: the welcome page's steps are not yet done or put away; only
+ *   then does the line end with how to leave (C291 (b)): after that, Esc is
+ *   a row of ?, said once
  */
-export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false, learning = true }) {
   const { i18n } = useLingui()
   // What Enter will do, in the language a language: line names, once its
   // words are loaded (C184); until then, in the page's.
@@ -38,7 +41,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   useSyncExternalStore(onLanguageLoaded, languageLoads, languageLoads)
   const speaker = (speaks && speakerOf(speaks)) || i18n
   const lang = speaker === i18n ? undefined : speaks
-  const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
+  const leave = learning ? { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) } : null
   const toRoom = room && (mode === 'prompt' || isRoom(addressed))
   let targetText
   if (!toRoom) targetText = i18n._(COPY.enter.target, { board: boardName(i18n, addressed) })
@@ -62,14 +65,14 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
       { key: 'p', text: i18n._(COPY.enter.restingPrompt) },
       { key: 'h', text: i18n._(COPY.enter.restingHelp) },
       leave,
-    ]
+    ].filter(Boolean)
   } else if (mode === 'command') {
     parts = [target, { key: 'does', now: true, text: say(speaker, says.message, says.values), lang }, ...also]
-    parts.push(leave)
+    if (leave) parts.push(leave)
   } else if (mode === 'search' && empty && told && says?.message) {
     // What a click on a board just ran, echoed with the field at rest (C240 (d)).
     parts = [{ key: 'does', now: true, text: say(speaker, says.message, says.values), lang }, ...also]
-    if (resting !== 'search') parts.push(leave)
+    if (leave && resting !== 'search') parts.push(leave)
   } else if (mode === 'search' && welcome && empty) {
     // At rest on the welcome page, nothing: how to begin is in the field (C286 (h)).
     parts = []
@@ -87,7 +90,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
           ? i18n._(search.cards ? COPY.enter.searchCards : search.settings ? COPY.enter.searchSettings : search.library ? COPY.enter.searchLibrary : COPY.enter.searchShows, { count: search.count })
           : i18n._(COPY.enter.searchRecords, { first: boardName(i18n, 'almanac'), second: boardName(i18n, 'collection') }),
       }]
-    if (resting !== 'search') parts.push(leave)
+    if (leave && resting !== 'search') parts.push(leave)
   } else {
     // Who receives the prompt and what it costs, before Enter (C83).
     parts = [target]
@@ -96,7 +99,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
     if (held) parts.push({ key: 'held', text: i18n._(COPY.enter.heldPrompt) })
     // On the welcome page, the way to the command line from a prompt (C119).
     if (welcome) parts.push({ key: 'cmd', text: i18n._(COPY.enter.toCommand, { leader: '>' }) })
-    if (resting !== 'prompt') parts.push(leave)
+    if (leave && resting !== 'prompt') parts.push(leave)
   }
   return (
     <div className={`ch-enter${hidden ? ' hide' : ''}`} aria-live="polite" aria-hidden={hidden ? 'true' : undefined}>

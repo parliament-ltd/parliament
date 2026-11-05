@@ -1041,9 +1041,8 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(at('>close:welcome', both).text).toBe('Enter closes the welcome page. tour: brings it back')
     expect(at('>close:welcome', both).next.columns.flat()).not.toContain('welcome')
     expect(at('>close:welcome').text).toBe('Welcome page is not open')
-    // close:tour is close:welcome (29 October).
-    expect(at('>close:tour', both).text).toBe('Enter closes the welcome page. tour: brings it back')
-    expect(at('>close:tour', both).next.columns.flat()).not.toContain('welcome')
+    // close:tour is written as close:welcome (29 October; C291 (o)).
+    expect(at('>close:tour', both)).toMatchObject({ text: 'close:tour is now close:welcome. Enter writes it in', answer: { fill: '>close:welcome' } })
   })
 
   it('pops several boards into one window, rooms by their number, display and beside (C283)', () => {
@@ -1088,7 +1087,7 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
   })
 
   it('closes the welcome page alone to the start card, and close:room the room here (C282)', () => {
-    for (const v of ['>close:welcome', '>close:tour']) {
+    for (const v of ['>close:welcome']) {
       const p = at(v, shipped('welcome'))
       expect(p.text).toBe('Enter closes the welcome page. tour: brings it back')
       expect(p.next.columns).toEqual([['start']])

@@ -29,7 +29,7 @@ export default function FrameworkPicker({ items, onToggle, onClose = null }) {
     <MenuPanel
       className="ch-menu"
       title={i18n._(COPY.frameworkPicker.title)}
-      foot={footOf(i18n._(COPY.frameworkPicker.foot), i18n._(COPY.frameworkPicker.keys), i18n._(COPY.shell.referenceClose))}
+      foot={footOf(i18n._(COPY.frameworkPicker.foot))}
       onClose={onClose}
     >
       <MenuColumns>

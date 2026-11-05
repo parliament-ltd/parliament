@@ -2561,6 +2561,20 @@ export default function Shell() {
   // A setting of this device (C253 (d)), off for someone new (C253 (c)).
   const calm = settings.calm === true
   const calmScreen = useMemo(() => ({ on: calm }), [calm])
+  // Calm once you know it (C291 (g)): when the welcome page's steps are done
+  // or put away, here and now, calm turns on, unless calm was ever set on
+  // this device: someone who turned it off stays off. Steps done before this
+  // page opened change nothing, so no one's screen changes on an upgrade.
+  // The strip then says "calm: on", and a click turns it off.
+  const stepsSettled = Boolean(welcome.finished || welcome.off)
+  const settledAt = useRef(null)
+  useEffect(() => {
+    if (!started) return
+    if (settledAt.current === null || settledAt.current === stepsSettled) { settledAt.current = stepsSettled; return }
+    settledAt.current = stepsSettled
+    if (!stepsSettled) return
+    getSetting('calm').then((kept) => { if (kept === undefined || kept === null) updateSetting('calm', true) }).catch(() => {})
+  }, [started, stepsSettled, updateSetting])
   // On a touch screen, "near" is the one last tapped (C253 (e)).
   useEffect(() => {
     if (!calm) return undefined
@@ -3178,6 +3192,17 @@ export default function Shell() {
   // A × on the board (C199): the delete: it stands for, run at once, and
   // what it did said under the bar.
   const [barSaid, setBarSaid] = useState(null)
+  // A highlight is kept on the colour's click (C291 (k)): said under the
+  // field with its number, as a note written with note: is. The page's own
+  // event carries ids and the number only, never the words.
+  useEffect(() => {
+    const onKept = (e) => {
+      const num = e.detail?.num
+      if (Number.isInteger(num)) setBarSaid({ says: { message: 'highlightKept', values: { num } } })
+    }
+    window.addEventListener('parliament-highlighted', onKept)
+    return () => window.removeEventListener('parliament-highlighted', onKept)
+  }, [])
   const onPlanDelete = useCallback(async (line) => {
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act || p.act.confirm) { setBarSaid({ says: p.says ?? null }); return }
@@ -3373,6 +3398,8 @@ export default function Shell() {
   const roomsSweeps = useChatEdits(roomChats, 'suggestions')
   const holdsMarkup = useCallback((chat) => Boolean(chat) && [roomsEdits, roomsAsks, roomsSweeps].some((m) => (m.get(chat) ?? []).length > 0), [roomsEdits, roomsAsks, roomsSweeps])
   // The room's edits by number, for hold: (C216 (f)).
+  // Edits in the room's chat that wait for its next prompt, said in its head (C291 (k)).
+  const editsKeptHere = useMemo(() => (roomEdits.get(roomId) ?? []).filter(editWaits).length, [roomEdits, roomId])
   const heldEdits = useMemo(() => ({
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
@@ -4234,7 +4261,8 @@ export default function Shell() {
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
   // Features of input, from the field's marginalia (C248).
   const featureActs = useMemo(() => ({ onWeb: toggleWeb, onAttach: () => { pickFiles().then((says) => { if (says) setBarSaid({ says }) }) }, onDropFile: dropFile }), [toggleWeb, pickFiles, dropFile])
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid, featureActs, onDropDraft: dropJoined }
+  // learning: the welcome steps not yet done or put away, so the Enter line still says how to leave (C291 (b)).
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, learning: !welcome.off && !welcome.finished, onSearch, searches, searchCounts, said: barSaid, featureActs, onDropDraft: dropJoined }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   // The Collection's search and filters in force, shown as Records shows its own (C287).
   const collectionFiltered = collectionShown.narrowing ? { search: collectionSearch.trim(), line: viewLine({ filters: collectionFilters }) } : null
@@ -4261,7 +4289,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} onWrite={writeField} alone={windowed || onlyBoard} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} />
     }
     if (board === 'almanac') {
       return (

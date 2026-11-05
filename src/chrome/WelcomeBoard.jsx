@@ -207,9 +207,11 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
             </p>
           )}
           {keep && (
+            // One line (C291 (h)); the full words are in Settings, Data.
             <div className="ch-wkeep" role="note">
-              <p>{i18n._(COPY.welcome.keepNot)}</p>
-              <p className="ch-marg">
+              <p>
+                {i18n._(COPY.welcome.keepNot)}
+                <span className="sep" aria-hidden="true"> · </span>
                 <button type="button" disabled={keep.asking} onClick={keep.onAsk}>{i18n._(keep.asking ? COPY.welcome.keepAsking : COPY.welcome.keepAsk)}</button>
                 <span className="sep" aria-hidden="true"> · </span>
                 <button type="button" onClick={() => onWrite('>open:settings data')}>{i18n._(COPY.welcome.keepBackup, { board: i18n._(COPY.boards.settings) })}</button>

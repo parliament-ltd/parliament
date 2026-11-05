@@ -35,7 +35,7 @@ export default function Compare({ a, b, meaning = null, onWrite = null }) {
   const id = (row) => (reply(row) ? row.address : row.num)
   const command = `compare:${id(a)} ${id(b)} meaning`
   const write = onWrite && !meaning
-    ? <button type="button" className="ch-compare-ask" title={i18n._(COPY.compare.writes, { command })} onMouseDown={(e) => e.preventDefault()} onClick={() => onWrite(command)}>{command}</button>
+    ? <button type="button" className="ch-compare-ask" onMouseDown={(e) => e.preventDefault()} onClick={() => onWrite(command)}>{command}</button>
     : null
   const few = !meaning && sharedShare(counts) < FEW_SHARED && Math.max(counts.same + counts.gone, counts.same + counts.added) >= FEW_SHARED_MIN
   return (

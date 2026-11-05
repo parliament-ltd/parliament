@@ -286,7 +286,7 @@ function Acts({ cards, picked, onPick, onClearPicked, onWrite, onPrompt }) {
     <div className="ch-col-acts">
       <div className="ch-col-scope ch-marg">
         {n === 0
-          ? <span>{i18n._(COPY.collections.selectNone)}</span>
+          ? null
           : (
             <>
               <b>{i18n._(COPY.collections.selected, { count: n })}</b>
@@ -415,7 +415,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
         {notHeld != null && (
           <p className="ch-marg ch-col-nothere">
             <span>{i18n._(C.notHeldHere, { num: notHeld })}</span>{' '}
-            <button type="button" title={i18n._(COPY.collections.pickHelp, { command: ADD(notHeld) })} onClick={() => onWrite(`>${ADD(notHeld)}`)}>{ADD(notHeld)}</button>
+            <button type="button" onClick={() => onWrite(`>${ADD(notHeld)}`)}>{ADD(notHeld)}</button>
           </p>
         )}
         <div className="ch-col-tabs" role="tablist">

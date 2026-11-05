@@ -113,7 +113,6 @@ function Item({ item, items, onWrite, lab, ticked, onTick, open, onOpen }) {
   if (item.shelf === 'layout' && item.places) facts.push(i18n._(L.places, { count: item.places }))
   if (item.shelf === 'block') facts.push(i18n._(L.inRoom))
   if (item.shelf === 'theme') facts.push(i18n._(L.themeFact))
-  if (item.shelf === 'board') facts.push(i18n._(L.onScreen))
   if (item.shelf === 'resource' && item.format) facts.push(item.format)
   const here = lab?.room?.mode ? inRoom(item, lab.room.mode) : false
   if (here) facts.push(i18n._(L.inThisRoom))

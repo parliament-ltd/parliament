@@ -61,7 +61,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -465,7 +465,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             ))}
           </div>
         )}
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} />
         {/* Extra screen detected (C259 (g)): once, under the field. */}
         {note && !folded && (
           <p className="ch-snote ch-marg">

@@ -30,11 +30,14 @@ export class Refused extends Error {
  * @param {{ destination: (id: string) => object|null, keyring: { get: (id: string) => Promise<string|null> },
  *   implementation: (id: string) => object|null, now?: () => number }} deps
  */
-export function createGateway({ destination, keyring, implementation, now = () => Date.now() }) {
-  let log = []
+export function createGateway({ destination, keyring, implementation, now = () => Date.now(), keep = null }) {
+  // keep: where the log outlives a reload within the tab (C291 (m)); what made
+  // each request and to whom, never its content or a key.
+  let log = keep?.read?.() ?? []
   const listeners = new Set()
   const note = (entry) => {
     log = [...log.slice(-199), entry]
+    keep?.write?.(log)
     listeners.forEach((fn) => fn())
   }
 

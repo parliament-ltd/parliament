@@ -10,7 +10,7 @@
 // registry never reaches the database, the providers or the keys. Until a
 // verb's action exists, its Enter line says it is not built yet.
 
-import { VERBS, RENAMED, RETIRED, KEPT_FREE, GROUPS, LEADERS, LINES, EVERYDAY } from './verbs'
+import { VERBS, RENAMED, RETIRED, FORM_RENAMED, KEPT_FREE, GROUPS, LEADERS, LINES, EVERYDAY } from './verbs'
 import { parseCommand, readField, shapedLikeKey } from './parse'
 import { offered } from '../lib/release'
 
@@ -180,6 +180,12 @@ export function enterLine(value, ctx = {}) {
 function answer(command, board, built, body) {
   const { verb } = command
   const said = `${command.minus ? '-' : ''}${verb}:`
+  // A form that became another command (C291 (o)): Enter writes it in.
+  const form = `${verb}:${String(command.raw ?? '').toLowerCase()}`
+  if (!command.minus && Object.hasOwn(FORM_RENAMED, form)) {
+    const fill = `>${body.slice(0, command.start)}${FORM_RENAMED[form]}${body.slice(command.end)}`
+    return { state: 'renamed', message: 'renamedForm', values: { verb: form, now: FORM_RENAMED[form] }, verb, fill }
+  }
   if (Object.hasOwn(RENAMED, verb)) {
     // Enter writes the new verb in place of the old one, and keeps the rest
     // of the line as it was.

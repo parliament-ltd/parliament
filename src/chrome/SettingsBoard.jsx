@@ -6,7 +6,7 @@ import LockPanel from './LockPanel'
 import Globe from './Globe'
 import { SECTIONS } from '../shell/boards'
 import { getEntries, subscribe as onLog } from '../lib/networkLog'
-import { gateway, networkByHost } from '../net'
+import { gateway, networkByHost, kindsOf } from '../net'
 import { money, longDay } from './say'
 import { browserAbilities } from '../shell/thisBrowser'
 import { checkOnDeviceVoice } from '../hooks/useVoiceInput'
@@ -45,7 +45,6 @@ function useAbilities() {
 // Only settings that do something are shown (settings spec §12; R28).
 
 const TITLE = Object.fromEntries(SECTIONS.map((s) => [s.id, COPY.settings[`${s.id}Title`]]))
-const DESC = Object.fromEntries(SECTIONS.map((s) => [s.id, COPY.settings[`${s.id}Desc`]]))
 
 // Whether a row's words hold every word searched for, or the search names
 // its section (settings spec §2: a word that names a section shows it all).
@@ -79,8 +78,16 @@ function Seg({ options, value, onPick, label }) {
   )
 }
 
+// It says its state in a word beside it, as the strip's "calm: off" does
+// (C291 (n)); the word is part of the control, so a click on it flips too.
 function Switch({ on, onFlip, label }) {
-  return <button type="button" role="switch" aria-checked={on} aria-label={label} className={`ch-sw${on ? ' on' : ''}`} onMouseDown={(e) => e.preventDefault()} onClick={() => onFlip(!on)} />
+  const { i18n } = useLingui()
+  return (
+    <button type="button" role="switch" aria-checked={on} aria-label={label} className={`ch-swc${on ? ' on' : ''}`} onMouseDown={(e) => e.preventDefault()} onClick={() => onFlip(!on)}>
+      <span className={`ch-sw${on ? ' on' : ''}`} aria-hidden="true" />
+      <span className="ch-sw-word" aria-hidden="true">{i18n._(on ? COPY.settings.switchOn : COPY.settings.switchOff)}</span>
+    </button>
+  )
 }
 
 function Marg({ line, onWrite, children }) {
@@ -178,8 +185,8 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
               className={`ch-set-ritem${current === s.id ? ' on' : ''}${visible(s.id) ? '' : ' dim'}`}
               onClick={() => onWrite(`>open:settings ${s.id}`)}
             >
-              <span className="ch-set-rname">{say(TITLE[s.id])}<span className="ch-set-ralias">{s.id}</span></span>
-              <span className="ch-marg ch-set-rdesc">{say(DESC[s.id])}</span>
+              {/* Its title only (C291 (e)): the heading of its section says its word for open:settings. */}
+              <span className="ch-set-rname">{say(TITLE[s.id])}</span>
             </button>
           ))}
         </nav>
@@ -414,6 +421,8 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
                           <span className="h">{g.host}</span>
                           <span className="w ch-marg">{g.name ?? say(g.self ? COPY.settings.networkSelf : COPY.settings.networkUnknown)}</span>
                           <span className="n">{g.count}</span>
+                          {/* What they were, by kind and count (C291 (m)). */}
+                          {g.labels.length > 0 && <span className="k ch-marg">{kindsOf(g.labels).map((k) => `${say(COPY.netKinds[k.kind])} ${k.count}`).join(' · ')}</span>}
                         </span>
                       ))}
                     </span>

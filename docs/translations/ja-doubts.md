@@ -397,3 +397,15 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - **enter.compareMeaningGo, GoCheap, GoUnpriced**: the cost part follows the shape of enter.reflectTalkGo (呼び出し1回、約{cost}), not the sweep lines' {model}を1回呼び出し, since the English already names {model} as the one asked.
 - **"marks the words that differ"** (enter.compare, enter.compareReplies, verb.compare): 違う語に印を付ける, taking 印 from the glossary's 違うところに印. It replaces the earlier 語ごとに比較します, as the English was reworded.
 - **compare.empty**: 言葉 instead of 語 for "words" (この返答には言葉がありません). 語がありません on its own reads stiffly, and this line is not one of the words or meaning contrasts.
+
+## Less said on screen, drafted 5 November 2026 (C291)
+
+- **shell.referenceMore, shell.referenceFewer:** もっと見る ▾ / 折りたたむ ▴, the pair Gmail's Japanese uses to open and fold a list, rather than a literal その他 / 減らす. enter.help names the row as 「もっと見る」, so the three must change together.
+- **group.everyday:** よく使うもの (the things you use often). 日常 would be literal and reads oddly as a heading; 基本 (basics) says something else. The other lines say よく使うコマンド.
+- **netKind.localCheck:** ローカルモデルの確認. The glossary has no word for "local"; このコンピュータのモデルの確認 is long for a label before a count, and the welcome letter already says ローカルモデル.
+- **netKind.nameCheck:** 人名の確認, since the privacy filter lines call the names it finds 人名.
+- **netKind.ripple:** Ripple, capitalised as the glossary keeps it as a name, though the English label is lower case.
+- **room.editsKept:** "edits kept" read as saved (C291 (k): kept after a pause or on blur), so 編集は保存済み, joined to the count with ・ as enter.promptEditsGo does.
+- **chat.continueReply:** 続ける, per the glossary's "carry on". 続きを書く would say more plainly what the button does, if 続ける feels bare under a cut-off reply.
+- **enter.continue* lines:** "asks {name} to carry on" as the causative {name}に続けさせます, as enter.privacyNames has {name}にまず人名を探させ.
+- **welcome.keepAsk:** データの保持を求める; the browser is the one asked, named in welcome.keepNot just before it.

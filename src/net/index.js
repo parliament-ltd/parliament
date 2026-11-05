@@ -1,11 +1,15 @@
 // The gateway and the key module, wired to the app (stage 4). Everything
 // that talks to a provider or source, or handles a key, goes through here.
 
+import { sessionKeep } from '../lib/sessionKeep'
 import { destination, shipped, DESTINATIONS } from './list'
 import { answererRows, answererFor, helperFor, findModel } from './answerers'
 import { onDevice } from './translate'
 import { englishNameOf } from '../lib/languages'
 import { requestsByHost } from './requestLog'
+
+// What each request was, as kinds the copy table words (C291 (m)).
+export { kindsOf, REQUEST_KINDS } from './requestLog'
 import { createKeyring } from './keyring'
 import { createVaultClient, STAND_IN_TYPED } from './vaultClient'
 import { noteVaultRequest } from '../lib/networkLog'
@@ -107,7 +111,12 @@ function implementation(id) {
   return null
 }
 
-export const gateway = createGateway({ destination, keyring: keys, implementation })
+// The gateway's log is kept for the tab's session (C291 (m)): when, to whom,
+// by which method and why, never what was sent.
+const requestsKept = sessionKeep('parliament-requests', (e) => (e && typeof e.to === 'string'
+  ? { at: Number(e.at) || 0, to: e.to.slice(0, 64), method: String(e.method ?? '').slice(0, 64), label: String(e.label ?? '').slice(0, 80) }
+  : null))
+export const gateway = createGateway({ destination, keyring: keys, implementation, keep: requestsKept })
 
 // The provider until the picker arrives (stage 7): every call names it, so
 // switching is a change of this one value per call site.

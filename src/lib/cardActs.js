@@ -100,6 +100,9 @@ export function planSummarize(step, screens = {}, addressed = null) {
   // A quote is kept from models until the person acts on it: this is acting (C78).
   const quotes = t.rows.filter((r) => r.kind === 'quote').map((r) => r.num)
   const also = quotes.length ? [{ message: 'summarizeQuotes', values: { nums: quotes, count: quotes.length } }] : []
+  // Summarized before, as rewrite: would have (C291 (o)): a new one, the old one kept.
+  const before = (screens.records?.rows ?? []).some((r) => r.kind === 'note' && Array.isArray(r.summarized?.from) && nums.every((n) => r.summarized.from.includes(n)))
+  if (before) also.unshift({ message: 'summarizeAgain' })
   return { says: { ...says, also }, act: { kind: 'summarize', nums, collection: shown.id } }
 }
 

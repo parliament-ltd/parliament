@@ -22,7 +22,7 @@ export default function LanguagePicker({ items, now, onPick, onClose = null }) {
     <MenuPanel
       className="ch-menu"
       title={i18n._(COPY.languagePicker.title)}
-      foot={footOf(i18n._(COPY.languagePicker.foot), i18n._(COPY.languagePicker.keys), i18n._(COPY.shell.referenceClose))}
+      foot={footOf(i18n._(COPY.languagePicker.foot))}
       onClose={onClose}
     >
       <MenuColumns>

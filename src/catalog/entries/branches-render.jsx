@@ -86,7 +86,7 @@ export default function BranchesRender({ config = {} } = {}) {
       {full && (
         <p className="text-xs text-[var(--p-text-secondary)] italic">
           {i18n._(B.full, { percent: contextUsage })}{' '}
-          <button type="button" className="underline underline-offset-2" title={i18n._(B.writes, { command: carryOn })} onClick={() => write(`>${carryOn}`)}>{carryOn}</button>
+          <button type="button" className="underline underline-offset-2" onClick={() => write(`>${carryOn}`)}>{carryOn}</button>
         </p>
       )}
 

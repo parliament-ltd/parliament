@@ -68,12 +68,15 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
       )}
       {onRun && !phone && (
         <span className="ch-marg ch-sfocus">
-          <button type="button" className={on ? 'on' : undefined} aria-pressed={on}
-            title={i18n._(COPY.shell.focusTitle, { command: on ? 'focus:off' : 'focus:' })}
-            onClick={() => onRun(on ? 'focus:off' : 'focus:')}>
-            {i18n._(on ? COPY.shell.focusOn : COPY.shell.focusOff)}
-          </button>
-          <button type="button" className="car" aria-expanded={picking} aria-label={i18n._(COPY.shell.focusPick)} onClick={open}>▾</button>
+          {/* One control (C291 (n)): the word toggles, the caret opens the picker. */}
+          <span className={`ch-sfocus-one${on ? ' on' : ''}`}>
+            <button type="button" className={on ? 'on' : undefined} aria-pressed={on}
+              title={i18n._(COPY.shell.focusTitle, { command: on ? 'focus:off' : 'focus:' })}
+              onClick={() => onRun(on ? 'focus:off' : 'focus:')}>
+              {i18n._(on ? COPY.shell.focusOn : COPY.shell.focusOff)}
+            </button>
+            <button type="button" className="car" aria-expanded={picking} aria-label={i18n._(COPY.shell.focusPick)} onClick={open}>▾</button>
+          </span>
           {picking && (
             <span className="ch-fpick" role="group" aria-label={i18n._(COPY.shell.focusPick)}>
               <span className="k">{i18n._(COPY.shell.focusPickHead)}</span>

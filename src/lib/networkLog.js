@@ -1,14 +1,20 @@
 // ─── Network Activity Log ────────────────────────────────
 // Wraps window.fetch to record every outbound request made
-// by the app. In-memory ring buffer (max 100 entries); resets
-// on page reload. Powers the Network Activity card in Settings
+// by the app. A ring buffer of the last 200, kept for the tab's session
+// (C291 (m)): host, time and outcome only, so a reload within the tab keeps
+// them and closing the tab forgets them. Powers the Network Activity card in Settings
 // so people can check that only the providers and sources they use are
 // contacted, and the requests the key vault makes for the page (C272 (h)).
 
-const MAX_ENTRIES = 100
+import { sessionKeep } from './sessionKeep'
+
+const MAX_ENTRIES = 200
+const kept = sessionKeep('parliament-network', (e) => (e && typeof e.host === 'string'
+  ? { id: String(e.id ?? ''), timestamp: Number(e.timestamp) || 0, method: String(e.method ?? '').slice(0, 10), host: e.host.slice(0, 255), path: '', status: Number.isInteger(e.status) ? e.status : null, ok: typeof e.ok === 'boolean' ? e.ok : null, durationMs: null, ...(e.via === 'vault' ? { via: 'vault' } : {}) }
+  : null), MAX_ENTRIES)
 
 const state = {
-  entries: [],
+  entries: kept.read(),
   listeners: new Set(),
 }
 
@@ -23,6 +29,7 @@ function pushEntry(entry) {
   if (state.entries.length > MAX_ENTRIES) {
     state.entries.splice(0, state.entries.length - MAX_ENTRIES)
   }
+  kept.write(state.entries)
   emit()
 }
 
@@ -51,6 +58,7 @@ export function subscribe(listener) {
 
 export function clearLog() {
   state.entries = []
+  kept.write([])
   emit()
 }
 
