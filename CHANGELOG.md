@@ -3,6 +3,15 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.13.0, 5 November 2026
+
+- ? opens with the everyday commands. more shows the rest, and ?all shows every command at once.
+- A click that changes a setting says what it ran under the bar, and undo: takes it back.
+- Continue on a cut-off reply writes continue: in the bar, which names the model that wrote the reply and the cost before you press Enter.
+- The network log in Settings says what each request was for, and keeps it until you close the tab.
+- Less said on screen: Escape is a row of ?, the menus lose their how-to-click sentences, and Settings' switches say on or off.
+- A room says when edits wait for your next prompt, and a highlight says it is kept.
+
 ## 0.12.0, 4 November 2026
 
 - compare:201a 201b sets the last replies of two branches side by side and marks the words that differ. Nothing is sent to an AI model.
