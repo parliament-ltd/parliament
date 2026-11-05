@@ -4694,6 +4694,10 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(p) The measure afterwards.** The numbers in "What was found" are the baseline. **Suggestion:** once the items are ruled and built, count the same way again, helper words per surface in its normal state and verbs built and command-only, and record the change in this entry.
 - **Tried:** the mockup, both states and both ways of drawing "more", in the browser pane at desktop width. **Not tried:** anything in the app; nothing is built. The copy table is untouched; the four languages change only when an item is ruled.
 - **Waiting for Stefan:** every item. (j), (l) and (a) first, since they are the ones about seeing what runs and what there is to run.
+- **Ruled 5 November: as suggested, with three changes** ("Yes, with your changes"), after the findings were checked against the code (every file, line and copy id named is where it says):
+  1. **(b):** the Enter line keeps "Escape goes back…" until the welcome page's nine steps are done or put away; the six panels lose theirs as suggested. Escape is the only way out of a mode, and someone new will not look it up in `?`.
+  2. **(l):** besides `continue:` through the bar, the reply is continued by the model that wrote it, not Settings' default model (today `messages-render.jsx` passes `settings.defaultModel`), and the Enter line names that model; the button's word "Continue", written in English in `MessageCard.jsx`, comes from the copy table.
+  3. **(o):** `diff:` stays a verb of its own. It sets two runs side by side by their steps and costs, not their words, and `compare:` was just taught as words, not meaning (C290); a third kind under one verb would blur that. `tour:off` and `close:tour` join `RENAMED` to `close:welcome`, and `rewrite:` goes, as suggested.
 
 
 ## Proposed CLAUDE.md rewrite
