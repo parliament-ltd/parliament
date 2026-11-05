@@ -4718,6 +4718,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **For Stefan:**
   - **`tour:off`.** Keep it (as built), or have `close:welcome` also put the steps away so one word does both. **Suggestion:** keep it; closing the page and putting the steps away are two things.
   - **The start card.** Keep your three lines, or one ("p> starts a chat · ? lists every command"). **Suggestion:** keep yours; they are the page someone sees after closing the welcome page, and they are short.
+  - **Ruled 5 November: keep both** ("Keep both"). `tour:off` stays a form of `tour:`, putting the steps away and keeping the page; the start card keeps its three lines (C286 (e)). C291 (i) and (o) stand as built.
 
 
 ## Proposed CLAUDE.md rewrite
