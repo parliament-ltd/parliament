@@ -5051,11 +5051,11 @@ msgstr "Valintaa ei tallennettu. Yritä uudelleen"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
-msgstr "Tämä näkymä on jo alkuperäinen"
+msgstr "Näkymä on jo tyhjä"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enter palauttaa tämän näkymän alkuperäiseksi} one {Enter palauttaa tämän näkymän alkuperäiseksi ja sulkee # ikkunan} other {Enter palauttaa tämän näkymän alkuperäiseksi ja sulkee # ikkunaa}}"
+msgstr "{count, plural, =0 {Enter tyhjentää näkymän: kaikki taulut suljetaan. Mitään ei poisteta} one {Enter tyhjentää näkymän: kaikki taulut ja # ikkuna suljetaan. Mitään ei poisteta} other {Enter tyhjentää näkymän: kaikki taulut ja # ikkunaa suljetaan. Mitään ei poisteta}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -6916,10 +6916,40 @@ msgstr "Löytyi: {names}. Valitse yksi komennolla by: tai valitsimessa."
 msgid "keys.localNone"
 msgstr "{provider} vastasi, mutta siinä ei ole vielä malleja. Lisää ensin malli ohjelmalla {provider}."
 
+#. {check} is the word on the button above, keys.localCheck
+#. js-lingui-explicit-id
+msgid "keys.localStepCheck"
+msgstr "Paina yllä olevaa painiketta ”{check}”."
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepInstall"
+msgstr "Asenna {provider} ja avaa se."
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepModel"
+msgstr "Lisää malli. Suorita päätteessä:"
+
+#. * stays as written: the setting for every site
+#. js-lingui-explicit-id
+msgid "keys.localStepNotAll"
+msgstr "Ei *, joka antaisi kaikkien sivustojen käyttää sitä."
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepOrigins"
+msgstr "Anna sen vastata tälle sivustolle ja vain tälle. Suorita päätteessä:"
+
 #. OLLAMA_ORIGINS is the name of a setting and stays as written
 #. js-lingui-explicit-id
-msgid "keys.localOrigins"
-msgstr "{provider} vastaa vain sivustoille, jotka sille on kerrottu. Aseta OLLAMA_ORIGINS-asetuksen arvoksi {origin} ja käynnistä se uudelleen. Älä käytä arvoa *, joka antaisi kaikkien sivustojen käyttää sitä."
+msgid "keys.localStepOriginsOther"
+msgstr "Anna sen vastata tälle sivustolle ja vain tälle: aseta asetuksen OLLAMA_ORIGINS arvoksi {origin} siellä, missä se on käynnissä."
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepRestart"
+msgstr "Lopeta {provider} ja avaa se uudelleen, jotta se lukee asetuksen."
 
 #. js-lingui-explicit-id
 msgid "keys.localUnchecked"
@@ -9818,7 +9848,7 @@ msgstr "Valitse vastausten kieli sen koodilla tai nimellä"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "Palauta taulut alkuperäisiksi ja sulje ikkunat"
+msgstr "Tyhjennä näkymä: sulje kaikki taulut ja ikkunat. Mitään ei poisteta"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"

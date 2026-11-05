@@ -409,3 +409,11 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - **chat.continueReply:** 続ける, per the glossary's "carry on". 続きを書く would say more plainly what the button does, if 続ける feels bare under a cut-off reply.
 - **enter.continue* lines:** "asks {name} to carry on" as the causative {name}に続けさせます, as enter.privacyNames has {name}にまず人名を探させ.
 - **welcome.keepAsk:** データの保持を求める; the browser is the one asked, named in welcome.keepNot just before it.
+
+## reset: and the local model in steps, drafted 5 November 2026 (C293)
+
+- enter.resetAlready, enter.resetArrangement, verb.reset: "clear the screen" is 画面をクリア, the usual UI word; the glossary has no entry. 画面を片付ける or 画面を空にする were the alternatives. The one branch collapses into other, as the old line did.
+- keys.localStepModel, keys.localStepOrigins: end with the full-width colon ：, as the context line (コンテキスト使用率{percent}%：) does. "run:" is 次のコマンドを実行してください, so it is clear a command follows.
+- keys.localStepNotAll: "* は指定しないでください。" * gets a half-width space, treated as typed text by the spacing rule; 「*」 was the alternative.
+- keys.localStepCheck: 上の「{check}」を押してください。 The button word is quoted, as 「すべて削除」 is, though the English does not quote it.
+- keys.localStepInstall, keys.localStepRestart: "open it" is 起動, the word for starting an app. The restart line is split in two (これで設定が読み込まれます。) to keep the order quit, reopen, reads.

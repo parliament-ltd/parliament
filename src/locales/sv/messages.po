@@ -5051,11 +5051,11 @@ msgstr "Valet sparades inte. Försök igen"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
-msgstr "Den här skärmen är som från början"
+msgstr "Skärmen är redan rensad"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enter ställer tillbaka skärmen som från början} one {Enter ställer tillbaka skärmen som från början och stänger # fönster} other {Enter ställer tillbaka skärmen som från början och stänger # fönster}}"
+msgstr "{count, plural, =0 {Enter rensar skärmen: alla tavlor stängs. Inget raderas} one {Enter rensar skärmen: alla tavlor och # fönster stängs. Inget raderas} other {Enter rensar skärmen: alla tavlor och # fönster stängs. Inget raderas}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -6916,10 +6916,40 @@ msgstr "Hittade: {names}. Välj en med by: eller i väljaren."
 msgid "keys.localNone"
 msgstr "{provider} svarade, men har inga modeller än. Lägg först till en med {provider}."
 
+#. {check} is the word on the button above, keys.localCheck
+#. js-lingui-explicit-id
+msgid "keys.localStepCheck"
+msgstr "Tryck på ”{check}” ovan."
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepInstall"
+msgstr "Installera {provider} och öppna det."
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepModel"
+msgstr "Lägg till en modell. Kör i en terminal:"
+
+#. * stays as written: the setting for every site
+#. js-lingui-explicit-id
+msgid "keys.localStepNotAll"
+msgstr "Inte *, som skulle låta alla webbplatser använda det."
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepOrigins"
+msgstr "Låt det svara den här webbplatsen och ingen annan. Kör i en terminal:"
+
 #. OLLAMA_ORIGINS is the name of a setting and stays as written
 #. js-lingui-explicit-id
-msgid "keys.localOrigins"
-msgstr "{provider} svarar bara de webbplatser som det är inställt på. Sätt OLLAMA_ORIGINS till {origin} och starta om det. Inte *, som skulle låta alla webbplatser använda det."
+msgid "keys.localStepOriginsOther"
+msgstr "Låt det svara den här webbplatsen och ingen annan: ställ in OLLAMA_ORIGINS på {origin} där det körs."
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepRestart"
+msgstr "Avsluta {provider} och öppna det igen, så att det läser inställningen."
 
 #. js-lingui-explicit-id
 msgid "keys.localUnchecked"
@@ -9818,7 +9848,7 @@ msgstr "Välj vilket språk svaren kommer på, med kod eller namn"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "Ställ tillbaka tavlorna som från början och stäng fönstren"
+msgstr "Rensa skärmen: stäng alla tavlor och fönster. Inget raderas"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"

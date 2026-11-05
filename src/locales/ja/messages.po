@@ -5051,11 +5051,11 @@ msgstr "選択を保存できませんでした。もう一度お試しくださ
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
-msgstr "この画面はすでに初期状態です"
+msgstr "画面はすでにクリアされています"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enterでこの画面を初期状態に戻します} other {Enterでこの画面を初期状態に戻し、#個のウインドウを閉じます}}"
+msgstr "{count, plural, =0 {Enterで画面をクリアし、すべてのボードを閉じます。何も削除されません} other {Enterで画面をクリアし、すべてのボードと#個のウインドウを閉じます。何も削除されません}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -6916,10 +6916,40 @@ msgstr "見つかったモデル：{names}。by: か一覧から選べます。"
 msgid "keys.localNone"
 msgstr "{provider}は応答しましたが、モデルがまだありません。先に{provider}でモデルを追加してください。"
 
+#. {check} is the word on the button above, keys.localCheck
+#. js-lingui-explicit-id
+msgid "keys.localStepCheck"
+msgstr "上の「{check}」を押してください。"
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepInstall"
+msgstr "{provider}をインストールして、起動してください。"
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepModel"
+msgstr "モデルを追加します。ターミナルで次のコマンドを実行してください："
+
+#. * stays as written: the setting for every site
+#. js-lingui-explicit-id
+msgid "keys.localStepNotAll"
+msgstr "* は指定しないでください。どのサイトからでも使えるようになります。"
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepOrigins"
+msgstr "このサイトだけに応答するようにします。ターミナルで次のコマンドを実行してください："
+
 #. OLLAMA_ORIGINS is the name of a setting and stays as written
 #. js-lingui-explicit-id
-msgid "keys.localOrigins"
-msgstr "{provider}は、許可されたサイトにしか応答しません。OLLAMA_ORIGINSに{origin}を設定して、再起動してください。*は使わないでください。どのサイトからでも使えるようになってしまいます。"
+msgid "keys.localStepOriginsOther"
+msgstr "このサイトだけに応答するようにします：動作している環境で、OLLAMA_ORIGINSを{origin}に設定してください。"
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepRestart"
+msgstr "{provider}をいったん終了して、もう一度起動してください。これで設定が読み込まれます。"
 
 #. js-lingui-explicit-id
 msgid "keys.localUnchecked"
@@ -9818,7 +9848,7 @@ msgstr "コードか名前で、返答の言語を選ぶ"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "ボードを初期状態に戻し、ウインドウを閉じる"
+msgstr "画面をクリアし、すべてのボードとウインドウを閉じる。何も削除されません"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"

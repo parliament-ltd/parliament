@@ -2117,7 +2117,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [installApp, readKeys, remember, run, showView, showCollectionView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
+  }, [installApp, continueMessage, readKeys, remember, run, showView, showCollectionView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -4186,8 +4186,12 @@ export default function Shell() {
 
   const focusBoard = (board) => { if (board !== current.current.addressed) commit(address(current.current, board)) }
   // On a phone the bar sits at the bottom, whatever bar: chose for wider screens (C261 (d)).
-  // The welcome card keeps its field.
-  const bar = size === 'phone' && arrangement.bar.at !== 'card' ? { ...arrangement.bar, at: 'bottom' } : arrangement.bar
+  // The welcome card keeps its field. The start card holds none: a bar kept
+  // in the card docks at the foot, centred, outside it (C293; Stefan,
+  // 5 November: "the command bar outside of it centered by the bottom").
+  const onStart = arrangement.columns.some((c) => c.includes(START)) && !arrangement.columns.some((c) => c.includes('welcome'))
+  const placed = onStart && arrangement.bar.at === 'card' ? { ...arrangement.bar, at: 'bottom', side: 'center' } : arrangement.bar
+  const bar = size === 'phone' && placed.at !== 'card' ? { ...placed, at: 'bottom' } : placed
   const barWindow = windows[BAR]
   // The other windows the one bar listens in (C280): every popped board's,
   // and the page itself while the bar is in a window of its own.
@@ -4406,7 +4410,7 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
+    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
       {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
       {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}

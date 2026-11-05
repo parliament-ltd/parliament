@@ -384,3 +384,12 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 - **picker.keys**: I kept "Napsautus nimeen" (a click on a name) from the old line. A literal "Nimi vastaa yksin" says the name answers, which reads oddly in Finnish.
 - **welcome.keepAsk**: "pyydä sitä säilyttämään tiedot". Its existing busy state, welcome.keepAsking, still says "kysytään" from the old "kysy selaimelta uudelleen". "pyydetään" would match better if that line is touched.
 - **room.editsKept, enter.highlightKept**: the room's head says "muokkaukset tallessa", a status phrase. The line under the bar says "Säilytetty korostuksena {num}", built like enter.quoteKept. Both mean kept, in two words.
+
+## reset: and the local model in steps, drafted 5 November 2026 (C293)
+
+- enter.resetAlready, enter.resetArrangement, verb.reset: "the screen" is "näkymä" (tyhjentää näkymän, Näkymä on jo tyhjä), kept from the old reset lines and enter.arrangeGo, not the glossary's "näyttö": "tyhjentää näytön" could read as blanking the display.
+- enter.resetArrangement: passive "kaikki taulut ja # ikkuna(a) suljetaan", so no verb has to agree with "# ikkunaa".
+- keys.localStepModel, keys.localStepOrigins: "terminal" is "pääte" (the Finnish name of the Terminal app on macOS and Linux). "terminaali" is the everyday alternative; "komentorivi" was avoided, since it is Parliament's own command line.
+- keys.localStepCheck: "Paina yllä olevaa painiketta ”{check}”." Head noun painiketta carries the partitive, and the word is quoted, as ”Poista kaikki” on painike.
+- keys.localStepInstall, keys.localStepRestart: {provider} stands bare as the object of an imperative (nominative), so no head noun is needed. "Quit" is "Lopeta" (the macOS word), not "Sulje", which could mean closing only its window.
+- keys.localStepOriginsOther: "aseta asetuksen OLLAMA_ORIGINS arvoksi {origin}", the head noun arvoksi carrying the translative; "where it runs" is "siellä, missä se on käynnissä", as keys.localUnreached says käynnissä.

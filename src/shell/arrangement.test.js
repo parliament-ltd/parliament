@@ -413,15 +413,16 @@ describe('bar: and reset:', () => {
     expect(keep(planBar(keep(moved), 'bottom')).bar.moved).toBe(2)
   })
 
-  it('reset: puts the arrangement back as shipped, closing its windows, and keeps what boards show', () => {
+  it('reset: clears the screen to the start card, closing every board and window, and keeps what boards show (C293)', () => {
     let a = { ...almanac(), context: { collection: 'Q2 evidence' } }
     a = keep(planOpen(a, 'library'))
     a = keep(planPop(a, 'library'))
     a = keep(planBar(a, 'bottom'))
     const p = planReset(a)
     expect(p.says).toEqual({ message: 'resetArrangement', values: { count: 1 } })
-    expect(p.next).toMatchObject({ columns: [['almanac'], ['collection']], popped: [], bar: { at: 'top' }, context: { collection: 'Q2 evidence' } })
-    expect(planReset(almanac())).toMatchObject({ next: null, says: { message: 'resetAlready' } })
+    expect(p.next).toMatchObject({ columns: [['start']], addressed: 'start', popped: [], bar: { at: 'bottom', side: 'center', popped: false }, context: { collection: 'Q2 evidence' } })
+    expect(planReset(almanac()).says.message).toBe('resetArrangement')
+    expect(planReset(p.next)).toMatchObject({ next: null, says: { message: 'resetAlready' } })
   })
 })
 
@@ -444,7 +445,7 @@ describe('from a typed command', () => {
     expect(run(a, '>pop:command')[0].says.message).toBe('popCommand')
     expect(run(a, '>pop:back')[0].says.message).toBe('popNothing')
     expect(run(a, '>bar:bottom')[0].says.message).toBe('barMove')
-    expect(run(a, '>reset:')[0].says.message).toBe('resetAlready')
+    expect(run(a, '>reset:')[0].says.message).toBe('resetArrangement')
   })
 
   it('leaves forms that need later stages unanswered', () => {

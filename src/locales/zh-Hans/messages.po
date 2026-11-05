@@ -5051,11 +5051,11 @@ msgstr "选择未能保存。请重试"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
-msgstr "此屏幕已是初始状态"
+msgstr "屏幕已清空"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {按 Enter 将此屏幕恢复为初始状态} other {按 Enter 将此屏幕恢复为初始状态，并关闭 # 个窗口}}"
+msgstr "{count, plural, =0 {按 Enter 清空屏幕：关闭所有面板。不会删除任何内容} other {按 Enter 清空屏幕：关闭所有面板和 # 个窗口。不会删除任何内容}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -6916,10 +6916,40 @@ msgstr "已找到：{names}。可用 by: 或在选择器中选择一个。"
 msgid "keys.localNone"
 msgstr "{provider} 已响应，但还没有模型。请先用 {provider} 添加一个。"
 
+#. {check} is the word on the button above, keys.localCheck
+#. js-lingui-explicit-id
+msgid "keys.localStepCheck"
+msgstr "点击上方的“{check}”。"
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepInstall"
+msgstr "安装 {provider} 并打开它。"
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepModel"
+msgstr "添加一个模型。在终端中运行："
+
+#. * stays as written: the setting for every site
+#. js-lingui-explicit-id
+msgid "keys.localStepNotAll"
+msgstr "不要设为 *，否则所有网站都能使用它。"
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepOrigins"
+msgstr "让它只响应本网站，不响应其他网站。在终端中运行："
+
 #. OLLAMA_ORIGINS is the name of a setting and stays as written
 #. js-lingui-explicit-id
-msgid "keys.localOrigins"
-msgstr "{provider} 只响应指定的网站。请将 OLLAMA_ORIGINS 设为 {origin}，然后重启它。不要设为 *，否则任何网站都能使用它。"
+msgid "keys.localStepOriginsOther"
+msgstr "让它只响应本网站，不响应其他网站：在运行它的环境中，将 OLLAMA_ORIGINS 设为 {origin}。"
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepRestart"
+msgstr "退出 {provider} 再重新打开，让它读取这项设置。"
 
 #. js-lingui-explicit-id
 msgid "keys.localUnchecked"
@@ -9818,7 +9848,7 @@ msgstr "按代码或名称选择回复所用的语言"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "将面板恢复为初始状态，并关闭各窗口"
+msgstr "清空屏幕：关闭所有面板和窗口。不会删除任何内容"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"

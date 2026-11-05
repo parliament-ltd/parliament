@@ -226,8 +226,8 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
 
 /**
  * The start card (30 October; C282): when the welcome page closes with
- * nothing else open, the birds in the middle of the screen with the bar
- * under them, and how to open a room. Each command is a link that writes it
+ * nothing else open, the birds in the middle of the screen and how to open a
+ * room, with the bar docked at the foot, outside the card (C293). Each command is a link that writes it
  * in the bar; nothing is opened for the person. It gives way to the first
  * board opened.
  * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void,

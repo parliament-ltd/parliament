@@ -388,3 +388,11 @@ Each: id, the English, the draft, and why I was unsure.
 - **netKind.compareMeaning**: "jämförelse av innebörd", longer than the other labels. It takes "innebörd" from compare.wordsOnly ("Orden jämförs, inte innebörden"). "innebördsjämförelse" is shorter but clumsy.
 - **netKind.localCheck**: "lokal modellkontroll" ("local model check"). The other lines say "på den här datorn" instead of "lokal", but that is too long for a label before a count.
 - **room.editsKept**: "redigeringar sparade" for "edits kept", where "kept" means saved as they are made. The one and other branches are the same, since "väntar" does not change with number.
+
+## reset: and the local model in steps, drafted 5 November 2026 (C293)
+
+- enter.resetAlready, enter.resetArrangement, verb.reset: "clear the screen" is "rensa skärmen", as enter.focusClosing ("Enter rensar skärmen till chatten"). The old reset words "ställa tillbaka som från början" leave these lines, so the glossary's "reset / as shipped → ställa tillbaka som från början" now covers only other lines.
+- keys.localStepCheck: "Tryck på ”{check}” ovan." The button word is quoted, as ”Spara” (keys.checkThenHold) and ”Radera allt” are, though the English does not quote it. Without quotes "Tryck på kontrollera ovan" reads as a verb.
+- keys.localStepOrigins, keys.localStepOriginsOther: "and only this site" is "och ingen annan", more natural than the literal "och bara den".
+- keys.localStepOriginsOther: "ställ in OLLAMA_ORIGINS på {origin}", the usual way to set a setting to a value; "där det körs" for "where it runs" (Ollama is "det", per the glossary).
+- keys.localStepNotAll: "som" points at * itself ("Inte *, som skulle låta alla webbplatser använda det"); "vilket" would point at the whole clause.

@@ -6916,9 +6916,39 @@ msgstr ""
 msgid "keys.localNone"
 msgstr ""
 
+#. {check} is the word on the button above, keys.localCheck
+#. js-lingui-explicit-id
+msgid "keys.localStepCheck"
+msgstr ""
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepInstall"
+msgstr ""
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepModel"
+msgstr ""
+
+#. * stays as written: the setting for every site
+#. js-lingui-explicit-id
+msgid "keys.localStepNotAll"
+msgstr ""
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepOrigins"
+msgstr ""
+
 #. OLLAMA_ORIGINS is the name of a setting and stays as written
 #. js-lingui-explicit-id
-msgid "keys.localOrigins"
+msgid "keys.localStepOriginsOther"
+msgstr ""
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepRestart"
 msgstr ""
 
 #. js-lingui-explicit-id

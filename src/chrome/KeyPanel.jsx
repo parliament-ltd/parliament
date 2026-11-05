@@ -1,3 +1,4 @@
+import { MODEL_COMMAND, systemOf, originsCommand } from '../shell/localSetup'
 import { useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
@@ -75,6 +76,30 @@ const LOCAL_STATE = {
  * status: 'unchecked'|'checking'|'ok'|'unreached'|'denied', models: string[],
  * onCheck }. Never checked unasked (C33); a click on check is the asking.
  */
+/**
+ * How to set up a model on this computer, numbered (C293; Stefan, 5 November:
+ * "would it be helpful to provide numbered steps since it's a bit more complex
+ * than the other APIs"). Each command is shown whole, to copy; the one that
+ * lets it answer this site is this system's.
+ */
+function LocalSteps({ name, origin }) {
+  const { i18n } = useLingui()
+  const command = originsCommand(systemOf(), origin)
+  return (
+    <ol className="ch-keys-steps">
+      <li>{i18n._(COPY.keys.localStepInstall, { provider: name })}</li>
+      <li>{i18n._(COPY.keys.localStepModel)}<code dir="ltr">{MODEL_COMMAND}</code></li>
+      <li>
+        {command ? i18n._(COPY.keys.localStepOrigins) : i18n._(COPY.keys.localStepOriginsOther, { origin })}
+        {command && <code dir="ltr">{command}</code>}
+        <span className="ch-keys-warn">{i18n._(COPY.keys.localStepNotAll)}</span>
+      </li>
+      <li>{i18n._(COPY.keys.localStepRestart, { provider: name })}</li>
+      <li>{i18n._(COPY.keys.localStepCheck, { check: i18n._(COPY.keys.localCheck) })}</li>
+    </ol>
+  )
+}
+
 export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSaved, onClose, region = null, onRegion = null, local = null }) {
   const { i18n } = useLingui()
   const slot = useRef(null) // where the vault's field is laid
@@ -219,8 +244,9 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
               {local.status === 'ok' && local.away?.length > 0 && <p className="ch-keys-note">{i18n._(COPY.keysData.localAway, { count: local.away.length })}</p>}
               {local.status === 'unreached' && <p className="ch-keyprob" role="alert">{i18n._(COPY.keys.localUnreached, { provider: local.name, origin: local.origin })}</p>}
               {local.status === 'denied' && <p className="ch-keyprob" role="alert">{i18n._(COPY.keys.localDenied)}</p>}
+              {/* Until it answers, how to set it up, in steps (C293): the hard one, letting it answer this site, with this system's command. */}
+              {local.status !== 'ok' && <LocalSteps name={local.name} origin={local.origin} />}
               {local.status !== 'ok' && <p className="ch-keys-note">{i18n._(COPY.keys.localWhy, { provider: local.name })}</p>}
-              <p className="ch-keys-note">{i18n._(COPY.keys.localOrigins, { provider: local.name, origin: local.origin })}</p>
             </div>
           )}
         </div>

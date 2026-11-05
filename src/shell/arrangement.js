@@ -32,8 +32,7 @@ export { isRoom }
 // is one space, edited by commands (C125, ruled 21 October): an
 // arrangement's verb (alm:, sym:, tour:, lab:) brings its boards into the
 // space beside what is there, and nothing switches to another screen. The
-// space is kept on this device; reset: puts it back as shipped, which is
-// the Almanac. The arrangements here say which boards each brings, until
+// space is kept on this device; reset: clears it to the start card (C293). The arrangements here say which boards each brings, until
 // their owner edits them (the Lab, stage 13).
 export const SPACE = 'space'
 // The start card's board (C282).
@@ -901,9 +900,15 @@ export function planCols(a, words = []) {
   return plan
 }
 
-/** reset:. This arrangement as shipped, its windows closed; what boards show stays. */
+/**
+ * reset: (C293; Stefan, 5 November: "i think it'd be best to clear
+ * everything"): the screen cleared to the start card, every board and window
+ * closed, the bar at the foot, centred, outside the card. Focus,
+ * widths and Records' columns go back as shipped. Nothing stored is touched,
+ * and what each board shows is kept for when it opens again.
+ */
 export function planReset(a) {
-  const next = shipped(a.id, a.context)
+  const next = { ...shipped(a.id, a.context), columns: [[START]], addressed: START, bar: { at: 'bottom', side: 'center', popped: false } }
   if (sameLayout(next, a)) return refuse('resetAlready')
   return go(next, 'resetArrangement', { count: a.popped.length })
 }

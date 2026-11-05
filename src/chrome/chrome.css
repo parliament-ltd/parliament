@@ -40,6 +40,9 @@
 /* The language at the end of the header, and alone in the top corner (1 November). */
 .ch-sglobe { margin-inline-start: 14px; }
 .ch-headcorner { position: fixed; top: 10px; inset-inline-end: 18px; z-index: 30; }
+/* With the language alone in the corner, the page starts below it, so it
+   never covers a board's edge (C293), in an installed app's narrow window too. */
+.ch-shell.on-welcome.corner .ch-stage { padding-top: 40px; }
 .ch-shell .ch-scalm button { padding: 0; font: inherit; color: inherit; }
 .ch-shell .ch-scalm button:hover, .ch-shell .ch-scalm button.on { color: var(--ch-ink); }
 /* focus: marginalia, as calm is (C292): one word, no caret, no picker. */
@@ -189,6 +192,11 @@
 .ch-keys-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: .5px solid var(--ch-border-2); }
 .ch-keys-lab { font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; }
 .ch-keys-note { margin: 5px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ch-ink-2); }
+/* A model on this computer, set up in numbered steps (C293); each command whole, to copy. */
+.ch-keys-steps { list-style: decimal outside; margin: 6px 0 0; padding-inline-start: 18px; font-size: 11.5px; line-height: 1.5; color: var(--ch-ink-2); }
+.ch-keys-steps li + li { margin-top: 4px; }
+.ch-keys-steps code { display: block; width: fit-content; max-width: 100%; margin: 3px 0; padding: 2px 6px; border-radius: var(--ch-r-md); background: var(--ch-wash); font: 500 11px var(--ch-mono); color: var(--ch-ink); overflow-wrap: anywhere; user-select: all; }
+.ch-keys-warn { display: block; color: var(--ch-ink-3); }
 .ch-keys-head .ch-keys-note { margin: 0; margin-inline-start: auto; }
 .ch-keyrow { padding: 8px 0; border-bottom: .5px solid var(--ch-border-2); }
 .ch-keytop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
@@ -615,6 +623,12 @@
 .ch-sgrid { width: 100%; max-width: 520px; margin: auto; display: flex; flex-direction: column; align-items: stretch; }
 .ch-slogo { align-self: center; width: 56px; height: 48px; color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
 .ch-start .ch-wscroll { padding-inline-start: 28px; }
+/* The start card fits around what it holds, in the middle of the screen
+   (C293; Stefan, 5 November: "a bit smaller to fit around the content, and
+   perhaps centered"), where the welcome page fills it. */
+.ch-card.ch-welcome.ch-start { flex: 0 0 auto; width: min(600px, 100%); margin: auto; }
+.ch-stage:has(> .ch-col > .ch-card.ch-start) { align-content: center; }
+.ch-start .ch-wbar:empty { display: none; }
 .ch-shint { list-style: none; margin: 18px 0 0; padding: 0 2px; font: 400 13px/1.7 var(--ch-serif); color: var(--ch-ink-2); }
 .ch-shell .ch-shint .c { font: inherit; color: var(--ch-ink); text-decoration: underline; text-decoration-color: var(--ch-soft); text-underline-offset: 3px; }
 .ch-shell .ch-shint .c:hover { text-decoration-color: var(--ch-ink); }

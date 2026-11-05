@@ -360,7 +360,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'swap', group: 'layout', example: 'swap:records collection', takes: [[ON_SCREEN, ON_SCREEN]], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.swap', message: 'Swap two boards' } }),
   v({ verb: 'reset', group: 'layout', example: 'reset:', takes: [[]], stage: 3, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.reset', message: 'Put the boards back as shipped and close the windows' } }),
+    gloss: /*i18n*/ { id: 'verb.reset', message: 'Clear the screen: close every board and window. Nothing is deleted' } }),
   v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:library 30%', 'width:204 40%', 'width:even'],
     takes: [['percent'], [ON_SCREEN, 'percent'], ['address', 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.width', message: 'Choose how much of the width a board takes, or put every width back' } }),

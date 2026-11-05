@@ -5051,11 +5051,11 @@ msgstr "The choice was not kept. Try again"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
-msgstr "This screen is as shipped"
+msgstr "The screen is clear already"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enter puts this screen back as shipped} one {Enter puts this screen back as shipped and closes # window} other {Enter puts this screen back as shipped and closes # windows}}"
+msgstr "{count, plural, =0 {Enter clears the screen: every board closes. Nothing is deleted} one {Enter clears the screen: every board closes, and # window. Nothing is deleted} other {Enter clears the screen: every board closes, and # windows. Nothing is deleted}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -6916,10 +6916,40 @@ msgstr "Found: {names}. Choose one with by: or in the picker."
 msgid "keys.localNone"
 msgstr "{provider} answered, but has no models yet. Add one with {provider} first."
 
+#. {check} is the word on the button above, keys.localCheck
+#. js-lingui-explicit-id
+msgid "keys.localStepCheck"
+msgstr "Press {check} above."
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepInstall"
+msgstr "Install {provider} and open it."
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepModel"
+msgstr "Add a model. In a terminal, run:"
+
+#. * stays as written: the setting for every site
+#. js-lingui-explicit-id
+msgid "keys.localStepNotAll"
+msgstr "Not *, which would let every site use it."
+
+#. A command follows on its own line, as written
+#. js-lingui-explicit-id
+msgid "keys.localStepOrigins"
+msgstr "Let it answer this site, and only this site. In a terminal, run:"
+
 #. OLLAMA_ORIGINS is the name of a setting and stays as written
 #. js-lingui-explicit-id
-msgid "keys.localOrigins"
-msgstr "{provider} answers only the sites it is told to. Set OLLAMA_ORIGINS to {origin} and restart it. Not *, which would let every site use it."
+msgid "keys.localStepOriginsOther"
+msgstr "Let it answer this site, and only this site: set OLLAMA_ORIGINS to {origin} where it runs."
+
+#. {provider} is a name from the list of providers
+#. js-lingui-explicit-id
+msgid "keys.localStepRestart"
+msgstr "Quit {provider} and open it again, so it reads the setting."
 
 #. js-lingui-explicit-id
 msgid "keys.localUnchecked"
@@ -9818,7 +9848,7 @@ msgstr "Choose the language replies come in, by its code or its name"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "Put the boards back as shipped and close the windows"
+msgstr "Clear the screen: close every board and window. Nothing is deleted"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"

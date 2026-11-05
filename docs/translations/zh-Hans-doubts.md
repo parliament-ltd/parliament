@@ -440,3 +440,10 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - `chat.continueReply`: 继续 ("continue"), the usual button word. The tooltip (chat.continueWrites) says what it writes. 续写 (the netKind word) would be more exact but less usual on a button.
 - `room.editsKept` / `enter.highlightKept`: "kept" is 已保存 ("saved"), as in enter.quoteKept and enter.askKept, not 已保留 ("retained").
 - `picker.keys`: "beside the others" is 加到其他回答者旁边 ("adds it next to the other answerers"). "A row that needs a key writes api: instead" drops the old 在输入栏中 ("in the bar"), as the English does.
+
+## reset: and the local model in steps, drafted 5 November 2026 (C293)
+
+- enter.resetAlready, enter.resetArrangement, verb.reset: "clear the screen" is 清空屏幕 (清屏 is the familiar term). 清空 can suggest deleting (清空回收站); the Enter line and verb.reset say 不会删除任何内容 at once, but enter.resetAlready (屏幕已清空) stands alone. 清理屏幕 was the alternative. The one branch collapses into other, as the old line did.
+- keys.localStepCheck: 点击上方的“{check}”。 The button word is quoted, as “保存” is in keys.checkThenHold; 点击, since 按 is kept for keys (按 Enter).
+- keys.localStepOrigins, keys.localStepOriginsOther: "and only this site" is 只响应本网站，不响应其他网站, which says the "only" twice as the English does.
+- keys.localStepModel, keys.localStepOrigins: end with the full-width colon ：, as the context line (上下文已用 {percent}%：) does.
