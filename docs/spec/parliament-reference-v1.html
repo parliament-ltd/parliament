@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parliament: the ? reference in two tiers, everyday then more</title>
+<!--
+  PARLIAMENT · THE ? REFERENCE IN TWO TIERS · 4 November 2026
+  Drawn for C291 (a) in conflicts.md, not yet ruled. Where this comment and
+  the proposal disagree on what is shown, this comment wins; the proposal
+  wins on what each row does.
+
+  WHAT CHANGES
+  · ? opens the reference with one group first, EVERYDAY: the bar's three
+    leaders, Esc, and fourteen verbs a person uses most days, each a row as
+    today (the command, then what it does). All of them work everywhere, so
+    no row is fainter and the aside about fainter rows is not shown.
+  · Under them one row, "more ▾ · 79 more, in 13 groups". A click
+    opens the whole reference below, every command in its group as C279 (f)
+    has it, fainter where it works on another board. The row then reads
+    "fewer ▴". ?all opens the whole reference at once; ?bar still shows one
+    command's forms.
+  · Two ways to draw "more", for the ruling (the strip at the top switches):
+    1. Everyday stays on top, and the groups follow. Its seventeen rows then
+       appear twice, once here and once in their groups.
+    2. Everyday folds to its heading and "fewer ▴", and the groups follow.
+       Nothing is listed twice, and the reference below is exactly today's.
+  · The foot is one sentence: "A click writes the command into the field,
+    and Enter runs it. ?bar shows one command's forms." "Escape closes this"
+    goes: Esc is a row of The bar now, said once (C291 (b)).
+  · The line under the bar at ">?" loses its "Escape goes back…" tail for
+    the same reason.
+  · The command menu board (open:commandmenu, pop:commandmenu) is unchanged:
+    a board kept open on purpose shows everything, as today.
+
+  WHAT STAYS
+  · Everything about a row: the mono command, the italic gloss, the hover
+    wash, a click writing the command into the field for Enter, fainter rows
+    naming where they work, "comes later" on a verb named but not built.
+  · The panel's place, width, columns (318px, up to four), its 64vh cap and
+    its scroll.
+  · Values are the chrome's tokens (src/styles/tokens.css; token-sheet.md).
+
+  THE EVERYDAY SET (a choice; C291 (a))
+  · >, p>, ?, Esc, records:, settings:, open:, close:, new:, name:, by:,
+    api:, note:, delete:, undo:, pop:, bar:, backup:.
+  · The welcome page's nine steps are all here or are keys, so what the
+    page taught is what ? shows first.
+
+  The strip at the top (state, how "more" draws) is for review only, not
+  product UI.
+-->
+<style>
+:root{
+  --paper:#FCFCFA; --surface:#FFFFFF; --ink:#191919; --ink-2:#45433F; --ink-3:#6B6964;
+  --marg:rgba(25,25,25,.62); --soft:rgba(25,25,25,.30); --wash:rgba(25,25,25,.045);
+  --border:#E9E9E7; --border-2:#F1F1EF; --navy:22,38,70;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --t-marg:11.5px; --t-body:14px; --r-md:6px; --r-btn:8px; --r-field:14px;
+  --focus:1px solid rgba(25,25,25,.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-body)/1.5 var(--sans)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible{outline:var(--focus);outline-offset:-1px;border-radius:var(--r-md)}
+
+/* The review strip: mockup only */
+.strip{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:10px 16px 0;padding:6px 10px;border:1px dashed var(--soft);border-radius:var(--r-btn);background:var(--paper);font:var(--t-marg) var(--sans);color:var(--ink-2)}
+.strip b{font-weight:600;letter-spacing:.055em;text-transform:uppercase;color:var(--ink-3);font-size:10.5px}
+.strip button{padding:2px 8px;border:1px solid var(--border);border-radius:999px;color:var(--ink-2)}
+.strip button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.strip .note{margin-inline-start:auto;font:italic var(--t-marg) var(--serif);color:var(--marg)}
+
+/* The stage: the bar at the top, as after close:welcome, and the panel under it */
+.stage{padding:14px 16px 40px}
+.bar{display:flex;align-items:center;gap:12px;height:40px;padding:0 14px;border-radius:var(--r-field);color:#fff;
+  background:rgb(var(--navy));
+  background-image:
+    radial-gradient(circle at 8% 40%, rgba(255,255,255,.55) .7px, transparent 1.3px),
+    radial-gradient(circle at 23% 72%, rgba(255,255,255,.35) .6px, transparent 1.2px),
+    radial-gradient(circle at 41% 28%, rgba(255,255,255,.5) .7px, transparent 1.3px),
+    radial-gradient(circle at 58% 62%, rgba(255,255,255,.3) .6px, transparent 1.2px),
+    radial-gradient(circle at 77% 34%, rgba(255,255,255,.5) .7px, transparent 1.3px),
+    radial-gradient(circle at 91% 70%, rgba(255,255,255,.35) .6px, transparent 1.2px);
+  background-size:260px 40px,310px 40px,220px 40px,340px 40px,280px 40px,300px 40px}
+.bar .pill{font:600 9.5px var(--sans);letter-spacing:.08em;padding:2px 7px;border:1px solid rgba(255,255,255,.75);border-radius:999px}
+.bar .text{font:500 var(--t-body) var(--mono)}
+.bar .caret{display:inline-block;width:1px;height:16px;background:#fff;vertical-align:-3px;margin-inline-start:1px}
+.enter{margin:7px 22px 0;font:italic 400 var(--t-marg)/1.5 var(--serif);color:var(--marg)}
+.enter .sep{margin:0 6px;opacity:.6}
+
+/* The reference, as chrome.css draws it (.ch-ref) */
+.ref{margin:10px 0 0;padding:13px 16px 12px;background:var(--surface);border-radius:var(--r-btn);box-shadow:0 8px 28px rgba(40,36,28,.08);max-height:64vh;overflow:auto;container:ref / inline-size}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding-bottom:8px;margin-bottom:11px;border-bottom:.5px solid var(--border-2)}
+.head h2,.ref h3{font:600 var(--t-marg) var(--sans);letter-spacing:.055em;text-transform:uppercase;color:var(--ink);margin:0}
+.head .aside{margin-inline-start:auto;font:italic 400 var(--t-marg) var(--serif);color:var(--marg);white-space:nowrap}
+.cols{columns:318px 4;column-gap:28px}
+.grp{break-inside:avoid;margin:0 0 15px}
+.ref h3{margin-bottom:5px;padding-bottom:4px;border-bottom:.5px solid var(--border-2)}
+.row{display:grid;grid-template-columns:168px minmax(0,1fr);gap:9px;align-items:baseline;width:100%;padding:4px 6px;border-radius:var(--r-md);text-align:start;color:var(--ink-2)}
+.row:hover{color:var(--ink);background:var(--wash)}
+.row .code{font:500 var(--t-marg) var(--mono);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .gloss{font:italic 400 var(--t-marg)/1.35 var(--serif)}
+.row.away,.row.away .code{color:var(--ink-3)}
+.row.away:hover,.row.away:hover .code{color:var(--ink)}
+.row .on{color:var(--marg)}
+.row .on .sep{margin:0 5px;opacity:.6}
+.row.later{cursor:default}
+.row.later:hover{color:var(--ink-2);background:none}
+.foot{margin:4px 0 0;padding-top:9px;border-top:.5px solid var(--border-2);font:italic 400 var(--t-marg)/1.5 var(--serif);color:var(--marg)}
+@container ref (max-width:420px){.row{grid-template-columns:minmax(0,1fr);gap:1px}}
+
+/* Everyday: the first tier, across the width, its rows in their own columns */
+.everyday{column-span:all;margin-bottom:12px}
+.everyday .rows{columns:318px 3;column-gap:28px}
+.everyday .rows .row{break-inside:avoid}
+.morerow{display:flex;gap:9px;align-items:baseline;width:100%;padding:5px 6px;margin-top:4px;border-radius:var(--r-md);color:var(--ink-2);text-align:start}
+.morerow:hover{color:var(--ink);background:var(--wash)}
+.morerow .code{font:500 var(--t-marg) var(--mono);color:var(--ink);white-space:nowrap;min-width:168px}
+.morerow .gloss{font:italic 400 var(--t-marg)/1.35 var(--serif)}
+.all{display:contents}
+
+/* The two states, and the two ways to draw "more" */
+.ref[data-state="everyday"] [data-only="more"]{display:none}
+.ref[data-state="more"] [data-only="everyday"]{display:none}
+.ref[data-state="more"][data-fold="fold"] .everyday .rows{display:none}
+.ref[data-state="more"][data-fold="fold"] .everyday{margin-bottom:15px}
+</style>
+</head>
+<body>
+
+<div class="strip" role="group" aria-label="Mockup controls, for review only">
+  <b>State</b>
+  <button type="button" data-set-state="everyday" aria-pressed="true">? · everyday</button>
+  <button type="button" data-set-state="more" aria-pressed="false">more</button>
+  <b>In more</b>
+  <button type="button" data-set-fold="top" aria-pressed="true">everyday stays on top</button>
+  <button type="button" data-set-fold="fold" aria-pressed="false">everyday folds</button>
+  <span class="note">for review only · drawn 4 November 2026 for C291 (a)</span>
+</div>
+
+<div class="stage">
+  <div class="bar" aria-label="The bar, in command mode">
+    <span class="pill">COMMAND</span>
+    <span class="text">&gt;?<span class="caret" aria-hidden="true"></span></span>
+  </div>
+  <p class="enter">→ 202 in Writing studio<span class="sep">·</span>Type a command, or ? for every command</p>
+
+  <section class="ref" id="ref" data-state="everyday" data-fold="top" aria-label="Every command">
+    <header class="head">
+      <h2>Commands</h2>
+      <span class="aside" data-only="more">A fainter command works on another board, named beside it</span>
+    </header>
+    <div class="cols">
+      <section class="grp everyday">
+        <h3>Everyday</h3>
+        <div class="rows">
+          <button type="button" class="row everyday-row" title="&gt;"><span class="code">&gt;</span><span class="gloss">Type a command. The &gt; stays in the field</span></button>
+          <button type="button" class="row everyday-row" title="p&gt;"><span class="code">p&gt;</span><span class="gloss">Write a prompt. Nothing is sent before Enter</span></button>
+          <button type="button" class="row everyday-row" title="?"><span class="code">?</span><span class="gloss">Every command, or how one works</span></button>
+          <button type="button" class="row everyday-row" title="Esc"><span class="code">Esc</span><span class="gloss">Back one mode, or closes what is open under the bar</span></button>
+          <button type="button" class="row everyday-row" title="records:"><span class="code">records:</span><span class="gloss">Bring Records and the Collection beside what is on screen</span></button>
+          <button type="button" class="row everyday-row" title="settings:"><span class="code">settings:</span><span class="gloss">Bring Settings beside what is on screen, or one section of it</span></button>
+          <button type="button" class="row everyday-row" title="open:207"><span class="code">open:207</span><span class="gloss">Open a board, or anything by its number or name</span></button>
+          <button type="button" class="row everyday-row" title="close:records"><span class="code">close:records</span><span class="gloss">Take a board off the screen. Nothing is lost</span></button>
+          <button type="button" class="row everyday-row" title="new:chat"><span class="code">new:chat</span><span class="gloss">Make a chat, plan, room, collection, framework, branch, step, run or block</span></button>
+          <button type="button" class="row everyday-row" title="name:&quot;Owl notes&quot;"><span class="code">name:"Owl notes"</span><span class="gloss">Name what the bar is pointed at: a room, a collection or a chat</span></button>
+          <button type="button" class="row everyday-row" title="by:haiku"><span class="code">by:haiku</span><span class="gloss">Choose who answers in this chat: a model, or a source with no tokens</span></button>
+          <button type="button" class="row everyday-row" title="api:"><span class="code">api:</span><span class="gloss">Add or replace a key, in its own field. Never type a key here</span></button>
+          <button type="button" class="row everyday-row" title="note:&quot;Check the dates&quot;"><span class="code">note:"Check the dates"</span><span class="gloss">Write a note for people. It is never sent</span></button>
+          <button type="button" class="row everyday-row" title="delete:207"><span class="code">delete:207</span><span class="gloss">Delete something by its number. What has been sent goes for good, after a second Enter</span></button>
+          <button type="button" class="row everyday-row" title="undo:"><span class="code">undo:</span><span class="gloss">Take back the last command, or one edit. It stops at a run</span></button>
+          <button type="button" class="row everyday-row" title="pop:records"><span class="code">pop:records</span><span class="gloss">Put one or more boards, or the bar, in a window of their own</span></button>
+          <button type="button" class="row everyday-row" title="bar:bottom"><span class="code">bar:bottom</span><span class="gloss">Move the bar on the page</span></button>
+          <button type="button" class="row everyday-row" title="backup:"><span class="code">backup:</span><span class="gloss">Download a backup of everything but your keys</span></button>
+        </div>
+        <button type="button" class="morerow" id="more" data-only="everyday" aria-expanded="false"><span class="code">more ▾</span><span class="gloss">79 more, in 13 groups. ?all shows them at once</span></button>
+        <button type="button" class="morerow" id="fewer" data-only="more" aria-expanded="true"><span class="code">fewer ▴</span><span class="gloss">Back to the everyday commands</span></button>
+      </section>
+      <div class="all" data-only="more">
+      <section class="grp"><h3>The bar</h3>
+        <button type="button" class="row" title="&gt;"><span class="code">&gt;</span><span class="gloss">Type a command. The &gt; stays in the field</span></button>
+        <button type="button" class="row" title="p&gt;"><span class="code">p&gt;</span><span class="gloss">Write a prompt. Nothing is sent before Enter</span></button>
+        <button type="button" class="row" title="s&gt;"><span class="code">s&gt;</span><span class="gloss">Search</span></button>
+        <button type="button" class="row" title="?"><span class="code">?</span><span class="gloss">Every command, or how one works</span></button>
+        <button type="button" class="row" title="Esc"><span class="code">Esc</span><span class="gloss">Back one mode, or closes what is open under the bar</span></button>
+      </section>
+      <section class="grp"><h3>Lines of several commands</h3>
+        <button type="button" class="row" title="open:records close:library pop:collection display 2 arrange:save &quot;review&quot;"><span class="code">open:records close:library pop:collection display 2 arrange:save &quot;review&quot;</span><span class="gloss">Open Records, close the Library, put the Collection on your second screen, and keep it all as review</span></button>
+        <button type="button" class="row" title="pin:207 tagadd:essay 207, 216 archive:209"><span class="code">pin:207 tagadd:essay 207, 216 archive:209</span><span class="gloss">In Records: pin a chat, tag two things, and put a third away. undo: takes back the whole line</span></button>
+        <button type="button" class="row" title="type:chat tag:essay since:7d sort:oldest"><span class="code">type:chat tag:essay since:7d sort:oldest</span><span class="gloss">In Records: chats tagged essay from the last seven days, oldest first</span></button>
+      </section>
+      <section class="grp"><h3>Go to</h3>
+        <button type="button" class="row" title="records:"><span class="code">records:</span><span class="gloss">Bring Records and the Collection beside what is on screen</span></button>
+        <button type="button" class="row" title="collection:"><span class="code">collection:</span><span class="gloss">Bring the Collection beside what is on screen</span></button>
+        <button type="button" class="row" title="plan:"><span class="code">plan:</span><span class="gloss">Bring the Plan board beside what is on screen</span></button>
+        <button type="button" class="row" title="library:"><span class="code">library:</span><span class="gloss">Bring the Library beside what is on screen</span></button>
+        <button type="button" class="row" title="settings:"><span class="code">settings:</span><span class="gloss">Bring Settings beside what is on screen, or one section of it</span></button>
+        <button type="button" class="row" title="room:"><span class="code">room:</span><span class="gloss">Bring the last room beside what is on screen, or a room by name</span></button>
+        <button type="button" class="row" title="jump:242"><span class="code">jump:242</span><span class="gloss">Scroll to a number on this board</span></button>
+        <button type="button" class="row" title="tour:"><span class="code">tour:</span><span class="gloss">Show the welcome steps, put them away, or show the second list</span></button>
+        <button type="button" class="row" title="letter:"><span class="code">letter:</span><span class="gloss">Read the newest letter from the maker of Parliament, one by its number, or the list of them</span></button>
+        <button type="button" class="row later" title="resources:"><span class="code">resources:</span><span class="gloss">Open the guides and references, with every command in full<span class="on"><span class="sep" aria-hidden="true">·</span>comes later</span></span></button>
+      </section>
+      <section class="grp"><h3>Start</h3>
+        <button type="button" class="row" title="new:chat"><span class="code">new:chat</span><span class="gloss">Make a chat, plan, room, collection, framework, branch, step, run or block</span></button>
+        <button type="button" class="row" title="open:207"><span class="code">open:207</span><span class="gloss">Open a board, or anything by its number or name; several at once, and spread across your screens</span></button>
+        <button type="button" class="row" title="close:records"><span class="code">close:records</span><span class="gloss">Take a board off the screen, or close the letter. Nothing is lost</span></button>
+      </section>
+      <section class="grp"><h3>Run</h3>
+        <button type="button" class="row away" title="run:201b"><span class="code">run:201b</span><span class="gloss">Run one branch. The Enter line says which run and what it costs<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Plan, Records</span></span></button>
+        <button type="button" class="row" title="stop:201b"><span class="code">stop:201b</span><span class="gloss">Halt a run, or every run in every window</span></button>
+        <button type="button" class="row away" title="diff:"><span class="code">diff:</span><span class="gloss">Set two runs of a plan side by side, and mark what differs<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Plan</span></span></button>
+        <button type="button" class="row" title="again:201a"><span class="code">again:201a</span><span class="gloss">Ask again from the edited prompt, as a new branch</span></button>
+      </section>
+      <section class="grp"><h3>Filters</h3>
+        <button type="button" class="row away" title="type:chat"><span class="code">type:chat</span><span class="gloss">Show some kinds of thing<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="tag:research"><span class="code">tag:research</span><span class="gloss">Show what carries a tag. A minus leaves it out<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="model:opus"><span class="code">model:opus</span><span class="gloss">Show what a model or a source answered<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="from:201b"><span class="code">from:201b</span><span class="gloss">Show what came from a chat, a plan, a branch or a run<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="in:&quot;Q2 evidence&quot;"><span class="code">in:&quot;Q2 evidence&quot;</span><span class="gloss">Show what is in a collection, or was made in a room<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="has:highlight"><span class="code">has:highlight</span><span class="gloss">Show what holds notes, quotes or highlights<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="cost:&gt;0.50"><span class="code">cost:&gt;0.50</span><span class="gloss">Show plans by what they cost<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="since:7d"><span class="code">since:7d</span><span class="gloss">Show what was made since a date<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="until:09/10/26"><span class="code">until:09/10/26</span><span class="gloss">Show what was made until a date<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="sort:active"><span class="code">sort:active</span><span class="gloss">Order the table<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="save:&quot;Water tower&quot;"><span class="code">save:&quot;Water tower&quot;</span><span class="gloss">Keep this search under a name<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records</span></span></button>
+      </section>
+      <section class="grp"><h3>Collection</h3>
+        <button type="button" class="row away" title="add:207, 216"><span class="code">add:207, 216</span><span class="gloss">Put things into the collection, or blocks into a room<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection, Lab</span></span></button>
+        <button type="button" class="row away" title="rm:207"><span class="code">rm:207</span><span class="gloss">Take things out of the collection, or blocks out of a room<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection, Lab</span></span></button>
+        <button type="button" class="row away" title="clear:"><span class="code">clear:</span><span class="gloss">Empty the collection, remove every filter, or one kind of filter<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row" title="compare:201a 201b"><span class="code">compare:201a 201b</span><span class="gloss">Set two side by side and mark the words that differ: notes, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ</span></button>
+        <button type="button" class="row" title="name:&quot;Q2 evidence&quot;"><span class="code">name:&quot;Q2 evidence&quot;</span><span class="gloss">Name what the bar is pointed at: a room, a collection or a chat. With two names, rename a saved arrangement</span></button>
+        <button type="button" class="row away" title="heading:&quot;Sources&quot;"><span class="code">heading:&quot;Sources&quot;</span><span class="gloss">Add a heading to a collection in your own order<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Collection</span></span></button>
+        <button type="button" class="row away" title="summarize:207, 216"><span class="code">summarize:207, 216</span><span class="gloss">Write a dated summary of some cards as a note. One model call<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row" title="forget:&quot;Surprised me&quot;"><span class="code">forget:&quot;Surprised me&quot;</span><span class="gloss">Remove a saved search, collection, framework of yours or arrangement</span></button>
+        <button type="button" class="row later" title="rewrite:234"><span class="code">rewrite:234</span><span class="gloss">Write a new dated summary beside the old one<span class="on"><span class="sep" aria-hidden="true">·</span>comes later</span></span></button>
+      </section>
+      <section class="grp"><h3>Tags</h3>
+        <button type="button" class="row" title="tagadd:essay 207, 216"><span class="code">tagadd:essay 207, 216</span><span class="gloss">Tag things, what is selected, or the reply you are in</span></button>
+        <button type="button" class="row away" title="retag:essay to &quot;Long form&quot;"><span class="code">retag:essay to &quot;Long form&quot;</span><span class="gloss">Rename a tag everywhere<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row away" title="untag:essay 207"><span class="code">untag:essay 207</span><span class="gloss">Remove a tag from some things, or from everything<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+      </section>
+      <section class="grp"><h3>Items</h3>
+        <button type="button" class="row" title="inspect:207"><span class="code">inspect:207</span><span class="gloss">Look at one thing in detail, where you are</span></button>
+        <button type="button" class="row" title="pin:207"><span class="code">pin:207</span><span class="gloss">Keep something at the top of its list</span></button>
+        <button type="button" class="row" title="archive:209"><span class="code">archive:209</span><span class="gloss">Put something away without deleting it</span></button>
+        <button type="button" class="row" title="copy:207"><span class="code">copy:207</span><span class="gloss">Copy something as Markdown, or the reply you are in</span></button>
+        <button type="button" class="row" title="quote:reply"><span class="code">quote:reply</span><span class="gloss">Keep a quote of the whole reply you are in, beside its chat or in another. It is never sent</span></button>
+        <button type="button" class="row away" title="export:md 201"><span class="code">export:md 201</span><span class="gloss">Download as Markdown or JSONL to read elsewhere. It cannot be restored<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records, Collection</span></span></button>
+        <button type="button" class="row" title="note:203 &quot;Try it without the ending&quot;"><span class="code">note:203 &quot;Try it without the ending&quot;</span><span class="gloss">Write a note for people. It is never sent</span></button>
+        <button type="button" class="row" title="delete:207"><span class="code">delete:207</span><span class="gloss">Delete something by its number. What has been sent goes for good, after a second Enter</span></button>
+        <button type="button" class="row" title="undo:"><span class="code">undo:</span><span class="gloss">Take back the last command, or one edit. It stops at a run</span></button>
+      </section>
+      <section class="grp"><h3>Editing</h3>
+        <button type="button" class="row" title="tell:&quot;Keep it under a page&quot;"><span class="code">tell:&quot;Keep it under a page&quot;</span><span class="gloss">Write a note the model reads with your next prompt</span></button>
+        <button type="button" class="row" title="ask:&quot;Add the year it opened&quot;"><span class="code">ask:&quot;Add the year it opened&quot;</span><span class="gloss">Ask about the selected words in a reply, in your own words. It goes with your next prompt</span></button>
+        <button type="button" class="row" title="strikethrough:"><span class="code">strikethrough:</span><span class="gloss">Strike the selected words in a reply. Its number with undo: takes it back</span></button>
+        <button type="button" class="row" title="to:201a"><span class="code">to:201a</span><span class="gloss">Send the next prompt to one branch, or to all</span></button>
+        <button type="button" class="row" title="accept:244"><span class="code">accept:244</span><span class="gloss">Accept a suggestion</span></button>
+        <button type="button" class="row" title="reject:244"><span class="code">reject:244</span><span class="gloss">Turn down a suggestion</span></button>
+        <button type="button" class="row" title="hold:242"><span class="code">hold:242</span><span class="gloss">Keep a branch or an edit from going until you say</span></button>
+        <button type="button" class="row" title="markup:off"><span class="code">markup:off</span><span class="gloss">Markup: show your edits in replies, or show replies clean</span></button>
+        <button type="button" class="row" title="by:haiku"><span class="code">by:haiku</span><span class="gloss">Choose who answers in this chat: a model, or a source with no tokens</span></button>
+        <button type="button" class="row" title="thinking:off"><span class="code">thinking:off</span><span class="gloss">Let models that can think do so before answering, shown as they go, or not</span></button>
+        <button type="button" class="row" title="framework:pushback"><span class="code">framework:pushback</span><span class="gloss">Choose the frameworks that shape every reply: standing instructions sent with each prompt</span></button>
+        <button type="button" class="row" title="helper:haiku"><span class="code">helper:haiku</span><span class="gloss">Choose the model that reads text from sources, and translates it</span></button>
+        <button type="button" class="row" title="reply:swedish"><span class="code">reply:swedish</span><span class="gloss">Choose the language replies come in, by its code or its name</span></button>
+        <button type="button" class="row" title="privacy:on"><span class="code">privacy:on</span><span class="gloss">Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, names too, or not</span></button>
+        <button type="button" class="row" title="check:"><span class="code">check:</span><span class="gloss">Check the last answer from a source for words that try to instruct a model</span></button>
+        <button type="button" class="row" title="web:"><span class="code">web:</span><span class="gloss">Let the model search the web for your next prompt only</span></button>
+        <button type="button" class="row" title="attach:"><span class="code">attach:</span><span class="gloss">Attach files to your next prompt</span></button>
+        <button type="button" class="row" title="include:201b"><span class="code">include:201b</span><span class="gloss">Bring an answer from a source into your next prompt, sent as material marked as data</span></button>
+        <button type="button" class="row" title="translate:"><span class="code">translate:</span><span class="gloss">Translate the last answer from a source into your language. On or off: translate what you ask sources that read only English</span></button>
+        <button type="button" class="row" title="ripple:on"><span class="code">ripple:on</span><span class="gloss">Carry edits across branches as suggestions. Each check is a model call</span></button>
+        <button type="button" class="row" title="sweep:201a editor"><span class="code">sweep:201a editor</span><span class="gloss">Check a reply or branch against a framework's rule, one suggestion per sentence</span></button>
+        <button type="button" class="row away" title="reflect:"><span class="code">reflect:</span><span class="gloss">Ask for a synthesis of a chat and its markings, with questions<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Reflection</span></span></button>
+      </section>
+      <section class="grp"><h3>Layout</h3>
+        <button type="button" class="row" title="bar:bottom"><span class="code">bar:bottom</span><span class="gloss">Move the bar on the page</span></button>
+        <button type="button" class="row" title="pop:records"><span class="code">pop:records</span><span class="gloss">Put one or more boards, or the bar, in a window of their own, place it, or bring it back</span></button>
+        <button type="button" class="row" title="spread:"><span class="code">spread:</span><span class="gloss">Spread the boards across your screens, in equal groups in the order named, the first on this one</span></button>
+        <button type="button" class="row" title="move:library left"><span class="code">move:library left</span><span class="gloss">Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan</span></button>
+        <button type="button" class="row" title="swap:records collection"><span class="code">swap:records collection</span><span class="gloss">Swap two boards</span></button>
+        <button type="button" class="row" title="reset:"><span class="code">reset:</span><span class="gloss">Put the boards back as shipped and close the windows</span></button>
+        <button type="button" class="row" title="width:60%"><span class="code">width:60%</span><span class="gloss">Choose how much of the width a board takes, or put every width back</span></button>
+        <button type="button" class="row away" title="cols:-room +created"><span class="code">cols:-room +created</span><span class="gloss">Hide or show columns of the table<span class="on"><span class="sep" aria-hidden="true">·</span>Works on Records</span></span></button>
+        <button type="button" class="row" title="focus:"><span class="code">focus:</span><span class="gloss">Close every board but the chat, or but the boards you name. focus:off brings the rest back</span></button>
+        <button type="button" class="row" title="calm:"><span class="code">calm:</span><span class="gloss">Hide markup and the details on boards until you come near them. calm:off shows them</span></button>
+        <button type="button" class="row" title="arrange:&quot;Review desk&quot;"><span class="code">arrange:&quot;Review desk&quot;</span><span class="gloss">Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save &quot;morning&quot;</span></button>
+      </section>
+      <section class="grp"><h3>Building rooms</h3>
+        <button type="button" class="row" title="set:notes order oldest"><span class="code">set:notes order oldest</span><span class="gloss">Change a setting of a block or of Parliament. The Enter line states the change in full</span></button>
+      </section>
+      <section class="grp"><h3>Settings and data</h3>
+        <button type="button" class="row" title="api:"><span class="code">api:</span><span class="gloss">Add or replace a key, in its own field. Never type a key here</span></button>
+        <button type="button" class="row" title="install:"><span class="code">install:</span><span class="gloss">Install Parliament as an app on this computer, where the browser can. Your work stays the same</span></button>
+        <button type="button" class="row" title="backup:"><span class="code">backup:</span><span class="gloss">Download a backup of everything but your keys</span></button>
+        <button type="button" class="row" title="restore:"><span class="code">restore:</span><span class="gloss">Bring a backup back</span></button>
+        <button type="button" class="row" title="import:"><span class="code">import:</span><span class="gloss">Open a file made elsewhere. It says what the file is before anything happens</span></button>
+        <button type="button" class="row" title="language:ja"><span class="code">language:ja</span><span class="gloss">Change the language, by its code or its name</span></button>
+      </section>
+      </div>
+    </div>
+    <p class="foot">A click writes the command into the field, and Enter runs it. ?bar shows one command's forms.</p>
+  </section>
+</div>
+
+<script>
+// Mockup only: the state and the way "more" draws.
+(function () {
+  var ref = document.getElementById('ref')
+  function press(attr, value) {
+    document.querySelectorAll('[' + attr + ']').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute(attr) === value))
+    })
+  }
+  function setState(s) { ref.dataset.state = s; press('data-set-state', s); ref.scrollTop = 0 }
+  function setFold(f) { ref.dataset.fold = f; press('data-set-fold', f) }
+  document.querySelectorAll('[data-set-state]').forEach(function (b) { b.addEventListener('click', function () { setState(b.getAttribute('data-set-state')) }) })
+  document.querySelectorAll('[data-set-fold]').forEach(function (b) { b.addEventListener('click', function () { setFold(b.getAttribute('data-set-fold')) }) })
+  document.getElementById('more').addEventListener('click', function () { setState('more') })
+  document.getElementById('fewer').addEventListener('click', function () { setState('everyday') })
+  // A row's click would write the command into the field; here it only shows which.
+  document.querySelectorAll('.row').forEach(function (r) {
+    r.addEventListener('click', function () {
+      var t = document.querySelector('.bar .text')
+      t.firstChild.nodeValue = '>' + r.getAttribute('title')
+    })
+  })
+})()
+</script>
+</body>
+</html>

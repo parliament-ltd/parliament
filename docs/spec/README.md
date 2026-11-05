@@ -35,6 +35,12 @@ the dates are worked out from what cites them.
 | 28 Sep | `parliament_lab_v6.html` | The Lab as two boards, Library and Canvas, which the arrangements document describes | Lab v7 is the same file plus a third board, Blocks. Which one is built is C38 |
 | 28 Sep | `parliament_screens_v1.html` | The map that bare `arrange:` shows across screens | The arrangements document §7a. `arrange:` is deferred |
 
+### Mockups drawn during the refactor
+
+| Date | File | What it is | Read it with |
+|---|---|---|---|
+| 4 Nov | `parliament-reference-v1.html` | The `?` reference in two tiers: Everyday first, then "more" opens every command in its groups. Drawn for C291 (a), not yet ruled | The bar reference (9 Oct) for the field; C279 (f) for the complete list it opens into |
+
 Working files written during the refactor: `inventory.md`, `conflicts.md`,
 `refactor-plan.md` (the plan, written 12 October), `change-plan.md` (the
 24 September plan it replaces, kept for the record), `plan-brief.md` (the
