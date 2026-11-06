@@ -3459,6 +3459,10 @@ msgid "enter.installNotOffered"
 msgstr "Den här webbläsaren har inte erbjudit att installera Parliament här. Där det går kan webbplatsen installeras, eller läggas till i Dock, från webbläsarens egen meny"
 
 #. js-lingui-explicit-id
+msgid "enter.installOpenApp"
+msgstr "Parliament är redan installerat som app på den här datorn. Öppna det bland dina appar, eller med knappen i slutet av adressfältet"
+
+#. js-lingui-explicit-id
 msgid "enter.installSame"
 msgstr "Appen och den här sidan delar allt: dina chattar, nycklar och säkerhetskopior"
 

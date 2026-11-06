@@ -1490,6 +1490,8 @@ describe('install: (C287)', () => {
     expect(go('>install:', { can: true, installed: false })).toMatchObject({ says: { message: 'installGo' }, act: { kind: 'install' } })
     expect(go('>install:', { can: false, installed: false })).toMatchObject({ says: { message: 'installNotOffered' }, act: null })
     expect(go('>install:', { can: false, installed: true }).says.message).toBe('installAlready')
+    // Installed already, seen from a page in the browser, which makes no offer then (C294).
+    expect(go('>install:', { can: false, installed: false, elsewhere: true })).toMatchObject({ says: { message: 'installOpenApp' }, act: null })
   })
   it('takes download: as the word for it, and writes install: in', () => {
     const p = go('>download:', { can: true, installed: false })

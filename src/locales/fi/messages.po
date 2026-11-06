@@ -3459,6 +3459,10 @@ msgid "enter.installNotOffered"
 msgstr "Tämä selain ei ole tarjonnut Parliamentin asentamista täällä. Jos selain pystyy siihen, sen omassa valikossa voi asentaa sivuston tai lisätä sen Dockiin"
 
 #. js-lingui-explicit-id
+msgid "enter.installOpenApp"
+msgstr "Parliament on jo asennettu sovellukseksi tälle tietokoneelle. Avaa se sovelluksistasi tai osoiterivin lopussa olevasta painikkeesta"
+
+#. js-lingui-explicit-id
 msgid "enter.installSame"
 msgstr "Sovellus ja tämä sivu jakavat kaiken: keskustelusi, avaimesi ja varmuuskopiosi"
 

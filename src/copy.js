@@ -217,6 +217,7 @@ export const COPY = {
     installGo: /*i18n*/ { id: 'enter.installGo', message: 'Enter asks the browser to install Parliament as an app on this computer' },
     installSame: /*i18n*/ { id: 'enter.installSame', message: 'The app and this page share everything: your chats, keys and backups' },
     installAlready: /*i18n*/ { id: 'enter.installAlready', message: 'This is Parliament installed as an app already' },
+    installOpenApp: /*i18n*/ { id: 'enter.installOpenApp', message: 'Parliament is installed as an app on this computer already. Open it from your apps, or from the button at the end of the address bar' },
     installNotOffered: /*i18n*/ { id: 'enter.installNotOffered', message: 'This browser has not offered to install Parliament here. Where it can, its own menu offers to install the site or add it to the dock' },
     installDone: /*i18n*/ { id: 'enter.installDone', message: 'Installed. Parliament opens as an app from now on, with everything you have here' },
     installDismissed: /*i18n*/ { id: 'enter.installDismissed', message: 'Not installed. install: asks again when the browser offers it', comment: 'Commands stay English' },

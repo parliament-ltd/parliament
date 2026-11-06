@@ -8,6 +8,8 @@
  * - The beforeinstallprompt event is captured and deferred; the native browser
  *   prompt fires only when the user explicitly clicks "Install" in the banner.
  */
+import { installOffer, onInstallOffer, takeInstallOffer, installedHere } from '../lib/installOffer'
+import { reloadIntoWaiting } from '../lib/swUpdate'
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { getSetting, setSetting } from '../lib/db'
@@ -35,7 +37,6 @@ export function PWAProvider({ children }) {
   // needRefresh[0] becomes true when a new SW is waiting to activate.
   const {
     needRefresh: [needRefresh],
-    updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
       console.log('[PWA] Service worker registered:', r?.scope ?? 'unknown scope')
@@ -61,9 +62,9 @@ export function PWAProvider({ children }) {
   }, [])
 
   const applyUpdate = useCallback(() => {
-    // true = reload the page after the new SW activates
-    updateServiceWorker(true)
-  }, [updateServiceWorker])
+    // Starts the waiting version and reloads into it, in any window (C294 (c)).
+    reloadIntoWaiting()
+  }, [])
 
   // ── Install prompt ────────────────────────────────────────────────────────
   const installPromptRef  = useRef(null)
@@ -71,33 +72,35 @@ export function PWAProvider({ children }) {
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   // install: in the bar (C287): whether the browser has offered to install
   // Parliament here, and whether this is the installed app already.
-  const [canInstall, setCanInstall] = useState(false)
+  const [canInstall, setCanInstall] = useState(() => Boolean(installOffer()))
   const [installed, setInstalled] = useState(() => Boolean(window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone))
+  // Installed as an app on this computer, seen from a page in the browser (C294).
+  const [installedApp, setInstalledApp] = useState(false)
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = async (e) => {
-      e.preventDefault()
-      // Kept for install:, which the person asks for, whatever the banner was told.
-      installPromptRef.current = e
-      setCanInstall(true)
-      const dismissed = await getSetting('installPromptDismissed')
-      if (dismissed) return
-      // Don't show the banner yet — wait until 3 messages have been sent.
-    }
+    // The offer, caught as the page started (installOffer.js); and any that comes later.
+    installPromptRef.current = installOffer()
+    setCanInstall(Boolean(installPromptRef.current))
+    const stop = onInstallOffer((offer) => {
+      installPromptRef.current = offer
+      setCanInstall(Boolean(offer))
+    })
+    let live = true
+    installedHere().then((yes) => { if (live && yes) setInstalledApp(true) })
 
     const handleAppInstalled = () => {
       setShowInstallBanner(false)
       installPromptRef.current = null
       setCanInstall(false)
       setInstalled(true)
-      console.log('[PWA] App installed successfully')
+      setInstalledApp(true)
     }
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled',         handleAppInstalled)
+    window.addEventListener('appinstalled', handleAppInstalled)
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('appinstalled',         handleAppInstalled)
+      live = false
+      stop()
+      window.removeEventListener('appinstalled', handleAppInstalled)
     }
   }, [])
 
@@ -121,8 +124,9 @@ export function PWAProvider({ children }) {
   }, [])
 
   const triggerInstallPrompt = useCallback(async () => {
-    const prompt = installPromptRef.current
+    const prompt = installPromptRef.current ?? installOffer()
     if (!prompt) return null
+    takeInstallOffer()
     prompt.prompt()
     const { outcome } = await prompt.userChoice
     // The browser offers once: after an answer, it may offer again later.
@@ -147,6 +151,7 @@ export function PWAProvider({ children }) {
       // Install prompt
       canInstall,
       installed,
+      installedApp,
       showInstallBanner,
       trackMessageSent,
       dismissInstallBanner,

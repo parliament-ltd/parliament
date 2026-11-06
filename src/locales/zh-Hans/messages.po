@@ -3459,6 +3459,10 @@ msgid "enter.installNotOffered"
 msgstr "此浏览器尚未提供在这里安装 Parliament 的选项。如果浏览器支持，它自己的菜单中可以安装此网站，或将其添加到程序坞"
 
 #. js-lingui-explicit-id
+msgid "enter.installOpenApp"
+msgstr "Parliament 已作为应用安装在这台电脑上。请从你的应用中打开它，或点击地址栏末端的按钮"
+
+#. js-lingui-explicit-id
 msgid "enter.installSame"
 msgstr "应用和此页面共享所有内容：你的对话、密钥和备份"
 

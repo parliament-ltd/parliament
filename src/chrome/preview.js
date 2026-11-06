@@ -1177,7 +1177,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       // install: (C287): the browser's own offer, asked for at Enter.
       install: (a1, s1, sc) => (sc.install?.installed ? { says: { message: 'installAlready' }, act: null }
         : sc.install?.can ? { says: { message: 'installGo', also: [{ message: 'installSame' }] }, act: { kind: 'install' } }
-          : { says: { message: 'installNotOffered' }, act: null }),
+          // Installed already, seen from a page in the browser, which then makes no offer (C294).
+          : sc.install?.elsewhere ? { says: { message: 'installOpenApp' }, act: null }
+            : { says: { message: 'installNotOffered' }, act: null }),
       backup: () => ({ says: { message: 'backupOpen' }, act: { kind: 'backupPanel' } }),
       restore: () => ({ says: { message: 'restoreOpen' }, act: { kind: 'filePick', then: 'restore' } }),
       import: () => ({ says: { message: 'importOpen' }, act: { kind: 'filePick', then: 'import' } }),

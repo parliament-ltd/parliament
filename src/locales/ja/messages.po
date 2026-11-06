@@ -3459,6 +3459,10 @@ msgid "enter.installNotOffered"
 msgstr "このブラウザは、ここでParliamentのインストールを提示していません。対応しているブラウザでは、そのメニューからサイトをインストールするか、Dockに追加できます"
 
 #. js-lingui-explicit-id
+msgid "enter.installOpenApp"
+msgstr "Parliamentはすでにこのコンピュータにアプリとしてインストールされています。アプリの一覧から、またはアドレスバーの端にあるボタンから開いてください"
+
+#. js-lingui-explicit-id
 msgid "enter.installSame"
 msgstr "アプリとこのページは、すべてを共有します：チャット、キー、バックアップ"
 

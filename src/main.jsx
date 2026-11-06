@@ -7,10 +7,15 @@ import App from './App'
 import UpgradeGate from './components/UpgradeGate'
 import UnlockGate from './components/UnlockGate'
 import { installFetchLogger } from './lib/networkLog'
+import { catchInstallOffer } from './lib/installOffer'
 import { I18nProvider } from '@lingui/react'
 import { i18n, startLanguage } from './i18n'
 
 installFetchLogger()
+
+// The browser's offer to install Parliament, caught before anything is drawn,
+// so a slow start or the lock screen cannot miss it (C294).
+catchInstallOffer()
 
 // The interface's language: English at once, then the person's (C87).
 startLanguage()
