@@ -4747,6 +4747,13 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Kept.** The board, its code, its catalogue, the backup category "Library" (the rooms kept on this device) and everything stored. `LAB = true` brings it all back.
 - Tried in the app: the strip without the Library, `library:` and `open:library` saying it comes later, and `?all` naming it nowhere.
 
+**C296. In calm, a reply reads as it stands until the markup switch** (5 November; **asked for by Stefan, 5 November:** "with calm and focus on, when hovering over text with changes it abruptly shows the edits and feels glitchy. shouldn't it hide the edits?"; ruled from three choices, "Hide until markup switch"; changes the editing spec's calm table, "The reply you hover or are editing shows full markup", and C255 (a), "being near shows the markup, and you edit with it in view"). Not released.
+- **Why.** Near a reply, calm put back its struck words, answers and full markers, so the paragraph moved under the pointer, and back as the pointer left.
+- **Now.** In calm a reply reads as it stands while you read it and while you edit it: hover, keyboard focus and a tap change nothing in its text. A word you strike leaves the view, and the rule at the reply's edge says something is marked. The room's switch, "markup · clean", shows the edits: in calm, `markup:on` and `markup:off` set `calmMarkup`, a setting of this device kept with calm and not in backups, and `undo:` takes it back; calm stays on for everything else. Outside calm the switch and `markup:` work as before, and `markup:off col` stays the Collection's own.
+- **Unchanged.** Calm's other details still come when you are near them: a board's head, the branch slider's line, Collection cards and the legend.
+- **Words.** `calm:`'s line, its description, the strip's tooltip and its "already" line say replies read as they stand until `markup:on`, with three new lines for `markup:` in calm; in all four languages, drafted.
+- Tried in the app: a struck word stays hidden on hover and when clicking into the reply; "markup" shows it struck with calm on, "clean" hides it again, and `calm:off` shows the markup as before.
+
 
 ## Proposed CLAUDE.md rewrite
 

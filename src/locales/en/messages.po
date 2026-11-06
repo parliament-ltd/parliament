@@ -2320,12 +2320,12 @@ msgstr "Enter shows markup and every detail again"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enter hides markup and the details on boards until you come near them"
+msgstr "Enter reads replies as they stand until markup:on, and hides the details on boards until you come near them"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "Markup and details show already. calm: hides them until you come near"
+msgstr "Markup and details show already. calm: reads replies as they stand and hides details until you come near"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3686,6 +3686,18 @@ msgstr "{count, plural, one {{nums} did not run: its condition was not met} othe
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOff"
+msgstr "Enter reads replies as they stand again, as calm does. markup:on shows the edits"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOn"
+msgstr "Enter shows the edits in replies. Calm stays on for everything else"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmSame"
+msgstr "{on, select, on {The edits in replies show already} other {Replies read as they stand already}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
@@ -9312,7 +9324,7 @@ msgstr "calm: on"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.calmTitle"
-msgstr "Markup and the details on boards wait until you come near them. Runs {command}"
+msgstr "Replies read as they stand until markup:on, and the details on boards wait until you come near them. Runs {command}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -9636,7 +9648,7 @@ msgstr "Choose who answers in this chat: a model, or a source with no tokens"
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Hide markup and the details on boards until you come near them. calm:off shows them"
+msgstr "Read replies as they stand until markup:on, and hide the details on boards until you come near them. calm:off shows them all"
 
 #. js-lingui-explicit-id
 msgid "verb.check"

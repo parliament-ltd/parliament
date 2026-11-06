@@ -2560,7 +2560,9 @@ export default function Shell() {
   // ── Calm (stage 14, piece 2; C255) ──
   // A setting of this device (C253 (d)), off for someone new (C253 (c)).
   const calm = settings.calm === true
-  const calmScreen = useMemo(() => ({ on: calm }), [calm])
+  // In calm, a reply reads as it stands until the markup switch shows its edits (C296).
+  const calmMarkup = calm && settings.calmMarkup === 'on'
+  const calmScreen = useMemo(() => ({ on: calm, markup: calmMarkup }), [calm, calmMarkup])
   // Calm once you know it (C291 (g)): when the welcome page's steps are done
   // or put away, here and now, calm turns on, unless calm was ever set on
   // this device: someone who turned it off stays off. Steps done before this
@@ -4293,7 +4295,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: calm ? !calmMarkup : settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} />
     }
     if (board === 'almanac') {
       return (
@@ -4410,7 +4412,7 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
+    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}${calmMarkup ? ' calm-markup' : ''}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
       {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
       {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}

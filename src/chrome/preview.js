@@ -860,6 +860,13 @@ function planMarkup(a, step, screens = {}) {
   const want = step.match?.values?.[0]?.value === 'on'
   // markup:off col, or on the Collection: the Collection's own (C220 (g)).
   const col = step.match?.values?.[1]?.value === 'col' || a.addressed === 'collection'
+  // In calm, the edits wait for the markup switch (C296): markup:on shows them
+  // and markup:off reads replies as they stand again, calm staying on.
+  if (!col && screens.calm?.on) {
+    const shown = screens.calm.markup === true
+    if (want === shown) return { says: { message: 'markupCalmSame', values: { on: shown ? 'on' : 'off' } }, act: null }
+    return { says: { message: want ? 'markupCalmOn' : 'markupCalmOff' }, act: { kind: 'setting', key: 'calmMarkup', value: want ? 'on' : 'off', before: shown ? 'on' : 'off' } }
+  }
   const on = col ? screens.collectionMarkup?.on !== false : screens.markup?.on !== false
   if (want === on) return { says: { message: col ? 'markupColSame' : 'markupSame', values: { on: on ? 'on' : 'off' } }, act: null }
   if (col) return { says: { message: want ? 'markupColOn' : 'markupColOff' }, act: { kind: 'markup', col: true, on: want, before: on } }

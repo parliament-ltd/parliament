@@ -2320,12 +2320,12 @@ msgstr "Enter näyttää taas muutosmerkit ja kaikki yksityiskohdat"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enter piilottaa muutosmerkit ja taulujen yksityiskohdat, kunnes tulet niiden lähelle"
+msgstr "Enter näyttää vastaukset sellaisinaan komentoon markup:on asti ja piilottaa taulujen yksityiskohdat, kunnes tulet niiden lähelle"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "Muutosmerkit ja yksityiskohdat näkyvät jo. calm: piilottaa ne, kunnes tulet lähelle"
+msgstr "Muutosmerkit ja yksityiskohdat näkyvät jo. calm: näyttää vastaukset sellaisinaan ja piilottaa yksityiskohdat, kunnes tulet lähelle"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3686,6 +3686,18 @@ msgstr "{count, plural, one {{nums} jäi ajamatta: sen ehto ei täyttynyt} other
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {jos mitään ei löydy} failed {jos edellinen epäonnistuu} always {edellisestä riippumatta} other {kun edellinen on valmis}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOff"
+msgstr "Enter näyttää vastaukset taas sellaisinaan, kuten calm tekee. markup:on näyttää muutosmerkit"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOn"
+msgstr "Enter näyttää vastausten muutosmerkit. Muu näkymä pysyy rauhallisena"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmSame"
+msgstr "{on, select, on {Vastausten muutosmerkit näkyvät jo} other {Vastaukset näkyvät jo sellaisinaan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
@@ -9312,7 +9324,7 @@ msgstr "calm: päällä"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.calmTitle"
-msgstr "Muutosmerkit ja taulujen yksityiskohdat odottavat, kunnes tulet niiden lähelle. Suorittaa komennon {command}"
+msgstr "Vastaukset näkyvät sellaisinaan komentoon markup:on asti, ja taulujen yksityiskohdat odottavat, kunnes tulet niiden lähelle. Suorittaa komennon {command}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -9636,7 +9648,7 @@ msgstr "Valitse, kuka vastaa tässä keskustelussa: malli tai lähde ilman token
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Piilota muutosmerkit ja taulujen yksityiskohdat, kunnes tulet niiden lähelle. calm:off näyttää ne"
+msgstr "Näytä vastaukset sellaisinaan komentoon markup:on asti ja piilota taulujen yksityiskohdat, kunnes tulet niiden lähelle. calm:off näyttää kaiken"
 
 #. js-lingui-explicit-id
 msgid "verb.check"

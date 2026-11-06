@@ -369,7 +369,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'focus', group: 'layout', example: 'focus:', forms: ['focus:', 'focus:sym col', 'focus:save', 'focus:off'], takes: [[], [['save', 'off']], [{ many: 'word' }]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.focus', message: 'Close every board but the chat, or but the boards you name. focus:off brings the rest back' } }),
   v({ verb: 'calm', group: 'layout', example: 'calm:', forms: ['calm:', 'calm:off'], takes: [[], [['off']]], stage: 14, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.calm', message: 'Hide markup and the details on boards until you come near them. calm:off shows them' } }),
+    gloss: /*i18n*/ { id: 'verb.calm', message: 'Read replies as they stand until markup:on, and hide the details on boards until you come near them. calm:off shows them all' } }),
   v({ verb: 'arrange', group: 'layout', example: 'arrange:"Review desk"', forms: ['arrange:', 'arrange:"Review desk"', 'arrange:save "Review desk"', 'arrange:"Review desk" 207'],
     takes: [[], [['save'], 'text'], ['text', { opt: 'address' }]], stage: 14, undoable: true,
     gloss: /*i18n*/ { id: 'verb.arrange', message: 'Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning"', comment: 'Commands stay English' } }),

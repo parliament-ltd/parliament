@@ -2320,12 +2320,12 @@ msgstr "Enterで、変更表示とすべての詳細を再び表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enterで、変更表示とボードの詳細を、近づくまで隠します"
+msgstr "Enterで、返答を markup:on まで今の形のまま表示し、ボードの詳細を近づくまで隠します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "変更表示と詳細はすでに表示されています。calm: で、近づくまで隠せます"
+msgstr "変更表示と詳細はすでに表示されています。calm: で、返答を今の形のまま表示し、詳細を近づくまで隠せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3686,6 +3686,18 @@ msgstr "{count, plural, other {{nums}は、条件を満たさなかったため�
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {何も見つからなければ} failed {前のものが失敗したら} always {前のものの結果にかかわらず} other {前のものが終わったら}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOff"
+msgstr "Enterで、calm と同じく返答を再び今の形のまま表示します。markup:on で変更表示を出せます"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOn"
+msgstr "Enterで、返答の変更表示を出します。ほかは落ち着いた表示のままです"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmSame"
+msgstr "{on, select, on {返答の変更表示はすでに出ています} other {返答はすでに今の形のまま表示されています}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
@@ -9312,7 +9324,7 @@ msgstr "calm: オン"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.calmTitle"
-msgstr "変更表示とボードの詳細は、近づいたときに表示されます。{command} を実行します"
+msgstr "返答は markup:on まで今の形のまま表示され、ボードの詳細は近づいたときに表示されます。{command} を実行します"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -9636,7 +9648,7 @@ msgstr "このチャットで答えるものを選ぶ：モデル、またはト
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "変更表示とボードの詳細を、近づくまで隠す。calm:off で再び表示します"
+msgstr "返答を markup:on まで今の形のまま表示し、ボードの詳細を近づくまで隠す。calm:off ですべて表示します"
 
 #. js-lingui-explicit-id
 msgid "verb.check"

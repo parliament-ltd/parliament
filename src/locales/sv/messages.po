@@ -2320,12 +2320,12 @@ msgstr "Enter visar ändringarna och alla detaljer igen"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "Enter döljer ändringarna och detaljerna på tavlorna tills du kommer nära dem"
+msgstr "Enter visar svaren som de står tills markup:on, och döljer detaljerna på tavlorna tills du kommer nära dem"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "Ändringarna och detaljerna visas redan. calm: döljer dem tills du närmar dig"
+msgstr "Ändringarna och detaljerna visas redan. calm: visar svaren som de står och döljer detaljerna tills du närmar dig"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3686,6 +3686,18 @@ msgstr "{count, plural, one {{nums} kördes inte: dess villkor uppfylldes inte} 
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {om inget hittas} failed {om den föregående misslyckas} always {vad den föregående än gör} other {när den föregående är klar}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOff"
+msgstr "Enter visar svaren som de står igen, som calm gör. markup:on visar ändringarna"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOn"
+msgstr "Enter visar ändringarna i svaren. Resten av skärmen förblir lugn"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmSame"
+msgstr "{on, select, on {Ändringarna i svaren visas redan} other {Svaren visas redan som de står}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
@@ -9312,7 +9324,7 @@ msgstr "calm: på"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.calmTitle"
-msgstr "Ändringarna och detaljerna på tavlorna väntar tills du kommer nära dem. Kör {command}"
+msgstr "Svaren visas som de står tills markup:on, och detaljerna på tavlorna väntar tills du kommer nära dem. Kör {command}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -9636,7 +9648,7 @@ msgstr "Välj vem som svarar i den här chatten: en modell, eller en källa utan
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Dölj ändringarna och detaljerna på tavlorna tills du kommer nära dem. calm:off visar dem"
+msgstr "Visa svaren som de står tills markup:on, och dölj detaljerna på tavlorna tills du kommer nära dem. calm:off visar allt"
 
 #. js-lingui-explicit-id
 msgid "verb.check"

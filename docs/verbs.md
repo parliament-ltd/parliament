@@ -143,7 +143,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `width:60%` | Choose how much of the width a board takes, or put every width back | `width:60%`, `width:collection 30%`, `width:204 40%`, `width:even` | everywhere | yes |
 | `cols:-room +created` | Hide or show columns of the table | `cols:-room +created`, `cols:` | Records | yes |
 | `focus:` | Close every board but the chat, or but the boards you name. focus:off brings the rest back | `focus:`, `focus:sym col`, `focus:save`, `focus:off` | everywhere | yes |
-| `calm:` | Hide markup and the details on boards until you come near them. calm:off shows them | `calm:`, `calm:off` | everywhere | yes |
+| `calm:` | Read replies as they stand until markup:on, and hide the details on boards until you come near them. calm:off shows them all | `calm:`, `calm:off` | everywhere | yes |
 | `arrange:"Review desk"` | Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning" | `arrange:`, `arrange:"Review desk"`, `arrange:save "Review desk"`, `arrange:"Review desk" 207` | everywhere | yes |
 
 ## Building rooms

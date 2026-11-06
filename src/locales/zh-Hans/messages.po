@@ -2320,12 +2320,12 @@ msgstr "按 Enter 重新显示标注和所有细节"
 
 #. js-lingui-explicit-id
 msgid "enter.calmOn"
-msgstr "按 Enter 隐藏标注和面板上的细节，等你靠近时再显示"
+msgstr "按 Enter 在 markup:on 之前按回复现有的样子显示，并隐藏面板上的细节，等你靠近时再显示"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calmSameOff"
-msgstr "标注和细节已经显示。calm: 可将它们隐藏，等你靠近时再显示"
+msgstr "标注和细节已经显示。calm: 可按回复现有的样子显示，并隐藏细节，等你靠近时再显示"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3686,6 +3686,18 @@ msgstr "{count, plural, other {{nums} 未运行：运行条件未满足}}"
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {前面没有找到内容时运行} failed {前一个失败时运行} always {无论前一个结果如何都运行} other {前一个完成后运行}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOff"
+msgstr "按 Enter 像 calm 一样，再次按回复现有的样子显示。markup:on 可显示标注"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOn"
+msgstr "按 Enter 显示回复中的标注。其他部分保持安静"
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmSame"
+msgstr "{on, select, on {回复中的标注已经显示} other {回复已经按现有的样子显示}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupColOff"
@@ -9312,7 +9324,7 @@ msgstr "calm: on"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "shell.calmTitle"
-msgstr "标注和面板上的细节等你靠近时再显示。执行 {command}"
+msgstr "在 markup:on 之前，回复按现有的样子显示，面板上的细节等你靠近时再显示。执行 {command}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -9636,7 +9648,7 @@ msgstr "选择此对话由谁回答：模型，或不耗 token 的来源"
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "隐藏标注和面板上的细节，等你靠近时再显示。calm:off 可显示它们"
+msgstr "在 markup:on 之前按回复现有的样子显示，并隐藏面板上的细节，等你靠近时再显示。calm:off 可全部显示"
 
 #. js-lingui-explicit-id
 msgid "verb.check"

@@ -1295,6 +1295,17 @@ describe('markup: replies marked up, or clean (stage 11, piece 1)', () => {
     expect(at('>markup:on').text).toBe('Replies are marked up already')
     expect(at('>markup:off', { markup: { on: false } }).text).toBe('Replies are clean already')
   })
+
+  it('in calm, shows the edits or reads replies as they stand, calm staying on (C296)', () => {
+    const calm = { calm: { on: true, markup: false } }
+    expect(at('>markup:on', calm)).toMatchObject({ text: 'Enter shows the edits in replies. Calm stays on for everything else', act: { kind: 'setting', key: 'calmMarkup', value: 'on', before: 'off' } })
+    expect(at('>markup:off', calm).text).toBe('Replies read as they stand already')
+    const shown = { calm: { on: true, markup: true } }
+    expect(at('>markup:off', shown)).toMatchObject({ text: 'Enter reads replies as they stand again, as calm does. markup:on shows the edits', act: { kind: 'setting', key: 'calmMarkup', value: 'off', before: 'on' } })
+    expect(at('>markup:on', shown).text).toBe('The edits in replies show already')
+    // markup:off col is the Collection's own, calm or not.
+    expect(at('>markup:off col', calm).act).toMatchObject({ kind: 'markup', col: true, on: false })
+  })
 })
 
 describe('ask: an ask from the bar (stage 11, piece 4; C218 (a))', () => {

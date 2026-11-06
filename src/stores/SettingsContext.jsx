@@ -45,6 +45,10 @@ const DEFAULT_SETTINGS = {
   // calm: and calm:off (stage 14, piece 2; C255): off for someone new
   // (C253 (c)), kept on this device and not in backups (C253 (d)).
   calm: false,
+  // While calm is on, whether replies show their edits (C296; Stefan, 5
+  // November: calm hides them until the markup switch). In calm, markup:on
+  // and markup:off set this, not markup. Kept with calm: on this device only.
+  calmMarkup: 'off',
   // Whether a second screen was already noticed (stage 14, piece 4; C259 (g)):
   // on this device, not in backups, false again once back to one screen.
   screensNoticed: false,

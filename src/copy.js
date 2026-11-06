@@ -802,10 +802,10 @@ export const COPY = {
     arrangeNameSame: /*i18n*/ { id: 'enter.arrangeNameSame', message: "It is called {to} already" },
     nameWhichKindAll: /*i18n*/ { id: 'enter.nameWhichKindAll', message: "{name} names more than one thing. Add search, collection, framework or arrangement after it", comment: 'Commands stay English' },
     // calm: (stage 14, piece 2; C255).
-    calmOn: /*i18n*/ { id: 'enter.calmOn', message: "Enter hides markup and the details on boards until you come near them" },
+    calmOn: /*i18n*/ { id: 'enter.calmOn', message: "Enter reads replies as they stand until markup:on, and hides the details on boards until you come near them" },
     calmOff: /*i18n*/ { id: 'enter.calmOff', message: "Enter shows markup and every detail again" },
     calmSameOn: /*i18n*/ { id: 'enter.calmSameOn', message: "Markup and details are hidden already. calm:off shows them", comment: 'Commands stay English' },
-    calmSameOff: /*i18n*/ { id: 'enter.calmSameOff', message: "Markup and details show already. calm: hides them until you come near", comment: 'Commands stay English' },
+    calmSameOff: /*i18n*/ { id: 'enter.calmSameOff', message: "Markup and details show already. calm: reads replies as they stand and hides details until you come near", comment: 'Commands stay English' },
     // Focus sets, kept with a room (stage 14, piece 1; C253).
     focusTheChat: /*i18n*/ { id: 'enter.focusTheChat', message: "the chat" },
     focusInLab: /*i18n*/ { id: 'enter.focusInLab', message: "focus: works outside the Lab. done: leaves it first", comment: 'Commands stay English' },
@@ -1135,6 +1135,10 @@ export const COPY = {
     // markup · clean (stage 11, piece 1; editing spec).
     markupOn: /*i18n*/ { id: 'enter.markupOn', message: 'Enter shows replies marked up: struck words and yours in blue, editable' },
     markupOff: /*i18n*/ { id: 'enter.markupOff', message: 'Enter shows replies clean: the result only, read-only until markup:on' },
+    // In calm (C296): the markup switch shows a reply's edits, or reads it as it stands again.
+    markupCalmOn: /*i18n*/ { id: 'enter.markupCalmOn', message: 'Enter shows the edits in replies. Calm stays on for everything else' },
+    markupCalmOff: /*i18n*/ { id: 'enter.markupCalmOff', message: 'Enter reads replies as they stand again, as calm does. markup:on shows the edits' },
+    markupCalmSame: /*i18n*/ { id: 'enter.markupCalmSame', message: '{on, select, on {The edits in replies show already} other {Replies read as they stand already}}' },
     markupSame: /*i18n*/ { id: 'enter.markupSame', message: '{on, select, on {Replies are marked up already} other {Replies are clean already}}' },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
@@ -2773,7 +2777,7 @@ export const COPY = {
     focusOn: /*i18n*/ { id: 'shell.focusOn', message: 'focus: on', comment: 'focus is the command word, kept English' },
     focusRuns: /*i18n*/ { id: 'shell.focusRuns', message: 'Runs {command}', comment: 'Commands stay English' },
     // The strip's calm and focus on hover, so the two read apart (C286 (e)).
-    calmTitle: /*i18n*/ { id: 'shell.calmTitle', message: 'Markup and the details on boards wait until you come near them. Runs {command}', comment: 'Commands stay English' },
+    calmTitle: /*i18n*/ { id: 'shell.calmTitle', message: 'Replies read as they stand until markup:on, and the details on boards wait until you come near them. Runs {command}', comment: 'Commands stay English' },
     focusTitle: /*i18n*/ { id: 'shell.focusTitle', message: 'Only the chat, or the boards you pick, stay on screen. Runs {command}', comment: 'Commands stay English' },
     calmOff: /*i18n*/ { id: 'shell.calmOff', message: 'calm: off', comment: 'calm is the command word, kept English' },
     calmOn: /*i18n*/ { id: 'shell.calmOn', message: 'calm: on', comment: 'calm is the command word, kept English' },

@@ -526,7 +526,7 @@ export default function MessagesRender() {
       editable,
       blocks: msg.blocks ?? null,
       onSaveEdits: editable ? (saved) => saveEditedReply(activeConversationId, msg.id, saved) : undefined,
-      clean: settings.markup === 'off',
+      clean: settings.markup === 'off' && !(settings.calm === true && settings.calmMarkup === 'on'),
       closedEdits,
       toldTo: toldToOf(msg),
       askInfo: askInfoOf(msg.id),
@@ -537,7 +537,7 @@ export default function MessagesRender() {
       sugWords,
     }
   }, [
-    saveEditedReply, settings.markup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
+    saveEditedReply, settings.markup, settings.calm, settings.calmMarkup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     notes, highlights, showNotes,
@@ -610,7 +610,7 @@ export default function MessagesRender() {
         sections={sections}
         terms={NO_QUOTES}
         quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
-        clean={settings.markup === 'off'}
+        clean={settings.markup === 'off' && !(settings.calm === true && settings.calmMarkup === 'on')}
         onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, saved)}
         words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.pairLabel) }}
         closedEdits={closedEdits}
@@ -623,7 +623,7 @@ export default function MessagesRender() {
         titleWords={titleWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, settings.markup, settings.calm, settings.calmMarkup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

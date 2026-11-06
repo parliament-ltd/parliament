@@ -16,12 +16,12 @@ const at = (value, on) => {
 
 describe('calm (C255)', () => {
   it('turns on and off as a setting of this device, one step for undo:', () => {
-    expect(at('>calm:', false)).toMatchObject({ text: 'Enter hides markup and the details on boards until you come near them', act: { kind: 'setting', key: 'calm', value: true, before: false } })
+    expect(at('>calm:', false)).toMatchObject({ text: 'Enter reads replies as they stand until markup:on, and hides the details on boards until you come near them', act: { kind: 'setting', key: 'calm', value: true, before: false } })
     expect(at('>calm:off', true)).toMatchObject({ text: 'Enter shows markup and every detail again', act: { kind: 'setting', key: 'calm', value: false, before: true } })
   })
   it('says when it is so already', () => {
     expect(at('>calm:', true).text).toBe('Markup and details are hidden already. calm:off shows them')
-    expect(at('>calm:off', false).text).toBe('Markup and details show already. calm: hides them until you come near')
+    expect(at('>calm:off', false).text).toBe('Markup and details show already. calm: reads replies as they stand and hides details until you come near')
   })
 })
 

@@ -3688,6 +3688,18 @@ msgid "enter.manyWhen"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.markupCalmOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupCalmSame"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.markupColOff"
 msgstr ""
 
