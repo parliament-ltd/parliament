@@ -3,6 +3,13 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.16.0, 6 November 2026
+
+- Tick an edit, an ask or a suggestion in the Collection, and what can be done to it (hold back, undo, accept, reject) appears at the foot of the board.
+- In calm, the Collection shows its cards and their edits in full: nothing opens as the pointer passes.
+- The menu of who answers stays open until you click outside it, and its order is always shown.
+- A summary, a comparison by meaning and a chat's summary are written in your language when the model cannot tell what the text is in.
+
 ## 0.15.0, 5 November 2026
 
 - In calm, a reply reads as it stands, even while you edit it, and no longer moves as the pointer passes over it. The room's markup switch shows the edits.
