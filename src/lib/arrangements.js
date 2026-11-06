@@ -16,7 +16,7 @@
 // gives way to the shipped default.
 
 import { boardEntry, isRoom } from '../shell/boards'
-import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS } from '../shell/arrangement'
+import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS, withoutWaiting } from '../shell/arrangement'
 import { LAB } from './release'
 
 const STORE = 'arrangements'
@@ -155,8 +155,9 @@ export async function openSpace(db, { fresh }) {
   const kept = record != null
   const stored = kept ? cleanArrangement(record) : null
   // A space left in the Lab opens on Records while the Lab waits for a later
-  // release (C279 (a)); the stored space is not changed.
-  if (stored) return { space: stored.lab && !LAB ? shipped(SPACE) : stored, kept, canKeep }
+  // release (C279 (a)); the stored space is not changed. A board that waits,
+  // the Library, is left out as if closed (C295).
+  if (stored) return { space: stored.lab && !LAB ? shipped(SPACE) : withoutWaiting(stored), kept, canKeep }
   return { space: fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE), kept, canKeep }
 }
 

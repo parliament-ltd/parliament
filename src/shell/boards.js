@@ -20,6 +20,8 @@
 // on it from the verb list (verbs.js, `on`). Its component comes with the
 // drawing.
 
+import { boardOffered } from '../lib/release'
+
 export const BOARDS = Object.freeze({
   room: { title: 'Room', resting: 'prompt', can: ['execute'], closable: true, strip: 1 },
   collection: { title: 'Collection', resting: 'search', can: [], closable: true, strip: 2 },
@@ -111,7 +113,8 @@ export function strip(arrangement) {
   const kind = (b) => (isRoom(b) ? 'room' : b)
   const here = new Set([...arrangement.columns.flat(), ...arrangement.popped.map((p) => p.board)].map(kind))
   return Object.entries(BOARDS)
-    .filter(([, b]) => b.strip != null)
+    // A board that waits for a later release is left off (C295).
+    .filter(([key, b]) => b.strip != null && boardOffered(key))
     .sort(([, a], [, b]) => a.strip - b.strip)
     .map(([key, b]) => ({ board: key, title: `${b.title}:`, context: arrangement.context?.[key] ?? null, here: here.has(key), addressed: kind(arrangement.addressed) === key }))
 }

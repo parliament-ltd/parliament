@@ -98,7 +98,7 @@ export const EVERYDAY = Object.freeze({
 export const LINES = Object.freeze({
   title: /*i18n*/ { id: 'group.lines', message: 'Lines of several commands' },
   rows: [
-    { example: 'open:records close:library pop:collection display 2 arrange:save "review"', gloss: /*i18n*/ { id: 'line.layout', message: 'Open Records, close the Library, put the Collection on your second screen, and keep it all as review' } },
+    { example: 'open:records close:settings pop:collection display 2 arrange:save "review"', gloss: /*i18n*/ { id: 'line.layout', message: 'Open Records, close Settings, put the Collection on your second screen, and keep it all as review' } },
     { example: 'pin:207 tagadd:essay 207, 216 archive:209', gloss: /*i18n*/ { id: 'line.items', message: 'In Records: pin a chat, tag two things, and put a third away. undo: takes back the whole line', comment: 'Commands stay English' } },
     { example: 'type:chat tag:essay since:7d sort:oldest', gloss: /*i18n*/ { id: 'line.records', message: 'In Records: chats tagged essay from the last seven days, oldest first' } },
   ],
@@ -148,7 +148,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     // Several at once, and spread across the screens (C284).
-    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Owl notes"', 'open:library', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
+    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Owl notes"', 'open:collection', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
     // open:records brings the Records board alone, where records: brings
     // Records and the Collection together (C124, C125, C131).
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']], ['text', { many: 'text' }]], stage: 3, click: 'apply',
@@ -347,21 +347,21 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.bar', message: 'Move the bar on the page' } }),
   v({ verb: 'pop', group: 'layout', example: 'pop:records',
     // Several boards share one window, and display or beside place it (C283).
-    forms: ['pop:records', 'pop:records 202 collection display 2', 'pop:library beside records', 'pop:settings keys', 'pop:library display 2', 'pop:command', 'pop:back', 'pop:back library', 'pop:left'],
+    forms: ['pop:records', 'pop:records 202 collection display 2', 'pop:collection beside records', 'pop:settings keys', 'pop:plan display 2', 'pop:command', 'pop:back', 'pop:back collection', 'pop:left'],
     takes: [[ON_SCREEN, ['display'], 'number'], [ON_SCREEN, { opt: 'word' }], ['address'], [['command']], [['back'], { opt: [...ON_SCREEN, 'command'] }], [['left', 'right']], ['text', { many: 'text' }]],
     stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.pop', message: 'Put one or more boards, or the bar, in a window of their own, place it, or bring it back' } }),
   // spread: alone spreads what is open across the screens; spread after open: or pop: the boards named (C284).
   v({ verb: 'spread', group: 'layout', example: 'spread:', forms: ['spread:'], takes: [[]], stage: 14, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.spread', message: 'Spread the boards across your screens, in equal groups in the order named, the first on this one' } }),
-  v({ verb: 'move', group: 'layout', example: 'move:library left', forms: ['move:library left', 'move:library display 3', 'move:202 beside library', 'move:201c after 201a'],
+  v({ verb: 'move', group: 'layout', example: 'move:collection left', forms: ['move:collection left', 'move:collection display 3', 'move:202 beside records', 'move:201c after 201a'],
     takes: [[ON_SCREEN, ['left', 'right', 'middle']], ['address', ['after', 'before'], 'address'], [ON_SCREEN, ['display'], 'number'], ['address', ['display'], 'number'], [ON_SCREEN, ['beside'], 'text'], ['address', ['beside'], 'text']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.move', message: 'Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan' } }),
   v({ verb: 'swap', group: 'layout', example: 'swap:records collection', takes: [[ON_SCREEN, ON_SCREEN]], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.swap', message: 'Swap two boards' } }),
   v({ verb: 'reset', group: 'layout', example: 'reset:', takes: [[]], stage: 3, undoable: true,
     gloss: /*i18n*/ { id: 'verb.reset', message: 'Clear the screen: close every board and window. Nothing is deleted' } }),
-  v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:library 30%', 'width:204 40%', 'width:even'],
+  v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:collection 30%', 'width:204 40%', 'width:even'],
     takes: [['percent'], [ON_SCREEN, 'percent'], ['address', 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.width', message: 'Choose how much of the width a board takes, or put every width back' } }),
   v({ verb: 'cols', group: 'layout', example: 'cols:-room +created', forms: ['cols:-room +created', 'cols:'], takes: [[], [{ many: 'word' }]], on: ['almanac'], stage: 6, undoable: true, click: 'apply',

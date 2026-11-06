@@ -2051,7 +2051,7 @@ msgstr "どの配置ですか：{names}？"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr "Enterでこの表示を開いたままにします。pop:library display 2 でボードをもう1つのディスプレイに出せます"
+msgstr "Enterでこの表示を開いたままにします。pop:collection display 2 でボードをもう1つのディスプレイに出せます"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
@@ -2185,7 +2185,7 @@ msgstr "{board}はすでに{other}の横にあります"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr "beside には pop:library beside records のように、ボードか番号を1つ指定します"
+msgstr "beside には pop:collection beside records のように、ボードか番号を1つ指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -7476,7 +7476,7 @@ msgstr "記録で：チャットをピン留めし、2つにタグを付け、3�
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr "記録を開き、ライブラリを閉じ、コレクションを2台目のディスプレイに出して、全体をreviewという名前で保存する"
+msgstr "記録を開き、設定を閉じ、コレクションを2台目のディスプレイに出して、全体をreviewという名前で保存する"
 
 #. js-lingui-explicit-id
 msgid "line.records"
@@ -8525,7 +8525,7 @@ msgstr "ほかの機能はすべてここで使えます。"
 msgid "screensMap.cannotHead"
 msgstr "このブラウザは、ほかのディスプレイにボードを配置できません。"
 
-#. A screen, by its number: pop:library display 2
+#. A screen, by its number: pop:collection display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
 msgstr "ディスプレイ{n}"

@@ -2051,7 +2051,7 @@ msgstr "Which arrangement: {names}?"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr "Enter keeps this view open. pop:library display 2 puts a board on the other screen"
+msgstr "Enter keeps this view open. pop:collection display 2 puts a board on the other screen"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
@@ -2185,7 +2185,7 @@ msgstr "{board} is beside {other} already"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr "beside takes one board or number: pop:library beside records"
+msgstr "beside takes one board or number: pop:collection beside records"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -7476,7 +7476,7 @@ msgstr "In Records: pin a chat, tag two things, and put a third away. undo: take
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr "Open Records, close the Library, put the Collection on your second screen, and keep it all as review"
+msgstr "Open Records, close Settings, put the Collection on your second screen, and keep it all as review"
 
 #. js-lingui-explicit-id
 msgid "line.records"
@@ -8525,7 +8525,7 @@ msgstr "Everything else works here."
 msgid "screensMap.cannotHead"
 msgstr "This browser cannot place boards on other screens."
 
-#. A screen, by its number: pop:library display 2
+#. A screen, by its number: pop:collection display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
 msgstr "Display {n}"

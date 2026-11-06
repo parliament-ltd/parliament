@@ -160,6 +160,15 @@ describe('the space to start on', () => {
     await openSpace(db, { fresh: true })
     expect(await db.getAll('arrangements')).toEqual([])
   })
+
+  it('opens without the Library while it waits, and leaves what is kept as it was (C295)', async () => {
+    const kept = { ...planOpen(shipped(SPACE), 'library').next, id: SPACE }
+    await saveArrangement(db, kept)
+    const { space } = await openSpace(db, { fresh: false })
+    expect(space.columns.flat()).not.toContain('library')
+    expect(space.addressed).not.toBe('library')
+    expect((await db.get('arrangements', SPACE)).columns.flat()).toContain('library')
+  })
 })
 
 describe('the space to start on, at version 5', () => {

@@ -2051,7 +2051,7 @@ msgstr "哪个排布：{names}？"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr "按 Enter 保持此视图打开。pop:library display 2 可把一个面板放到另一块屏幕上"
+msgstr "按 Enter 保持此视图打开。pop:collection display 2 可把一个面板放到另一块屏幕上"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
@@ -2185,7 +2185,7 @@ msgstr "{board}已经在{other}旁边"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr "beside 需要一个面板或编号，例如 pop:library beside records"
+msgstr "beside 需要一个面板或编号，例如 pop:collection beside records"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -7476,7 +7476,7 @@ msgstr "在记录中：置顶一个对话，给两项内容加标签，再归档
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr "打开记录，关闭资源库，把合集放到你的第二块屏幕上，然后将整个排布保存为“review”"
+msgstr "打开记录，关闭设置，把合集放到你的第二块屏幕上，然后将整个排布保存为“review”"
 
 #. js-lingui-explicit-id
 msgid "line.records"
@@ -8525,7 +8525,7 @@ msgstr "其他功能都可以正常使用。"
 msgid "screensMap.cannotHead"
 msgstr "此浏览器无法把面板放到其他屏幕上。"
 
-#. A screen, by its number: pop:library display 2
+#. A screen, by its number: pop:collection display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
 msgstr "屏幕 {n}"

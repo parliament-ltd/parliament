@@ -2051,7 +2051,7 @@ msgstr "Vilken uppställning: {names}?"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr "Enter håller den här vyn öppen. pop:library display 2 lägger en tavla på den andra skärmen"
+msgstr "Enter håller den här vyn öppen. pop:collection display 2 lägger en tavla på den andra skärmen"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
@@ -2185,7 +2185,7 @@ msgstr "{board} är redan bredvid {other}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr "beside tar en tavla eller ett nummer, som pop:library beside records"
+msgstr "beside tar en tavla eller ett nummer, som pop:collection beside records"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -7476,7 +7476,7 @@ msgstr "I Registret: fäst en chatt, tagga två saker och lägg undan en tredje.
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr "Öppna Registret, stäng Biblioteket, lägg Samlingen på din andra skärm och spara alltihop under namnet review"
+msgstr "Öppna Registret, stäng Inställningar, lägg Samlingen på din andra skärm och spara alltihop under namnet review"
 
 #. js-lingui-explicit-id
 msgid "line.records"
@@ -8525,7 +8525,7 @@ msgstr "Allt annat fungerar här."
 msgid "screensMap.cannotHead"
 msgstr "Den här webbläsaren kan inte placera tavlor på andra skärmar."
 
-#. A screen, by its number: pop:library display 2
+#. A screen, by its number: pop:collection display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
 msgstr "Skärm {n}"

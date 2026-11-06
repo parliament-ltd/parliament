@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import { BOARDS, boardEntry, boardByTitle, boardFor, wordFor, strip } from './boards'
-import {
+import { withoutWaiting, START,
   SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
   SPACE, arrangementBoards, roomOnScreen, planBring, planRoom,
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
@@ -46,10 +46,11 @@ describe('the boards registry', () => {
   it('draws the strip in its fixed order, marking what is open and addressed', () => {
     const a = { ...almanac(), context: { collection: 'Q2 evidence' } }
     const s = strip(a)
-    expect(s.map((x) => x.title)).toEqual(['Room:', 'Collection:', 'Reflection:', 'Records:', 'Library:', 'Plan:'])
+    // The Library waits with the Lab, off the strip (C295).
+    expect(s.map((x) => x.title)).toEqual(['Room:', 'Collection:', 'Reflection:', 'Records:', 'Plan:'])
     expect(s.find((x) => x.board === 'almanac')).toMatchObject({ here: true, addressed: true })
     expect(s.find((x) => x.board === 'collection')).toMatchObject({ here: true, addressed: false, context: 'Q2 evidence' })
-    expect(s.find((x) => x.board === 'library').here).toBe(false)
+    expect(s.find((x) => x.board === 'docket').here).toBe(false)
   })
 })
 
@@ -613,5 +614,26 @@ describe('width: inside a window (C286 (k))', () => {
     const even = planWidthEven(set)
     expect(even.next.popped.every((x) => x.share == null)).toBe(true)
     expect(planWidthEven(even.next).says.message).toBe('widthEvenAlready')
+  })
+})
+
+describe('a screen without the boards that wait (C295)', () => {
+  const lib = (b) => b !== 'library'
+  it('takes the Library off as if closed, from the page, a window and the space kept for focus:off', () => {
+    const a = { ...shipped(SPACE), columns: [['almanac'], ['library']], popped: [{ board: 'library', window: 2 }, { board: 'docket', window: 3 }], addressed: 'library', focus: { columns: [['library'], ['collection']], popped: [], addressed: 'library' } }
+    const b = withoutWaiting(a, lib)
+    expect(b.columns).toEqual([['almanac']])
+    expect(b.popped).toEqual([{ board: 'docket', window: 3 }])
+    expect(b.addressed).toBe('almanac')
+    expect(b.focus).toMatchObject({ columns: [['collection']], addressed: 'collection' })
+    expect(a.columns).toEqual([['almanac'], ['library']])
+  })
+  it('leaves the start card when the Library was all there was, and changes nothing without it', () => {
+    expect(withoutWaiting({ ...shipped(SPACE), columns: [['library']], popped: [], addressed: 'library' }, lib)).toMatchObject({ columns: [[START]], addressed: START })
+    const plain = shipped(SPACE)
+    expect(withoutWaiting(plain, lib)).toBe(plain)
+    const open = planOpen(shipped(SPACE), 'library').next
+    expect(withoutWaiting(open, () => true)).toBe(open)
+    expect(withoutWaiting(open).columns.flat()).not.toContain('library')
   })
 })

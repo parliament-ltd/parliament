@@ -37,7 +37,7 @@ import { planTo, planAgain, planContinue, planNewBranch } from '../lib/branchVer
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
 import { planReflect, reflectTalkPreview } from '../lib/reflection'
-import { LAB } from '../lib/release'
+import { LAB, boardOffered } from '../lib/release'
 import { LETTERS, letterOf, newestLetter } from './letters'
 import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate, planLocal } from '../lib/lab'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
@@ -447,7 +447,7 @@ function focusSetLine(a, step, screens = {}) {
   for (const v of vals) {
     const b = boardFor(String(v.value ?? v.text ?? '').toLowerCase())
     const k = b && isRoom(b) ? 'room' : b
-    if (!k || !FOCUS_BOARDS.includes(k)) return { says: { message: 'focusWhich', values: { said: v.text ?? String(v.value), choices: FOCUS_BOARDS.map(wordFor) } }, act: null }
+    if (!k || !FOCUS_BOARDS.includes(k) || !boardOffered(k)) return { says: { message: 'focusWhich', values: { said: v.text ?? String(v.value), choices: FOCUS_BOARDS.filter((x) => boardOffered(x)).map(wordFor) } }, act: null }
     if (!boards.includes(k)) boards.push(k)
   }
   const p = planFocusSet(a, boards, screens.lastRoom?.id ?? null)
@@ -991,6 +991,21 @@ function planName(a, step, screens = {}) {
  *   act is what Enter does besides, to what the bar points at (name:), to
  *   the welcome steps (tour:), or to what Records shows (filters)
  */
+// The commands that take boards by name (C295).
+const BOARD_VERBS = new Set(['open', 'close', 'pop', 'move', 'swap', 'width', 'focus', 'spread'])
+
+/** The first board a line names that this release does not offer, or null. */
+function waitingBoardIn(steps) {
+  for (const step of steps) {
+    if (!BOARD_VERBS.has(step.verb)) continue
+    for (const v of step.match?.values ?? []) {
+      const b = v?.kind === 'word' ? boardFor(String(v.value).toLowerCase()) : null
+      if (b && !boardOffered(b)) return b
+    }
+  }
+  return null
+}
+
 export function preview(value, { mode, arrangement, built = BUILT, screens = {} }) {
   // A second room (room-2, C175 (a)) is a room to the commands that work in one.
   // In the Lab, its Canvas, Blocks board and Library are the Lab to the commands that build (C238, C242 (b)).
@@ -1002,6 +1017,10 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   // On a phone or in a narrow window, what does not fit says so (stage 14, piece 5; C261 (e)).
   const small = smallRefusal(answer.steps, screens.size)
   if (small) return { answer, says: small, next: null }
+  // A board that waits for a later release, the Library (C295): a line that
+  // names it says so, as its own command does, and nothing else in it runs.
+  const waiting = waitingBoardIn(answer.steps)
+  if (waiting) return { answer, says: { message: 'notOffered', values: { verb: `${wordFor(waiting)}:` } }, next: null }
 
   // A line of arrangement commands, spread among them, may end with
   // arrange:save "…": what the line makes is kept under that name (C284).

@@ -46,6 +46,9 @@ describe('arrange: on the Enter line (C257 (b))', () => {
     const p = at('>arrange:"Review"')
     expect(p.text).toBe('Enter switches to Review desk. undo: brings back the screen as it is')
     expect(p.next).toMatchObject({ id: 'space', columns: [['room'], ['collection']], context: { room: 'c9' } })
+    // Its Library window waits with the Lab (C295); the saved arrangement keeps it.
+    expect(p.next.popped).toEqual([])
+    expect(desk.popped.map((w) => w.board)).toEqual(['library'])
     expect(at('>arrange:"Review desk" 207', { rows: [{ kind: 'chat', num: 207, chatId: 'c207' }] }).next.context.room).toBe('c207')
     expect(at('>arrange:"Nowhere"').text).toBe('No arrangement is called Nowhere. Yours are Review desk')
   })
@@ -53,7 +56,7 @@ describe('arrange: on the Enter line (C257 (b))', () => {
     expect(at('>arrange:')).toMatchObject({ text: 'Enter keeps this view open. Escape goes back', act: { kind: 'map', ask: false } })
     const two = { can: true, extended: true, permission: 'prompt', list: null }
     expect(at('>arrange:', { displays: two })).toMatchObject({ text: 'Enter keeps this view open. The browser asks once whether Parliament may place windows on your screens', act: { ask: true } })
-    expect(at('>arrange:', { displays: { ...two, permission: 'granted', list: [{ n: 1 }, { n: 2 }] } })).toMatchObject({ text: 'Enter keeps this view open. pop:library display 2 puts a board on the other screen', act: { ask: false } })
+    expect(at('>arrange:', { displays: { ...two, permission: 'granted', list: [{ n: 1 }, { n: 2 }] } })).toMatchObject({ text: 'Enter keeps this view open. pop:collection display 2 puts a board on the other screen', act: { ask: false } })
     expect(at('>arrange:Nowhere', { saved: [] }).text).toBe('No arrangement is saved yet. arrange:save "a name" keeps what is on screen')
     expect(at('>arrange:"Review desk"', { a: { ...space(), lab: { columns: [['almanac']], popped: [], addressed: 'almanac', bar: { at: 'top', side: 'center', popped: false } } } }).text).toBe('arrange: works outside the Lab. done: leaves it first')
   })

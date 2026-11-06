@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { LAB, LAB_VERBS, DEFAULT_TEMPLATE, HIDDEN_TEMPLATES, offered, shownInLibrary, newChatTemplate } from './release'
+import { LAB, LAB_VERBS, DEFAULT_TEMPLATE, HIDDEN_TEMPLATES, WAITING_BOARDS, offered, boardOffered, shownInLibrary, newChatTemplate } from './release'
 import { TEMPLATES } from './seedTemplates'
 import { catalogueItems } from './catalogue'
 
@@ -14,6 +14,15 @@ describe('what this release offers (C279 (a))', () => {
     expect(offered('open')).toBe(true)
     expect(offered('set')).toBe(true)
     expect(LAB_VERBS.every((v) => offered(v, true))).toBe(true)
+  })
+
+  it('keeps the Library and library: for the Lab, and offers every other board (C295)', () => {
+    expect(WAITING_BOARDS).toEqual(['library'])
+    expect(boardOffered('library')).toBe(false)
+    expect(offered('library')).toBe(false)
+    for (const b of ['room', 'almanac', 'collection', 'reflection', 'docket', 'settings']) expect(boardOffered(b)).toBe(true)
+    expect(boardOffered('library', true)).toBe(true)
+    expect(offered('library', true)).toBe(true)
   })
 
   it('shows in the Library every room someone made, the default template, and no shelf for building', () => {

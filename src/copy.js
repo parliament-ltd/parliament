@@ -176,7 +176,7 @@ export const COPY = {
     moveJoinDisplay: /*i18n*/ { id: 'enter.moveJoinDisplay', message: 'Enter moves {board} into the window on display {display}' },
     moveBeside: /*i18n*/ { id: 'enter.moveBeside', message: 'Enter puts {board} beside {other}' },
     besideAlready: /*i18n*/ { id: 'enter.besideAlready', message: '{board} is beside {other} already' },
-    besideWhich: /*i18n*/ { id: 'enter.besideWhich', message: 'beside takes one board or number: pop:library beside records', comment: 'Commands stay English' },
+    besideWhich: /*i18n*/ { id: 'enter.besideWhich', message: 'beside takes one board or number: pop:collection beside records', comment: 'Commands stay English' },
     popDisplayWhich: /*i18n*/ { id: 'enter.popDisplayWhich', message: 'display takes its number, last: pop:records 202 collection display 2', comment: 'Commands stay English' },
     // Under a line that places a window on a screen, when it cannot go there (C283; C259 (d) to (f)).
     windowHereCannot: /*i18n*/ { id: 'enter.windowHereCannot', message: 'This browser cannot place windows on other screens, so it opens here' },
@@ -794,7 +794,7 @@ export const COPY = {
     smallBar: /*i18n*/ { id: 'enter.smallBar', message: "On a phone the bar stays at the bottom. bar:top works on a wider screen", comment: 'Commands stay English' },
     smallWidth: /*i18n*/ { id: 'enter.smallWidth', message: "width: works on a wider window", comment: 'Commands stay English' },
     // The screens map (piece 4; C259 (b), (d), (h)).
-    arrangeMap: /*i18n*/ { id: 'enter.arrangeMap', message: "Enter keeps this view open. pop:library display 2 puts a board on the other screen", comment: 'Commands stay English' },
+    arrangeMap: /*i18n*/ { id: 'enter.arrangeMap', message: "Enter keeps this view open. pop:collection display 2 puts a board on the other screen", comment: 'Commands stay English' },
     arrangeMapOne: /*i18n*/ { id: 'enter.arrangeMapOne', message: "Enter keeps this view open. Escape goes back" },
     arrangeMapAsk: /*i18n*/ { id: 'enter.arrangeMapAsk', message: "Enter keeps this view open. The browser asks once whether Parliament may place windows on your screens" },
     arrangeName: /*i18n*/ { id: 'enter.arrangeName', message: "Enter renames {name} to {to}. undo: names it back", comment: 'Commands stay English' },
@@ -2731,7 +2731,7 @@ export const COPY = {
   // The screens map, under the bar while arrange: shows it (stage 14, piece 4; C259).
   screensMap: {
     label: /*i18n*/ { id: 'screensMap.label', message: "Your screens" },
-    display: /*i18n*/ { id: 'screensMap.display', message: "Display {n}", comment: "A screen, by its number: pop:library display 2" },
+    display: /*i18n*/ { id: 'screensMap.display', message: "Display {n}", comment: "A screen, by its number: pop:collection display 2" },
     wide: /*i18n*/ { id: 'screensMap.wide', message: "{width} wide" },
     wideHere: /*i18n*/ { id: 'screensMap.wideHere', message: "{width} wide, this window" },
     here: /*i18n*/ { id: 'screensMap.here', message: "This screen" },

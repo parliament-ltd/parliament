@@ -14,7 +14,7 @@
 // show: a desk, not a session.
 
 import { isRoom } from '../shell/boards'
-import { SPACE, settle } from '../shell/arrangement'
+import { SPACE, settle, withoutWaiting } from '../shell/arrangement'
 import { SAVED, NAME_MAX } from './arrangements'
 import { mustAsk } from '../shell/screens'
 
@@ -108,7 +108,8 @@ export function planArrange(a, step, screens = {}, newId = () => crypto.randomUU
     if (!row) return { says: { message: 'numNone', values: { num: String(vals[1].text ?? num) } }, act: null }
     chat = row.chatId
   }
-  const next = spaceFrom(got.found, a, chat)
+  // Without a board that waits, the Library (C295); what is saved stays as it is.
+  const next = withoutWaiting(spaceFrom(got.found, a, chat))
   return { says: { message: a.focus ? 'arrangeGoFocus' : 'arrangeGo', values: { name: got.found.name } }, next, act: null }
 }
 

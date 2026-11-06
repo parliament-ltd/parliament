@@ -8525,7 +8525,7 @@ msgstr ""
 msgid "screensMap.cannotHead"
 msgstr ""
 
-#. A screen, by its number: pop:library display 2
+#. A screen, by its number: pop:collection display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
 msgstr ""

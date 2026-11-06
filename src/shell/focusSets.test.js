@@ -9,7 +9,7 @@ import { messages as en } from '../locales/en/messages.mjs'
 // Focus sets, kept with their room (stage 14, piece 1; C253).
 
 const i18n = setupI18n({ locale: 'en', messages: { en } })
-const space = () => ({ ...shipped('almanac'), columns: [['room'], ['almanac'], ['library']], context: { room: 'c1' }, addressed: 'room' })
+const space = () => ({ ...shipped('almanac'), columns: [['room'], ['almanac'], ['docket']], context: { room: 'c1' }, addressed: 'room' })
 const mode = { id: 'mode_1', scope: 'room', schema: 'x', meta: { name: 'Essay room' }, components: [] }
 const at = (value, { a = space(), focus = { room: { id: 'mode_1', name: 'Essay room', mode }, set: null } } = {}) => {
   const p = preview(value, { mode: 'command', arrangement: a, screens: { focus } })
@@ -20,16 +20,20 @@ describe('a focus set (C253 piece 1)', () => {
   it('lays the boards out left to right and keeps what was there for focus:off', () => {
     const p = planFocusSet(space(), ['room', 'collection'])
     expect(p.next.columns).toEqual([['room'], ['collection']])
-    expect(p.next.focus.columns).toEqual([['room'], ['almanac'], ['library']])
-    const changed = planFocusSet(p.next, ['library']).next
-    expect(changed.focus.columns).toEqual([['room'], ['almanac'], ['library']])
-    expect(planFocusOff(changed).next.columns).toEqual([['room'], ['almanac'], ['library']])
+    expect(p.next.focus.columns).toEqual([['room'], ['almanac'], ['docket']])
+    const changed = planFocusSet(p.next, ['docket']).next
+    expect(changed.focus.columns).toEqual([['room'], ['almanac'], ['docket']])
+    expect(planFocusOff(changed).next.columns).toEqual([['room'], ['almanac'], ['docket']])
     expect(planFocusSet(p.next, ['room', 'collection']).says.message).toBe('focusSetAlready')
-    expect(focusBoardsOf(space())).toEqual(['room', 'almanac', 'library'])
+    expect(focusBoardsOf(space())).toEqual(['room', 'almanac', 'docket'])
+  })
+  it('focuses on the rest of a set kept with the Library, which waits (C295)', () => {
+    expect(planFocusSet(space(), ['room', 'library']).next.columns).toEqual([['room']])
+    expect(planFocusSet(space(), ['library']).says.message).toBe('focusNothing')
   })
   it('turns off when something needs a board it hides', () => {
     const focused = planFocusSet(space(), ['room']).next
-    expect(outOfFocusFor(focused, 'collection').columns).toEqual([['room'], ['almanac'], ['library']])
+    expect(outOfFocusFor(focused, 'collection').columns).toEqual([['room'], ['almanac'], ['docket']])
     expect(outOfFocusFor(focused, 'room')).toBeNull()
     expect(outOfFocusFor(space(), 'collection')).toBeNull()
   })
@@ -45,12 +49,12 @@ describe('focus:room collection and focus:save on the Enter line (C253 (a), (b))
   })
   it('takes boards by their names, and says which it does not know', () => {
     expect(at('>focus:records plan').act.after.focus).toEqual(['almanac', 'docket'])
-    expect(at('>focus:room owls').text).toBe('focus: takes boards by name: room, collection, reflection, records, library, and plan. owls is not one')
+    expect(at('>focus:room owls').text).toBe('focus: takes boards by name: room, collection, reflection, records, and plan. owls is not one')
   })
   it('keeps what is on screen with focus:save, and uses the set with focus: alone', () => {
     const s = at('>focus:save')
-    expect(s.text).toBe('Enter keeps what is on screen now as the focus of Essay room: the chat, Records, and Library')
-    expect(s.act.after.focus).toEqual(['room', 'almanac', 'library'])
+    expect(s.text).toBe('Enter keeps what is on screen now as the focus of Essay room: the chat, Records, and Plan')
+    expect(s.act.after.focus).toEqual(['room', 'almanac', 'docket'])
     expect(s.next ?? null).toBeNull()
     const alone = at('>focus:', { focus: { room: { id: 'mode_1', name: 'Essay room', mode }, set: ['room', 'collection'] } })
     expect(alone.next.columns).toEqual([['room'], ['collection']])

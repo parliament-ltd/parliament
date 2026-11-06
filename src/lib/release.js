@@ -31,8 +31,19 @@ export const LAB_VERBS = Object.freeze(['lab', 'edit', 'done', 'place', 'layout'
 /** The Library's shelves that only serve building rooms. */
 export const LAB_SHELVES = Object.freeze(['layout', 'block', 'theme'])
 
-/** Whether this release offers a command. */
-export const offered = (verb, lab = LAB) => lab || !LAB_VERBS.includes(verb)
+// Boards that wait with the Lab (C295; Stefan, 5 November: "let's hide
+// library for now until lab is ready"). The Library offers rooms, layouts,
+// blocks and themes to build with, and with the Lab away it held one room.
+// It leaves the strip, library: and any line that names it say it comes in
+// a later release, and a screen kept with it open opens without it. Its
+// board, its catalogue and everything stored stay; LAB = true brings it back.
+export const WAITING_BOARDS = Object.freeze(['library'])
+
+/** Whether this release offers a board. */
+export const boardOffered = (board, lab = LAB) => lab || !WAITING_BOARDS.includes(board)
+
+/** Whether this release offers a command. library: waits with its board. */
+export const offered = (verb, lab = LAB) => lab || (!LAB_VERBS.includes(verb) && !WAITING_BOARDS.includes(verb))
 
 // Rooms hidden though someone made them (C288 (a); Stefan, 2 November:
 // "let's hide drafting desk for now"): Drafting Desk waits for a room design

@@ -37,17 +37,17 @@ describe('screens, numbered (C259 (c))', () => {
 
 describe('pop:… display 2 on the Enter line (C259 (d) to (f))', () => {
   const line = (displays) => {
-    const p = preview('>pop:library display 2', { mode: 'command', arrangement: { ...shipped('almanac'), columns: [['almanac'], ['library']] }, screens: { displays } })
+    const p = preview('>pop:reflection display 2', { mode: 'command', arrangement: { ...shipped('almanac'), columns: [['almanac'], ['reflection']] }, screens: { displays } })
     return say(i18n, p.says.message, p.says.values)
   }
   const list = numberScreens([laptop, big], laptop)
   it('says what happens on this computer before Enter', () => {
-    expect(line({ can: true, extended: true, permission: 'granted', list })).toBe('Enter puts Library in its own window on display 2')
-    expect(line({ can: true, extended: true, permission: 'prompt', list: null })).toBe('Enter puts Library in its own window on display 2. The browser asks once whether Parliament may place windows on your screens')
-    expect(line({ can: true, extended: false, permission: 'prompt', list: null })).toBe('Display 2 is not connected. Enter opens Library in its own window here')
-    expect(line({ can: false, extended: false, permission: null, list: null })).toBe('This browser cannot place windows on other screens. Enter opens Library in its own window here')
-    expect(line({ can: true, extended: true, permission: 'denied', list: null })).toBe('The browser was told not to let Parliament place windows. Enter opens Library in its own window here')
-    expect(line({ can: true, extended: false, permission: 'denied', list: null })).toBe('Display 2 is not connected. Enter opens Library in its own window here')
+    expect(line({ can: true, extended: true, permission: 'granted', list })).toBe('Enter puts Reflection in its own window on display 2')
+    expect(line({ can: true, extended: true, permission: 'prompt', list: null })).toBe('Enter puts Reflection in its own window on display 2. The browser asks once whether Parliament may place windows on your screens')
+    expect(line({ can: true, extended: false, permission: 'prompt', list: null })).toBe('Display 2 is not connected. Enter opens Reflection in its own window here')
+    expect(line({ can: false, extended: false, permission: null, list: null })).toBe('This browser cannot place windows on other screens. Enter opens Reflection in its own window here')
+    expect(line({ can: true, extended: true, permission: 'denied', list: null })).toBe('The browser was told not to let Parliament place windows. Enter opens Reflection in its own window here')
+    expect(line({ can: true, extended: false, permission: 'denied', list: null })).toBe('Display 2 is not connected. Enter opens Reflection in its own window here')
     expect(popDisplayLine({ message: 'popDisplay', values: { board: 'library', display: 3 } }, { can: true, extended: true, permission: 'granted', list }).message).toBe('popDisplayNone')
   })
   it('asks only once, and only where it can', () => {

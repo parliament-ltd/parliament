@@ -17,24 +17,24 @@ const words = (value, a = almanac()) => {
 
 describe('what Enter would do', () => {
   it('says it in words, with board names from the copy table', () => {
-    const p = words('>open:library')
-    expect(p.text).toBe('Enter opens Library on the right')
-    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['library']])
+    const p = words('>open:reflection')
+    expect(p.text).toBe('Enter opens Reflection on the right')
+    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['reflection']])
   })
 
   it('refuses before Enter, and Enter then runs nothing', () => {
-    const p = words('>close:library')
-    expect(p.text).toBe('Library is not open')
+    const p = words('>close:reflection')
+    expect(p.text).toBe('Reflection is not open')
     expect(p.next).toBeNull()
   })
 
   it('plans a line whole, so it never stops half done', () => {
-    const p = words('>open:library close:settings')
+    const p = words('>open:reflection close:settings')
     expect(p.text).toBe('Settings is not open')
     expect(p.next).toBeNull()
-    const q = words('>open:library move:library left')
+    const q = words('>open:reflection move:reflection left')
     expect(q.text).toBe('Enter runs 2 commands in turn: open: and move:')
-    expect(q.next.columns[0]).toEqual(['library'])
+    expect(q.next.columns[0]).toEqual(['reflection'])
   })
 
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
@@ -43,7 +43,7 @@ describe('what Enter would do', () => {
 
   it('plans pop:, which opens windows', () => {
     expect(BUILT.has('pop')).toBe(true)
-    expect(words('>pop:library').text).toBe('Enter puts Library in its own window')
+    expect(words('>pop:reflection').text).toBe('Enter puts Reflection in its own window')
     expect(words('>pop:command').text).toBe('Enter puts the bar in its own window')
     expect(words('>pop:back').text).toBe('No board is in its own window')
   })
@@ -368,7 +368,7 @@ describe('width: (C126)', () => {
   })
 
   it('shares a line with other layout commands', () => {
-    expect(at('>open:library width:50%').text).toBe('Enter runs 2 commands in turn: open: and width:')
+    expect(at('>open:reflection width:50%').text).toBe('Enter runs 2 commands in turn: open: and width:')
   })
 })
 
@@ -414,10 +414,17 @@ describe('the welcome page (stage 5)', () => {
     expect(welcome().bar.at).toBe('card')
   })
 
-  it('brings Records and the Library on the right of the card (W §5; C95, C125)', () => {
+  it('brings Records on the right of the card (W §5; C95, C125)', () => {
     expect(at('>records:').next.columns).toEqual([['welcome'], ['almanac', 'collection']])
-    expect(at('>library:').next.columns).toEqual([['welcome'], ['library']])
-    expect(at('>library:', shipped('almanac')).next.columns).toEqual([['almanac'], ['collection'], ['library']])
+  })
+
+  it('says the Library comes in a later release, by its command or by name (C295)', () => {
+    for (const line of ['>library:', '>open:library', '>pop:library display 2', '>open:records move:library left', '>move:202 beside library', '>width:library 30%', '>focus:library']) {
+      const p = at(line)
+      expect(p.text).toBe('library: comes in a later release')
+      expect(p.next).toBeNull()
+    }
+    expect(at('>focus:lib').text).not.toMatch(/library/)
   })
 
   it('tour: brings the page and its steps back; tour:off puts the steps away (A20)', () => {
@@ -524,9 +531,9 @@ describe('search and filters on Records (stage 6, piece 1; C132)', () => {
   })
 
   it('shares a line with layout commands (C99)', () => {
-    const p = at('>tag:owls open:library')
-    expect(p.text).toBe('Enter runs 2 commands in turn: tag: and open: · Enter opens Library on the right · Enter shows 2 rows')
-    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['library']])
+    const p = at('>tag:owls open:reflection')
+    expect(p.text).toBe('Enter runs 2 commands in turn: tag: and open: · Enter opens Reflection on the right · Enter shows 2 rows')
+    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['reflection']])
     expect(p.act.view.filters).toHaveLength(1)
   })
 
@@ -858,8 +865,8 @@ describe('filters, export: and pin: on the Collection (C287)', () => {
   })
 
   it('shares a line with layout commands, and clear: alone still empties the collection', () => {
-    const p = at('>tag:essay open:library')
-    expect(p.next.columns.flat()).toContain('library')
+    const p = at('>tag:essay open:reflection')
+    expect(p.next.columns.flat()).toContain('reflection')
     expect(p.act.kind).toBe('collectionFilters')
     expect(at('>clear:').text).toBe('Q2 is empty already')
   })
@@ -1056,7 +1063,7 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     const fresh = at('>pop:206')
     expect(fresh.text).toBe('Enter puts 206 in its own window')
     expect(fresh.next.context[fresh.next.popped[0].board]).toBe('c206')
-    expect(at('>pop:library beside records').text).toBe('Enter puts Library beside Records')
+    expect(at('>pop:reflection beside records').text).toBe('Enter puts Reflection beside Records')
     expect(at('>move:204 beside records').text).toBe('Enter puts 204 beside Records')
     expect(at('>move:204 beside collection').text).toBe('204 is beside Collection already')
     expect(at('>move:records display 3').text).toBe('Enter moves Records to display 3')
@@ -1067,22 +1074,22 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
   })
 
   it('opens several at once, spreads them, and keeps the line with arrange:save (C284)', () => {
-    const open = at('>open:library plan 206')
-    expect(open.text).toBe('Enter opens Library, Plan, and 206')
-    expect(open.next.columns.flat()).toEqual(expect.arrayContaining(['library', 'docket']))
+    const open = at('>open:reflection plan 206')
+    expect(open.text).toBe('Enter opens Reflection, Plan, and 206')
+    expect(open.next.columns.flat()).toEqual(expect.arrayContaining(['reflection', 'docket']))
     const two = { can: true, extended: true, list: [{ n: 1, current: true }, { n: 2, current: false }] }
-    const sp = preview('>open:library plan 206 spread', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two } })
+    const sp = preview('>open:reflection plan 206 spread', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two } })
     expect(say(i18n, sp.says.message, sp.says.values)).toBe('Enter spreads 3 boards across 2 screens, in the order named, the first on this one')
-    expect(sp.act).toMatchObject({ kind: 'spread', boards: ['library', 'docket', expect.any(String)] })
+    expect(sp.act).toMatchObject({ kind: 'spread', boards: ['reflection', 'docket', expect.any(String)] })
     expect(at('>spread:').act).toMatchObject({ kind: 'spread', boards: ['almanac', 'collection', 'room'] })
-    expect(at('>open:library spread plan').text).toBe('spread comes last: open:202 203 collection records spread')
-    const kept = preview('>open:library plan spread arrange:save "Morning"', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two, arrangements: { saved: [] } } })
+    expect(at('>open:reflection spread plan').text).toBe('spread comes last: open:202 203 collection records spread')
+    const kept = preview('>open:reflection plan spread arrange:save "Morning"', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two, arrangements: { saved: [] } } })
     expect(kept.act).toMatchObject({ kind: 'spread', save: { name: 'Morning' } })
     expect(kept.says.also.map((x) => say(i18n, x.message, x.values))).toContain('Then keeps it all as Morning')
-    const plain = at('>open:library move:library left')
-    expect(plain.says.also.map((x) => say(i18n, x.message, x.values))).toEqual(['Enter opens Library on the right', 'Enter moves Library to the left'])
-    const saved = preview('>open:library arrange:save "Desk"', { mode: 'command', arrangement: room, screens: { records: { rows }, arrangements: { saved: [] } } })
-    expect(saved.next.columns.flat()).toContain('library')
+    const plain = at('>open:reflection move:reflection left')
+    expect(plain.says.also.map((x) => say(i18n, x.message, x.values))).toEqual(['Enter opens Reflection on the right', 'Enter moves Reflection to the left'])
+    const saved = preview('>open:reflection arrange:save "Desk"', { mode: 'command', arrangement: room, screens: { records: { rows }, arrangements: { saved: [] } } })
+    expect(saved.next.columns.flat()).toContain('reflection')
     expect(saved.act).toMatchObject({ kind: 'arrangeSave', record: { name: 'Desk' } })
   })
 

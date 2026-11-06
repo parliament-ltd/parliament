@@ -12,6 +12,7 @@
 // the plan.
 
 import { boardEntry, boardFor, isRoom, sectionOf } from './boards'
+import { boardOffered } from '../lib/release'
 
 export { isRoom }
 
@@ -37,6 +38,26 @@ export { isRoom }
 export const SPACE = 'space'
 // The start card's board (C282).
 export const START = 'start'
+
+/**
+ * The arrangement without the boards this release does not offer (C295): as
+ * if each were closed, so a screen kept with the Library open opens without
+ * it. With nothing left on the page, the start card. The same object when
+ * nothing waits.
+ */
+export function withoutWaiting(a, offeredBoard = boardOffered) {
+  if (!a || !Array.isArray(a.columns)) return a
+  const waits = (b) => !offeredBoard(b)
+  const popped = Array.isArray(a.popped) ? a.popped : []
+  if (!a.columns.flat().some(waits) && !popped.some((p) => waits(p.board))) return a
+  let columns = a.columns.map((c) => c.filter((b) => !waits(b))).filter((c) => c.length)
+  if (!columns.length) columns = [[START]]
+  const rest = popped.filter((p) => !waits(p.board))
+  const here = [...columns.flat(), ...rest.map((p) => p.board)]
+  const next = { ...a, columns, popped: rest, addressed: here.includes(a.addressed) ? a.addressed : columns[0][0] }
+  if (a.focus) next.focus = withoutWaiting(a.focus, offeredBoard)
+  return next
+}
 export const SHIPPED = Object.freeze({
   space: { columns: [['almanac'], ['collection']], addressed: 'almanac', bar: 'top', resting: null },
   almanac: { columns: [['almanac'], ['collection']], addressed: 'almanac', bar: 'top', resting: null },
@@ -757,7 +778,7 @@ export function planFocus(a, chat = null) {
 export const FOCUS_BOARDS = Object.freeze(['room', 'collection', 'reflection', 'almanac', 'library', 'docket'])
 
 /** The boards on screen, as a focus set names them: every room as 'room', in order, once each. */
-export const focusBoardsOf = (a) => [...new Set(a.columns.flat().map((b) => (isRoom(b) ? 'room' : b)))].filter((b) => FOCUS_BOARDS.includes(b))
+export const focusBoardsOf = (a) => [...new Set(a.columns.flat().map((b) => (isRoom(b) ? 'room' : b)))].filter((b) => FOCUS_BOARDS.includes(b) && boardOffered(b))
 
 /**
  * focus:room collection, or focus: with a room's set (stage 14, piece 1;
@@ -767,8 +788,11 @@ export const focusBoardsOf = (a) => [...new Set(a.columns.flat().map((b) => (isR
  * @param {string[]} boards from FOCUS_BOARDS
  * @param {string|null} chat the last chat, when the space has no room with one
  */
-export function planFocusSet(a, boards, chat = null) {
+export function planFocusSet(a, all, chat = null) {
   if (a.lab) return refuse('focusInLab')
+  // A set kept with a board that waits, the Library, focuses on the rest (C295).
+  const boards = all.filter((b) => boardOffered(b))
+  if (!boards.length) return refuse('focusNothing')
   const wantsRoom = boards.includes('room')
   const room = currentRoom(a) ?? 'room'
   const here = roomOnScreen(a)

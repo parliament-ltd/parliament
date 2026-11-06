@@ -18,7 +18,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Type | What it does |
 | --- | --- |
-| `open:records close:library pop:collection display 2 arrange:save "review"` | Open Records, close the Library, put the Collection on your second screen, and keep it all as review |
+| `open:records close:settings pop:collection display 2 arrange:save "review"` | Open Records, close Settings, put the Collection on your second screen, and keep it all as review |
 | `pin:207 tagadd:essay 207, 216 archive:209` | In Records: pin a chat, tag two things, and put a third away. undo: takes back the whole line |
 | `type:chat tag:essay since:7d sort:oldest` | In Records: chats tagged essay from the last seven days, oldest first |
 
@@ -29,7 +29,6 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `records:` | Bring Records and the Collection beside what is on screen | `records:` | everywhere | no |
 | `collection:` | Bring the Collection beside what is on screen | `collection:` | everywhere | no |
 | `plan:` | Bring the Plan board beside what is on screen | `plan:` | everywhere | no |
-| `library:` | Bring the Library beside what is on screen | `library:` | everywhere | no |
 | `settings:` | Bring Settings beside what is on screen, or one section of it | `settings:`, `settings:data` | everywhere | no |
 | `room:` | Bring the last room beside what is on screen, or a room by name | `room:`, `room:"Owl notes"` | everywhere | no |
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |
@@ -41,7 +40,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `new:chat` | Make a chat, plan, room, collection, framework, branch, step, run or block | `new:chat`, `new:plan`, `new:plan "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:run` | everywhere | yes |
-| `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Owl notes"`, `open:library`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
+| `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Owl notes"`, `open:collection`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
 | `close:records` | Take a board off the screen, or close the letter. Nothing is lost | `close:records`, `close:204`, `close:room`, `close:welcome` | everywhere | yes |
 
 ## Run
@@ -136,12 +135,12 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `bar:bottom` | Move the bar on the page | `bar:top`, `bar:bottom`, `bar:left`, `bar:center`, `bar:right` | everywhere | yes |
-| `pop:records` | Put one or more boards, or the bar, in a window of their own, place it, or bring it back | `pop:records`, `pop:records 202 collection display 2`, `pop:library beside records`, `pop:settings keys`, `pop:library display 2`, `pop:command`, `pop:back`, `pop:back library`, `pop:left` | everywhere | yes |
+| `pop:records` | Put one or more boards, or the bar, in a window of their own, place it, or bring it back | `pop:records`, `pop:records 202 collection display 2`, `pop:collection beside records`, `pop:settings keys`, `pop:plan display 2`, `pop:command`, `pop:back`, `pop:back collection`, `pop:left` | everywhere | yes |
 | `spread:` | Spread the boards across your screens, in equal groups in the order named, the first on this one | `spread:` | everywhere | yes |
-| `move:library left` | Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan | `move:library left`, `move:library display 3`, `move:202 beside library`, `move:201c after 201a` | everywhere | yes |
+| `move:collection left` | Move a board to the left, right or middle, to another screen or beside another board, or a branch in its plan | `move:collection left`, `move:collection display 3`, `move:202 beside records`, `move:201c after 201a` | everywhere | yes |
 | `swap:records collection` | Swap two boards | `swap:records collection` | everywhere | yes |
 | `reset:` | Clear the screen: close every board and window. Nothing is deleted | `reset:` | everywhere | yes |
-| `width:60%` | Choose how much of the width a board takes, or put every width back | `width:60%`, `width:library 30%`, `width:204 40%`, `width:even` | everywhere | yes |
+| `width:60%` | Choose how much of the width a board takes, or put every width back | `width:60%`, `width:collection 30%`, `width:204 40%`, `width:even` | everywhere | yes |
 | `cols:-room +created` | Hide or show columns of the table | `cols:-room +created`, `cols:` | Records | yes |
 | `focus:` | Close every board but the chat, or but the boards you name. focus:off brings the rest back | `focus:`, `focus:sym col`, `focus:save`, `focus:off` | everywhere | yes |
 | `calm:` | Hide markup and the details on boards until you come near them. calm:off shows them | `calm:`, `calm:off` | everywhere | yes |
@@ -175,6 +174,7 @@ The bar knows these words and says they come later.
 
 The Lab, where rooms are built, comes in a later release with its commands. The bar knows these words and says so.
 
+- `library:`: Bring the Library beside what is on screen
 - `lab:`: Go to the Lab, where rooms are built
 - `duplicate:"Writing studio"`: Copy a room, yours or a template, and open the copy in the Lab
 - `edit:"Reading room"`: Open a room in the Lab to change it

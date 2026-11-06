@@ -2051,7 +2051,7 @@ msgstr "Mikä järjestely: {names}?"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.arrangeMap"
-msgstr "Enter pitää tämän näkymän auki. pop:library display 2 siirtää taulun toiselle näytölle"
+msgstr "Enter pitää tämän näkymän auki. pop:collection display 2 siirtää taulun toiselle näytölle"
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMapAsk"
@@ -2185,7 +2185,7 @@ msgstr "{board} on jo taulun {other} vieressä"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.besideWhich"
-msgstr "beside tarvitsee yhden taulun tai numeron, esimerkiksi pop:library beside records"
+msgstr "beside tarvitsee yhden taulun tai numeron, esimerkiksi pop:collection beside records"
 
 #. js-lingui-explicit-id
 msgid "enter.blockAdd"
@@ -7476,7 +7476,7 @@ msgstr "Luettelossa: kiinnitä keskustelu, lisää tunniste kahteen kohteeseen j
 
 #. js-lingui-explicit-id
 msgid "line.layout"
-msgstr "Avaa Luettelo, sulje Kirjasto, siirrä Kokoelma toiselle näytöllesi ja tallenna kaikki nimellä review"
+msgstr "Avaa Luettelo, sulje Asetukset, siirrä Kokoelma toiselle näytöllesi ja tallenna kaikki nimellä review"
 
 #. js-lingui-explicit-id
 msgid "line.records"
@@ -8525,7 +8525,7 @@ msgstr "Kaikki muu toimii täällä."
 msgid "screensMap.cannotHead"
 msgstr "Tämä selain ei voi sijoittaa tauluja muille näytöille."
 
-#. A screen, by its number: pop:library display 2
+#. A screen, by its number: pop:collection display 2
 #. js-lingui-explicit-id
 msgid "screensMap.display"
 msgstr "Näyttö {n}"
