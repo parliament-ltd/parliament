@@ -736,7 +736,7 @@ export function ChatProvider({ children }) {
   // each labelled with who wrote it, summarized by the helper in one call.
   // With the privacy filter on and the helper off this computer, what it
   // finds is swapped for placeholders first and back in the summary.
-  const summarizeChat = useCallback(async (chatId, helper) => {
+  const summarizeChat = useCallback(async (chatId, helper, language = null) => {
     const list = sendable(chatId, hasMessages(chatId) ? heldMessages(chatId) : await getMessages(chatId))
     const { turns } = summaryTurns(list, { modelName: (id) => modelFacts(id)?.name ?? null })
     if (!turns.length) throw new Error('Nothing to summarize')
@@ -747,7 +747,7 @@ export function ChatProvider({ children }) {
       send = turns.map((t) => ({ ...t, text: veil.out(t.text) }))
       back = veil.back
     }
-    const text = await gateway.call(helper.provider, 'summarizeChat', [send, { model: helper.id }], { label: 'branch summary' })
+    const text = await gateway.call(helper.provider, 'summarizeChat', [send, { model: helper.id, language }], { label: 'branch summary' })
     return back(text)
   }, [])
 

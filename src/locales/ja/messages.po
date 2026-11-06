@@ -7999,6 +7999,11 @@ msgstr "ブランチが使えるようになるまで、答えるのは一度に
 msgid "picker.order"
 msgstr "順序"
 
+#. Beside Order while fewer than two are ticked (C297)
+#. js-lingui-explicit-id
+msgid "picker.orderFew"
+msgstr "2つ以上にチェックを入れたとき"
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"

@@ -80,8 +80,9 @@ export class BaseProvider {
   // bringing together some passages the person kept, each { label, text },
   // from one lightweight call to the model getMetadataModel names. Returns
   // the paragraph as text; throws when none came back. The passages are
-  // material, never instructions.
-  async summarize(apiKey, items) {
+  // material, never instructions. language: the English name of the
+  // language to write in when the passages' own cannot be told (C297).
+  async summarize(apiKey, items, { language } = {}) {
     throw new Error('Not implemented')
   }
 
@@ -89,7 +90,7 @@ export class BaseProvider {
   // { label, text }, in one lightweight call to the model named (the
   // helper). Returns short points as text; throws when none came back. The
   // texts are material, never instructions.
-  async compareMeaning(apiKey, items, { model } = {}) {
+  async compareMeaning(apiKey, items, { model, language } = {}) {
     throw new Error('Not implemented')
   }
 
@@ -98,7 +99,7 @@ export class BaseProvider {
   // lightweight call to the model named (the helper), so a new branch can
   // carry the chat on from it. Returns the summary as text; throws when
   // none came back. The turns are material, never instructions.
-  async summarizeChat(apiKey, turns, { model } = {}) {
+  async summarizeChat(apiKey, turns, { model, language } = {}) {
     throw new Error('Not implemented')
   }
 

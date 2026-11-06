@@ -23,7 +23,7 @@ import FullScreenMark from './FullScreenMark'
 import Globe from './Globe'
 import { useScreenSize } from '../shell/sizes'
 import { vault, moveKeysToVault, availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
-import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
+import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf, englishNameOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import { findPrivate } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -1064,6 +1064,9 @@ export default function Shell() {
   const keepTranslationNow = useRef(async () => {})
   // Has the helper summarize a chat (open:203b summary, C175).
   const summarizeChatNow = useRef(async () => { throw new Error('Not ready') })
+  // The language a helper writes in when it cannot tell what it was given is
+  // in (C297): the reply language, else the interface's, named in English.
+  const fallbackLanguage = () => englishNameOf(translateInto(replyNow.current, i18n.locale))
   // A veil for what goes to a hosted helper, with the privacy filter on (C179).
   const veilForNow = useRef(async () => null)
   // Asks a branch's last prompt again as a new branch (again:, C177).
@@ -1447,7 +1450,7 @@ export default function Shell() {
       const later = (async () => {
         let text = null
         try {
-          text = await gateway.call(what.helper.provider, 'compareMeaning', [items, { model: what.helper.id }], { label: 'compare meaning' })
+          text = await gateway.call(what.helper.provider, 'compareMeaning', [items, { model: what.helper.id, language: fallbackLanguage() }], { label: 'compare meaning' })
         } catch {
           text = null
         }
@@ -1488,7 +1491,7 @@ export default function Shell() {
       const later = (async () => {
         let text
         try {
-          text = await gateway.call(PROVIDER, 'summarize', [items], { label: 'summary' })
+          text = await gateway.call(PROVIDER, 'summarize', [items, { language: fallbackLanguage() }], { label: 'summary' })
         } catch {
           return 'summarizeFailed'
         }
@@ -1615,7 +1618,7 @@ export default function Shell() {
       const later = (async () => {
         let text
         try {
-          text = await summarizeChatNow.current(what.chatId, what.helper)
+          text = await summarizeChatNow.current(what.chatId, what.helper, fallbackLanguage())
         } catch (err) {
           return err?.name === 'NamesUnchecked' ? 'namesUnchecked' : failed
         }
@@ -2095,7 +2098,8 @@ export default function Shell() {
         if (touched.current) touched.current.pending = { before: pendingNow.current }
         setPendingAnswerer(what.id)
       }
-      setPicking(false)
+      // One chosen, from the menu or the bar: the menu, if open, stays open
+      // until a click outside it, as when several are ticked (C297).
       remember(body)
       return null
     }
@@ -4073,7 +4077,7 @@ export default function Shell() {
   const switchAnswerer = useCallback(async (row) => {
     if (row.later) return
     if (stepPickNow.current || row.needsKey || row.unchecked) return pickAnswererNow.current?.(row)
-    setPicking(false)
+    // The menu stays open until a click outside it (C297; Stefan, 6 November).
     const line = `by:"${row.id}"`
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act) { setBarSaid({ says: p.says ?? null }); return }
@@ -4103,7 +4107,8 @@ export default function Shell() {
     const joint = ans?.order === 'sequence' ? ' then ' : ', '
     const body = next.length === 1 ? `by:${next[0]}` : `by:${next.map((x) => `"${String(nameOf(x)).replace(/"/g, '')}"`).join(joint)}`
     const p = preview(`>${body}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
-    if (!p.act) { if (next.length === 1) setPicking(false); return }
+    // Nothing to change (the one left answers here already): the menu stays open (C297).
+    if (!p.act) return
     sayRan(body, await onRun(p.next ?? null, body, null, p.act))
   }, [onRun, writeField, sayRan])
   useEffect(() => { pickAnswererNow.current = pickAnswerer }, [pickAnswerer])

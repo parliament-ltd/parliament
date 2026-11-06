@@ -83,12 +83,15 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
       </MenuGroup>
     )
   })
-  // With several ticked: all at once, or one after another (branch slider v9; C201).
-  const orderGroup = picked?.length > 1 && onOrder
+  // With several ticked: all at once, or one after another (branch slider v9;
+  // C201). Always drawn, so the menu keeps its shape as boxes are ticked
+  // (C297; Stefan, 6 November); with fewer than two it waits, fainter.
+  const few = !(picked?.length > 1)
+  const orderGroup = onOrder
     ? (
-      <MenuGroup title={i18n._(COPY.picker.order)}>
+      <MenuGroup title={i18n._(COPY.picker.order)} aside={few ? <span className="ch-menu-aside">{i18n._(COPY.picker.orderFew)}</span> : null}>
         {[['together', COPY.picker.together, COPY.picker.togetherHelp], ['sequence', COPY.picker.sequence, COPY.picker.sequenceHelp]].map(([key, name, help]) => (
-          <MenuRow key={key} round on={sending === key} label={i18n._(name)} onClick={() => onOrder(key)}>{i18n._(help)}</MenuRow>
+          <MenuRow key={key} round on={!few && sending === key} off={few} label={i18n._(name)} onClick={() => onOrder(key)}>{i18n._(help)}</MenuRow>
         ))}
       </MenuGroup>
     )

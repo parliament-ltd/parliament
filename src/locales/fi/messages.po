@@ -7999,6 +7999,11 @@ msgstr "Yksi vastaa kerrallaan, kunnes haarat ovat käytössä."
 msgid "picker.order"
 msgstr "Järjestys"
 
+#. Beside Order while fewer than two are ticked (C297)
+#. js-lingui-explicit-id
+msgid "picker.orderFew"
+msgstr "kun valittuna on kaksi tai useampi"
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"

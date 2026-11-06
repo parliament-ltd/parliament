@@ -2491,6 +2491,7 @@ export const COPY = {
     keys: /*i18n*/ { id: 'picker.keys', message: 'A name answers alone from now on; its box adds it beside the others. A row that needs a key writes api: instead.', comment: 'The foot of the menu of who answers. api: is a command, kept English' },
     // One after another (branch slider v9; C201).
     order: /*i18n*/ { id: 'picker.order', message: 'Order' },
+    orderFew: /*i18n*/ { id: 'picker.orderFew', message: 'with two or more ticked', comment: 'Beside Order while fewer than two are ticked (C297)' },
     together: /*i18n*/ { id: 'picker.together', message: 'All at once' },
     togetherHelp: /*i18n*/ { id: 'picker.togetherHelp', message: 'One reply from each, in a slider, in the numbered order.' },
     sequence: /*i18n*/ { id: 'picker.sequence', message: 'One after another' },

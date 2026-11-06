@@ -7999,6 +7999,11 @@ msgstr ""
 msgid "picker.order"
 msgstr ""
 
+#. Beside Order while fewer than two are ticked (C297)
+#. js-lingui-explicit-id
+msgid "picker.orderFew"
+msgstr ""
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"

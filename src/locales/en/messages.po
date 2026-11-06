@@ -7999,6 +7999,11 @@ msgstr "One answers at a time until branches come."
 msgid "picker.order"
 msgstr "Order"
 
+#. Beside Order while fewer than two are ticked (C297)
+#. js-lingui-explicit-id
+msgid "picker.orderFew"
+msgstr "with two or more ticked"
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"

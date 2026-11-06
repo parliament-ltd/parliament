@@ -1,5 +1,5 @@
 import { BaseProvider } from './base'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, COMPARE_SYSTEM_PROMPT, COMPARE_MAX_TOKENS, COMPARE_MAX_CHARS, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded } from './shared'
+import { withLanguageFallback, DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, COMPARE_SYSTEM_PROMPT, COMPARE_MAX_TOKENS, COMPARE_MAX_CHARS, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded } from './shared'
 import { NAMES_SYSTEM_PROMPT, CHECK_SYSTEM_PROMPT, readNames, readCheck } from '../lib/injection'
 
 // Text for one of the checks below, in its tag, any such tag inside taken out.
@@ -273,8 +273,8 @@ export class OllamaProvider extends BaseProvider {
     return null
   }
 
-  async summarize(items) {
-    const text = await this._lightweightCall(SUMMARIZE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
+  async summarize(items, { language = null } = {}) {
+    const text = await this._lightweightCall(withLanguageFallback(SUMMARIZE_SYSTEM_PROMPT, language), [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
   }
@@ -299,15 +299,15 @@ export class OllamaProvider extends BaseProvider {
 
   // compare: … meaning (C290): how two texts differ in what they say, by
   // the model named (the helper).
-  async compareMeaning(items, { model } = {}) {
-    const text = String(await this._lightweightCall(COMPARE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], COMPARE_MAX_TOKENS, model) ?? '').trim()
+  async compareMeaning(items, { model, language = null } = {}) {
+    const text = String(await this._lightweightCall(withLanguageFallback(COMPARE_SYSTEM_PROMPT, language), [{ role: 'user', content: summaryItems(items) }], COMPARE_MAX_TOKENS, model) ?? '').trim()
     if (!text) throw new Error('No reading came back')
     return text.slice(0, COMPARE_MAX_CHARS)
   }
 
   // open:203b summary (C175) by a model on this computer: free, and nothing leaves it.
-  async summarizeChat(turns, { model } = {}) {
-    return readChatSummary(await this._lightweightCall(CHAT_SUMMARY_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(turns) }], CHAT_SUMMARY_MAX_TOKENS, model))
+  async summarizeChat(turns, { model, language = null } = {}) {
+    return readChatSummary(await this._lightweightCall(withLanguageFallback(CHAT_SUMMARY_SYSTEM_PROMPT, language), [{ role: 'user', content: summaryItems(turns) }], CHAT_SUMMARY_MAX_TOKENS, model))
   }
 
   // translate: (C166) by a model on this computer: free, and nothing leaves it.

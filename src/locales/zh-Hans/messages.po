@@ -7999,6 +7999,11 @@ msgstr "在分支功能推出之前，一次只能由一个回答者回答。"
 msgid "picker.order"
 msgstr "顺序"
 
+#. Beside Order while fewer than two are ticked (C297)
+#. js-lingui-explicit-id
+msgid "picker.orderFew"
+msgstr "勾选两个或更多时"
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"

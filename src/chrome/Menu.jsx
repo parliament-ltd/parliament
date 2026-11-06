@@ -65,16 +65,17 @@ export function MenuGroup({ title = null, aside = null, children }) {
  *   children?: import('react').ReactNode }} props
  *   mark: what the box shows, such as its place; faint: waits for a key; later: not built yet, and does nothing
  */
-export function MenuRow({ on = false, mark = '', round = false, faint = false, later = false, title, label, lang, onClick, children = null }) {
+// off: drawn but not usable yet, fainter, and a click does nothing (C297).
+export function MenuRow({ on = false, mark = '', round = false, faint = false, later = false, off = false, title, label, lang, onClick, children = null }) {
   return (
     <button
       type="button"
-      className={`ch-ref-row${on ? ' on' : ''}${faint || later ? ' faint' : ''}${later ? ' later' : ''}`}
+      className={`ch-ref-row${on ? ' on' : ''}${faint || later || off ? ' faint' : ''}${later ? ' later' : ''}`}
       aria-pressed={on}
-      aria-disabled={later || undefined}
+      aria-disabled={later || off || undefined}
       title={title}
       onMouseDown={(e) => e.preventDefault()}
-      onClick={onClick}
+      onClick={off ? undefined : onClick}
     >
       <span className="ch-menu-lab">
         <span className={`ch-menu-box${round ? ' round' : ''}`} aria-hidden="true">{mark}</span>

@@ -1168,7 +1168,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
    and the room's, and its markup switch while it holds edits (30 October):
    what a room is called is not a detail, and the switch is how hidden
    markup is found again. */
-.ch-shell.calm .ch-card:not(:hover):not(:focus-within):not(.near) > .ch-chead > :not(h2) { visibility: hidden; }
+.ch-shell.calm .ch-card:not(.ch-collection):not(:hover):not(:focus-within):not(.near) > .ch-chead > :not(h2) { visibility: hidden; }
 .ch-shell.calm .ch-card.room:not(:hover):not(:focus-within):not(.near) > .ch-chead > :is(.ch-aside, .ch-col-markup) { visibility: visible; }
 
 /* A reply as it stands (as markup:off reads it), while you read it and while
@@ -1208,17 +1208,13 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 /* The branch slider's line: its first open: only. */
 .ch-shell.calm .ch-branches:not(:hover):not(:focus-within):not(.near) .ch-bmarg > :not(button:first-of-type) { display: none; }
 
-/* Collection cards: one line, the result. */
-.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) :is(.ch-mk-marg, .ch-ask-on, .ch-mk-qs, .ch-sg-from) { display: none; }
-.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) .ch-ed :is(s, .ch-ed-arrow) { display: none; }
-.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) .ch-ed ins { text-decoration: none; color: inherit; }
-.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) .ch-ed:not(:has(ins, .ch-ed-gone))::before { content: attr(data-gone); font-style: italic; color: var(--ch-ink-3); }
-.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near):has(.ch-ask-a) .ch-ask-q { display: none; }
-.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) :is(.t, .q, .ch-ed, .ch-ask-q, .ch-ask-a) { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-
-/* The legend: "colours ▾". The review keys hidden; the tab counts dimmed. */
-.ch-shell.calm .ch-col-legend:not(:hover):not(:focus-within):not(.near) > * { display: none; }
-.ch-shell.calm .ch-col-legend:not(:hover):not(:focus-within):not(.near)::before { content: attr(data-calm); }
+/* The Collection is not calmed by hover (C297; Stefan, 6 November: "it's
+   more calm to see everything and then close items than to have them pop
+   open quickly when moving the mouse"). Its cards show their edits, their
+   words and their marginalia in full, and its legend stays open, calm on or
+   off; until C297 they folded to one line and opened when the pointer came
+   near. Its head is left whole too, by the head rule above. The review keys stay hidden and
+   the tab counts dimmed, which never move. */
 .ch-shell.calm .ch-sg-keys { display: none; }
 .ch-shell.calm .ch-col-tabs .n { opacity: .55; }
 

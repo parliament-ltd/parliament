@@ -7999,6 +7999,11 @@ msgstr "En svarar åt gången tills grenar finns."
 msgid "picker.order"
 msgstr "Ordning"
 
+#. Beside Order while fewer than two are ticked (C297)
+#. js-lingui-explicit-id
+msgid "picker.orderFew"
+msgstr "med två eller fler ikryssade"
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"
