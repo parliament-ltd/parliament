@@ -3,6 +3,11 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.14.1, 5 November 2026
+
+- reload on the notice of a new version works in every window, where it sometimes did nothing.
+- install: no longer misses the browser's offer when the page is slow to start, and says so when Parliament is installed as an app on this computer already.
+
 ## 0.14.0, 5 November 2026
 
 - reset: clears the screen to the start card: every board and window closes. Nothing is deleted.
