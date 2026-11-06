@@ -4761,6 +4761,14 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(d) The Collection is not calmed by hover.** Its cards show their edits, words and marginalia in full, its legend stays open and its head stays whole, calm on or off; until now they folded to one line and opened when the pointer came near. The review keys stay hidden and the tab counts dimmed in calm, which never move.
 - The new line is in all four languages, drafted. Tried in the app: two ticked and the order live, one unticked and a row clicked by name with the menu still open, a click outside closing it.
 
+**C298. The Collection's actions, shown another way** (proposed 6 November; **asked for by Stefan, 6 November:** "im not a fan of showcasing marginalia on hover when that marginalia has actions associated with it. it makes a lot of things appear quickly on screen and then disappear ... let's revisit and try to think of a different way to showcase the actions"). Proposed; nothing built.
+- **What there is.** Each card's marginalia holds its facts (its number, its kind, "from 202", its heading, its tags) and, on an edit, an ask or a suggestion, one or two actions: hold back or let go, undo, drop, accept, reject. Each runs a command, said under the bar, which `undo:` takes back. Calm hid all of it until the pointer came near; since C297 (d) it shows at all times, calm or not.
+- **(a) Suggested: the bar acts on the card you pick.** A card shows its facts only. A click on a card picks it (its box ticks, as now); the line under the bar then offers what can be done to the picked cards, as commands to click or type: "hold:241 · undo:241", "accept:241 · reject:241", and for several, `summarize:` and `export:`. Nothing appears without a click, the board stays still, and the bar stays the one actor, as everywhere else.
+- **(b) The actions always shown, quieter.** As C297 (d) left it: each card keeps its one or two actions in its marginalia, always drawn, in the margin's grey. Nothing moves, but a long collection carries many small actions.
+- **(c) One mark per card that opens its actions.** A fixed "…" at the end of a card with actions opens them under it on a click, never on hover, and a click outside closes them, as the menus do.
+- **(d) An action column.** The actions set in a narrow column at each card's right edge, always drawn and aligned, so the eye scans them as one column; a card with none leaves it empty.
+- **Asked:** which of (a) to (d), or another. A mockup of the chosen one comes before anything is built.
+
 
 ## Proposed CLAUDE.md rewrite
 
