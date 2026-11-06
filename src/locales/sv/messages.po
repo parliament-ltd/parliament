@@ -1257,10 +1257,30 @@ msgstr "Citerade källor"
 msgid "collection.acceptAnswer"
 msgstr "godta"
 
+#. An answer or a suggestion goes into the reply; runs accept:
+#. js-lingui-explicit-id
+msgid "collection.actAccept"
+msgstr "Godta"
+
+#. An ask not yet sent is dropped; runs delete:
+#. js-lingui-explicit-id
+msgid "collection.actDrop"
+msgstr "Ta bort"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
 msgstr "Skriver {command} i fältet"
+
+#. Keeps an edit or ask from going with the next prompt; runs hold:
+#. js-lingui-explicit-id
+msgid "collection.actHoldBack"
+msgstr "Håll kvar"
+
+#. An edit or ask held back goes with the next prompt again; runs hold:off
+#. js-lingui-explicit-id
+msgid "collection.actLetGo"
+msgstr "Släpp den"
 
 #. js-lingui-explicit-id
 msgid "collection.actNewChat"
@@ -1286,6 +1306,11 @@ msgstr "Prompt"
 msgid "collection.actPromptHelp"
 msgstr "Gör fältet till en prompt om det som är valt"
 
+#. A suggestion is turned down; runs reject:
+#. js-lingui-explicit-id
+msgid "collection.actReject"
+msgstr "Avvisa"
+
 #. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "Sammanfatta"
@@ -1293,6 +1318,11 @@ msgstr "Sammanfatta"
 #. js-lingui-explicit-id
 msgid "collection.actTag"
 msgstr "Tagga"
+
+#. Takes an edit back, or an answer to an ask
+#. js-lingui-explicit-id
+msgid "collection.actUndo"
+msgstr "Ångra"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
@@ -1332,7 +1362,7 @@ msgstr "efter"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {anteckning {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {plan {num}} other {{num}}}"
+msgstr "{kind, select, note {anteckning {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {plan {num}} edit {redigering {num}} ask {fråga {num}} suggestion {förslag {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"

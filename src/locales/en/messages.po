@@ -1257,10 +1257,30 @@ msgstr "Sources it cited"
 msgid "collection.acceptAnswer"
 msgstr "accept"
 
+#. An answer or a suggestion goes into the reply; runs accept:
+#. js-lingui-explicit-id
+msgid "collection.actAccept"
+msgstr "Accept"
+
+#. An ask not yet sent is dropped; runs delete:
+#. js-lingui-explicit-id
+msgid "collection.actDrop"
+msgstr "Drop"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
 msgstr "Writes {command} in the bar"
+
+#. Keeps an edit or ask from going with the next prompt; runs hold:
+#. js-lingui-explicit-id
+msgid "collection.actHoldBack"
+msgstr "Hold back"
+
+#. An edit or ask held back goes with the next prompt again; runs hold:off
+#. js-lingui-explicit-id
+msgid "collection.actLetGo"
+msgstr "Let it go"
 
 #. js-lingui-explicit-id
 msgid "collection.actNewChat"
@@ -1286,6 +1306,11 @@ msgstr "Prompt"
 msgid "collection.actPromptHelp"
 msgstr "Turns the bar to a prompt about what is selected"
 
+#. A suggestion is turned down; runs reject:
+#. js-lingui-explicit-id
+msgid "collection.actReject"
+msgstr "Reject"
+
 #. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "Summarize"
@@ -1293,6 +1318,11 @@ msgstr "Summarize"
 #. js-lingui-explicit-id
 msgid "collection.actTag"
 msgstr "Tag"
+
+#. Takes an edit back, or an answer to an ask
+#. js-lingui-explicit-id
+msgid "collection.actUndo"
+msgstr "Undo"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
@@ -1332,7 +1362,7 @@ msgstr "by"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} other {{num}}}"
+msgstr "{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"

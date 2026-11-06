@@ -1257,10 +1257,30 @@ msgstr "参照した情報源"
 msgid "collection.acceptAnswer"
 msgstr "受け入れる"
 
+#. An answer or a suggestion goes into the reply; runs accept:
+#. js-lingui-explicit-id
+msgid "collection.actAccept"
+msgstr "受け入れる"
+
+#. An ask not yet sent is dropped; runs delete:
+#. js-lingui-explicit-id
+msgid "collection.actDrop"
+msgstr "取り下げる"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
 msgstr "バーに {command} と入力します"
+
+#. Keeps an edit or ask from going with the next prompt; runs hold:
+#. js-lingui-explicit-id
+msgid "collection.actHoldBack"
+msgstr "保留にする"
+
+#. An edit or ask held back goes with the next prompt again; runs hold:off
+#. js-lingui-explicit-id
+msgid "collection.actLetGo"
+msgstr "保留を解除"
 
 #. js-lingui-explicit-id
 msgid "collection.actNewChat"
@@ -1286,6 +1306,11 @@ msgstr "プロンプト"
 msgid "collection.actPromptHelp"
 msgstr "バーを、選択したものについてのプロンプトに切り替えます"
 
+#. A suggestion is turned down; runs reject:
+#. js-lingui-explicit-id
+msgid "collection.actReject"
+msgstr "却下する"
+
 #. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "要約"
@@ -1293,6 +1318,11 @@ msgstr "要約"
 #. js-lingui-explicit-id
 msgid "collection.actTag"
 msgstr "タグ"
+
+#. Takes an edit back, or an answer to an ask
+#. js-lingui-explicit-id
+msgid "collection.actUndo"
+msgstr "取り消す"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
@@ -1332,7 +1362,7 @@ msgstr "並べ替え"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {メモ{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} other {{num}}}"
+msgstr "{kind, select, note {メモ{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} edit {編集{num}} ask {質問{num}} suggestion {提案{num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"

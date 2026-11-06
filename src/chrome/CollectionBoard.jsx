@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { dayOf } from './when'
-import { WORDED, selectionOf, actCommand } from '../lib/cardActs'
+import { WORDED, selectionOf, actCommand, sharedActs } from '../lib/cardActs'
 import { isChangeRow } from '../lib/recordsFilter'
 import { InForce } from './AlmanacBoard'
 
@@ -101,23 +101,17 @@ function Card({ card, under, onWrite, picked, onPick, onFind, rowOf }) {
 const addressOf = (card) => (card.branch && card.docketNum != null ? `${card.docketNum}${card.branch}` : String(card.chatNum ?? ''))
 
 /** An edit's or an ask's card (C220 (b), (c)). */
-function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
+function ChangeCard({ card, clean, fresh, picked = false, onPick = null, onFind, nameOf }) {
   const { i18n } = useLingui()
   const c = card.change
   const C = COPY.collections
-  const run = (command, word) => (
-    <button type="button" title={i18n._(C.runs, { command })} onClick={() => onRun(command)}>{i18n._(word)}</button>
-  )
   const sentTo = c.sent?.to ? nameOf(c.sent.to) : null
-  const hold = c.held ? `hold:off ${card.num}` : `hold:${card.num}`
   let state
-  let acts = []
-  if (card.kind === 'suggestion') return <SuggestionCard card={card} clean={clean} fresh={fresh} run={run} onFind={onFind} nameOf={nameOf} />
+  if (card.kind === 'suggestion') return <SuggestionCard card={card} clean={clean} fresh={fresh} picked={picked} onPick={onPick} onFind={onFind} nameOf={nameOf} />
   if (card.kind === 'edit') {
     state = c.sent?.into ? i18n._(C.changeInto)
       : c.sent ? i18n._(C.changeSent, { name: sentTo ?? '', day: dayOf(i18n, c.sent.at) })
         : c.held ? i18n._(C.changeHeld) : i18n._(C.changeWaits)
-    if (!c.sent) acts = [run(hold, c.held ? C.letGo : C.holdBack), run(`undo:${card.num}`, C.undoEdit)]
   } else {
     const st = c.state
     state = st === 'answered' ? i18n._(c.answer?.inPlace ? C.askAnswered : C.askAnsweredHere)
@@ -125,14 +119,12 @@ function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
         : st === 'taken back' ? i18n._(C.askTakenBack)
           : c.sent ? i18n._(C.askAsked, { name: sentTo ?? '' })
             : c.held ? i18n._(C.changeHeld) : i18n._(C.changeWaits)
-    if (st === 'open' && !c.sent) acts = [run(hold, c.held ? C.letGo : C.holdBack), run(`delete:${card.num}`, C.dropAsk)]
-    if (st === 'answered') acts = [...(c.answer?.inPlace ? [run(`accept:${card.num}`, C.acceptAnswer)] : []), run(`reject:${card.num}`, C.undoAnswer)]
   }
   const answer = card.kind === 'ask' && c.answer?.text && c.state !== 'taken back' ? c.answer.text : ''
   const where = i18n._(C.editWhere, { part: c.part, address: addressOf(card) })
   return (
-    <div className={`ch-mk ck-${card.kind}${c.held ? ' held' : ''}${fresh ? ' ch-flash' : ''}`} data-key={card.key} data-num={card.num}>
-      <span className="ch-mk-box none" aria-hidden="true" />
+    <div className={`ch-mk ck-${card.kind}${c.held ? ' held' : ''}${picked ? ' sel' : ''}${fresh ? ' ch-flash' : ''}`} data-key={card.key} data-num={card.num}>
+      <PickBox card={card} picked={picked} onPick={onPick} />
       <div className="ch-mk-body">
         {card.kind === 'edit'
           ? (
@@ -161,20 +153,28 @@ function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
           <button type="button" title={i18n._(C.findHere)} onClick={() => onFind(card.num)}>{where}</button>
           {card.kind === 'ask' && c.answer?.by && <span>{i18n._(C.askAnsweredBy, { name: nameOf(c.answer.by) })}</span>}
           <span className="ch-mk-st">{state}</span>
-          {acts.map((a, i) => <span key={i} className="ch-mk-act">{a}</span>)}
         </div>
       </div>
     </div>
   )
 }
 
+/** The box that picks a change card, whose actions then join the foot (C298 (a)). */
+function PickBox({ card, picked, onPick }) {
+  const { i18n } = useLingui()
+  if (card.num == null || !onPick) return <span className="ch-mk-box none" aria-hidden="true" />
+  const name = i18n._(COPY.collections.card, { kind: card.kind, num: card.num })
+  return <button type="button" className="ch-mk-box" aria-pressed={picked} aria-label={i18n._(COPY.collections.select, { card: name })} onClick={() => onPick(card.num)}>{picked ? '✓' : ''}</button>
+}
+
 /**
  * A suggestion's card (stage 12, piece 1; C228, C229): what it would strike
  * and suggest, in its colour; where it came from ("the same as your edit 242
  * in 201a", or the framework and its instruction); who made it; accept and
- * reject while it waits. Model text is shown as text.
+ * whether it waits; picked, accept and reject join the foot (C298 (a)).
+ * Model text is shown as text.
  */
-function SuggestionCard({ card, clean, fresh, run, onFind, nameOf }) {
+function SuggestionCard({ card, clean, fresh, picked = false, onPick = null, onFind, nameOf }) {
   const { i18n } = useLingui()
   const c = card.change
   const C = COPY.collections
@@ -184,11 +184,10 @@ function SuggestionCard({ card, clean, fresh, run, onFind, nameOf }) {
   const state = c.state === 'accepted'
     ? (c.made === 'sweep' ? (c.sent ? i18n._(C.sugTold, { name: c.sent.to ? nameOf(c.sent.to) : '', day: dayOf(i18n, c.sent.at) }) : i18n._(C.sugToTell)) : i18n._(C.sugAccepted, { made: c.made }))
     : c.state === 'rejected' ? i18n._(C.sugRejected) : i18n._(C.sugOpen)
-  const acts = c.state === 'open' ? [run(`accept:${card.num}`, C.sugAccept), run(`reject:${card.num}`, C.sugReject)] : []
   const where = i18n._(C.editWhere, { part: c.part, address: addressOf(card) })
   return (
-    <div className={`ch-mk ck-suggestion sg-${c.made} sg-${c.state}${fresh ? ' ch-flash' : ''}`} data-key={card.key} data-num={card.num}>
-      <span className="ch-mk-box none" aria-hidden="true" />
+    <div className={`ch-mk ck-suggestion sg-${c.made} sg-${c.state}${picked ? ' sel' : ''}${fresh ? ' ch-flash' : ''}`} data-key={card.key} data-num={card.num}>
+      <PickBox card={card} picked={picked} onPick={onPick} />
       <div className="ch-mk-body">
         <div className="ch-sg-from" dir="auto">{from}</div>
         <div className="ch-ed" dir="auto">
@@ -208,7 +207,6 @@ function SuggestionCard({ card, clean, fresh, run, onFind, nameOf }) {
           <button type="button" title={i18n._(C.findHere)} onClick={() => onFind(card.num)}>{where}</button>
           {c.model && <span>{i18n._(C.sugBy, { name: nameOf(c.model) })}</span>}
           <span className="ch-mk-st">{state}</span>
-          {acts.map((a, i) => <span key={i} className="ch-mk-act">{a}</span>)}
         </div>
       </div>
     </div>
@@ -272,11 +270,19 @@ function ReviewBar({ open, active, onRun, onFind }) {
   )
 }
 
-/** The foot: what is selected, and the four acts (C145 (d)). */
-function Acts({ cards, picked, onPick, onClearPicked, onWrite, onPrompt }) {
+/**
+ * The foot: what is selected, the picked edits', asks' and suggestions' own
+ * actions, which run at once (C298 (a)), and the four acts (C145 (d)), which
+ * take notes, quotes and highlights only.
+ */
+function Acts({ cards, picked, onPick, onClearPicked, onWrite, onRun, onPrompt }) {
   const { i18n } = useLingui()
   const sel = selectionOf(cards, picked)
   const n = sel.nums.length
+  const byNum = new Map(cards.filter((c) => c.num != null).map((c) => [c.num, c]))
+  const own = sharedActs(sel.nums.map((x) => byNum.get(x)).filter(Boolean))
+  const worded = sel.items.filter((c) => WORDED.has(c.kind)).map((c) => c.num)
+  const w = worded.length
   const act = (word, command, extra = null, disabled = false) => (
     <button type="button" className="ch-act" disabled={disabled} title={command ? i18n._(COPY.collections.actHelp, { command: command.slice(1) }) : undefined} onClick={() => onWrite(command)}>
       {i18n._(word)}{extra && <small>{extra}</small>}
@@ -300,10 +306,16 @@ function Acts({ cards, picked, onPick, onClearPicked, onWrite, onPrompt }) {
           )}
       </div>
       <div className="ch-col-actrow">
-        {act(COPY.collections.actNote, actCommand.note(sel.nums), n ? i18n._(COPY.collections.actNoteQuoting, { count: n }) : null)}
-        {act(COPY.collections.actTag, actCommand.tag(sel.nums), null, n === 0)}
-        {act(COPY.collections.actSummarize, actCommand.summarize(sel.nums), i18n._(COPY.collections.actOneCall))}
-        <button type="button" className="ch-act" disabled={n === 0} title={i18n._(COPY.collections.actPromptHelp)} onClick={onPrompt}>
+        {own.map((a) => (
+          <button key={a.key} type="button" className="ch-act own" title={i18n._(COPY.collections.runs, { command: a.command })} onClick={() => onRun(a.command)}>
+            {i18n._(COPY.collections[a.word])}<small>{a.command}</small>
+          </button>
+        ))}
+        {own.length > 0 && <span className="ch-act-sep" aria-hidden="true" />}
+        {act(COPY.collections.actNote, actCommand.note(worded), w ? i18n._(COPY.collections.actNoteQuoting, { count: w }) : null)}
+        {act(COPY.collections.actTag, actCommand.tag(worded), null, w === 0)}
+        {act(COPY.collections.actSummarize, actCommand.summarize(worded), i18n._(COPY.collections.actOneCall), n > 0 && w === 0)}
+        <button type="button" className="ch-act" disabled={w === 0} title={i18n._(COPY.collections.actPromptHelp)} onClick={onPrompt}>
           {i18n._(COPY.collections.actPrompt)}<small>{i18n._(COPY.collections.actNewChat)}</small>
         </button>
       </div>
@@ -389,7 +401,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
           return <div key={`g:${e.group.kind}:${e.group.num}:${e.group.branch ?? ''}`} className="ch-mk-group">{i18n._(title, { num: e.group.num ?? '', address: `${e.group.num ?? ''}${e.group.branch ?? ''}` })}</div>
         }
         if (e.card.change) {
-          return <ChangeCard key={e.card.key} card={e.card} clean={clean} fresh={fresh.includes(e.card.num)} onRun={onRun} onFind={onFindChange} nameOf={nameOf} />
+          return <ChangeCard key={e.card.key} card={e.card} clean={clean} fresh={fresh.includes(e.card.num)} picked={e.card.num != null && picked.includes(e.card.num)} onPick={onPick} onFind={onFindChange} nameOf={nameOf} />
         }
         return (
           <Card
@@ -449,7 +461,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
         ) : null}
         {view.tab === 'suggestion' && <ReviewBar open={waiting} active={addressed} onRun={onRun} onFind={onFindChange} />}
         <div className="ch-col-list">{list}</div>
-        <Acts cards={cards} picked={picked} onPick={onPick} onClearPicked={onClearPicked} onWrite={onWrite} onPrompt={onPrompt} />
+        <Acts cards={cards} picked={picked} onPick={onPick} onClearPicked={onClearPicked} onWrite={onWrite} onRun={onRun} onPrompt={onPrompt} />
       </>
     )
   }

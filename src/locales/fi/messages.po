@@ -1257,10 +1257,30 @@ msgstr "Lähteet, joihin se viittasi"
 msgid "collection.acceptAnswer"
 msgstr "hyväksy"
 
+#. An answer or a suggestion goes into the reply; runs accept:
+#. js-lingui-explicit-id
+msgid "collection.actAccept"
+msgstr "Hyväksy"
+
+#. An ask not yet sent is dropped; runs delete:
+#. js-lingui-explicit-id
+msgid "collection.actDrop"
+msgstr "Poista"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
 msgstr "Kirjoittaa palkkiin {command}"
+
+#. Keeps an edit or ask from going with the next prompt; runs hold:
+#. js-lingui-explicit-id
+msgid "collection.actHoldBack"
+msgstr "Aseta pitoon"
+
+#. An edit or ask held back goes with the next prompt again; runs hold:off
+#. js-lingui-explicit-id
+msgid "collection.actLetGo"
+msgstr "Vapauta"
 
 #. js-lingui-explicit-id
 msgid "collection.actNewChat"
@@ -1286,6 +1306,11 @@ msgstr "Kehote"
 msgid "collection.actPromptHelp"
 msgstr "Muuttaa palkin kehotteeksi valituista kohteista"
 
+#. A suggestion is turned down; runs reject:
+#. js-lingui-explicit-id
+msgid "collection.actReject"
+msgstr "Hylkää"
+
 #. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "Tiivistä"
@@ -1293,6 +1318,11 @@ msgstr "Tiivistä"
 #. js-lingui-explicit-id
 msgid "collection.actTag"
 msgstr "Tunniste"
+
+#. Takes an edit back, or an answer to an ask
+#. js-lingui-explicit-id
+msgid "collection.actUndo"
+msgstr "Kumoa"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
@@ -1332,7 +1362,7 @@ msgstr "lajittelu"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {muistiinpano {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} other {{num}}}"
+msgstr "{kind, select, note {muistiinpano {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} edit {muokkaus {num}} ask {kysymys {num}} suggestion {ehdotus {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectionOf, actCommand, aboutText, replySide, chatAddress, planSummarize } from './cardActs'
+import { selectionOf, actCommand, aboutText, replySide, chatAddress, planSummarize, ownActsOf, sharedActs } from './cardActs'
 import { cardsOf } from './collectionCards'
 import { newCollection } from './collections'
 
@@ -95,5 +95,36 @@ describe('summarize: again (C291 (o)): rewrite: is summarize: on cards summarize
     expect(planSummarize(step([214, 217]), screens, 'collection').says.also[0]).toEqual({ message: 'summarizeAgain' })
     expect(planSummarize(step([214]), screens, 'collection').says.also.some((a) => a.message === 'summarizeAgain')).toBe(true)
     expect(planSummarize(step([231]), screens, 'collection').says.also.some((a) => a.message === 'summarizeAgain')).toBe(false)
+  })
+})
+
+describe("a picked change card's own actions, at the foot (C298 (a))", () => {
+  const edit = (num, change = {}) => ({ num, kind: 'edit', change: { held: false, sent: null, ...change } })
+  const ask = (num, change) => ({ num, kind: 'ask', change })
+  const sug = (num, state = 'open') => ({ num, kind: 'suggestion', change: { state } })
+  it('offers what can be done to each kind now', () => {
+    expect(ownActsOf(edit(241))).toEqual(['holdBack', 'undoEdit'])
+    expect(ownActsOf(edit(244, { held: true }))).toEqual(['letGo', 'undoEdit'])
+    expect(ownActsOf(edit(245, { sent: { to: 'm', at: 'x' } }))).toEqual([])
+    expect(ownActsOf(ask(246, { state: 'open' }))).toEqual(['holdBack', 'dropAsk'])
+    expect(ownActsOf(ask(247, { state: 'answered', answer: { inPlace: true } }))).toEqual(['acceptAnswer', 'undoAnswer'])
+    expect(ownActsOf(ask(249, { state: 'answered', answer: { inPlace: false } }))).toEqual(['undoAnswer'])
+    expect(ownActsOf(sug(248))).toEqual(['accept', 'reject'])
+    expect(ownActsOf(sug(250, 'accepted'))).toEqual([])
+    expect(ownActsOf({ num: 236, kind: 'highlight' })).toEqual([])
+  })
+  it('writes the command for one, and for several only what they share, undo: for one alone', () => {
+    expect(sharedActs([edit(241)])).toEqual([
+      { key: 'holdBack', word: 'actHoldBack', command: 'hold:241' },
+      { key: 'undoEdit', word: 'actUndo', command: 'undo:241' },
+    ])
+    expect(sharedActs([edit(241), edit(243)]).map((a) => a.command)).toEqual(['hold:241, 243'])
+    expect(sharedActs([edit(244, { held: true })]).map((a) => a.command)).toEqual(['hold:off 244', 'undo:244'])
+    expect(sharedActs([edit(241), edit(244, { held: true })])).toEqual([])
+    expect(sharedActs([sug(248), sug(251)]).map((a) => a.command)).toEqual(['accept:248, 251', 'reject:248, 251'])
+    expect(sharedActs([ask(246, { state: 'open' })]).map((a) => a.command)).toEqual(['hold:246', 'delete:246'])
+    // With a note among them, only the four acts, on the note.
+    expect(sharedActs([edit(241), { num: 250, kind: 'note' }])).toEqual([])
+    expect(sharedActs([])).toEqual([])
   })
 })

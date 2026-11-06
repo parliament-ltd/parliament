@@ -766,8 +766,12 @@
 .ch-shell .ch-col-scope button { padding: 0; text-decoration: underline; text-underline-offset: 2px; }
 .ch-shell .ch-col-scope button:hover { color: var(--ch-ink); }
 .ch-col-actrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.ch-shell .ch-act { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border: .5px solid var(--ch-border); border-radius: var(--ch-r-sm); color: var(--ch-ink); font: 500 12px var(--ch-sans); }
+/* button.ch-act, so it weighs as much as the button reset at the top, which comes first (C298 (a)). */
+.ch-shell button.ch-act { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border: .5px solid var(--ch-border); border-radius: var(--ch-r-sm); color: var(--ch-ink); font: 500 12px var(--ch-sans); }
 .ch-shell .ch-act small { color: var(--ch-ink-3); font: 400 10.5px var(--ch-sans); }
+/* A picked card's own actions, first in the row, set apart by a thin rule (C298 (a)). */
+.ch-shell .ch-act.own { border-color: rgba(var(--ch-navy), .35); }
+.ch-act-sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--ch-border); }
 .ch-shell .ch-act:hover:not(:disabled) { border-color: var(--ch-ink); }
 .ch-shell .ch-act:disabled { opacity: .45; cursor: default; }
 /* Found: the spot a jump: or a click lands on, for a moment. */

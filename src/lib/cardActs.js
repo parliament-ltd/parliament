@@ -240,6 +240,53 @@ export function selectionOf(cards, picked) {
   return { items, kinds, nums: items.map((c) => c.num) }
 }
 
+// A change card's own actions (C298 (a); Stefan, 6 November: "Build A").
+// An edit, an ask or a suggestion shows its facts only; picked, what can be
+// done to it joins the row at the Collection's foot, and runs at once, said
+// under the bar, with undo:. Each action has a key, its word, and its
+// command for some numbers; undo: takes one number, the others several.
+const nums = (list) => list.join(', ')
+const ACTS = Object.freeze({
+  holdBack: { word: 'actHoldBack', command: (n) => `hold:${nums(n)}` },
+  letGo: { word: 'actLetGo', command: (n) => `hold:off ${nums(n)}` },
+  undoEdit: { word: 'actUndo', command: (n) => `undo:${n[0]}`, one: true },
+  dropAsk: { word: 'actDrop', command: (n) => `delete:${nums(n)}` },
+  acceptAnswer: { word: 'actAccept', command: (n) => `accept:${nums(n)}` },
+  undoAnswer: { word: 'actUndo', command: (n) => `reject:${nums(n)}` },
+  accept: { word: 'actAccept', command: (n) => `accept:${nums(n)}` },
+  reject: { word: 'actReject', command: (n) => `reject:${nums(n)}` },
+})
+
+/** The keys of what can be done to one change card now, in order; none for any other card. */
+export function ownActsOf(card) {
+  const c = card?.change
+  if (!c || card.num == null) return []
+  if (card.kind === 'edit') return c.sent ? [] : [c.held ? 'letGo' : 'holdBack', 'undoEdit']
+  if (card.kind === 'ask') {
+    if (c.state === 'open' && !c.sent) return [c.held ? 'letGo' : 'holdBack', 'dropAsk']
+    if (c.state === 'answered') return [...(c.answer?.inPlace ? ['acceptAnswer'] : []), 'undoAnswer']
+    return []
+  }
+  if (card.kind === 'suggestion') return c.state === 'open' ? ['accept', 'reject'] : []
+  return []
+}
+
+/**
+ * What the picked cards can have done to them together (C298 (a)): only
+ * when every one is an edit, an ask or a suggestion, each action they all
+ * have, with all their numbers in one command; undo: only for one card.
+ * @param {object[]} picked the picked cards, each with its change
+ * @returns {Array<{ key: string, word: string, command: string }>}
+ */
+export function sharedActs(picked) {
+  if (!picked.length || picked.some((c) => !c?.change || c.num == null)) return []
+  const lists = picked.map(ownActsOf)
+  const ns = picked.map((c) => c.num)
+  return lists[0]
+    .filter((key) => lists.every((l) => l.includes(key)) && !(ACTS[key].one && picked.length > 1))
+    .map((key) => ({ key, word: ACTS[key].word, command: ACTS[key].command(ns) }))
+}
+
 /** The commands the four acts write into the bar, with the numbers (C145 (d)). */
 export const actCommand = {
   note: (nums) => (nums.length ? `>note:${nums.join(', ')} ""` : '>note:""'),

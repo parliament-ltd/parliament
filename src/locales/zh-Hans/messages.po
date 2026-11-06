@@ -1257,10 +1257,30 @@ msgstr "引用的来源"
 msgid "collection.acceptAnswer"
 msgstr "接受"
 
+#. An answer or a suggestion goes into the reply; runs accept:
+#. js-lingui-explicit-id
+msgid "collection.actAccept"
+msgstr "接受"
+
+#. An ask not yet sent is dropped; runs delete:
+#. js-lingui-explicit-id
+msgid "collection.actDrop"
+msgstr "去掉"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
 msgstr "在输入栏中写入 {command}"
+
+#. Keeps an edit or ask from going with the next prompt; runs hold:
+#. js-lingui-explicit-id
+msgid "collection.actHoldBack"
+msgstr "搁置"
+
+#. An edit or ask held back goes with the next prompt again; runs hold:off
+#. js-lingui-explicit-id
+msgid "collection.actLetGo"
+msgstr "取消搁置"
 
 #. js-lingui-explicit-id
 msgid "collection.actNewChat"
@@ -1286,6 +1306,11 @@ msgstr "提示词"
 msgid "collection.actPromptHelp"
 msgstr "把输入栏切换为针对所选内容的提示词"
 
+#. A suggestion is turned down; runs reject:
+#. js-lingui-explicit-id
+msgid "collection.actReject"
+msgstr "拒绝"
+
 #. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "总结"
@@ -1293,6 +1318,11 @@ msgstr "总结"
 #. js-lingui-explicit-id
 msgid "collection.actTag"
 msgstr "加标签"
+
+#. Takes an edit back, or an answer to an ask
+#. js-lingui-explicit-id
+msgid "collection.actUndo"
+msgstr "撤销"
 
 #. js-lingui-explicit-id
 msgid "collection.askAccepted"
@@ -1332,7 +1362,7 @@ msgstr "按"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {笔记 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} other {{num}}}"
+msgstr "{kind, select, note {笔记 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} edit {编辑 {num}} ask {提问 {num}} suggestion {建议 {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"

@@ -1257,9 +1257,29 @@ msgstr ""
 msgid "collection.acceptAnswer"
 msgstr ""
 
+#. An answer or a suggestion goes into the reply; runs accept:
+#. js-lingui-explicit-id
+msgid "collection.actAccept"
+msgstr ""
+
+#. An ask not yet sent is dropped; runs delete:
+#. js-lingui-explicit-id
+msgid "collection.actDrop"
+msgstr ""
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
+msgstr ""
+
+#. Keeps an edit or ask from going with the next prompt; runs hold:
+#. js-lingui-explicit-id
+msgid "collection.actHoldBack"
+msgstr ""
+
+#. An edit or ask held back goes with the next prompt again; runs hold:off
+#. js-lingui-explicit-id
+msgid "collection.actLetGo"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1286,12 +1306,22 @@ msgstr ""
 msgid "collection.actPromptHelp"
 msgstr ""
 
+#. A suggestion is turned down; runs reject:
+#. js-lingui-explicit-id
+msgid "collection.actReject"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.actTag"
+msgstr ""
+
+#. Takes an edit back, or an answer to an ask
+#. js-lingui-explicit-id
+msgid "collection.actUndo"
 msgstr ""
 
 #. js-lingui-explicit-id

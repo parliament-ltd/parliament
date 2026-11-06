@@ -2310,6 +2310,13 @@ export const COPY = {
     selected: /*i18n*/ { id: 'collection.selected', message: '{count} selected' },
     selectClear: /*i18n*/ { id: 'collection.selectClear', message: 'clear' },
     actNote: /*i18n*/ { id: 'collection.actNote', message: 'Note' },
+    // A picked edit's, ask's or suggestion's own actions, at the foot (C298 (a)).
+    actHoldBack: /*i18n*/ { id: 'collection.actHoldBack', message: 'Hold back', comment: 'Keeps an edit or ask from going with the next prompt; runs hold:' },
+    actLetGo: /*i18n*/ { id: 'collection.actLetGo', message: 'Let it go', comment: 'An edit or ask held back goes with the next prompt again; runs hold:off' },
+    actUndo: /*i18n*/ { id: 'collection.actUndo', message: 'Undo', comment: 'Takes an edit back, or an answer to an ask' },
+    actDrop: /*i18n*/ { id: 'collection.actDrop', message: 'Drop', comment: 'An ask not yet sent is dropped; runs delete:' },
+    actAccept: /*i18n*/ { id: 'collection.actAccept', message: 'Accept', comment: 'An answer or a suggestion goes into the reply; runs accept:' },
+    actReject: /*i18n*/ { id: 'collection.actReject', message: 'Reject', comment: 'A suggestion is turned down; runs reject:' },
     actNoteQuoting: /*i18n*/ { id: 'collection.actNoteQuoting', message: 'quoting {count}' },
     actTag: /*i18n*/ { id: 'collection.actTag', message: 'Tag' },
     actSummarize: /*i18n*/ { id: 'collection.actSummarize', message: 'Summarize' },
@@ -2323,7 +2330,7 @@ export const COPY = {
     summaryOf: /*i18n*/ { id: 'collection.summaryOf', message: 'summary, written {day} from {nums}' },
     quotedGone: /*i18n*/ { id: 'collection.quotedGone', message: '{num}, no longer here' },
     // A card by its kind and number, in a sentence: "note 214".
-    card: /*i18n*/ { id: 'collection.card', message: '{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} other {{num}}}' },
+    card: /*i18n*/ { id: 'collection.card', message: '{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}' },
   },
 
   // The Library (stage 5, piece 4; Lab v7): the catalogue, read-only.
