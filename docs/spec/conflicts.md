@@ -4768,6 +4768,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(c) One mark per card that opens its actions.** A fixed "…" at the end of a card with actions opens them under it on a click, never on hover, and a click outside closes them, as the menus do.
 - **(d) An action column.** The actions set in a narrow column at each card's right edge, always drawn and aligned, so the eye scans them as one column; a card with none leaves it empty.
 - **Asked:** which of (a) to (d), or another. A mockup of the chosen one comes before anything is built.
+- **Mockup of (a) and (b),** asked for by Stefan ("can we see mockups of A and B"): `docs/spec/parliament-collection-actions-v1.html`, the same seven cards drawn both ways. In (a) a picked card's own actions join the foot row beside Note, Tag, Summarize and Prompt, and run at once on a click, said under the bar, as a card's do now.
 
 
 ## Proposed CLAUDE.md rewrite

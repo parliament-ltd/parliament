@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collection actions</title>
+<!--
+  C298 (proposed 6 November): two ways to show the Collection's actions
+  without anything appearing on hover. A: the actions of the cards you pick,
+  in the Collection's own row at its foot. B: each card's actions always
+  drawn in its marginalia, in the margin's grey. Values from src/styles/
+  tokens.css and the Collection's rules in src/chrome/chrome.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --divider: rgba(25, 25, 25, .08);
+    --navy: 22, 38, 70; --navy-2: 38, 56, 92;
+    --you: #2B5CB8; --ai: #2E7458; --rust: #94491F; --high: #B63674; --note: #5A4AB0;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 1240px; margin: 0 auto; padding: 28px 16px 48px; }
+  .intro { max-width: 760px; margin: 0 0 22px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 28px; }
+  @media (min-width: 1100px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .opt h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  .opt .why { margin: 0 0 12px; font: italic 400 var(--t-marg)/1.55 var(--serif); color: var(--marg); max-width: 560px; }
+
+  /* The board */
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 8px; padding: 12px 16px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .inner { padding: 8px 16px 0; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  .col-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 4px 0 6px; }
+  .col-name { font: 600 var(--t-small) var(--sans); }
+  .col-head u { text-underline-offset: 2px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 2px 14px; padding: 4px 0; border-bottom: .5px solid var(--border-2); font: 400 12px var(--sans); color: var(--ink-3); }
+  .tabs span.on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .tabs .n { margin-inline-start: 4px; font: 400 var(--t-id) var(--mono); opacity: .8; }
+  .tabs .n.rust { color: var(--rust); opacity: 1; }
+  .tools { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 6px 0 2px; }
+  .tools .on { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+  .tools .right { margin-inline-start: auto; display: inline-flex; gap: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 4px 0 4px; }
+  .legend s { color: var(--ink-3); }
+  .l-you { color: var(--you); text-decoration: underline; text-underline-offset: 2px; }
+  .l-ai { color: var(--ai); text-decoration: underline dotted; text-underline-offset: 2px; }
+  .l-rust { color: var(--rust); text-decoration: underline dashed; text-underline-offset: 2px; }
+
+  /* Cards */
+  .mk { display: flex; gap: 10px; padding: 10px 0 9px; border-bottom: .5px solid var(--border-2); }
+  .mk.sel { background: var(--subtle); box-shadow: -16px 0 0 var(--subtle), 16px 0 0 var(--subtle); }
+  .box { flex: none; width: 15px; height: 15px; margin-top: 3px; border: 1px solid var(--soft); border-radius: 3px; font: 600 10px/13px var(--sans); color: var(--surface); text-align: center; cursor: pointer; }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .body { flex: 1; min-width: 0; }
+  .ck-edit .body { border-inline-start: 2px solid var(--you); padding-inline-start: 9px; }
+  .ck-edit.held .body { border-inline-start-style: dashed; }
+  .ck-ask .body { border-inline-start: 2px solid var(--ai); padding-inline-start: 9px; }
+  .ck-sug .body { border-inline-start: 2px dashed var(--rust); padding-inline-start: 9px; }
+  .ed { font: 400 13px/1.55 var(--serif); }
+  .ed s { color: var(--ink-3); }
+  .ed ins { color: var(--you); text-decoration: underline; text-underline-offset: 3px; }
+  .ck-sug .ed s, .ck-sug .ed ins { color: var(--rust); text-decoration-color: var(--rust); }
+  .ck-sug .ed ins { text-decoration-style: dashed; }
+  .sg-from { font: italic 400 var(--t-marg)/1.45 var(--serif); color: var(--ink-2); margin-bottom: 3px; }
+  .ask-q { font: 400 var(--t-small)/1.5 var(--sans); }
+  .ask-a { margin-top: 5px; font: 400 13px/1.5 var(--serif); color: var(--ai); text-decoration: underline dotted; text-underline-offset: 3px; }
+  .q { font: italic 400 var(--t-small)/1.5 var(--serif); border-inline-start: 2px solid var(--soft); padding-inline-start: 9px; }
+  .ck-high .q { border-inline-start-color: var(--high); }
+  .t { font: 400 var(--t-small)/1.5 var(--sans); }
+  .mk-marg { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 5px; }
+  .mk-marg .id { font: 400 var(--t-id) var(--mono); font-style: normal; text-decoration: underline dotted; text-underline-offset: 2px; }
+  .mk-marg .st { color: var(--ink); }
+  .mk-marg a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  /* B: the actions, set after a thin rule so they read apart from the facts. */
+  .mk-marg .acts { display: inline-flex; gap: 8px; padding-inline-start: 8px; border-inline-start: 1px solid var(--border); }
+
+  /* The foot: what is picked, and what can be done to it */
+  .acts-foot { border-top: 1px solid var(--divider); padding: 8px 16px 12px; margin-top: 4px; }
+  .scope { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-height: 18px; }
+  .scope b { font-weight: 600; color: var(--ink); font-style: normal; font-family: var(--sans); font-size: 12px; }
+  .scope a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+  .pick { font: 400 var(--t-id) var(--mono); font-style: normal; color: var(--you); }
+  .actrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .act { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border: .5px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); font: 500 12px var(--sans); }
+  .act small { color: var(--ink-3); font: 400 10.5px var(--sans); }
+  .act.own { border-color: rgba(var(--navy), .35); }
+  .act.off { color: var(--ink-3); }
+  .sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--border); }
+  .own-of { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); margin-inline-end: 2px; }
+
+  /* The bar and its line, under the board */
+  .bar { margin: 14px 0 0; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: .5px solid var(--border); border-radius: 22px; background: var(--surface); }
+  .chip { padding: 2px 7px; border-radius: 9px; background: rgb(var(--navy-2)); color: #fff; font: 600 9px var(--sans); letter-spacing: .06em; }
+  .bar .v { font: 400 13.5px var(--sans); }
+  .bar .v .cmd { font-family: var(--mono); font-size: 12.5px; }
+  .enter { margin: 6px 4px 0; }
+  .enter b { font-weight: 400; color: var(--ink); }
+
+  .notes { margin: 12px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>The Collection's actions, two ways</h1>
+    <p>C298, proposed. The same collection drawn twice. In both, nothing appears or disappears when the pointer moves: what changes, changes on a click.</p>
+  </div>
+
+  <div class="pair">
+
+    <!-- A -->
+    <section class="opt">
+      <h2>A · The actions of the cards you pick, at the foot</h2>
+      <p class="why">Cards show their facts only. Ticking a card adds its own actions to the row at the board's foot, beside Note, Tag, Summarize and Prompt, which already act on what is picked. Here edit 241 is picked.</p>
+      <div class="card">
+        <div class="chead"><h2>Collection</h2></div>
+        <div class="inner">
+          <div class="col-head"><span class="col-name">Owl reading</span><span class="marg">from <u>202, 205</u> · 7 cards</span></div>
+          <div class="tabs"><span class="on">All<span class="n">7</span></span><span>Edits<span class="n">2</span></span><span>Asks<span class="n">1</span></span><span>Suggestions<span class="n rust">1</span></span><span>Highlights<span class="n">1</span></span><span>Quotes<span class="n">1</span></span><span>Notes<span class="n">1</span></span></div>
+          <div class="tools marg"><span>by</span><span class="on">yours</span><span>source</span><span>date</span><span class="right"><span class="on">markup</span>·<span>clean</span></span></div>
+          <div class="legend marg"><span><s>struck</s> yours, removed</span><span><span class="l-you">blue</span> yours, added</span><span><span class="l-ai">green, dotted</span> an answer</span><span><span class="l-rust">rust, dashed</span> Ripple's suggestion</span></div>
+
+          <div class="mk ck-edit sel"><span class="box on">✓</span><div class="body">
+            <div class="ed">The barn owls are owls in the genus Tyto, the <s>most</s> widely distributed genus of owls in the world.</div>
+            <div class="mk-marg marg"><span class="id">241</span><span>Edit</span><span class="st">goes with your next prompt</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk ck-edit held"><span class="box"></span><div class="body">
+            <div class="ed">They have long, strong legs with powerful talons <ins>and fly without a sound</ins>.</div>
+            <div class="mk-marg marg"><span class="id">244</span><span>Edit</span><span class="st">held back: stays yours</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk ck-ask"><span class="box"></span><div class="body">
+            <div class="ask-q">Which of these lives in the Americas?</div>
+            <div class="ask-a">The American barn owl, T. furcata.</div>
+            <div class="mk-marg marg"><span class="id">246</span><span>Ask</span><span class="st">answered in place</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk ck-sug"><span class="box"></span><div class="body">
+            <div class="sg-from">the same as your edit 241 in 205b</div>
+            <div class="ed">Tyto is the <s>most</s> widely distributed genus.</div>
+            <div class="mk-marg marg"><span class="id">248</span><span>Suggestion</span><span class="st">waits for you</span><a>205b</a></div>
+          </div></div>
+
+          <div class="mk ck-high"><span class="box"></span><div class="body">
+            <div class="q">characteristic heart-shaped faces</div>
+            <div class="mk-marg marg"><span class="id">236</span><span>Highlight</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk"><span class="box"></span><div class="body">
+            <div class="q">Tyto is the largest genus of the Tytonidae.</div>
+            <div class="mk-marg marg"><span class="id">238</span><span>Quote</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk"><span class="box"></span><div class="body">
+            <div class="t">Check the Andaman species next.</div>
+            <div class="mk-marg marg"><span class="id">250</span><span>Note</span><span>written here</span></div>
+          </div></div>
+        </div>
+        <div class="acts-foot">
+          <div class="scope marg"><b>1 selected</b><span class="pick">edit 241</span><a>clear</a></div>
+          <div class="actrow">
+            <span class="own-of">edit 241</span>
+            <span class="act own">Hold back<small>hold:241</small></span>
+            <span class="act own">Undo<small>undo:241</small></span>
+            <span class="sep"></span>
+            <span class="act">Note<small>quoting 1</small></span>
+            <span class="act">Tag</span>
+            <span class="act">Summarize<small>1 call</small></span>
+            <span class="act">Prompt<small>new chat</small></span>
+          </div>
+        </div>
+      </div>
+      <div class="bar"><span class="chip">COMMAND</span><span class="v"><span class="cmd">&gt;</span></span></div>
+      <div class="enter marg">→ Collection · <b>Ran hold:241. undo: takes it back</b> <span>(after a click on Hold back)</span></div>
+      <ul class="notes">
+        <li>A click on Hold back runs <code>hold:241</code> at once and says so under the bar, as a card's action does now; undo: takes it back. Typed in the bar, it does the same without picking.</li>
+        <li>Several picked of one kind (two edits): their shared actions. Of mixed kinds: Note, Tag, Summarize and Prompt only.</li>
+        <li>An answered ask offers Accept and Undo; a suggestion Accept and Reject; a held edit Let it go and Undo.</li>
+        <li>The cards are quieter, and acting takes one click more: tick, then act. The foot row stays where it is, so the eye learns one place.</li>
+      </ul>
+    </section>
+
+    <!-- B -->
+    <section class="opt">
+      <h2>B · Each card's actions, always drawn</h2>
+      <p class="why">As C297 left it, in calm too: every card that can be acted on keeps its one or two actions in its marginalia, after a thin rule, in the margin's grey. Nothing waits for the pointer.</p>
+      <div class="card">
+        <div class="chead"><h2>Collection</h2></div>
+        <div class="inner">
+          <div class="col-head"><span class="col-name">Owl reading</span><span class="marg">from <u>202, 205</u> · 7 cards</span></div>
+          <div class="tabs"><span class="on">All<span class="n">7</span></span><span>Edits<span class="n">2</span></span><span>Asks<span class="n">1</span></span><span>Suggestions<span class="n rust">1</span></span><span>Highlights<span class="n">1</span></span><span>Quotes<span class="n">1</span></span><span>Notes<span class="n">1</span></span></div>
+          <div class="tools marg"><span>by</span><span class="on">yours</span><span>source</span><span>date</span><span class="right"><span class="on">markup</span>·<span>clean</span></span></div>
+          <div class="legend marg"><span><s>struck</s> yours, removed</span><span><span class="l-you">blue</span> yours, added</span><span><span class="l-ai">green, dotted</span> an answer</span><span><span class="l-rust">rust, dashed</span> Ripple's suggestion</span></div>
+
+          <div class="mk ck-edit"><span class="box"></span><div class="body">
+            <div class="ed">The barn owls are owls in the genus Tyto, the <s>most</s> widely distributed genus of owls in the world.</div>
+            <div class="mk-marg marg"><span class="id">241</span><span>Edit</span><span class="st">goes with your next prompt</span><a>from 202</a><span class="acts"><a>hold back</a><a>undo</a></span></div>
+          </div></div>
+
+          <div class="mk ck-edit held"><span class="box"></span><div class="body">
+            <div class="ed">They have long, strong legs with powerful talons <ins>and fly without a sound</ins>.</div>
+            <div class="mk-marg marg"><span class="id">244</span><span>Edit</span><span class="st">held back: stays yours</span><a>from 202</a><span class="acts"><a>let it go</a><a>undo</a></span></div>
+          </div></div>
+
+          <div class="mk ck-ask"><span class="box"></span><div class="body">
+            <div class="ask-q">Which of these lives in the Americas?</div>
+            <div class="ask-a">The American barn owl, T. furcata.</div>
+            <div class="mk-marg marg"><span class="id">246</span><span>Ask</span><span class="st">answered in place</span><a>from 202</a><span class="acts"><a>accept</a><a>undo</a></span></div>
+          </div></div>
+
+          <div class="mk ck-sug"><span class="box"></span><div class="body">
+            <div class="sg-from">the same as your edit 241 in 205b</div>
+            <div class="ed">Tyto is the <s>most</s> widely distributed genus.</div>
+            <div class="mk-marg marg"><span class="id">248</span><span>Suggestion</span><span class="st">waits for you</span><a>205b</a><span class="acts"><a>accept</a><a>reject</a></span></div>
+          </div></div>
+
+          <div class="mk ck-high"><span class="box"></span><div class="body">
+            <div class="q">characteristic heart-shaped faces</div>
+            <div class="mk-marg marg"><span class="id">236</span><span>Highlight</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk"><span class="box"></span><div class="body">
+            <div class="q">Tyto is the largest genus of the Tytonidae.</div>
+            <div class="mk-marg marg"><span class="id">238</span><span>Quote</span><a>from 202</a></div>
+          </div></div>
+
+          <div class="mk"><span class="box"></span><div class="body">
+            <div class="t">Check the Andaman species next.</div>
+            <div class="mk-marg marg"><span class="id">250</span><span>Note</span><span>written here</span></div>
+          </div></div>
+        </div>
+        <div class="acts-foot">
+          <div class="scope marg"></div>
+          <div class="actrow">
+            <span class="act off">Note</span>
+            <span class="act off">Tag</span>
+            <span class="act off">Summarize<small>1 call</small></span>
+            <span class="act off">Prompt<small>new chat</small></span>
+          </div>
+        </div>
+      </div>
+      <div class="bar"><span class="chip">COMMAND</span><span class="v"><span class="cmd">&gt;</span></span></div>
+      <div class="enter marg">→ Collection · Type a command, or ? for every command</div>
+      <ul class="notes">
+        <li>A click on an action runs it at once and says what ran under the bar, with undo:, as now.</li>
+        <li>One click to act, and every action is in sight. A collection of thirty edits and asks carries sixty small actions.</li>
+        <li>The foot row stays for what acts on picked cards, and waits until one is ticked.</li>
+      </ul>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>
