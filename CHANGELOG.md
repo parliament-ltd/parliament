@@ -3,6 +3,11 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.15.0, 5 November 2026
+
+- In calm, a reply reads as it stands, even while you edit it, and no longer moves as the pointer passes over it. The room's markup switch shows the edits.
+- The Library waits for the Lab, in a later release: it leaves the strip, and library: says so. Nothing in it is deleted.
+
 ## 0.14.1, 5 November 2026
 
 - reload on the notice of a new version works in every window, where it sometimes did nothing.
