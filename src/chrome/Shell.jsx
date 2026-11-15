@@ -750,7 +750,9 @@ export default function Shell() {
   const [collections, setCollections] = useState([])
   // The first highlight, with no collection yet, starts one holding its chat,
   // so the highlight is in the Collection (31 October; C283). Nothing opens:
-  // the strip names the new collection, and the Collection shows it.
+  // the strip names the new collection, and the Collection shows it. The
+  // first edit or ask does too (C300; Stefan, 15 November: "nothing appears
+  // in the collection until a highlight is made").
   const rowsNow = useRef(null)
   useEffect(() => {
     if (!started) return undefined
@@ -770,7 +772,11 @@ export default function Shell() {
       commit({ ...a, context: { ...a.context, collection: fresh.id } })
     }
     window.addEventListener('parliament-highlighted', onHighlight)
-    return () => window.removeEventListener('parliament-highlighted', onHighlight)
+    window.addEventListener('parliament-marked', onHighlight)
+    return () => {
+      window.removeEventListener('parliament-highlighted', onHighlight)
+      window.removeEventListener('parliament-marked', onHighlight)
+    }
   }, [started, commit])
   const [collectionView, setCollectionView] = useState({ tab: 'all', sort: 'yours', asc: false })
   const collectionLabel = useCallback((c) => c?.name || (c?.builtIn && COPY.collections[c.builtIn] ? i18n._(COPY.collections[c.builtIn]) : i18n._(COPY.collections.untitled)), [i18n])
@@ -4196,8 +4202,11 @@ export default function Shell() {
   // The welcome card keeps its field. The start card holds none: a bar kept
   // in the card docks at the foot, centred, outside it (C293; Stefan,
   // 5 November: "the command bar outside of it centered by the bottom").
-  const onStart = arrangement.columns.some((c) => c.includes(START)) && !arrangement.columns.some((c) => c.includes('welcome'))
-  const placed = onStart && arrangement.bar.at === 'card' ? { ...arrangement.bar, at: 'bottom', side: 'center' } : arrangement.bar
+  // Closing the welcome page beside other boards left it at the top; it docks
+  // at the foot whenever the welcome card is not on screen (C300; Stefan,
+  // 15 November: "let's not move it unless the user commands it to").
+  const welcomeHere = arrangement.columns.some((c) => c.includes('welcome'))
+  const placed = !welcomeHere && arrangement.bar.at === 'card' ? { ...arrangement.bar, at: 'bottom', side: 'center' } : arrangement.bar
   const bar = size === 'phone' && placed.at !== 'card' ? { ...placed, at: 'bottom' } : placed
   const barWindow = windows[BAR]
   // The other windows the one bar listens in (C280): every popped board's,

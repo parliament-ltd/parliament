@@ -64,6 +64,10 @@
 /* focus: the chat alone, centred at up to 820px (W §7). */
 .ch-shell.focused .ch-stage.space { justify-content: center; }
 .ch-shell.focused .ch-stage.space > .ch-col { flex: 0 1 820px; max-width: 820px; }
+/* A room alone on the page is as wide as in focus, centred (C300; Stefan,
+   15 November: "it's too wide normally"). Beside other boards, it shares. */
+.ch-shell .ch-stage.space:has(> .ch-col:only-child > .ch-card.room) { justify-content: center; }
+.ch-shell .ch-stage.space > .ch-col:only-child:has(> .ch-card.room) { flex: 0 1 820px; max-width: 820px; }
 .ch-stage.space > .ch-col { flex-grow: var(--share, 1); min-width: 180px; }
 .ch-stage.space > .ch-col:has(> .ch-welcome) { min-width: 260px; }
 .ch-stage.space > .ch-col:has(> .ch-card.room) { min-width: 300px; }

@@ -420,7 +420,6 @@ export default function CollectionBoard({ collection, collections, label, entrie
             <button type="button" className="ch-col-from" aria-expanded={picking} title={i18n._(COPY.collections.fromHelp)} onClick={() => setPicking((p) => !p)}>
               {sources.length ? sources.map((s) => s.num).join(', ') : i18n._(COPY.collections.fromNothing)}
             </button>
-            <span className="ch-col-count">{i18n._(COPY.collections.count, { count: counts.all ?? 0 })}</span>
           </span>
         </div>
         {picking && <Picker pickable={pickable} sources={sources} onWrite={onWrite} />}

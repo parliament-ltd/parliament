@@ -773,6 +773,11 @@ export function ChatProvider({ children }) {
   const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply' }) => {
     const counts = await saveEditedMessage(messageId, { blocks, edits, asks, suggestions, part })
     updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
+    // An edit or an ask starts a collection when there is none, as a first
+    // highlight does (C300). An id only, never the words.
+    if ((edits?.length ?? 0) > 0 || (asks?.length ?? 0) > 0) {
+      window.dispatchEvent(new CustomEvent('parliament-marked', { detail: { chatId: conversationId } }))
+    }
     return counts
   }, [])
 

@@ -769,7 +769,8 @@ export function planFocus(a, chat = null) {
   next.columns = [[room]]
   next.popped = []
   next.addressed = room
-  next.bar = { ...a.bar, at: 'bottom', popped: false }
+  // The bar stays where it is: only bar: moves it (C300; Stefan, 15 November).
+  next.bar = { ...a.bar }
   next.context[room] = target
   return go2(next, closing.length ? 'focusClosing' : 'focusAlone', { boards: closing.map((b) => (isRoom(b) ? 'room' : b)) })
 }
@@ -805,7 +806,8 @@ export function planFocusSet(a, all, chat = null) {
   next.columns = keys.map((k) => [k])
   next.popped = []
   next.addressed = wantsRoom ? room : keys[0]
-  next.bar = { ...a.bar, at: 'bottom', popped: false }
+  // The bar stays where it is: only bar: moves it (C300; Stefan, 15 November).
+  next.bar = { ...a.bar }
   if (wantsRoom) next.context[room] = target
   return go2(next, 'focusSetGo', { focusBoards: boards })
 }
@@ -821,16 +823,23 @@ export function outOfFocusFor(a, board) {
   return planFocusOff(a).next
 }
 
-/** focus:off. The space as it was before focus:, windows and all. */
+/**
+ * focus:off. The boards from before focus: come back, windows and all, and
+ * any opened while focused stay open after them (C300; Stefan, 15 November:
+ * "boards that have been opened should stay open. only turning focus on
+ * should close boards"). The bar stays where it is.
+ */
 export function planFocusOff(a) {
   if (!a.focus) return refuse('focusOffNot')
   const before = a.focus
   const next = copy(a)
   delete next.focus
-  next.columns = before.columns.map((c) => [...c])
-  next.popped = before.popped.map((p) => ({ ...p }))
-  next.addressed = before.addressed
-  next.bar = { ...before.bar }
+  const was = new Set([...before.columns.flat(), ...before.popped.map((p) => p.board)])
+  next.columns = [...before.columns.map((c) => [...c]), ...a.columns.flat().filter((b) => !was.has(b)).map((b) => [b])]
+  next.popped = [...before.popped.map((p) => ({ ...p })), ...a.popped.filter((p) => !was.has(p.board)).map((p) => ({ ...p }))]
+  const here = [...next.columns.flat(), ...next.popped.map((p) => p.board)]
+  next.addressed = here.includes(a.addressed) ? a.addressed : before.addressed
+  next.bar = { ...a.bar }
   const kept = a.columns.flat().find(isRoom)
   const back = [...before.columns.flat(), ...before.popped.map((p) => p.board)].filter((b) => b !== kept)
   return go2(next, back.length ? 'focusOff' : 'focusOffSame', { boards: back.map((b) => (isRoom(b) ? 'room' : b)) })

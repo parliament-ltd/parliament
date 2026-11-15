@@ -273,7 +273,8 @@ describe('focus: (stage 5, piece 6; W §7)', () => {
     const a = space()
     const p = planFocus(a)
     expect(p.says).toEqual({ message: 'focusClosing', values: { boards: ['welcome', 'almanac', 'collection'] } })
-    expect(p.next).toMatchObject({ columns: [['room']], popped: [], addressed: 'room', bar: { at: 'bottom', popped: false } })
+    // The bar stays where it is (C300).
+    expect(p.next).toMatchObject({ columns: [['room']], popped: [], addressed: 'room', bar: a.bar })
     expect(p.next.context.room).toBe('c1')
     expect(p.next.focus.columns).toEqual(a.columns)
     expect(planFocus(p.next).says.message).toBe('focusAlready')
@@ -288,6 +289,17 @@ describe('focus: (stage 5, piece 6; W §7)', () => {
     expect(back.next.columns).toEqual(a.columns)
     expect(back.next.popped).toEqual(a.popped)
     expect(back.next.focus).toBeUndefined()
+  })
+
+  it('keeps open what was opened while focused, and leaves the bar where it is (C300)', () => {
+    const a = keep(planBar(space(), 'top'))
+    const f = keep(planOpen(keep(planFocus(a)), 'docket'))
+    expect(f.columns.flat()).toEqual(['room', 'docket'])
+    const back = planFocusOff(keep(planBar(f, 'bottom'))).next
+    expect(back.columns).toEqual([...a.columns, ['docket']])
+    expect(back.bar.at).toBe('bottom')
+    expect(back.addressed).toBe('docket')
+    expect(back.focus).toBeUndefined()
   })
 
   it('takes the last chat when the space has no room, and refuses with nothing to focus on', () => {
