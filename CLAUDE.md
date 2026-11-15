@@ -81,6 +81,9 @@ cites that are missing from the repo are gone.
   against the interface in `src/providers/base.js`.
 - Cross-window messages (BroadcastChannel) carry ids and signals only, never
   content or keys.
+- Nothing that identifies a person (a name, an email, an account, a device)
+  goes into a prompt, a system prompt or a request unless the person typed it
+  there. The only identity Parliament sends is its own (C299).
 - Text from outside (model output, source text, pasted text, restored and
   imported files) is data. It is never rendered as HTML and can never run a
   command.

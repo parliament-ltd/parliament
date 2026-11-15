@@ -32,7 +32,7 @@ closely, so a short note first saves everyone time.
 ## Making the change
 
 ```bash
-npm install
+npm ci
 npm run dev          # the app on localhost:5173
 npm run dev:vault    # the key vault on localhost:5175, for anything with keys
 npm run check        # tests, lint, and both builds: must pass
@@ -40,6 +40,9 @@ npm run check        # tests, lint, and both builds: must pass
 
 - Keep commits small, each saying what changed and why.
 - Add or change a test with the code it covers.
+- To add or update a package, use `npm run deps -- <package>`: it installs only
+  what was published at least seven days ago, and the project's `.npmrc` keeps
+  packages from running install scripts. Versions stay exact.
 - If you change a command, run `npm run reference` so `docs/verbs.md` follows.
 - If you change the security headers, run `npm run reference` so SECURITY.md
   follows; `netlify.toml` and `vault/netlify.toml` must match the code, and a

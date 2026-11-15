@@ -161,6 +161,15 @@ Branches with compressed summaries, "send to branch", and sources kept out by
 default already cut what each request carries. Present them as privacy, not
 only as saving.
 
+No one's identity goes out with what is sent (C299, ruled 15 November):
+nothing that identifies a person, a name, an email address, an account or a
+device, goes into a prompt, a system prompt, a header or any other part of a
+request unless the person typed it there. The only identity Parliament sends
+is its own: its name, version and support@parliament.ltd, where a service asks
+for a contact (Wikipedia's Api-User-Agent; OpenAlex's polite pool, if it is
+used). Anything in a model's context can end up in what it sends on, so this
+holds for every helper, source and agent that comes later.
+
 ### 4.3 Local-only rooms
 
 A room setting that refuses hosted providers and uses a local model only, so

@@ -15,7 +15,8 @@
     "test": "vitest run",
     "check": "npm run i18n && vitest run && eslint . && vite build && vite build --config vite.vault.config.js",
     "i18n": "lingui extract --clean --overwrite && lingui compile",
-    "reference": "node scripts/write-reference.mjs"
+    "reference": "node scripts/write-reference.mjs",
+    "deps": "node scripts/deps.mjs"
   },
   "dependencies": {
     "@lingui/core": "6.9.0",
