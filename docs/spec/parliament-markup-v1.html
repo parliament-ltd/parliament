@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markup and sending</title>
+<!--
+  C301 (proposed 15 November): one markup menu where "calm: off" is now,
+  prompts and comments written in the text, and the bar's list of what Enter
+  sends, by branch. Values from src/styles/tokens.css and src/editing/
+  editing.css; the prompt's vermillion (#C2410C) is proposed, nowhere yet.
+  The colour panel's samples are simulated with Machado, Oliveira and
+  Fernandes (2009), at full severity, in linear RGB.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --divider: rgba(25, 25, 25, .08); --wash: rgba(25, 25, 25, .045);
+    --navy: 22, 38, 70; --navy-2: 38, 56, 92;
+    --you: #2B5CB8; --ai: #2E7458; --rust: #94491F;
+    --prompt: #C2410C; --prompt-tint: rgba(194, 65, 12, .07);
+    --note: #5A4AB0; --note-tint: rgba(124, 108, 212, .16);
+    --high-tint: rgba(236, 72, 153, .16);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 720px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  .marg u { text-underline-offset: 2px; }
+  .marg .on { color: var(--ink); }
+  code, .cmd { font: 400 12px var(--mono); }
+
+  /* The strip, and the markup menu where calm was */
+  /* The menu drops over the room; here it is drawn clear of it, so both can be read. */
+  .strip { position: relative; display: flex; align-items: baseline; gap: 14px; padding: 0 4px 10px; margin-bottom: 248px; }
+  .strip .clear { position: absolute; inset-inline-start: 4px; top: 60px; max-width: 360px; }
+  .strip .boards { display: flex; gap: 12px; }
+  .strip .boards .on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .strip .right { margin-inline-start: auto; display: flex; gap: 14px; }
+  .strip .mk-open { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .menu { position: absolute; z-index: 2; inset-inline-end: 64px; top: 24px; width: 318px; background: var(--surface); border: .5px solid var(--border); border-radius: 10px; box-shadow: 0 8px 28px rgba(0, 0, 0, .09); padding: 8px 6px 6px; font: 400 13px var(--sans); }
+  .menu h3 { margin: 4px 8px 4px; font: 600 10.5px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .menu .row { display: flex; align-items: baseline; gap: 8px; padding: 5px 8px; border-radius: 6px; }
+  .menu .row.on { background: var(--wash); }
+  .menu .row small { margin-inline-start: auto; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); text-align: end; }
+  .radio { flex: none; width: 12px; height: 12px; border: 1px solid var(--soft); border-radius: 50%; position: relative; top: 1px; }
+  .radio.on { border-color: var(--ink); box-shadow: inset 0 0 0 3px var(--surface); background: var(--ink); }
+  .shows { display: grid; grid-template-columns: 1fr 1fr; }
+  .box { flex: none; display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+  .sw { display: inline-block; width: 18px; text-align: center; }
+  .menu .foot { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; padding: 8px 8px 2px; border-top: .5px solid var(--border); }
+  .menu .foot a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .menu .foot small { margin-inline-start: auto; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+
+  /* The room */
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .num { font: 400 var(--t-id) var(--mono); color: var(--ink-3); }
+  .chead .right { margin-inline-start: auto; }
+  .reply { padding: 14px 22px 18px; font: 400 15.5px/1.7 var(--serif); }
+  .reply p { margin: 0 0 .8em; }
+  .reply .who { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); margin-bottom: 6px; }
+  /* your edit */
+  .reply s.struck { color: var(--ink-3); text-decoration-color: var(--ink-2); }
+  .reply ins.added { color: var(--you); text-decoration: underline; text-underline-offset: 3px; margin-inline-start: .22em; }
+  /* an answer, suggested in place */
+  .reply s.replaced { color: var(--ai); text-decoration-color: var(--ai); }
+  .reply ins.answer { color: var(--ai); text-decoration: underline dotted; text-underline-offset: 3px; margin-inline-start: .22em; }
+  .sug-marker { margin-inline-start: 4px; font: italic 400 var(--t-marg) var(--serif); color: var(--ai); white-space: nowrap; }
+  .sug-marker a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  /* a highlight */
+  .reply mark.hl { background: var(--high-tint); color: inherit; border-radius: 2px; padding: 0 1px; }
+  /* a prompt: corner brackets at the ends of the passage, its words after it behind p> */
+  .pr-at { background: var(--prompt-tint); border-radius: 2px; }
+  .pr-at::before, .pr-at::after { content: ""; display: inline-block; width: 5px; height: .78em; border: 0 solid var(--prompt); }
+  .pr-at::before { border-width: 1.5px 0 0 1.5px; vertical-align: text-top; margin-inline-end: 1px; }
+  .pr-at::after { border-width: 0 1.5px 1.5px 0; vertical-align: baseline; margin-inline-start: 1px; }
+  .pr { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--prompt); white-space: nowrap; }
+  .pr b, .pl b { font: 600 10.5px var(--mono); font-style: normal; margin-inline-end: 3px; letter-spacing: -.02em; }
+  /* a comment: a tint over the passage, a bubble and its words after it */
+  .cm-at { background: var(--note-tint); border-radius: 2px; padding: 0 1px; }
+  .cm { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--note); white-space: nowrap; }
+  .cm svg, .cl svg { width: 11px; height: 11px; vertical-align: -1px; margin-inline-end: 3px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 8px 22px 12px; border-top: .5px solid var(--border-2); }
+  .legend .l-you { color: var(--you); text-decoration: underline; text-underline-offset: 2px; }
+  .legend .l-ai { color: var(--ai); text-decoration: underline dotted; text-underline-offset: 2px; }
+  .legend .l-pr { color: var(--prompt); }
+  .legend .l-cm { color: var(--note); }
+
+  /* The bar */
+  .barwrap { margin-top: 16px; }
+  .bar { background: var(--surface); border: .5px solid var(--border); border-radius: 14px; box-shadow: 0 1px 2px rgba(40, 36, 28, .035); }
+  .field { position: relative; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 14px; overflow: hidden; }
+  .field .mosaic { position: absolute; inset: 0; pointer-events: none; }
+  .field .mark { position: relative; flex: none; width: 18px; height: 18px; color: var(--ink); }
+  .field .v { position: relative; font: 400 14px var(--sans); }
+  .field .v .caret { display: inline-block; width: 1px; height: 16px; background: var(--ink); vertical-align: -3px; margin-inline-start: 1px; }
+  .enter { margin: 7px 6px 0; }
+  .enter b { font-weight: 400; color: var(--ink); }
+  .enter a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  /* The list of what Enter sends, above the field */
+  .list { padding: 10px 14px 6px; border-bottom: .5px solid var(--border-2); }
+  .list-head { display: flex; align-items: baseline; gap: 8px; padding: 0 0 6px; }
+  .list-head h3 { margin: 0; font: 600 12px var(--sans); }
+  .list-head .right { margin-inline-start: auto; }
+  .br { padding: 6px 0 4px; border-top: .5px solid var(--border-2); }
+  .br-row, .it { display: flex; align-items: baseline; gap: 8px; }
+  .br-row { font: 400 12.5px var(--sans); }
+  .br-row .addr { font: 600 11px var(--mono); }
+  .br-row .what { color: var(--ink-2); }
+  .it { padding: 3px 0 3px 22px; font: 400 12.5px/1.45 var(--sans); }
+  .it .on-what { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .it .how { margin-inline-start: auto; flex: none; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .it .how u { color: var(--ink); text-underline-offset: 2px; }
+  .it.held { color: var(--ink-3); }
+  .it.held .pl { color: var(--ink-3); }
+  .pl { color: var(--prompt); flex: none; }
+  .el { color: var(--ink); flex: none; }
+  .el s { color: var(--ink-3); }
+  .el ins { color: var(--you); text-decoration: underline; text-underline-offset: 2px; }
+  .cl { color: var(--note); flex: none; }
+  .it.later { margin: 2px 0 2px 16px; padding: 3px 6px; border: 1px dashed var(--soft); border-radius: 6px; }
+  .tag { flex: none; font: 600 9px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); border: .5px solid var(--soft); border-radius: 4px; padding: 0 4px; }
+  .br.none .br-row { color: var(--ink-3); }
+  .list-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 6px 0 2px; border-top: .5px solid var(--border-2); }
+  .list-foot .on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Writing one: the boxes at the passage */
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 760px) { .two { grid-template-columns: 1fr 1fr; } }
+  .at-card { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 16px 18px 18px; font: 400 15.5px/1.7 var(--serif); }
+  .at-card .sel { background: rgba(43, 92, 184, .16); }
+  .wbox { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; background: var(--surface); border: 1px solid var(--prompt); border-radius: 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, .08); padding: 6px 9px; font: 400 13px var(--sans); }
+  .wbox .lab { font: 600 10.5px var(--sans); letter-spacing: .06em; color: var(--prompt); }
+  .wbox.cmt { border-color: var(--note); }
+  .wbox.cmt .lab { color: var(--note); }
+  .wbox .v { flex: 1; }
+  .wbox .keys { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .at-card .said { margin-top: 8px; font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+
+  /* Colour */
+  table.cvd { width: 100%; border-collapse: collapse; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; overflow: hidden; font: 400 13px var(--sans); }
+  .cvd th, .cvd td { padding: 8px 12px; text-align: start; border-bottom: .5px solid var(--border-2); }
+  .cvd th { font: 600 11px var(--sans); color: var(--ink-3); background: var(--subtle); }
+  .cvd td.k { font: 400 12.5px var(--sans); color: var(--ink-2); white-space: nowrap; }
+  .cvd td .hex { display: block; font: 400 var(--t-id) var(--mono); color: var(--ink-3); }
+  .cvd tr.chosen td { background: rgba(194, 65, 12, .035); }
+  .sample { font: 400 15px var(--serif); }
+  .sample.u { text-decoration: underline; text-underline-offset: 3px; }
+  .sample.dot { text-decoration: underline dotted; text-underline-offset: 3px; }
+  .sample.dash { text-decoration: underline dashed; text-underline-offset: 3px; }
+  .sample.tint { padding: 0 2px; border-radius: 2px; color: var(--ink); }
+
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 4px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="rgba(122,120,114,.17)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern>
+    <symbol id="bubble" viewBox="0 0 12 12"><path d="M2 2.5h8a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H6l-2.5 2v-2H2a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></symbol>
+    <symbol id="pot" viewBox="0 0 24 24"><path d="M8 5h8M9 5v3c-2.6 1-4 3.2-4 6a7 7 0 0 0 14 0c0-2.8-1.4-5-4-6V5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 15h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+<div class="page">
+  <div class="intro">
+    <h1>Markup, prompts in the text, and what Enter sends</h1>
+    <p>C301, proposed. One room, on its branch 201a, with the markup menu open and the bar beneath it. Then the bar's list when prompts wait in two branches, the two keys that write a prompt and a comment, and the colours as each kind of colour blindness sees them. Nothing here is built.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The markup menu, and the marks in the text</h2>
+    <p class="lede">"markup ▾" takes calm's place at the strip's end. Mode and what shows are kept apart, as Word keeps Track Changes apart from Show Markup. The room's and the Collection's own markup switches go.</p>
+
+    <div class="strip marg">
+      <span class="boards"><span>Almanac</span><span>Collection</span><span class="on">201 Committee notes</span></span>
+      <span class="right"><span class="mk-open">markup ▾</span><span>focus: off</span></span>
+      <div class="menu" role="menu" aria-label="Markup">
+        <h3>Mode</h3>
+        <div class="row on"><span class="radio on"></span>Editing<small>what you type is the text</small></div>
+        <div class="row"><span class="radio"></span>Suggesting<small>what you type is marked until accepted</small></div>
+        <h3 style="margin-top:8px">Show</h3>
+        <div class="shows">
+          <div class="row"><span class="box on"></span>edits</div>
+          <div class="row"><span class="box on"></span>highlights</div>
+          <div class="row"><span class="box on"></span>prompts</div>
+          <div class="row"><span class="box on"></span>comments</div>
+        </div>
+        <div class="foot"><a>Accept all</a><a>Reject all</a><small>1 suggestion in 201a</small></div>
+      </div>
+      <span class="clear">The menu opens on a click and closes on a click outside it. It drops over the room; it is drawn clear of the room here so both can be read.</span>
+    </div>
+
+    <div class="card addressed">
+      <div class="chead">
+        <h2>Committee notes</h2><span class="num">201</span>
+        <span class="marg right">branch <span class="on">201a</span> · 201b · 201c</span>
+      </div>
+      <div class="reply">
+        <div class="who">Sonnet 5.5 answered, 10:42</div>
+        <p>The committee met on <span class="pr-at">Tuesday the 4th of November</span><span class="pr"><b>p&gt;</b>keep the date, say it plainer</span> and agreed <s class="struck">three</s><ins class="added">four</ins> priorities for the coming year.</p>
+        <p>First, the budget, which <mark class="hl">nineteen members asked to see before any vote</mark>. Second, <span class="cm-at">the hiring plan</span><span class="cm"><svg><use href="#bubble"/></svg>Anna wanted five, ask her</span>, with <span class="pr-at">a freeze until March</span><span class="pr"><b>p&gt;</b>is this too strict? say why</span>. Third, the move to the new building.</p>
+        <p>The move <s class="replaced">is expected to take</s><ins class="answer">should take</ins> eighteen months.<span class="sug-marker">Sonnet 5.5 suggests · <a>accept</a> · <a>reject</a></span></p>
+        <p><span class="pr-at">Fourth, a review in the spring</span><span class="pr"><b>p&gt;</b>fold this into the third</span></p>
+      </div>
+      <div class="legend marg">
+        <span><s>struck</s> <span class="l-you">yours</span></span>
+        <span class="l-ai">suggested</span>
+        <span class="l-pr"><b style="font:600 10.5px var(--mono);font-style:normal">p&gt;</b> a prompt, waiting</span>
+        <span class="l-cm"><svg style="width:11px;height:11px;vertical-align:-1px"><use href="#bubble"/></svg> a comment, never sent</span>
+      </div>
+    </div>
+
+    <div class="barwrap">
+      <div class="bar">
+        <div class="field">
+          <svg class="mosaic" width="100%" height="100%" aria-hidden="true"><rect width="100%" height="100%" fill="url(#mosaic)"/></svg>
+          <svg class="mark" aria-hidden="true"><use href="#pot"/></svg>
+          <span class="v">tighten the whole thing, keep it under a page<span class="caret"></span></span>
+        </div>
+      </div>
+      <div class="enter marg"><b>Enter sends your words, 3 prompts and an edit in 201a, to Sonnet 5.5, about 2¢</b> · <a>see what goes</a></div>
+    </div>
+    <ul class="notes">
+      <li>One branch, so the bar stays one line and its line says it all. With nothing typed, Enter sends what waits: "Enter sends 3 prompts and an edit in 201a". Ctrl+Enter does the same from inside the text.</li>
+      <li>In Editing, your change is the text at once and the model is told of it with your next prompt, as edits are now. In Suggesting, it stays marked until you accept it. The model's answers come back as suggestions in either mode.</li>
+      <li>The prompt in the second paragraph asks a question; its row in the list can send it "as a reply" instead (section 2).</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · The bar, when prompts wait in more than one branch</h2>
+    <p class="lede">The list opens above the field by itself, because what waits spans two branches; otherwise a click on the line opens it. Each branch with something ticked gets a request of its own, with only its own prompts and edits, so each answer is that branch's and lands in it. An unticked item is held back, as in the Collection: it waits for the next send.</p>
+
+    <div class="bar">
+      <div class="list">
+        <div class="list-head"><h3>What Enter sends</h3><span class="marg right">2 requests, to Sonnet 5.5 · about 3¢</span></div>
+
+        <div class="br">
+          <div class="br-row"><span class="box on"></span><span class="addr">201a</span><span class="what">your words, 3 prompts and an edit</span><span class="marg">on screen</span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>keep the date, say it plainer</span><span class="on-what">on "Tuesday the 4th of November"</span><span class="how"><u>in the text</u></span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>is this too strict? say why</span><span class="on-what">on "a freeze until March"</span><span class="how"><u>as a reply</u></span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>fold this into the third</span><span class="on-what">on "Fourth, a review in the spring"</span><span class="how"><u>in the text</u></span></div>
+          <div class="it"><span class="box on"></span><span class="el">edit <s>three</s> <ins>four</ins></span></div>
+          <div class="it later"><span class="box"></span><span class="cl"><svg><use href="#bubble"/></svg>Anna wanted five, ask her</span><span class="on-what">stays with you; tick to send it once, as context</span><span class="tag">later</span></div>
+        </div>
+
+        <div class="br">
+          <div class="br-row"><span class="box on"></span><span class="addr">201b</span><span class="what">your words and a prompt</span><span class="marg">1 held back</span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>shorter, for the minutes</span><span class="on-what">on "The budget comes first because"</span><span class="how"><u>in the text</u></span></div>
+          <div class="it held"><span class="box"></span><span class="pl"><b>p&gt;</b>add last year's figures</span><span class="on-what">on "spending rose again"</span><span class="how">waits</span></div>
+        </div>
+
+        <div class="br none">
+          <div class="br-row"><span class="box"></span><span class="addr">201c</span><span class="what">nothing waits</span><span class="marg">tick to send your words here too</span></div>
+        </div>
+
+        <div class="list-foot marg"><span>answers:</span><span class="on">in the text</span><span>·</span><span>as a reply</span><span>· each prompt can differ, on its row</span></div>
+      </div>
+      <div class="field">
+        <svg class="mosaic" width="100%" height="100%" aria-hidden="true"><rect width="100%" height="100%" fill="url(#mosaic)"/></svg>
+        <svg class="mark" aria-hidden="true"><use href="#pot"/></svg>
+        <span class="v">tighten the whole thing, keep it under a page<span class="caret"></span></span>
+      </div>
+    </div>
+    <div class="enter marg"><b>Enter sends your words, 3 prompts and an edit in 201a, and a prompt in 201b, to Sonnet 5.5, about 3¢</b> · <a>fold the list</a></div>
+    <ul class="notes">
+      <li>Your typed words go to each ticked branch, with that branch's own prompts. Untick 201b and they go to 201a alone.</li>
+      <li>It covers the room the bar is addressing. Prompts waiting in another room go when that room is addressed.</li>
+      <li>With several answerers ticked, each branch's request goes to each of them and every answer is a new branch, as now. The head then counts those requests and their cost.</li>
+      <li>The dashed row is for later: comments stay unsent in the first build, and the row comes only if testing shows they are missed.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · Writing a prompt or a comment in the text</h2>
+    <p class="lede">Select words, then Ctrl+Alt+P for a prompt or Ctrl+Alt+M for a comment. A box opens at the passage, as the ask box does now. Enter keeps it; Escape lets it go.</p>
+    <div class="two">
+      <div class="at-card">
+        <span>with </span><span class="sel">a freeze until March</span><span>. Third, the move</span>
+        <div class="wbox"><span class="lab">PROMPT</span><span class="v">is this too strict? say why<span class="caret" style="display:inline-block;width:1px;height:15px;background:var(--ink);vertical-align:-3px"></span></span><span class="keys">Ctrl+Alt+P</span></div>
+        <div class="said">It waits in 201a, and goes with your next Enter.</div>
+      </div>
+      <div class="at-card">
+        <span>Second, </span><span class="sel">the hiring plan</span><span>, with a freeze</span>
+        <div class="wbox cmt"><span class="lab">COMMENT</span><span class="v">Anna wanted five, ask her<span class="caret" style="display:inline-block;width:1px;height:15px;background:var(--ink);vertical-align:-3px"></span></span><span class="keys">Ctrl+Alt+M</span></div>
+        <div class="said">For you and anyone you share it with. Never sent to a model.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · The colours, as each kind of colour blindness sees them</h2>
+    <p class="lede">Simulated at full strength. About one man in twelve has some red and green colour blindness; blue and yellow blindness is rare. No colour is safe alone, so every mark also has its own shape: underlined, dotted, dashed, bracketed with p&gt;, a tint with a bubble.</p>
+    <table class="cvd">
+      <thead><tr><th>Mark</th><th>Ordinary sight</th><th>Protanopia</th><th>Deuteranopia</th><th>Tritanopia</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Your edit</td>
+          <td><span class="sample u" style="color:#2B5CB8">four</span><span class="hex">#2B5CB8</span></td>
+          <td><span class="sample u" style="color:#2567BB">four</span><span class="hex">#2567BB</span></td>
+          <td><span class="sample u" style="color:#005AB6">four</span><span class="hex">#005AB6</span></td>
+          <td><span class="sample u" style="color:#007281">four</span><span class="hex">#007281</span></td></tr>
+        <tr><td class="k">A suggested answer</td>
+          <td><span class="sample dot" style="color:#2E7458">should take</span><span class="hex">#2E7458</span></td>
+          <td><span class="sample dot" style="color:#726C56">should take</span><span class="hex">#726C56</span></td>
+          <td><span class="sample dot" style="color:#68655A">should take</span><span class="hex">#68655A</span></td>
+          <td><span class="sample dot" style="color:#0B746C">should take</span><span class="hex">#0B746C</span></td></tr>
+        <tr><td class="k">Ripple</td>
+          <td><span class="sample dash" style="color:#94491F">nineteen</span><span class="hex">#94491F</span></td>
+          <td><span class="sample dash" style="color:#5E541A">nineteen</span><span class="hex">#5E541A</span></td>
+          <td><span class="sample dash" style="color:#70641E">nineteen</span><span class="hex">#70641E</span></td>
+          <td><span class="sample dash" style="color:#A33940">nineteen</span><span class="hex">#A33940</span></td></tr>
+        <tr class="chosen"><td class="k"><b>A prompt, vermillion</b><span class="hex">proposed</span></td>
+          <td><span class="sample" style="color:#C2410C"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#C2410C · 5.0 on the paper</span></td>
+          <td><span class="sample" style="color:#685B00"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#685B00</span></td>
+          <td><span class="sample" style="color:#877800"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#877800</span></td>
+          <td><span class="sample" style="color:#D61538"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#D61538</span></td></tr>
+        <tr><td class="k">A comment</td>
+          <td><span class="sample tint" style="background:rgba(90,74,176,.16)">the hiring plan</span><span class="hex">#5A4AB0</span></td>
+          <td><span class="sample tint" style="background:rgba(0,93,179,.16)">the hiring plan</span><span class="hex">#005DB3</span></td>
+          <td><span class="sample tint" style="background:rgba(0,87,174,.16)">the hiring plan</span><span class="hex">#0057AE</span></td>
+          <td><span class="sample tint" style="background:rgba(60,97,118,.16)">the hiring plan</span><span class="hex">#3C6176</span></td></tr>
+        <tr><td class="k">A highlight</td>
+          <td><span class="sample tint" style="background:rgba(182,54,116,.16)">nineteen members</span><span class="hex">#B63674</span></td>
+          <td><span class="sample tint" style="background:rgba(77,89,118,.16)">nineteen members</span><span class="hex">#4D5976</span></td>
+          <td><span class="sample tint" style="background:rgba(113,113,113,.16)">nineteen members</span><span class="hex">#717171</span></td>
+          <td><span class="sample tint" style="background:rgba(196,42,80,.16)">nineteen members</span><span class="hex">#C42A50</span></td></tr>
+        <tr class="not"><td class="k">A prompt, violet<span class="hex">not chosen</span></td>
+          <td><span class="sample" style="color:#7E3FB0"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#7E3FB0</span></td>
+          <td><span class="sample" style="color:#005CB3"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#005CB3, the comment's colour</span></td>
+          <td><span class="sample" style="color:#275EAD"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#275EAD, near your edit's</span></td>
+          <td><span class="sample" style="color:#765672"><b style="font:600 10.5px var(--mono)">p&gt;</b> say it plainer</span><span class="hex">#765672</span></td></tr>
+      </tbody>
+    </table>
+    <ul class="notes">
+      <li>Vermillion's nearest mark, measured by CIEDE2000: Ripple's rust, 9.7 apart in ordinary sight, 4.9 with protanopia, 9.0 with deuteranopia; the highlights' pink at 7.5 with tritanopia. Under about 5, two colours start to be mistaken, so with protanopia the brackets and p&gt; tell a prompt from Ripple's dashes.</li>
+      <li>Violet fails: with protanopia it is the comments' purple (0.4 apart), and with deuteranopia it is near your edits' blue (2.0).</li>
+      <li>Gold stays the api: ignition's alone, and as text it is too faint (2.2 on the paper; small text needs 4.5).</li>
+      <li>Already so: your edits' blue and the comments' purple are 1.3 apart with deuteranopia. They differ by shape, underlined words against a tint, and comments in the text keep that.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>Vermillion for prompts,</b> with the brackets and p&gt; as its shape.</li>
+        <li><b>The list:</b> it opens by itself when what waits spans more than one branch, and otherwise on a click on the line.</li>
+        <li><b>Answers in the text</b> unless a prompt's row says "as a reply".</li>
+        <li><b>Comments not sent</b> in the first build; the dashed row only if they are missed.</li>
+        <li><b>Mode and Show apart,</b> in the one menu, Editing first.</li>
+        <li><b>The order:</b> this menu and the modes, then comments, then prompts in the text with the list, then the room to write in, then tasks.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
