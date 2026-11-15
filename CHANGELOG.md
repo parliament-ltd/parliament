@@ -3,6 +3,16 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.17.0, 15 November 2026
+
+- markup ▾ at the end of the strip, where calm was, opens one menu for what shows in the text: edits, highlights and prompts, each shown or hidden. With edits hidden, a reply reads as it stands and you can still type in it.
+- In the same menu, Suggesting keeps what you type held back, drawn dashed, until you accept it, and Editing makes it the text. Accept all and Reject all settle what waits in the room, your held edits included.
+- calm: and the markup switches on rooms and the Collection are folded into the menu. The Collection always shows its marks.
+- The bar stays where it is when the welcome page closes or focus turns on or off. Only bar: moves it.
+- Turning focus off keeps the boards you opened while focused, and a room alone on the screen is as wide as in focus.
+- Your first edit or ask starts a collection, as a first highlight does, and the Collection no longer counts its cards.
+- Parliament's own building blocks are taken only once they are a week old, and none of them runs scripts as it installs.
+
 ## 0.16.0, 6 November 2026
 
 - Tick an edit, an ask or a suggestion in the Collection, and what can be done to it (hold back, undo, accept, reject) appears at the foot of the board.
