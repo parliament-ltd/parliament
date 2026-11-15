@@ -392,6 +392,10 @@ export default function MessagesRender() {
   // C216): which were told and are closed, which wait, and who was told.
   const chatEdits = useChatEdits([activeConversationId, ...memberIds])
   const closedEdits = useMemo(() => new Set([...chatEdits.values()].flat().filter((r) => r.sent).map((r) => r.edit)), [chatEdits])
+  // Held back and not sent: drawn dashed, as Suggesting keeps them (C301 (b)).
+  const heldEdits = useMemo(() => new Set([...chatEdits.values()].flat().filter((r) => r.held && !r.sent).map((r) => r.edit)), [chatEdits])
+  // In Suggesting, what you type is kept held back until accepted (C301 (b)).
+  const suggesting = settings.markupMode === 'suggesting'
   const toldToOf = useCallback((msg) => {
     if (msg.role !== 'user' || !msg.told) return null
     const r = [...chatEdits.values()].flat().find((e) => e.sent?.prompt === msg.id)
@@ -525,9 +529,11 @@ export default function MessagesRender() {
       onQuote: (text) => handleQuote(msg, text),
       editable,
       blocks: msg.blocks ?? null,
-      onSaveEdits: editable ? (saved) => saveEditedReply(activeConversationId, msg.id, saved) : undefined,
-      clean: settings.markup === 'off' && !(settings.calm === true && settings.calmMarkup === 'on'),
+      onSaveEdits: editable ? (saved) => saveEditedReply(activeConversationId, msg.id, { ...saved, held: suggesting }) : undefined,
+      // Never read-only now: the markup menu hides edits and the reply stays editable (C301 (b)).
+      clean: false,
       closedEdits,
+      heldEdits,
       toldTo: toldToOf(msg),
       askInfo: askInfoOf(msg.id),
       onSettleAsk: (askId, how) => settleAskOf(msg.id, askId, how),
@@ -537,7 +543,7 @@ export default function MessagesRender() {
       sugWords,
     }
   }, [
-    saveEditedReply, settings.markup, settings.calm, settings.calmMarkup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
+    saveEditedReply, suggesting, closedEdits, heldEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     notes, highlights, showNotes,
@@ -610,10 +616,11 @@ export default function MessagesRender() {
         sections={sections}
         terms={NO_QUOTES}
         quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
-        clean={settings.markup === 'off' && !(settings.calm === true && settings.calmMarkup === 'on')}
-        onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, saved)}
+        clean={false}
+        onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, { ...saved, held: suggesting })}
         words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.pairLabel) }}
         closedEdits={closedEdits}
+        heldEdits={heldEdits}
         askInfo={pairAsks(sections)}
         onSettleAsk={settleAskOf}
         askWords={askWords}
@@ -623,7 +630,7 @@ export default function MessagesRender() {
         titleWords={titleWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, settings.markup, settings.calm, settings.calmMarkup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

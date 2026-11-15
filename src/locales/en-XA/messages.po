@@ -1389,10 +1389,6 @@ msgid "collection.chats"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "collection.cleanWord"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "collection.count"
 msgstr ""
 
@@ -1512,10 +1508,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.line"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "collection.markupWord"
 msgstr ""
 
 #. new:collection stays English
@@ -2342,24 +2334,6 @@ msgstr ""
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "enter.calmOff"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "enter.calmOn"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOff"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOn"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3717,40 +3691,55 @@ msgstr ""
 msgid "enter.manyWhen"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOff"
+msgid "enter.markupColGone"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOn"
+msgid "enter.markupCommentsLater"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmSame"
+msgid "enter.markupEditing"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOff"
+msgid "enter.markupHiddenAlready"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOn"
+msgid "enter.markupHideAll"
+msgstr ""
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupHideKind"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupColSame"
+msgid "enter.markupMenu"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupOff"
+msgid "enter.markupModeSame"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupOn"
+msgid "enter.markupShowAll"
+msgstr ""
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupShowKind"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.markupSame"
+msgid "enter.markupShownAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupSuggesting"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5562,6 +5551,14 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsLetGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsTakeBack"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7784,6 +7781,78 @@ msgstr ""
 msgid "lock.wrong"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "markupMenu.acceptAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.allAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editingAbout"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.foot"
+msgstr ""
+
+#. A row of the menu: edits, highlights, prompts or comments
+#. js-lingui-explicit-id
+msgid "markupMenu.kind"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.kindAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.mode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.noRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.rejectAll"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.runs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.show"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggesting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggestingAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "markupMenu.waiting"
+msgstr ""
+
+#. {where} is a chat number, as 214
+#. js-lingui-explicit-id
+msgid "markupMenu.waitingCount"
+msgstr ""
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -8446,11 +8515,6 @@ msgstr ""
 msgid "room.chatSheet"
 msgstr ""
 
-#. Show replies as they read now, without marks
-#. js-lingui-explicit-id
-msgid "room.cleanWord"
-msgstr ""
-
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -8492,16 +8556,6 @@ msgstr ""
 #. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
 #. js-lingui-explicit-id
 msgid "room.home"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "room.markupRuns"
-msgstr ""
-
-#. Show replies with their edits marked up
-#. js-lingui-explicit-id
-msgid "room.markupWord"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9346,21 +9400,6 @@ msgstr ""
 msgid "shell.boardLater"
 msgstr ""
 
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOff"
-msgstr ""
-
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOn"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "shell.calmTitle"
-msgstr ""
-
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9411,6 +9450,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
+msgstr ""
+
+#. markup is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.markupMenu"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.markupTitle"
 msgstr ""
 
 #. Beside the heading of the ? reference
@@ -9681,6 +9730,7 @@ msgstr ""
 msgid "verb.by"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.calm"
 msgstr ""
@@ -9829,6 +9879,7 @@ msgstr ""
 msgid "verb.local"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.markup"
 msgstr ""

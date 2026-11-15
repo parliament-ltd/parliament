@@ -127,6 +127,8 @@ function knownChanges(screens) {
 //                      a sweep's becomes the reply's words
 //   reject:244         the suggestion goes, the reply stays
 //   accept:all         also every suggestion waiting in the room's chat and its plan's branches
+//   accept:all         and your edits held back there, as Suggesting keeps them: they go
+//                      with your next prompt (C301 (b)); reject:all takes them back
 //
 // Each is a change to a message's stored form and its records, which undo:
 // takes back. Rows come from Records (screens.records.rows), where edits and
@@ -168,19 +170,31 @@ export function planUndoChange(step, screens = {}) {
   return { says: { message: 'undoEditOne', values: { num: row.num } }, act: { kind: 'storedChange', changes: [changeOf(row, 'undoEdit')] } }
 }
 
+/**
+ * What accept:all and reject:all settle in the room's chat: answers in place
+ * (reject:all also those kept on their cards), suggestions there and in its
+ * plan's other branches, and your edits held back there (C301 (b)). The
+ * markup menu counts them.
+ */
+export function settleable(rows = [], room = null, how = 'accept') {
+  if (!room) return []
+  // An answer kept on its card only can be let go, never accepted.
+  const asks = rows.filter((r) => r.kind === 'ask' && r.chatId && r.chatId === room && r.change?.state === 'answered' && (how !== 'accept' || r.change.answer?.inPlace))
+  // Suggestions in the room's chat and its plan's other branches, where Ripple puts them.
+  const plan = rows.find((r) => r.kind === 'chat' && r.chatId === room)?.docketNum ?? null
+  const sugs = rows.filter((r) => r.kind === 'suggestion' && r.chatId && r.change?.state === 'open' && (r.chatId === room || (plan != null && r.docketNum === plan)))
+  // Your edits held back, not yet sent: what Suggesting keeps (C301 (b)).
+  const held = rows.filter((r) => r.kind === 'edit' && r.chatId === room && r.change?.held && !r.change.sent && r.messageId)
+  return [...asks, ...sugs, ...held]
+}
+
 /** accept: and reject: on asks answered (the marker's accept and undo), and on suggestions waiting (C229 (e)). */
 export function planSettle(step, screens = {}, how = 'accept') {
   const vals = step.match?.values ?? []
   const rows = screens.records?.rows ?? []
   let picked
   if (vals[0]?.kind === 'word' && vals[0].value === 'all') {
-    const room = screens.roomChat ?? null
-    // An answer kept on its card only can be let go, never accepted.
-    const asks = rows.filter((r) => r.kind === 'ask' && r.chatId && r.chatId === room && r.change?.state === 'answered' && (how !== 'accept' || r.change.answer?.inPlace))
-    // Suggestions in the room's chat and its plan's other branches, where Ripple puts them.
-    const plan = rows.find((r) => r.kind === 'chat' && r.chatId === room)?.docketNum ?? null
-    const sugs = rows.filter((r) => r.kind === 'suggestion' && r.chatId && r.change?.state === 'open' && (r.chatId === room || (plan != null && r.docketNum === plan)))
-    picked = [...asks, ...sugs]
+    picked = settleable(rows, screens.roomChat ?? null, how)
     if (!picked.length) return { says: { message: 'settleNoneHere' }, act: null }
   } else {
     const t = changeRows(vals, rows)
@@ -197,6 +211,7 @@ export function planSettle(step, screens = {}, how = 'accept') {
     if (here) return { says: { message: 'settleCardOnly', values: { num: here.num } }, act: null }
   }
   const asks = picked.filter((r) => r.kind === 'ask').map((r) => r.num)
+  const edits = picked.filter((r) => r.kind === 'edit').map((r) => r.num)
   const sugs = picked.filter((r) => r.kind === 'suggestion')
   const ripple = sugs.filter((r) => r.change.made !== 'sweep').map((r) => r.num)
   const sweep = sugs.filter((r) => r.change.made === 'sweep').map((r) => r.num)
@@ -205,7 +220,9 @@ export function planSettle(step, screens = {}, how = 'accept') {
   if (how === 'accept' && ripple.length) says.push({ message: 'settleSugRipple', values: { nums: ripple, count: ripple.length } })
   if (how === 'accept' && sweep.length) says.push({ message: 'settleSugSweep', values: { nums: sweep, count: sweep.length } })
   if (how !== 'accept' && sugs.length) says.push({ message: 'settleSugReject', values: { nums: sugs.map((r) => r.num), count: sugs.length } })
-  const howOf = (r) => (r.kind === 'suggestion' ? (how === 'accept' ? 'acceptSuggestion' : 'rejectSuggestion')
+  if (edits.length) says.push({ message: how === 'accept' ? 'settleEditsLetGo' : 'settleEditsTakeBack', values: { nums: edits, count: edits.length } })
+  const howOf = (r) => (r.kind === 'edit' ? (how === 'accept' ? 'letGo' : 'undoEdit')
+    : r.kind === 'suggestion' ? (how === 'accept' ? 'acceptSuggestion' : 'rejectSuggestion')
     : how === 'accept' ? 'accept' : (r.change.answer?.inPlace ? 'undo' : 'undoHere'))
   return {
     says: { ...says[0], ...(says.length > 1 ? { also: says.slice(1) } : {}) },

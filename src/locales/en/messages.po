@@ -1389,10 +1389,6 @@ msgid "collection.chats"
 msgstr "Chats"
 
 #. js-lingui-explicit-id
-msgid "collection.cleanWord"
-msgstr "clean"
-
-#. js-lingui-explicit-id
 msgid "collection.count"
 msgstr "{count, plural, =0 {nothing} one {# card} other {# cards}}"
 
@@ -1513,10 +1509,6 @@ msgstr "let it go"
 #. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "Collections"
-
-#. js-lingui-explicit-id
-msgid "collection.markupWord"
-msgstr "markup"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -2343,24 +2335,6 @@ msgstr "Put then between each of them, as by:wikipedia then sonnet"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} could be {names}. Say which, like {example}"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOff"
-msgstr "Enter shows markup and every detail again"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOn"
-msgstr "Enter reads replies as they stand until markup:on, and hides the details on boards until you come near them"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOff"
-msgstr "Markup and details show already. calm: reads replies as they stand and hides details until you come near"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOn"
-msgstr "Markup and details are hidden already. calm:off shows them"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3717,41 +3691,56 @@ msgstr "{count, plural, one {{nums} did not run: its condition was not met} othe
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}"
 
+#. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOff"
-msgstr "Enter reads replies as they stand again, as calm does. markup:on shows the edits"
+msgid "enter.markupColGone"
+msgstr "Marks always show on the collection board now. markup:off hides them in the text"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOn"
-msgstr "Enter shows the edits in replies. Calm stays on for everything else"
+msgid "enter.markupCommentsLater"
+msgstr "Comments come into the text next. Until then, notes are kept on the collection board"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmSame"
-msgstr "{on, select, on {The edits in replies show already} other {Replies read as they stand already}}"
+msgid "enter.markupEditing"
+msgstr "Enter switches to editing: what you type is the text, and goes with your next prompt"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOff"
-msgstr "Enter shows the cards clean: each edit as it reads now, each answer alone"
+msgid "enter.markupHiddenAlready"
+msgstr "{kind, select, edits {Edits are hidden already} highlights {Highlights are hidden already} prompts {Prompts are hidden already} other {Every mark is hidden already}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOn"
-msgstr "Enter shows the cards marked up: struck words, yours in blue, answers in green"
+msgid "enter.markupHideAll"
+msgstr "Enter hides every mark in the text. Replies read as they stand, and stay editable"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupHideKind"
+msgstr "{kind, select, edits {Enter hides edits in the text: replies read as they stand, and stay editable} highlights {Enter hides highlights in the text. They are still kept} other {Enter hides prompts in the text. They are still kept}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColSame"
-msgstr "{on, select, on {The cards are marked up already} other {The cards are clean already}}"
+msgid "enter.markupMenu"
+msgstr "Enter opens the markup menu: what shows in the text, and how your typing is kept"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOff"
-msgstr "Enter shows replies clean: the result only, read-only until markup:on"
+msgid "enter.markupModeSame"
+msgstr "{mode, select, suggesting {Suggesting already: what you type waits until you accept it} other {Editing already: what you type is the text}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOn"
-msgstr "Enter shows replies marked up: struck words and yours in blue, editable"
+msgid "enter.markupShowAll"
+msgstr "Enter shows every mark in the text: edits, highlights and prompts"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupShowKind"
+msgstr "{kind, select, edits {Enter shows edits in the text} highlights {Enter shows highlights in the text} other {Enter shows prompts in the text}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupSame"
-msgstr "{on, select, on {Replies are marked up already} other {Replies are clean already}}"
+msgid "enter.markupShownAlready"
+msgstr "{kind, select, edits {Edits show already} highlights {Highlights show already} prompts {Prompts show already} other {Every mark shows already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupSuggesting"
+msgstr "Enter switches to suggesting: what you type is held back, marked, until you accept it"
 
 #. js-lingui-explicit-id
 msgid "enter.messageFailed"
@@ -5565,8 +5554,16 @@ msgid "enter.settleCardOnly"
 msgstr "The passage of ask {num} changed after it was asked, so its answer is on its card only. reject:{num} lets it go"
 
 #. js-lingui-explicit-id
+msgid "enter.settleEditsLetGo"
+msgstr "Enter lets your held {count, plural, one {edit} other {edits}} {nums} go: {count, plural, one {it goes} other {they go}} with your next prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsTakeBack"
+msgstr "Enter takes back your held {count, plural, one {edit} other {edits}} {nums}: the struck words stand again"
+
+#. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr "No answers or suggestions wait in the chat here"
+msgstr "No answers, suggestions or held edits wait in the chat here"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
@@ -7784,6 +7781,78 @@ msgstr "Use the passphrase instead"
 msgid "lock.wrong"
 msgstr "That does not open it."
 
+#. js-lingui-explicit-id
+msgid "markupMenu.acceptAll"
+msgstr "Accept all"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.allAbout"
+msgstr "Answers, suggestions and your held edits, in the room here"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editing"
+msgstr "Editing"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editingAbout"
+msgstr "What you type is the text, and goes with your next prompt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.foot"
+msgstr "Each click runs its command, as markup:off highlights or accept:all, and undo: takes it back. Escape or a click outside closes it."
+
+#. A row of the menu: edits, highlights, prompts or comments
+#. js-lingui-explicit-id
+msgid "markupMenu.kind"
+msgstr "{kind, select, edits {Edits} highlights {Highlights} prompts {Prompts} other {Comments}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.kindAbout"
+msgstr "{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Next: comments written in the text}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.mode"
+msgstr "Mode"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.noRoom"
+msgstr "Open a room to accept or reject what waits in it"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.rejectAll"
+msgstr "Reject all"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.runs"
+msgstr "Runs {command}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.show"
+msgstr "Show"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggesting"
+msgstr "Suggesting"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggestingAbout"
+msgstr "What you type is marked, and waits until you accept it"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.title"
+msgstr "Markup"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.waiting"
+msgstr "Waiting"
+
+#. {where} is a chat number, as 214
+#. js-lingui-explicit-id
+msgid "markupMenu.waitingCount"
+msgstr "{count, plural, =0 {nothing waits in {where}} one {# waits in {where}} other {# wait in {where}}}"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -8446,11 +8515,6 @@ msgstr "The reply you are viewing. Your prompt follows it as you move between th
 msgid "room.chatSheet"
 msgstr "Chat"
 
-#. Show replies as they read now, without marks
-#. js-lingui-explicit-id
-msgid "room.cleanWord"
-msgstr "clean"
-
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -8493,16 +8557,6 @@ msgstr "Hide the margin"
 #. js-lingui-explicit-id
 msgid "room.home"
 msgstr "Go to Parliament's start"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "room.markupRuns"
-msgstr "Runs {command}"
-
-#. Show replies with their edits marked up
-#. js-lingui-explicit-id
-msgid "room.markupWord"
-msgstr "markup"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -9346,21 +9400,6 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "This board is drawn in a later stage."
 
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOff"
-msgstr "calm: off"
-
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOn"
-msgstr "calm: on"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "shell.calmTitle"
-msgstr "Replies read as they stand until markup:on, and the details on boards wait until you come near them. Runs {command}"
-
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9412,6 +9451,16 @@ msgstr "full screen"
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
 msgstr "leave full screen"
+
+#. markup is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.markupMenu"
+msgstr "markup"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.markupTitle"
+msgstr "What shows in the text, and how your typing is kept. Runs {command}"
 
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
@@ -9681,9 +9730,10 @@ msgstr "Move the bar on the page"
 msgid "verb.by"
 msgstr "Choose who answers in this chat: a model, or a source with no tokens"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Read replies as they stand until markup:on, and hide the details on boards until you come near them. calm:off shows them all"
+msgstr "An older name: calm: hides every mark in the text, as markup:off does, and calm:off shows them"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9829,9 +9879,10 @@ msgstr "Bring the Library beside what is on screen"
 msgid "verb.local"
 msgstr "Say whether a room sends only to models on this computer"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Markup: show your edits in replies, or show replies clean"
+msgstr "Markup: markup: opens the menu. markup:on and markup:off show or hide every mark in the text, or one kind, as markup:off highlights. markup:suggesting keeps what you type held back until you accept it, and markup:editing makes it the text"
 
 #. js-lingui-explicit-id
 msgid "verb.model"

@@ -77,6 +77,8 @@ import { aboutText, WORDED, replySide, COMPARE_READS } from '../lib/cardActs'
 import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCards'
 import CollectionBoard from './CollectionBoard'
+import { showOf, modeOf, hiddenClasses } from '../lib/markupShow'
+import { settleable } from '../lib/editVerbs'
 import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
@@ -1135,6 +1137,10 @@ export default function Shell() {
   useEffect(() => { pendingFwNow.current = pendingFrameworks }, [pendingFrameworks])
   const [fwPicking, setFwPicking] = useState(false)
   const [langPicking, setLangPicking] = useState(false) // language:'s picker (C184)
+  // The markup menu (C301 (b)): open or not, and where, when opened from the strip.
+  const [markupPicking, setMarkupPicking] = useState(false)
+  const [markupAt, setMarkupAt] = useState(null)
+  const markupAsked = useRef(null)
   // Where the globe that opened it stands, so the menu opens under it (30 October).
   const [langAt, setLangAt] = useState(null)
   const globeAsked = useRef(null)
@@ -1682,6 +1688,13 @@ export default function Shell() {
       // made by the editor's own rules, and kept for undo:.
       const done = []
       for (const c of what.changes) {
+        // An edit held back, accepted by accept:all (C301 (b)): it goes with
+        // the next prompt, as Let it go does. Its record changes, not the text.
+        if (c.how === 'letGo') {
+          const went = await changeRecords(db.current, [{ store: 'edits', id: `${c.messageId}:${c.mark}`, num: c.num, set: { held: false }, expect: { held: true } }])
+          if (touched.current) touched.current.records.push(...went)
+          continue
+        }
         const snap = await messageSnapshot(db.current, c.messageId).catch(() => null)
         if (!snap) return { message: 'changeGone', values: { num: c.num } }
         // A suggestion (stage 12, piece 1; C229 (e)): accepted or rejected
@@ -1904,12 +1917,15 @@ export default function Shell() {
       remember(body)
       return null
     }
-    if (what.kind === 'markup') {
-      // markup:on / markup:off (stage 11, piece 1): replies marked up, or
-      // clean; with col, or on the Collection, its cards (piece 5; C220 (g)).
-      const key = what.col ? 'collectionMarkup' : 'markup'
-      await updateSettingNow.current(key, what.on ? 'on' : 'off')
-      if (touched.current) touched.current.setting = { key, before: what.before ? 'on' : 'off' }
+    if (what.kind === 'markupMenu') {
+      // A bare markup:, or "markup ▾" in the strip (C301 (b)): the menu under
+      // the field, or right under the word, as the globe's languages are.
+      setMarkupAt(markupAsked.current)
+      markupAsked.current = null
+      setPicking(false)
+      setFwPicking(false)
+      setLangPicking(false)
+      setMarkupPicking(true)
       remember(body)
       return null
     }
@@ -2567,45 +2583,16 @@ export default function Shell() {
     for (const id of stepsKept({ collections, arrangements: savedLayouts })) updateWelcome((w) => tick(w, id))
   }, [started, collections, savedLayouts, updateWelcome])
 
-  // ── Calm (stage 14, piece 2; C255) ──
-  // A setting of this device (C253 (d)), off for someone new (C253 (c)).
-  const calm = settings.calm === true
-  // In calm, a reply reads as it stands until the markup switch shows its edits (C296).
-  const calmMarkup = calm && settings.calmMarkup === 'on'
-  const calmScreen = useMemo(() => ({ on: calm, markup: calmMarkup }), [calm, calmMarkup])
-  // Calm once you know it (C291 (g)): when the welcome page's steps are done
-  // or put away, here and now, calm turns on, unless calm was ever set on
-  // this device: someone who turned it off stays off. Steps done before this
-  // page opened change nothing, so no one's screen changes on an upgrade.
-  // The strip then says "calm: on", and a click turns it off.
-  const stepsSettled = Boolean(welcome.finished || welcome.off)
-  const settledAt = useRef(null)
-  useEffect(() => {
-    if (!started) return
-    if (settledAt.current === null || settledAt.current === stepsSettled) { settledAt.current = stepsSettled; return }
-    settledAt.current = stepsSettled
-    if (!stepsSettled) return
-    getSetting('calm').then((kept) => { if (kept === undefined || kept === null) updateSetting('calm', true) }).catch(() => {})
-  }, [started, stepsSettled, updateSetting])
-  // On a touch screen, "near" is the one last tapped (C253 (e)).
-  useEffect(() => {
-    if (!calm) return undefined
-    const NEAR = '.ch-card, .p-pair-host, .p-edit, .ch-mk, .ch-col-legend, .ch-branches'
-    const onDown = (e) => {
-      if (e.pointerType === 'mouse') return
-      document.querySelectorAll('.near').forEach((el) => el.classList.remove('near'))
-      let el = e.target instanceof Element ? e.target.closest(NEAR) : null
-      while (el) {
-        el.classList.add('near')
-        el = el.parentElement?.closest(NEAR) ?? null
-      }
-    }
-    document.addEventListener('pointerdown', onDown, true)
-    return () => {
-      document.removeEventListener('pointerdown', onDown, true)
-      document.querySelectorAll('.near').forEach((el) => el.classList.remove('near'))
-    }
-  }, [calm])
+  // ── The markup menu (C301 (b); Stefan, 15 November) ──
+  // Calm (stage 14, piece 2; C255) retired into it: what shows in the text,
+  // each kind ticked or not, and how your typing is kept. Settings of this
+  // device, as calm was (C253 (d)). Nothing waits for the pointer to come
+  // near any more: what calm hid on boards shows always.
+  const markupShow = useMemo(() => showOf(settings.markupShow), [settings.markupShow])
+  const markupMode = modeOf(settings.markupMode)
+  const markupScreen = useMemo(() => ({ show: markupShow, mode: markupMode }), [markupShow, markupMode])
+  // Another menu opening closes this one: one menu at a time (29 October).
+  useEffect(() => { if (picking || fwPicking || langPicking) setMarkupPicking(false) }, [picking, fwPicking, langPicking])
 
   // ── "Extra screen detected" (stage 14, piece 4; C259 (g)) ──
   // Once, when a second screen is attached; remembered on this device until
@@ -3400,15 +3387,13 @@ export default function Shell() {
   const roomAsks = useChatEdits(roomId ? [roomId] : [], 'asks')
   // Suggestions in the room's chat: its accepted sweeps go with the next prompt (C233 (a)).
   const roomSweeps = useChatEdits(roomId ? [roomId] : [], 'suggestions')
-  // The chats of every room on screen or in a window, and which hold markup
-  // (edits, asks or suggestions): a room shows markup · clean once it does
-  // (30 October).
-  const roomChats = useMemo(() => [...arrangement.columns.flat(), ...(arrangement.popped ?? []).map((p) => p.board)]
-    .filter(isRoom).map((b) => chatIn(arrangement, b)).filter(Boolean), [arrangement])
-  const roomsEdits = useChatEdits(roomChats)
-  const roomsAsks = useChatEdits(roomChats, 'asks')
-  const roomsSweeps = useChatEdits(roomChats, 'suggestions')
-  const holdsMarkup = useCallback((chat) => Boolean(chat) && [roomsEdits, roomsAsks, roomsSweeps].some((m) => (m.get(chat) ?? []).length > 0), [roomsEdits, roomsAsks, roomsSweeps])
+  // What accept:all and reject:all would settle in the room here, for the markup menu (C301 (b)).
+  const markupWaiting = useMemo(() => {
+    if (!roomId) return { where: null, accept: 0, reject: 0 }
+    const rows = records.rows ?? []
+    const where = rows.find((r) => r.kind === 'chat' && r.chatId === roomId)?.num ?? null
+    return { where, accept: settleable(rows, roomId, 'accept').length, reject: settleable(rows, roomId, 'reject').length }
+  }, [records, roomId])
   // The room's edits by number, for hold: (C216 (f)).
   // Edits in the room's chat that wait for its next prompt, said in its head (C291 (k)).
   const editsKeptHere = useMemo(() => (roomEdits.get(roomId) ?? []).filter(editWaits).length, [roomEdits, roomId])
@@ -3416,7 +3401,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled, elsewhere: installedApp }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, installedApp, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled, elsewhere: installedApp }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: markupScreen, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, installedApp, helper, answering, frameworkScreens, settings.thinking, markupScreen, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -4303,13 +4288,26 @@ export default function Shell() {
     globeAsked.current = r ? { top: Math.round(r.bottom + 6), end: Math.round(Math.max(16, Math.min(end, width - 16 - panel))), doc } : null
     runCommand('language:')
   }
+  // "markup ▾" opens its menu right under itself, and a second click closes
+  // it (C301 (b)), as the globe does. Typed, markup: opens it under the field.
+  const openMarkupFrom = (from) => {
+    if (markupPicking) { setMarkupPicking(false); return }
+    const r = from?.getBoundingClientRect?.()
+    const doc = from?.ownerDocument ?? document
+    const width = doc.defaultView?.innerWidth ?? window.innerWidth
+    const rtl = doc.documentElement.dir === 'rtl'
+    const panel = Math.min(360, width - 32)
+    const end = rtl ? r?.left : width - (r?.right ?? 0)
+    markupAsked.current = r ? { top: Math.round(r.bottom + 6), end: Math.round(Math.max(16, Math.min(end, width - 16 - panel))), doc } : null
+    runCommand('markup:')
+  }
   // The language picker's globe, in the header, with more than one language offered.
   const globe = offeredLanguages().length > 1 ? <Globe now={i18n.locale} onOpen={openLanguagesFrom} /> : null
   const drawBoard = (board, windowed = false) => {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} markup={holdsMarkup(chat) ? { clean: calm ? !calmMarkup : settings.markup === 'off', onRun: onPlanDelete } : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} />
     }
     if (board === 'almanac') {
       return (
@@ -4391,7 +4389,7 @@ export default function Shell() {
           onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
           cards={collectionAll.cards} picked={pickedHere} onPick={onPick} onClearPicked={clearPicked}
           onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}
-          clean={settings.collectionMarkup === 'off'} onRun={onPlanDelete} onFindChange={(num) => { findPassage(num) }}
+          clean={false} onRun={onPlanDelete} onFindChange={(num) => { findPassage(num) }}
           nameOf={planModelName} notHeld={roomNotHeld}
         />
       )
@@ -4426,10 +4424,10 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}${calmMarkup ? ' calm-markup' : ''}`}>
+    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${hiddenClasses(markupShow)}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
       {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
-      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}
+      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} markup={{ open: markupPicking, onOpen: openMarkupFrom }} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}
       {welcomeAlone && globe && <div className="ch-headcorner">{globe}</div>}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
@@ -4445,7 +4443,8 @@ export default function Shell() {
             : picking && stepPick ? { rows: answerRows, now: stepPick.model ? stepWho : null, picked: null, reference: referenceName, forStep: { ...stepPick, branchName: stepBranchWho?.name ?? null } }
             : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onSwitchAnswerer={switchAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
-          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`, { say: true })} onLanguagePickerClose={() => setLangPicking(false)} />,
+          languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`, { say: true })} onLanguagePickerClose={() => setLangPicking(false)}
+          markupMenu={markupPicking ? { show: markupShow, mode: markupMode, waiting: markupWaiting, at: markupAt } : null} onMarkupRun={runClicked} onMarkupMenuClose={() => setMarkupPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

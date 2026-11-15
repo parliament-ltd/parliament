@@ -1389,10 +1389,6 @@ msgid "collection.chats"
 msgstr "Chattar"
 
 #. js-lingui-explicit-id
-msgid "collection.cleanWord"
-msgstr "renskrivet"
-
-#. js-lingui-explicit-id
 msgid "collection.count"
 msgstr "{count, plural, =0 {inget} one {# kort} other {# kort}}"
 
@@ -1513,10 +1509,6 @@ msgstr "släpp den"
 #. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "Samlingar"
-
-#. js-lingui-explicit-id
-msgid "collection.markupWord"
-msgstr "ändringar"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -2343,24 +2335,6 @@ msgstr "Sätt then mellan namnen, som by:wikipedia then sonnet"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} kan vara {names}. Ange vilken, till exempel {example}"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOff"
-msgstr "Enter visar ändringarna och alla detaljer igen"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOn"
-msgstr "Enter visar svaren som de står tills markup:on, och döljer detaljerna på tavlorna tills du kommer nära dem"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOff"
-msgstr "Ändringarna och detaljerna visas redan. calm: visar svaren som de står och döljer detaljerna tills du närmar dig"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOn"
-msgstr "Ändringarna och detaljerna är redan dolda. calm:off visar dem"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3717,41 +3691,56 @@ msgstr "{count, plural, one {{nums} kördes inte: dess villkor uppfylldes inte} 
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {om inget hittas} failed {om den föregående misslyckas} always {vad den föregående än gör} other {när den föregående är klar}}"
 
+#. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOff"
-msgstr "Enter visar svaren som de står igen, som calm gör. markup:on visar ändringarna"
+msgid "enter.markupColGone"
+msgstr "Samlingen visar nu alltid allt som är markerat. markup:off döljer det i texten"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOn"
-msgstr "Enter visar ändringarna i svaren. Resten av skärmen förblir lugn"
+msgid "enter.markupCommentsLater"
+msgstr "Kommentarer kommer in i texten härnäst. Till dess sparas anteckningar i Samlingen"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmSame"
-msgstr "{on, select, on {Ändringarna i svaren visas redan} other {Svaren visas redan som de står}}"
+msgid "enter.markupEditing"
+msgstr "Enter växlar till redigering: det du skriver blir texten och följer med din nästa prompt"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOff"
-msgstr "Enter visar korten renskrivna: varje redigering som den lyder nu, varje svar för sig"
+msgid "enter.markupHiddenAlready"
+msgstr "{kind, select, edits {Redigeringarna är redan dolda} highlights {Markeringarna är redan dolda} prompts {Promptarna är redan dolda} other {Allt markerat är redan dolt}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOn"
-msgstr "Enter visar korten med ändringarna: genomstrukna ord, dina i blått, svar i grönt"
+msgid "enter.markupHideAll"
+msgstr "Enter döljer allt som är markerat i texten. Svaren visas som de står och går fortfarande att redigera"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupHideKind"
+msgstr "{kind, select, edits {Enter döljer redigeringarna i texten: svaren visas som de står och går fortfarande att redigera} highlights {Enter döljer markeringarna i texten. De finns kvar} other {Enter döljer promptarna i texten. De finns kvar}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColSame"
-msgstr "{on, select, on {Korten visar redan ändringarna} other {Korten är redan renskrivna}}"
+msgid "enter.markupMenu"
+msgstr "Enter öppnar markup-menyn: vad som visas i texten och hur det du skriver sparas"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOff"
-msgstr "Enter visar svaren renskrivna: bara resultatet, skrivskyddat tills markup:on"
+msgid "enter.markupModeSame"
+msgstr "{mode, select, suggesting {Redan förslag: det du skriver väntar tills du godtar det} other {Redan redigering: det du skriver blir texten}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOn"
-msgstr "Enter visar svaren med ändringarna: genomstrukna ord och dina i blått, går att redigera"
+msgid "enter.markupShowAll"
+msgstr "Enter visar allt som är markerat i texten: redigeringar, markeringar och promptar"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupShowKind"
+msgstr "{kind, select, edits {Enter visar redigeringarna i texten} highlights {Enter visar markeringarna i texten} other {Enter visar promptarna i texten}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupSame"
-msgstr "{on, select, on {Svaren visar redan ändringarna} other {Svaren är redan renskrivna}}"
+msgid "enter.markupShownAlready"
+msgstr "{kind, select, edits {Redigeringarna visas redan} highlights {Markeringarna visas redan} prompts {Promptarna visas redan} other {Allt markerat visas redan}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupSuggesting"
+msgstr "Enter växlar till förslag: det du skriver hålls kvar, markerat, tills du godtar det"
 
 #. js-lingui-explicit-id
 msgid "enter.messageFailed"
@@ -5565,8 +5554,16 @@ msgid "enter.settleCardOnly"
 msgstr "Textavsnittet för fråga {num} ändrades efter att frågan ställdes, så svaret finns bara på dess kort. reject:{num} släpper det"
 
 #. js-lingui-explicit-id
+msgid "enter.settleEditsLetGo"
+msgstr "Enter släpper {count, plural, one {din kvarhållna redigering} other {dina kvarhållna redigeringar}} {nums}: {count, plural, one {den följer} other {de följer}} med din nästa prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsTakeBack"
+msgstr "Enter tar tillbaka {count, plural, one {din kvarhållna redigering} other {dina kvarhållna redigeringar}} {nums}: de genomstrukna orden blir som förut"
+
+#. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr "Inga svar eller förslag väntar i chatten här"
+msgstr "Inga svar, förslag eller kvarhållna redigeringar väntar i chatten här"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
@@ -7784,6 +7781,78 @@ msgstr "Använd lösenfrasen i stället"
 msgid "lock.wrong"
 msgstr "Det öppnar inte låset."
 
+#. js-lingui-explicit-id
+msgid "markupMenu.acceptAll"
+msgstr "Godta alla"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.allAbout"
+msgstr "Svar, förslag och dina kvarhållna redigeringar, i rummet här"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editing"
+msgstr "Redigering"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editingAbout"
+msgstr "Det du skriver blir texten och följer med din nästa prompt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.foot"
+msgstr "Varje klick kör sitt kommando, som markup:off highlights eller accept:all, och undo: tar tillbaka det. Escape eller ett klick utanför stänger menyn."
+
+#. A row of the menu: edits, highlights, prompts or comments
+#. js-lingui-explicit-id
+msgid "markupMenu.kind"
+msgstr "{kind, select, edits {Redigeringar} highlights {Markeringar} prompts {Promptar} other {Kommentarer}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.kindAbout"
+msgstr "{kind, select, edits {Dina, och ändringar som föreslås dig} highlights {Orden du har markerat} prompts {Frågor i texten, väntande eller besvarade} other {Härnäst: kommentarer skrivna i texten}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.mode"
+msgstr "Läge"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.noRoom"
+msgstr "Öppna ett rum för att godta eller avvisa det som väntar där"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.rejectAll"
+msgstr "Avvisa alla"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.runs"
+msgstr "Kör {command}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.show"
+msgstr "Visa"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggesting"
+msgstr "Förslag"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggestingAbout"
+msgstr "Det du skriver markeras och väntar tills du godtar det"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.title"
+msgstr "Ändringar"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.waiting"
+msgstr "Väntar"
+
+#. {where} is a chat number, as 214
+#. js-lingui-explicit-id
+msgid "markupMenu.waitingCount"
+msgstr "{count, plural, =0 {inget väntar i {where}} one {# väntar i {where}} other {# väntar i {where}}}"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -8446,11 +8515,6 @@ msgstr "Svaret du tittar på. Din prompt följer det när du flyttar mellan dem.
 msgid "room.chatSheet"
 msgstr "Chatt"
 
-#. Show replies as they read now, without marks
-#. js-lingui-explicit-id
-msgid "room.cleanWord"
-msgstr "renskrivet"
-
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -8493,16 +8557,6 @@ msgstr "Dölj marginalen"
 #. js-lingui-explicit-id
 msgid "room.home"
 msgstr "Gå till Parliaments startsida"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "room.markupRuns"
-msgstr "Kör {command}"
-
-#. Show replies with their edits marked up
-#. js-lingui-explicit-id
-msgid "room.markupWord"
-msgstr "ändringar"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -9346,21 +9400,6 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "Den här tavlan ritas i ett senare skede."
 
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOff"
-msgstr "calm: av"
-
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOn"
-msgstr "calm: på"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "shell.calmTitle"
-msgstr "Svaren visas som de står tills markup:on, och detaljerna på tavlorna väntar tills du kommer nära dem. Kör {command}"
-
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9412,6 +9451,16 @@ msgstr "helskärm"
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
 msgstr "avsluta helskärm"
+
+#. markup is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.markupMenu"
+msgstr "markup"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.markupTitle"
+msgstr "Vad som visas i texten och hur det du skriver sparas. Kör {command}"
 
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
@@ -9681,9 +9730,10 @@ msgstr "Flytta fältet på sidan"
 msgid "verb.by"
 msgstr "Välj vem som svarar i den här chatten: en modell, eller en källa utan tokens"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Visa svaren som de står tills markup:on, och dölj detaljerna på tavlorna tills du kommer nära dem. calm:off visar allt"
+msgstr "Ett äldre namn: calm: döljer allt markerat i texten, som markup:off, och calm:off visar det"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9829,9 +9879,10 @@ msgstr "Ta fram Biblioteket bredvid det som visas"
 msgid "verb.local"
 msgstr "Ange om ett rum bara skickar till modeller på den här datorn"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Ändringar: visa dina redigeringar i svaren, eller visa svaren renskrivna"
+msgstr "Ändringar: markup: öppnar menyn. markup:on och markup:off visar eller döljer allt markerat i texten, eller ett slag, som markup:off highlights. markup:suggesting håller kvar det du skriver tills du godtar det, och markup:editing gör det till texten"
 
 #. js-lingui-explicit-id
 msgid "verb.model"

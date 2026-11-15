@@ -144,6 +144,15 @@ describe('saving an edited reply (C212)', () => {
     expect((await R.editsOfChat(db, c.id))[0].held).toBe(true)
   })
 
+  it('keeps a new edit held back in Suggesting, and leaves one kept before as it was (C301 (b))', async () => {
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), held: true, now: at() })
+    expect((await R.editsOfChat(db, c.id))[0].held).toBe(true)
+    // Changed again, in Editing: still held until it is let go.
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a long century')]]), now: at() })
+    const [edit] = await R.editsOfChat(db, c.id)
+    expect(edit).toMatchObject({ held: true, added: 'a long century' })
+  })
+
   it('counts the blocks in the chat\'s size', async () => {
     const before = (await db.get('conversations', c.id)).storageBytes
     await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map(), now: at() })

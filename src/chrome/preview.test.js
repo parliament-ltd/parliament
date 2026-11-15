@@ -1283,28 +1283,52 @@ describe('framework:, new:framework and forget: (stage 7, piece 5; C164)', () =>
   })
 })
 
-describe('markup: replies marked up, or clean (stage 11, piece 1)', () => {
-  const at = (value, screens = {}) => {
-    // It works where replies are edited: a room.
-    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens })
+describe('markup: the markup menu (C301 (b))', () => {
+  const at = (value, screens = {}, addressed = 'almanac') => {
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed }, screens })
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
   }
-  it('turns markup off and on, marked up unless turned off', () => {
-    expect(at('>markup:off')).toMatchObject({ text: 'Enter shows replies clean: the result only, read-only until markup:on', act: { kind: 'markup', on: false, before: true } })
-    expect(at('>markup:on', { markup: { on: false } }).act).toEqual({ kind: 'markup', on: true, before: false })
-    expect(at('>markup:on').text).toBe('Replies are marked up already')
-    expect(at('>markup:off', { markup: { on: false } }).text).toBe('Replies are clean already')
+  const all = { edits: true, highlights: true, prompts: true, comments: true }
+
+  it('opens the menu, from any board', () => {
+    expect(at('>markup:')).toMatchObject({ text: 'Enter opens the markup menu: what shows in the text, and how your typing is kept', act: { kind: 'markupMenu' } })
+    expect(at('>markup:', {}, 'room').act).toEqual({ kind: 'markupMenu' })
   })
 
-  it('in calm, shows the edits or reads replies as they stand, calm staying on (C296)', () => {
-    const calm = { calm: { on: true, markup: false } }
-    expect(at('>markup:on', calm)).toMatchObject({ text: 'Enter shows the edits in replies. Calm stays on for everything else', act: { kind: 'setting', key: 'calmMarkup', value: 'on', before: 'off' } })
-    expect(at('>markup:off', calm).text).toBe('Replies read as they stand already')
-    const shown = { calm: { on: true, markup: true } }
-    expect(at('>markup:off', shown)).toMatchObject({ text: 'Enter reads replies as they stand again, as calm does. markup:on shows the edits', act: { kind: 'setting', key: 'calmMarkup', value: 'off', before: 'on' } })
-    expect(at('>markup:on', shown).text).toBe('The edits in replies show already')
-    // markup:off col is the Collection's own, calm or not.
-    expect(at('>markup:off col', calm).act).toMatchObject({ kind: 'markup', col: true, on: false })
+  it('hides and shows every kind drawn in the text, one step for undo:', () => {
+    expect(at('>markup:off')).toMatchObject({ text: 'Enter hides every mark in the text. Replies read as they stand, and stay editable',
+      act: { kind: 'setting', key: 'markupShow', value: { ...all, edits: false, highlights: false, prompts: false }, before: all } })
+    const hidden = { markup: { show: { edits: false, highlights: false, prompts: false } } }
+    expect(at('>markup:on', hidden)).toMatchObject({ text: 'Enter shows every mark in the text: edits, highlights and prompts', act: { key: 'markupShow', value: all } })
+    expect(at('>markup:on').text).toBe('Every mark shows already')
+    expect(at('>markup:off', hidden).text).toBe('Every mark is hidden already')
+  })
+
+  it('hides and shows one kind, leaving the others', () => {
+    expect(at('>markup:off highlights')).toMatchObject({ text: 'Enter hides highlights in the text. They are still kept', act: { value: { ...all, highlights: false }, before: all } })
+    expect(at('>markup:off edits').text).toBe('Enter hides edits in the text: replies read as they stand, and stay editable')
+    expect(at('>markup:on prompts', { markup: { show: { prompts: false } } })).toMatchObject({ text: 'Enter shows prompts in the text', act: { value: all } })
+    expect(at('>markup:on edits').text).toBe('Edits show already')
+    expect(at('>markup:off prompts', { markup: { show: { prompts: false } } }).text).toBe('Prompts are hidden already')
+  })
+
+  it('sets the mode: editing or suggesting', () => {
+    expect(at('>markup:suggesting')).toMatchObject({ text: 'Enter switches to suggesting: what you type is held back, marked, until you accept it',
+      act: { kind: 'setting', key: 'markupMode', value: 'suggesting', before: 'editing' } })
+    expect(at('>markup:editing', { markup: { mode: 'suggesting' } }).act).toEqual({ kind: 'setting', key: 'markupMode', value: 'editing', before: 'suggesting' })
+    expect(at('>markup:editing').text).toBe('Editing already: what you type is the text')
+    expect(at('>markup:suggesting', { markup: { mode: 'suggesting' } }).text).toBe('Suggesting already: what you type waits until you accept it')
+  })
+
+  it('says the Collection always shows its marks, and that comments come next', () => {
+    expect(at('>markup:off col')).toMatchObject({ text: 'Marks always show on the collection board now. markup:off hides them in the text', act: null })
+    expect(at('>markup:off comments')).toMatchObject({ text: 'Comments come into the text next. Until then, notes are kept on the collection board', act: null })
+  })
+
+  it('reads calm: and calm:off as hiding and showing every mark', () => {
+    expect(at('>calm:').act).toMatchObject({ kind: 'setting', key: 'markupShow', value: { ...all, edits: false, highlights: false, prompts: false } })
+    expect(at('>calm:off', { markup: { show: { edits: false } } }).act).toMatchObject({ key: 'markupShow', value: all })
+    expect(at('>calm:off').text).toBe('Every mark shows already')
   })
 })
 

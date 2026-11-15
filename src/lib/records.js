@@ -686,10 +686,11 @@ export async function markEditsSent(db, ids, sent, list = 'edits') {
  * and its number is not used again.
  * @param {import('idb').IDBPDatabase} db
  * @param {string} messageId
- * @param {{ blocks: object[], edits: Map<string|number, { struck: string, added: string, places: object[] }>, part?: 'reply'|'prompt', now?: string }} saved
+ * @param {{ blocks: object[], edits: Map<string|number, { struck: string, added: string, places: object[] }>, part?: 'reply'|'prompt', held?: boolean, now?: string }} saved
+ *   held: a new edit starts held back, as in Suggesting (C301 (b)); one already kept keeps its own state
  * @returns {Promise<{ created: number, updated: number, removed: number }>}
  */
-export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', now = new Date().toISOString() }) {
+export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', held = false, now = new Date().toISOString() }) {
   if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
   return write(db, ['messages', 'conversations', 'edits', 'counters', ...(asks ? ['asks'] : []), ...(suggestions ? ['suggestions'] : [])], async (tx) => {
     const message = await tx.objectStore('messages').get(messageId)
@@ -720,7 +721,7 @@ export async function saveEditedMessage(db, messageId, { blocks, edits, asks = n
         id: `${messageId}:${edit}`, edit, num: await takeNum(tx),
         conversationId: message.conversationId, messageId, part,
         struck: said.struck, added: said.added, places: said.places,
-        held: false, sent: null, createdAt: now, updatedAt: now,
+        held: held === true, sent: null, createdAt: now, updatedAt: now,
       }
       await store.put(record)
       changes.push({ kind: 'edit', op: 'created', id: record.id, num: record.num })

@@ -1389,10 +1389,6 @@ msgid "collection.chats"
 msgstr "Keskustelut"
 
 #. js-lingui-explicit-id
-msgid "collection.cleanWord"
-msgstr "puhdas"
-
-#. js-lingui-explicit-id
 msgid "collection.count"
 msgstr "{count, plural, =0 {ei mitään} one {# kortti} other {# korttia}}"
 
@@ -1513,10 +1509,6 @@ msgstr "vapauta"
 #. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "Kokoelmat"
-
-#. js-lingui-explicit-id
-msgid "collection.markupWord"
-msgstr "muutosmerkit"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -2343,24 +2335,6 @@ msgstr "Kirjoita sana then kunkin nimen väliin, esimerkiksi by:wikipedia then s
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} voi tarkoittaa: {names}. Kerro mikä, esimerkiksi {example}"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOff"
-msgstr "Enter näyttää taas muutosmerkit ja kaikki yksityiskohdat"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOn"
-msgstr "Enter näyttää vastaukset sellaisinaan komentoon markup:on asti ja piilottaa taulujen yksityiskohdat, kunnes tulet niiden lähelle"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOff"
-msgstr "Muutosmerkit ja yksityiskohdat näkyvät jo. calm: näyttää vastaukset sellaisinaan ja piilottaa yksityiskohdat, kunnes tulet lähelle"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOn"
-msgstr "Muutosmerkit ja yksityiskohdat ovat jo piilossa. calm:off näyttää ne"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3717,41 +3691,56 @@ msgstr "{count, plural, one {{nums} jäi ajamatta: sen ehto ei täyttynyt} other
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {jos mitään ei löydy} failed {jos edellinen epäonnistuu} always {edellisestä riippumatta} other {kun edellinen on valmis}}"
 
+#. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOff"
-msgstr "Enter näyttää vastaukset taas sellaisinaan, kuten calm tekee. markup:on näyttää muutosmerkit"
+msgid "enter.markupColGone"
+msgstr "Kokoelma näyttää nyt aina merkintänsä. markup:off piilottaa ne tekstistä"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOn"
-msgstr "Enter näyttää vastausten muutosmerkit. Muu näkymä pysyy rauhallisena"
+msgid "enter.markupCommentsLater"
+msgstr "Kommentit tulevat tekstiin seuraavaksi. Siihen asti muistiinpanot säilyvät Kokoelmassa"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmSame"
-msgstr "{on, select, on {Vastausten muutosmerkit näkyvät jo} other {Vastaukset näkyvät jo sellaisinaan}}"
+msgid "enter.markupEditing"
+msgstr "Enter vaihtaa muokkaukseen: kirjoittamasi on tekstiä ja lähtee seuraavan kehotteesi mukana"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOff"
-msgstr "Enter näyttää kortit puhtaina: jokainen muokkaus nykyisessä muodossaan, jokainen vastaus yksinään"
+msgid "enter.markupHiddenAlready"
+msgstr "{kind, select, edits {Muokkaukset on jo piilotettu} highlights {Korostukset on jo piilotettu} prompts {Kehotteet on jo piilotettu} other {Kaikki merkinnät on jo piilotettu}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOn"
-msgstr "Enter näyttää kortit muutosmerkein: yliviivatut sanat, omasi sinisellä, vastaukset vihreällä"
+msgid "enter.markupHideAll"
+msgstr "Enter piilottaa kaikki merkinnät tekstistä. Vastaukset näkyvät sellaisinaan ja ovat yhä muokattavissa"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupHideKind"
+msgstr "{kind, select, edits {Enter piilottaa muokkaukset tekstistä: vastaukset näkyvät sellaisinaan ja ovat yhä muokattavissa} highlights {Enter piilottaa korostukset tekstistä. Ne säilyvät} other {Enter piilottaa kehotteet tekstistä. Ne säilyvät}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColSame"
-msgstr "{on, select, on {Kortit näkyvät jo muutosmerkein} other {Kortit näkyvät jo puhtaina}}"
+msgid "enter.markupMenu"
+msgstr "Enter avaa merkintävalikon: mitä tekstissä näkyy ja miten kirjoittamasi säilytetään"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOff"
-msgstr "Enter näyttää vastaukset puhtaina: vain lopputulos, eikä sitä voi muokata ennen komentoa markup:on"
+msgid "enter.markupModeSame"
+msgstr "{mode, select, suggesting {Ehdotustila on jo käytössä: kirjoittamasi odottaa, kunnes hyväksyt sen} other {Muokkaustila on jo käytössä: kirjoittamasi on tekstiä}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOn"
-msgstr "Enter näyttää vastaukset muutosmerkein: yliviivatut sanat ja omasi sinisellä, muokattavina"
+msgid "enter.markupShowAll"
+msgstr "Enter näyttää kaikki merkinnät tekstissä: muokkaukset, korostukset ja kehotteet"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupShowKind"
+msgstr "{kind, select, edits {Enter näyttää muokkaukset tekstissä} highlights {Enter näyttää korostukset tekstissä} other {Enter näyttää kehotteet tekstissä}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupSame"
-msgstr "{on, select, on {Vastaukset näkyvät jo muutosmerkein} other {Vastaukset näkyvät jo puhtaina}}"
+msgid "enter.markupShownAlready"
+msgstr "{kind, select, edits {Muokkaukset näkyvät jo} highlights {Korostukset näkyvät jo} prompts {Kehotteet näkyvät jo} other {Kaikki merkinnät näkyvät jo}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupSuggesting"
+msgstr "Enter vaihtaa ehdotustilaan: kirjoittamasi pidetään merkittynä pidossa, kunnes hyväksyt sen"
 
 #. js-lingui-explicit-id
 msgid "enter.messageFailed"
@@ -5565,8 +5554,16 @@ msgid "enter.settleCardOnly"
 msgstr "Kysymyksen {num} tekstikohta muuttui kysymisen jälkeen, joten sen vastaus on vain sen kortilla. reject:{num} hylkää sen"
 
 #. js-lingui-explicit-id
+msgid "enter.settleEditsLetGo"
+msgstr "Enter vapauttaa pidossa {count, plural, one {olevan muokkauksesi} other {olevat muokkauksesi}} {nums}: {count, plural, one {se lähtee} other {ne lähtevät}} seuraavan kehotteesi mukana"
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsTakeBack"
+msgstr "Enter kumoaa pidossa {count, plural, one {olevan muokkauksesi} other {olevat muokkauksesi}} {nums}: yliviivatut sanat palaavat"
+
+#. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr "Tässä keskustelussa ei odota vastauksia eikä ehdotuksia"
+msgstr "Tässä keskustelussa ei odota vastauksia, ehdotuksia eikä pidossa olevia muokkauksia"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
@@ -7784,6 +7781,78 @@ msgstr "Käytä sen sijaan salalausetta"
 msgid "lock.wrong"
 msgstr "Tämä ei avaa lukitusta."
 
+#. js-lingui-explicit-id
+msgid "markupMenu.acceptAll"
+msgstr "Hyväksy kaikki"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.allAbout"
+msgstr "Vastaukset, ehdotukset ja pidossa olevat muokkauksesi tässä huoneessa"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editing"
+msgstr "Muokkaus"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editingAbout"
+msgstr "Kirjoittamasi on tekstiä ja lähtee seuraavan kehotteesi mukana"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.foot"
+msgstr "Jokainen napsautus suorittaa komentonsa, kuten markup:off highlights tai accept:all, ja undo: kumoaa sen. Esc tai napsautus valikon ulkopuolella sulkee sen."
+
+#. A row of the menu: edits, highlights, prompts or comments
+#. js-lingui-explicit-id
+msgid "markupMenu.kind"
+msgstr "{kind, select, edits {Muokkaukset} highlights {Korostukset} prompts {Kehotteet} other {Kommentit}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.kindAbout"
+msgstr "{kind, select, edits {Omasi ja sinulle ehdotetut muutokset} highlights {Korostamasi sanat} prompts {Kysymykset tekstissä, odottavat tai vastatut} other {Seuraavaksi: tekstiin kirjoitetut kommentit}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.mode"
+msgstr "Tila"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.noRoom"
+msgstr "Avaa huone, niin voit hyväksyä tai hylätä siinä odottavat"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.rejectAll"
+msgstr "Hylkää kaikki"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.runs"
+msgstr "Suorittaa komennon {command}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.show"
+msgstr "Näytä"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggesting"
+msgstr "Ehdotus"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggestingAbout"
+msgstr "Kirjoittamasi merkitään ja odottaa, kunnes hyväksyt sen"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.title"
+msgstr "Muutosmerkit"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.waiting"
+msgstr "Odottaa"
+
+#. {where} is a chat number, as 214
+#. js-lingui-explicit-id
+msgid "markupMenu.waitingCount"
+msgstr "{count, plural, =0 {mikään ei odota keskustelussa {where}} one {# odottaa keskustelussa {where}} other {# odottaa keskustelussa {where}}}"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -8446,11 +8515,6 @@ msgstr "Vastaus, jota katsot. Kehotteesi seuraa sitä, kun siirryt vastausten v�
 msgid "room.chatSheet"
 msgstr "Keskustelu"
 
-#. Show replies as they read now, without marks
-#. js-lingui-explicit-id
-msgid "room.cleanWord"
-msgstr "puhdas"
-
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -8493,16 +8557,6 @@ msgstr "Piilota marginaali"
 #. js-lingui-explicit-id
 msgid "room.home"
 msgstr "Siirry Parliamentin aloitusnäkymään"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "room.markupRuns"
-msgstr "Suorittaa komennon {command}"
-
-#. Show replies with their edits marked up
-#. js-lingui-explicit-id
-msgid "room.markupWord"
-msgstr "muutosmerkit"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -9346,21 +9400,6 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "Tämä taulu piirretään myöhemmässä vaiheessa."
 
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOff"
-msgstr "calm: pois"
-
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOn"
-msgstr "calm: päällä"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "shell.calmTitle"
-msgstr "Vastaukset näkyvät sellaisinaan komentoon markup:on asti, ja taulujen yksityiskohdat odottavat, kunnes tulet niiden lähelle. Suorittaa komennon {command}"
-
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9412,6 +9451,16 @@ msgstr "koko näyttö"
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
 msgstr "poistu koko näytön tilasta"
+
+#. markup is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.markupMenu"
+msgstr "markup"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.markupTitle"
+msgstr "Mitä tekstissä näkyy ja miten kirjoittamasi säilytetään. Suorittaa komennon {command}"
 
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
@@ -9681,9 +9730,10 @@ msgstr "Siirrä palkkia sivulla"
 msgid "verb.by"
 msgstr "Valitse, kuka vastaa tässä keskustelussa: malli tai lähde ilman tokeneita"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "Näytä vastaukset sellaisinaan komentoon markup:on asti ja piilota taulujen yksityiskohdat, kunnes tulet niiden lähelle. calm:off näyttää kaiken"
+msgstr "Vanhempi nimi: calm: piilottaa kaikki merkinnät tekstistä kuten markup:off, ja calm:off näyttää ne"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9829,9 +9879,10 @@ msgstr "Tuo Kirjasto näkyvien rinnalle"
 msgid "verb.local"
 msgstr "Kerro, lähettääkö huone vain tämän koneen malleille"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "Muutosmerkit: näytä muokkauksesi vastauksissa tai näytä vastaukset puhtaina"
+msgstr "Muutosmerkit: markup: avaa valikon. markup:on ja markup:off näyttävät tai piilottavat kaikki merkinnät tekstissä tai yhden lajin, kuten markup:off highlights. markup:suggesting pitää kirjoittamasi pidossa, kunnes hyväksyt sen, ja markup:editing tekee siitä tekstiä"
 
 #. js-lingui-explicit-id
 msgid "verb.model"

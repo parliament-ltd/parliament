@@ -16,6 +16,7 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
+import { showOf, modeOf, SHOWN_KINDS } from '../lib/markupShow'
 import { plan, planOpen, planOpenSettings, planBring, planRoom, planFocus, planFocusOff, planFocusSet, focusBoardsOf, FOCUS_BOARDS, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS, planPopMany, planMoveTo, planMoveBeside, currentRoom, freeRoom } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost, LOCAL_READS } from '../shell/estimate'
@@ -847,30 +848,44 @@ function planThinking(a, step, screens = {}) {
   return { says: { message: want ? 'thinkingOn' : 'thinkingOff' }, act: { kind: 'thinking', on: want, before: on } }
 }
 
-/** markup:on / markup:off: replies marked up, or clean (stage 11, piece 1). screens.markup: { on }, on by default. */
-/** calm: and calm:off (stage 14, piece 2; C255 (d)): a setting of this device. */
-function planCalm(a, step, screens = {}) {
-  const want = step.match?.values?.[0]?.value !== 'off'
-  const on = screens.calm?.on === true
-  if (want === on) return { says: { message: on ? 'calmSameOn' : 'calmSameOff' }, act: null }
-  return { says: { message: want ? 'calmOn' : 'calmOff' }, act: { kind: 'setting', key: 'calm', value: want, before: on } }
+/**
+ * The markup menu's commands (C301 (b); Stefan, 15 November), settings of
+ * this device, each one step for undo:. screens.markup: { show, mode }.
+ *   markup:                 opens the menu
+ *   markup:on, markup:off   every kind drawn in the text shown, or hidden
+ *   markup:off highlights   one kind
+ *   markup:suggesting       what you type is kept held back until accepted
+ *   markup:editing          what you type is the text
+ */
+function planMarkup(a, step, screens = {}) {
+  const vals = step.match?.values ?? []
+  if (!vals.length) return { says: { message: 'markupMenu' }, act: { kind: 'markupMenu' } }
+  const word = vals[0]?.value
+  if (word === 'editing' || word === 'suggesting') {
+    const mode = modeOf(screens.markup?.mode)
+    if (word === mode) return { says: { message: 'markupModeSame', values: { mode } }, act: null }
+    return { says: { message: word === 'suggesting' ? 'markupSuggesting' : 'markupEditing' }, act: { kind: 'setting', key: 'markupMode', value: word, before: mode } }
+  }
+  const kind = vals[1]?.value ?? null
+  // The Collection's own switch went into the menu; it always shows its marks (C301 (b)).
+  if (kind === 'col') return { says: { message: 'markupColGone' }, act: null }
+  if (kind === 'comments') return { says: { message: 'markupCommentsLater' }, act: null }
+  return showOrHide(word === 'on', kind, screens)
 }
 
-function planMarkup(a, step, screens = {}) {
-  const want = step.match?.values?.[0]?.value === 'on'
-  // markup:off col, or on the Collection: the Collection's own (C220 (g)).
-  const col = step.match?.values?.[1]?.value === 'col' || a.addressed === 'collection'
-  // In calm, the edits wait for the markup switch (C296): markup:on shows them
-  // and markup:off reads replies as they stand again, calm staying on.
-  if (!col && screens.calm?.on) {
-    const shown = screens.calm.markup === true
-    if (want === shown) return { says: { message: 'markupCalmSame', values: { on: shown ? 'on' : 'off' } }, act: null }
-    return { says: { message: want ? 'markupCalmOn' : 'markupCalmOff' }, act: { kind: 'setting', key: 'calmMarkup', value: want ? 'on' : 'off', before: shown ? 'on' : 'off' } }
-  }
-  const on = col ? screens.collectionMarkup?.on !== false : screens.markup?.on !== false
-  if (want === on) return { says: { message: col ? 'markupColSame' : 'markupSame', values: { on: on ? 'on' : 'off' } }, act: null }
-  if (col) return { says: { message: want ? 'markupColOn' : 'markupColOff' }, act: { kind: 'markup', col: true, on: want, before: on } }
-  return { says: { message: want ? 'markupOn' : 'markupOff' }, act: { kind: 'markup', on: want, before: on } }
+/** markup:on and markup:off, for every kind or one. */
+function showOrHide(want, kind, screens) {
+  const show = showOf(screens.markup?.show)
+  const kinds = kind ? [kind] : SHOWN_KINDS
+  if (kinds.every((k) => show[k] === want)) return { says: { message: want ? 'markupShownAlready' : 'markupHiddenAlready', values: { kind: kind ?? 'all' } }, act: null }
+  const next = { ...show, ...Object.fromEntries(kinds.map((k) => [k, want])) }
+  const says = kind ? { message: want ? 'markupShowKind' : 'markupHideKind', values: { kind } } : { message: want ? 'markupShowAll' : 'markupHideAll' }
+  return { says, act: { kind: 'setting', key: 'markupShow', value: next, before: show } }
+}
+
+/** calm: and calm:off, older names (stage 14, piece 2; C255): retired into the menu (C301 (b)), hiding or showing every mark. */
+function planCalm(a, step, screens = {}) {
+  return showOrHide(step.match?.values?.[0]?.value === 'off', null, screens)
 }
 
 /** new:framework "Editor" "Make each sentence shorter": one of your own, or rewriting it (C164). */

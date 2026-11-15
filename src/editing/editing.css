@@ -65,6 +65,9 @@
 .p-text del.pm-blk > * { opacity: .55; margin-bottom: 0; }
 .p-text del.pm-blk :is(td, th, figcaption) { text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
 .p-text ins.pm-added { color: var(--ch-you); text-decoration: underline; text-decoration-color: var(--ch-you); text-underline-offset: 3px; }
+/* An edit held back, as Suggesting keeps it (C301 (b); C298): dashed, as
+   its card in the Collection, until it is let go (accepted) or taken back. */
+.p-text ins.pm-added:has(.pm-held), .p-text del.pm-struck:has(.pm-held) { text-decoration-style: dashed; }
 /* A hair of space where struck and added words meet, drawn only: the text has none. */
 .p-text del.pm-struck + ins.pm-added, .p-text ins.pm-added + del.pm-struck { margin-inline-start: .22em; }
 

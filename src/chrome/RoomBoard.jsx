@@ -50,7 +50,7 @@ const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]
 const withoutComposer = (mode) => ({ ...mode, components: (mode.components ?? []).filter((c) => blockName(c?.ref) !== COMPOSER) })
 
-function Card({ board, addressed, onAddress, title, aside, room, ripple, markup = null, kept = 0, children }) {
+function Card({ board, addressed, onAddress, title, aside, room, ripple, kept = 0, children }) {
   const { i18n } = useLingui()
   return (
     <article
@@ -66,14 +66,7 @@ function Card({ board, addressed, onAddress, title, aside, room, ripple, markup 
         {room && <span className="ch-marg ch-aside" dir="auto">{room}</span>}
         {/* Edits are kept as they are made (C291 (k)): said once here while some wait for the next prompt. */}
         {kept > 0 && <span className="ch-marg ch-aside ch-kept">{i18n._(COPY.room.editsKept, { count: kept })}</span>}
-        {/* markup · clean (inline editing v5; 29 October): a click runs markup:on or markup:off, which undo: takes back. */}
-        {markup && (
-          <span className="ch-marg ch-col-markup">
-            <button type="button" className={markup.clean ? undefined : 'on'} aria-pressed={!markup.clean} title={i18n._(COPY.room.markupRuns, { command: 'markup:on' })} onMouseDown={(e) => e.stopPropagation()} onClick={() => markup.onRun('markup:on')}>{i18n._(COPY.room.markupWord)}</button>
-            <span aria-hidden="true">{'·'}</span>
-            <button type="button" className={markup.clean ? 'on' : undefined} aria-pressed={markup.clean} title={i18n._(COPY.room.markupRuns, { command: 'markup:off' })} onMouseDown={(e) => e.stopPropagation()} onClick={() => markup.onRun('markup:off')}>{i18n._(COPY.room.cleanWord)}</button>
-          </span>
-        )}
+        {/* The room's markup · clean switch went into the markup menu in the strip (C301 (b)). */}
         {/* Ripple for the plan's branches (stage 12, piece 2; C231 (e)): a click writes the command, which costs, and waits for Enter. */}
         {ripple && (
           <button type="button" className={`ch-marg ch-ripple${ripple.on ? ' on' : ''}`} title={i18n._(COPY.room.rippleHelp, { command: ripple.on ? 'ripple:off' : 'ripple:on' })} onMouseDown={(e) => e.stopPropagation()} onClick={() => ripple.onWrite(ripple.on ? '>ripple:off' : '>ripple:on')}>
@@ -99,7 +92,7 @@ function Card({ board, addressed, onAddress, title, aside, room, ripple, markup 
  *   named, so it is read again; alone: no other board shares the screen
  *   with it (C279 (b))
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, markup = null, systemFor = null, onWrite = null, kept = 0, small = false, alone = false }) {
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, systemFor = null, onWrite = null, kept = 0, small = false, alone = false }) {
   const { i18n } = useLingui()
   const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
@@ -180,7 +173,7 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
 
   const title = chat?.num != null ? String(chat.num) : i18n._(COPY.boards.room)
   const room = found.forId === chatId && found.mode ? roomLabel(i18n, named) : null
-  const card = (body) => <Card board={board} addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room} ripple={ripple} markup={markup} kept={kept}>{body}</Card>
+  const card = (body) => <Card board={board} addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room} ripple={ripple} kept={kept}>{body}</Card>
 
   if (found.forId !== chatId) return card(null)
   if (found.error) {

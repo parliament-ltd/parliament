@@ -286,8 +286,12 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.reject', message: 'Turn down a suggestion' } }),
   v({ verb: 'hold', group: 'editing', example: 'hold:242', forms: ['hold:242', 'hold:201c', 'hold:off 242'], takes: [['addresses'], [['off'], { opt: 'addresses' }]], on: EDITING, stage: 10, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.hold', message: 'Keep a branch or an edit from going until you say' } }),
-  v({ verb: 'markup', group: 'editing', example: 'markup:off', forms: ['markup:on', 'markup:off'], takes: [[['on', 'off'], { opt: ['col'] }]], on: EDITING, stage: 11, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.markup', message: 'Markup: show your edits in replies, or show replies clean' } }),
+  // The markup menu (C301 (b)): from any board, as the strip's "markup ▾"
+  // is. col, the Collection's own switch before, is still read (it says the
+  // Collection always shows its marks now).
+  v({ verb: 'markup', group: 'editing', example: 'markup:', forms: ['markup:', 'markup:off', 'markup:on prompts', 'markup:suggesting'],
+    takes: [[], [['on', 'off'], { opt: ['edits', 'highlights', 'prompts', 'comments', 'col'] }], [['editing', 'suggesting']]], stage: 11, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.markup', message: 'Markup: markup: opens the menu. markup:on and markup:off show or hide every mark in the text, or one kind, as markup:off highlights. markup:suggesting keeps what you type held back until you accept it, and markup:editing makes it the text', comment: 'Commands stay English' } }),
   // Who answers in the chat the room shows (C149): a model or a source.
   // Works from any board, as a prompt does. Several at once is branches.
   // A name of several words needs no quotes: by:mistral small.
@@ -369,7 +373,8 @@ export const VERBS = Object.freeze([
   v({ verb: 'focus', group: 'layout', example: 'focus:', forms: ['focus:', 'focus:sym col', 'focus:save', 'focus:off'], takes: [[], [['save', 'off']], [{ many: 'word' }]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.focus', message: 'Close every board but the chat, or but the boards you name. focus:off brings the rest back' } }),
   v({ verb: 'calm', group: 'layout', example: 'calm:', forms: ['calm:', 'calm:off'], takes: [[], [['off']]], stage: 14, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.calm', message: 'Read replies as they stand until markup:on, and hide the details on boards until you come near them. calm:off shows them all' } }),
+    // Retired into the markup menu (C301 (b)), and still read: calm: hides every mark, calm:off shows them.
+    gloss: /*i18n*/ { id: 'verb.calm', message: 'An older name: calm: hides every mark in the text, as markup:off does, and calm:off shows them', comment: 'Commands stay English' } }),
   v({ verb: 'arrange', group: 'layout', example: 'arrange:"Review desk"', forms: ['arrange:', 'arrange:"Review desk"', 'arrange:save "Review desk"', 'arrange:"Review desk" 207'],
     takes: [[], [['save'], 'text'], ['text', { opt: 'address' }]], stage: 14, undoable: true,
     gloss: /*i18n*/ { id: 'verb.arrange', message: 'Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning"', comment: 'Commands stay English' } }),

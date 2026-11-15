@@ -83,6 +83,8 @@ export default function MessageCard({
   // Edits already told to a model (C216 (i)); toldTo: who was told the
   // edits this prompt carried, for a prompt that was only those (C216 (e)).
   closedEdits, toldTo = null,
+  // Edits held back, as Suggesting keeps them (C301 (b)).
+  heldEdits,
   // Asks (C218): each one's number and state, settling one, and the words.
   askInfo, onSettleAsk, askWords,
   // Suggestions (stage 12; C229): each one's number, settling one, and the words.
@@ -216,6 +218,7 @@ export default function MessageCard({
           clean={clean}
           onSave={onSaveEdits}
           closedEdits={closedEdits}
+          heldEdits={heldEdits}
           askInfo={askInfo}
           onSettleAsk={onSettleAsk}
           askWords={askWords}
@@ -367,7 +370,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, heldEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords])
 
   return (
     <motion.div

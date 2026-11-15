@@ -3,6 +3,7 @@ import { setupI18n } from '@lingui/core'
 import { preview } from '../chrome/preview'
 import { say } from '../chrome/say'
 import { shipped } from '../shell/arrangement'
+import { settleable } from './editVerbs'
 import { messages as en } from '../locales/en/messages.mjs'
 
 // Edits and asks by number (stage 11, piece 5; C220 (d)).
@@ -126,6 +127,32 @@ describe('accept: and reject: on suggestions (stage 12, piece 1; C229 (e))', () 
   it('points undo: and delete: to accept: and reject:', () => {
     expect(on('>undo:250').text).toBe('A suggestion is settled with accept:250 or reject:250')
     expect(on('>delete:250').text).toBe('A suggestion is turned down with reject:250, and kept as the record of it')
+  })
+})
+
+describe('accept:all and reject:all on edits held back, as Suggesting keeps them (C301 (b))', () => {
+  const rows = [...ROWS, row('edit', 247, { mark: 'e3', struck: 'old', added: 'new', held: true }),
+    // Held and sent already (told before it was held): not waiting.
+    row('edit', 248, { mark: 'e4', struck: 'x', added: 'y', held: true, sent: { to: 'haiku' } })]
+  const on = (value) => {
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: { records: { rows }, roomChat: 'c202' } })
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '', also: (p.says?.also ?? []).map((x) => say(i18n, x.message, x.values)) }
+  }
+  it('lets them go with accept:all, as Let it go does, beside the answers', () => {
+    const p = on('>accept:all')
+    expect(p.act.changes).toContainEqual({ how: 'letGo', num: 247, mark: 'e3', messageId: 'm1', conversationId: 'c202' })
+    expect(p.act.changes.map((c) => c.num).sort()).toEqual([244, 247])
+    expect(p.also).toContain('Enter lets your held edit 247 go: it goes with your next prompt')
+  })
+  it('takes them back with reject:all, as Undo does', () => {
+    const p = on('>reject:all')
+    expect(p.act.changes).toContainEqual({ how: 'undoEdit', num: 247, mark: 'e3', messageId: 'm1', conversationId: 'c202' })
+    expect(p.also).toContain('Enter takes back your held edit 247: the struck words stand again')
+  })
+  it('counts them for the markup menu, and nothing with no room', () => {
+    expect(settleable(rows, 'c202', 'accept').map((r) => r.num).sort()).toEqual([244, 247])
+    expect(settleable(rows, 'c202', 'reject').map((r) => r.num).sort()).toEqual([244, 245, 247])
+    expect(settleable(rows, null)).toEqual([])
   })
 })
 

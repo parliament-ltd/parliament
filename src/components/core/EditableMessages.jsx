@@ -19,6 +19,7 @@ import { useAskBox } from './useAskBox'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
+import { heldPlugin, heldKey } from '../../editing/held'
 import { titlesPlugin } from '../../editing/titles'
 import MessageCard from './MessageCard'
 import { isReleased, onRelease } from '../../editing/across'
@@ -87,7 +88,7 @@ const NO_TITLE_WORDS = { ask: '', help: () => '' }
 // suggestionId, how) when one is accepted or rejected in place (C229).
 // titleWords: the "ask" after a line of a source's answer that is the title
 // of a page it links to, and what it says it does, for a title (C287).
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS }) {
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS }) {
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -189,6 +190,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     doc.forEach((sec) => { savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
       ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), ...menuOptions, ...askOptions }),
+      // Edits held back, dashed (C301 (b)).
+      heldPlugin(),
       // Accept or undo an answered ask, in place; its message is the card it is in (C218).
       asksPlugin({
         words: askWords,
@@ -331,6 +334,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(asksKey, askInfo)) }, [askInfo, sectionsKey])
   // Each suggestion's number, for its marker (C229).
   useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(suggestionsKey, sugInfo)) }, [sugInfo, sectionsKey])
+  useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(heldKey, heldEdits)) }, [heldEdits, sectionsKey])
 
   // Highlights and quotes, each card's its own, drawn again only when they change.
   const shownWas = useRef('')

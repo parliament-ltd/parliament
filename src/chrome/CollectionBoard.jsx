@@ -441,13 +441,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
           {ORDERS.map(([k, word]) => (
             <button key={k} type="button" className={view.sort === k ? 'on' : undefined} onClick={() => onView({ sort: k, asc: false })}>{i18n._(word)}</button>
           ))}
-          {changed ? (
-            <span className="ch-col-markup">
-              <button type="button" className={clean ? undefined : 'on'} aria-pressed={!clean} title={i18n._(C.runs, { command: 'markup:on col' })} onClick={() => onRun('markup:on col')}>{i18n._(C.markupWord)}</button>
-              <span aria-hidden="true">{'·'}</span>
-              <button type="button" className={clean ? 'on' : undefined} aria-pressed={clean} title={i18n._(C.runs, { command: 'markup:off col' })} onClick={() => onRun('markup:off col')}>{i18n._(C.cleanWord)}</button>
-            </span>
-          ) : null}
+          {/* Its markup · clean switch went into the markup menu (C301 (b)): the Collection always shows its marks. */}
         </div>
         {filtered && <InForce search={filtered.search} line={filtered.line} count={shownCount} onClear={onClear} shown={C.shown} />}
         {changed && !clean ? (

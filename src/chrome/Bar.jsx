@@ -21,6 +21,7 @@ import LanguagePicker from './LanguagePicker'
 import AnswerPicker from './AnswerPicker'
 import ReplyPicker from './ReplyPicker'
 import FrameworkPicker from './FrameworkPicker'
+import MarkupMenu from './MarkupMenu'
 import { step as stepBranch } from '../stores/branchView'
 import { useVoiceInput } from '../hooks/useVoiceInput'
 import { formatSize } from '../lib/fileUpload'
@@ -61,7 +62,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -150,12 +151,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // them, as before. Escape closes one, from the field or from a row.
   const root = useRef(null)
   const under = !reference && !inspect && !compare && !keyPanel && !backupPanel
-  const menu = reference ? 'reference' : !under ? null : picker ? 'picker' : frameworkPicker ? 'frameworks' : languagePicker ? 'languages' : null
+  const menu = reference ? 'reference' : !under ? null : picker ? 'picker' : frameworkPicker ? 'frameworks' : languagePicker ? 'languages' : markupMenu ? 'markup' : null
   const closeMenu = (which, refocus = false) => {
     if (which === 'reference') setReference(null)
     else if (which === 'picker') onPickerClose?.()
     else if (which === 'frameworks') onFrameworkPickerClose?.()
     else if (which === 'languages') onLanguagePickerClose?.()
+    else if (which === 'markup') onMarkupMenuClose?.()
     if (refocus) input.current?.focus()
   }
   const closeNow = useRef(closeMenu)
@@ -169,21 +171,22 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     function onDown(e) {
       const at = e.target
       if (root.current?.contains(at) && at.closest?.('.ch-ref, .ch-frow, .ch-fheld')) return
-      // The languages opened from the globe float under it; the globe itself opens and closes them.
-      if (at.closest?.('.ch-float, .ch-globe')) return
+      // The languages opened from the globe float under it, and the markup
+      // menu under its word; the globe and the word open and close them.
+      if (at.closest?.('.ch-float, .ch-globe, .ch-smarkup')) return
       closeNow.current(menu)
     }
-    // The languages floating under the globe close on Escape wherever the focus is.
-    const floating = menu === 'languages' && languagePicker?.at
+    // A menu floating under the strip closes on Escape wherever the focus is.
+    const floating = menu === 'languages' ? languagePicker?.at : menu === 'markup' ? markupMenu?.at : null
     function onKey(e) { if (e.key === 'Escape' && !e.defaultPrevented) closeNow.current(menu) }
-    const keyDocs = floating ? [...docs, languagePicker.at.doc].filter((d, i, all) => d && all.indexOf(d) === i) : []
+    const keyDocs = floating ? [...docs, floating.doc].filter((d, i, all) => d && all.indexOf(d) === i) : []
     for (const d of docs) d.addEventListener('pointerdown', onDown, true)
     for (const d of keyDocs) d.addEventListener('keydown', onKey)
     return () => {
       for (const d of docs) d.removeEventListener('pointerdown', onDown, true)
       for (const d of keyDocs) d.removeEventListener('keydown', onKey)
     }
-  }, [menu, doc, alsoDocs, languagePicker])
+  }, [menu, doc, alsoDocs, languagePicker, markupMenu])
 
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere: in this document,
   // and in every other window of the page, since this bar is the one point of
@@ -361,6 +364,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (picker) { onPickerClose?.(); return }
       if (frameworkPicker) { onFrameworkPickerClose?.(); return }
       if (languagePicker) { onLanguagePickerClose?.(); return }
+      if (markupMenu) { onMarkupMenuClose?.(); return }
       if (map) { onMapClose?.(); return }
       // A held prompt is cleared, and that is all this Escape does.
       if (showsHeld(field)) { dispatch({ type: 'escape' }); onDropDraft?.(); return }
@@ -515,6 +519,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           languagePicker.at.doc.body,
         )
         : <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} onClose={() => closeMenu('languages', true)} />)}
+      {/* The markup menu (C301 (b)): under its word in the strip, or under the field when typed. */}
+      {menu === 'markup' && (() => {
+        const panel = <MarkupMenu show={markupMenu.show} mode={markupMenu.mode} waiting={markupMenu.waiting} onRun={onMarkupRun} onClose={() => closeMenu('markup', true)} />
+        return markupMenu.at
+          ? createPortal(<div className="ch-shell ch-float" style={{ top: markupMenu.at.top, insetInlineEnd: markupMenu.at.end }}>{panel}</div>, markupMenu.at.doc.body)
+          : panel
+      })()}
     </div>
   )
 }

@@ -42,13 +42,15 @@ const DEFAULT_SETTINGS = {
   // Replies marked up (struck words, the person's in blue, editable) or
   // clean, the result only (stage 11, piece 1; markup:on, markup:off).
   markup: 'on',
-  // calm: and calm:off (stage 14, piece 2; C255): off for someone new
-  // (C253 (c)), kept on this device and not in backups (C253 (d)).
+  // calm: and calm:off (stage 14, piece 2; C255), and whether calm showed
+  // edits (C296): retired into the markup menu (C301 (b)), no longer read.
+  // What was kept stays as it is.
   calm: false,
-  // While calm is on, whether replies show their edits (C296; Stefan, 5
-  // November: calm hides them until the markup switch). In calm, markup:on
-  // and markup:off set this, not markup. Kept with calm: on this device only.
   calmMarkup: 'off',
+  // The markup menu (C301 (b)): what shows in the text, and how your typing
+  // is kept (src/lib/markupShow.js). On this device, not in backups, as calm was.
+  markupShow: { edits: true, highlights: true, prompts: true, comments: true },
+  markupMode: 'editing',
   // Whether a second screen was already noticed (stage 14, piece 4; C259 (g)):
   // on this device, not in backups, false again once back to one screen.
   screensNoticed: false,

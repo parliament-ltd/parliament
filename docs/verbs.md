@@ -114,7 +114,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `accept:244` | Accept a suggestion | `accept:244`, `accept:all` | Rooms, Plan, Reflection, Collection | yes |
 | `reject:244` | Turn down a suggestion | `reject:244`, `reject:all` | Rooms, Plan, Reflection, Collection | yes |
 | `hold:242` | Keep a branch or an edit from going until you say | `hold:242`, `hold:201c`, `hold:off 242` | Rooms, Plan, Reflection, Collection | yes |
-| `markup:off` | Markup: show your edits in replies, or show replies clean | `markup:on`, `markup:off` | Rooms, Plan, Reflection, Collection | yes |
+| `markup:` | Markup: markup: opens the menu. markup:on and markup:off show or hide every mark in the text, or one kind, as markup:off highlights. markup:suggesting keeps what you type held back until you accept it, and markup:editing makes it the text | `markup:`, `markup:off`, `markup:on prompts`, `markup:suggesting` | everywhere | yes |
 | `by:haiku` | Choose who answers in this chat: a model, or a source with no tokens | `by:`, `by:haiku`, `by:mistral small`, `by:wikipedia` | everywhere | yes |
 | `thinking:off` | Let models that can think do so before answering, shown as they go, or not | `thinking:`, `thinking:on`, `thinking:off` | everywhere | yes |
 | `framework:pushback` | Choose the frameworks that shape every reply: standing instructions sent with each prompt | `framework:pushback`, `framework:pushback, uncertain`, `framework:off` | everywhere | yes |
@@ -143,7 +143,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `width:60%` | Choose how much of the width a board takes, or put every width back | `width:60%`, `width:collection 30%`, `width:204 40%`, `width:even` | everywhere | yes |
 | `cols:-room +created` | Hide or show columns of the table | `cols:-room +created`, `cols:` | Records | yes |
 | `focus:` | Close every board but the chat, or but the boards you name. focus:off brings the rest back | `focus:`, `focus:sym col`, `focus:save`, `focus:off` | everywhere | yes |
-| `calm:` | Read replies as they stand until markup:on, and hide the details on boards until you come near them. calm:off shows them all | `calm:`, `calm:off` | everywhere | yes |
+| `calm:` | An older name: calm: hides every mark in the text, as markup:off does, and calm:off shows them | `calm:`, `calm:off` | everywhere | yes |
 | `arrange:"Review desk"` | Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save "morning" | `arrange:`, `arrange:"Review desk"`, `arrange:save "Review desk"`, `arrange:"Review desk" 207` | everywhere | yes |
 
 ## Building rooms

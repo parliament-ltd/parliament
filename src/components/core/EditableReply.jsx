@@ -15,6 +15,7 @@ import { useAskBox } from './useAskBox'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
+import { heldPlugin, heldKey } from '../../editing/held'
 import { titlesPlugin } from '../../editing/titles'
 import { isReleased, onRelease } from '../../editing/across'
 
@@ -49,12 +50,13 @@ const NO_ASKS = new Map()
 const NO_TITLES = Object.freeze([])
 const NO_TITLE_WORDS = { ask: '', help: () => '' }
 // closedEdits: edits already told to a model; typing beside one starts a new edit (C216 (i)).
+// heldEdits: edits held back, as Suggesting keeps them, drawn dashed (C301 (b)).
 // askInfo: each ask's number and state, by its id; onSettleAsk(askId, how) when
 // one is accepted or undone; askWords: the ASK box's and markers' words (C218).
 // sugInfo, onSettleSuggestion(suggestionId, how), sugWords: suggestions, as asks (C229).
 // titles: a source's answer's lines that are titles of pages it links to;
 // titleWords: the "ask" after each, and what it says it does (C287).
-export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titles = NO_TITLES, titleWords = NO_TITLE_WORDS }) {
+export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titles = NO_TITLES, titleWords = NO_TITLE_WORDS }) {
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
   const host = useRef(null)
@@ -110,6 +112,8 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     saved.current = JSON.stringify(toBlocks(doc))
     const plugins = [
       ...editingPlugins({ ids, blocks: true, onNote: (text) => setSaid(text), ...menuOptions, ...askOptions }),
+      // Edits held back, dashed (C301 (b)).
+      heldPlugin(),
       // Accept or undo an answered ask, in place (C218).
       asksPlugin({ words: askWords, onSettle: (askId, how) => { view.current?.dispatch(settleAsk(view.current.state, askId, how)); onSettleRef.current?.(askId, how) } }),
       // Accept or reject a suggestion, in place (C229 (e)).
@@ -180,6 +184,7 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
   // Each ask's number and state, for its marker.
   useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(asksKey, askInfo)) }, [askInfo])
   useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(suggestionsKey, sugInfo)) }, [sugInfo])
+  useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(heldKey, heldEdits)) }, [heldEdits])
 
   // Highlights and quotes, drawn again only when they change: a card redraws
   // often, and a change sent to the editor then could move the cursor.

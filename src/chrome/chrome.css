@@ -35,17 +35,17 @@
 .ch-btitle { font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink-3); padding: 2px 0; }
 .ch-btitle.here { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .ch-btitle .ch-ctx { font-weight: 400; color: var(--ch-ink-3); margin-inline-start: 4px; }
-/* focus: at the end of the strip, and its picker (stage 14, piece 1; C253). */
-.ch-scalm { margin-inline-start: auto; }
+/* markup ▾ and focus: at the end of the strip (stage 14, piece 1; C253; C301 (b)). */
+.ch-smarkup { margin-inline-start: auto; }
 /* The language at the end of the header, and alone in the top corner (1 November). */
 .ch-sglobe { margin-inline-start: 14px; }
 .ch-headcorner { position: fixed; top: 10px; inset-inline-end: 18px; z-index: 30; }
 /* With the language alone in the corner, the page starts below it, so it
    never covers a board's edge (C293), in an installed app's narrow window too. */
 .ch-shell.on-welcome.corner .ch-stage { padding-top: 40px; }
-.ch-shell .ch-scalm button { padding: 0; font: inherit; color: inherit; }
-.ch-shell .ch-scalm button:hover, .ch-shell .ch-scalm button.on { color: var(--ch-ink); }
-/* focus: marginalia, as calm is (C292): one word, no caret, no picker. */
+.ch-shell .ch-smarkup button { padding: 0; font: inherit; color: inherit; }
+.ch-shell .ch-smarkup button:hover, .ch-shell .ch-smarkup button.on { color: var(--ch-ink); }
+/* focus: marginalia (C292): one word, no caret, no picker. */
 .ch-shell .ch-sfocus button { padding: 0; font: inherit; color: inherit; }
 .ch-shell .ch-sfocus button:hover, .ch-shell .ch-sfocus button.on { color: var(--ch-ink); }
 /* A Settings switch says its state beside it (C291 (n)). */
@@ -1167,64 +1167,52 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-bmarg { display: flex; flex-wrap: wrap; gap: 0 12px; margin: 8px 0 0; }
 .ch-bmissing p { display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px; margin: 0; }
 
-/* Calm (stage 14, piece 2; C255; the editing spec, "Calm"): detail waits
-   until you are near it, by hover, keyboard focus inside, or on a touch
-   screen the one last tapped (.near). Never calmed: the field, the Enter
-   line, the review bar's buttons, the count line and the strip. */
+/* The markup menu (C301 (b); Stefan, 15 November), where calm was (stage
+   14, piece 2; C255): each kind shown or hidden in the text, from one place,
+   and nothing waits for the pointer to come near any more.
 
-/* A board's head: its title only. A room keeps its names, the chat's title
-   and the room's, and its markup switch while it holds edits (30 October):
-   what a room is called is not a detail, and the switch is how hidden
-   markup is found again. */
-.ch-shell.calm .ch-card:not(.ch-collection):not(:hover):not(:focus-within):not(.near) > .ch-chead > :not(h2) { visibility: hidden; }
-.ch-shell.calm .ch-card.room:not(:hover):not(:focus-within):not(.near) > .ch-chead > :is(.ch-aside, .ch-col-markup) { visibility: visible; }
-
-/* A reply as it stands (as markup:off reads it), while you read it and while
-   you edit it: hover, keyboard focus and a tap change nothing in its text,
-   which moved under the pointer before (C296; Stefan, 5 November). The
-   room's markup switch shows the edits (.calm-markup; markup:on in calm).
-   It stays editable. A reply with something marked keeps a rule at its
-   edge, as inline editing v5 draws the margin tick (.calm .ans:has(…): a
-   2px inset rule, not a check mark), in the chat's ink rather than blue
-   (Stefan, 29 October: "little blue checkmarks ... can we not have
-   those?"): ink-3, the colour of the struck words it stands for. A
-   source's answer has its rule already, which darkens. An edited prompt
-   says so on the line under it. */
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text del { display: none; }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text :is(del.pm-sug-out, del.pm-replaced) { display: inline; color: inherit; text-decoration: none; }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text ins.pm-added { color: inherit; text-decoration: none; }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text :is(ins.pm-answer, ins.pm-sug-in, .pm-ask-point) { display: none; }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text .pm-ask { text-decoration: none; }
-.ch-shell.calm:not(.calm-markup) .p-pair-host .p-msg-reply:not(.from-source, .ghost):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body::before,
-.ch-shell.calm:not(.calm-markup) .p-msg-reply:not(.from-source, .ghost):not(.p-pair-host .p-msg-reply):has(.p-edit .p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body::before {
+   Edits hidden: a reply reads as it stands, as calm read it (C296), and stays
+   editable, so what you type is simply the text. Where something is marked,
+   it keeps a rule at its edge, as inline editing v5 draws the margin tick,
+   in the chat's ink rather than blue (Stefan, 29 October: "little blue
+   checkmarks ... can we not have those?"). A source's answer has its rule
+   already, which darkens. */
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text del { display: none; }
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text :is(del.pm-sug-out, del.pm-replaced) { display: inline; color: inherit; text-decoration: none; }
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text ins.pm-added { color: inherit; text-decoration: none; }
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text :is(ins.pm-answer, ins.pm-sug-in) { display: none; }
+.ch-shell.hide-edits .p-pair-host .p-msg-reply:not(.from-source, .ghost):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body::before,
+.ch-shell.hide-edits .p-msg-reply:not(.from-source, .ghost):not(.p-pair-host .p-msg-reply):has(.p-edit .p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body::before {
   content: ""; position: absolute; inset-block: 2px; inset-inline-start: -12px; width: 2px; border-radius: 1px; background: var(--ch-ink-3); pointer-events: none;
 }
-.ch-shell.calm:not(.calm-markup) .p-pair-host .p-msg-reply:is(.from-source, .ghost):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body,
-.ch-shell.calm:not(.calm-markup) .p-msg-reply:is(.from-source, .ghost):not(.p-pair-host .p-msg-reply):has(.p-edit .p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body {
+.ch-shell.hide-edits .p-pair-host .p-msg-reply:is(.from-source, .ghost):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body,
+.ch-shell.hide-edits .p-msg-reply:is(.from-source, .ghost):not(.p-pair-host .p-msg-reply):has(.p-edit .p-text :is(del, ins, .pm-ask, .pm-ask-point)) > .p-msg-box > .p-msg-body {
   border-inline-start-color: var(--ch-ink-3);
 }
-
-/* Inline markers: small numbered dots, green for asks and sweeps, rust for Ripple. */
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-marker, .pm-sug-marker) { font-size: 0; }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-marker, .pm-sug-marker) > * { display: none; }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-marker, .pm-sug-marker)::before {
+/* What waits to be accepted, with edits hidden: small numbered dots, green
+   for answers and sweeps, rust for Ripple. */
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-marker.answered, .pm-sug-marker) { font-size: 0; }
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-marker.answered, .pm-sug-marker) > * { display: none; }
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-marker.answered, .pm-sug-marker)::before {
   content: attr(data-num); display: inline-flex; align-items: center; justify-content: center; min-width: 14px; height: 14px; padding: 0 3px; box-sizing: border-box;
   border-radius: 7px; background: var(--ch-ai); color: var(--ch-surface); font: 600 9px/1 var(--ch-sans); font-style: normal; vertical-align: middle;
 }
-.ch-shell.calm:not(.calm-markup) :is(.p-pair-host, .p-edit) .p-text .pm-sug-marker.ripple::before { background: var(--ch-rust); }
+.ch-shell.hide-edits :is(.p-pair-host, .p-edit) .p-text .pm-sug-marker.ripple::before { background: var(--ch-rust); }
 
-/* The branch slider's line: its first open: only. */
-.ch-shell.calm .ch-branches:not(:hover):not(:focus-within):not(.near) .ch-bmarg > :not(button:first-of-type) { display: none; }
+/* Prompts hidden: an ask's passage, its point and its marker while it
+   waits. Its answer is a change, shown with the edits. */
+.ch-shell.hide-prompts :is(.p-pair-host, .p-edit) .p-text .pm-ask { text-decoration: none; }
+.ch-shell.hide-prompts :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-point, .pm-ask-marker:not(.answered)) { display: none; }
 
-/* The Collection is not calmed by hover (C297; Stefan, 6 November: "it's
-   more calm to see everything and then close items than to have them pop
-   open quickly when moving the mouse"). Its cards show their edits, their
-   words and their marginalia in full, and its legend stays open, calm on or
-   off; until C297 they folded to one line and opened when the pointer came
-   near. Its head is left whole too, by the head rule above. The review keys stay hidden and
-   the tab counts dimmed, which never move. */
-.ch-shell.calm .ch-sg-keys { display: none; }
-.ch-shell.calm .ch-col-tabs .n { opacity: .55; }
+/* Highlights hidden: their colour, which each carries on itself, goes. */
+.ch-shell.hide-highlights :is(.p-pair-host, .p-edit) .p-text .pm-hl { background-color: transparent !important; }
+
+/* The menu's own (MarkupMenu.jsx): the count at its heading, Accept all and
+   Reject all as the Collection's foot draws its buttons (C298), and a line. */
+.ch-markup-menu .ch-markup-count { margin-inline-start: 8px; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-transform: none; letter-spacing: 0; }
+.ch-markup-menu .ch-markup-acts { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 0 2px; }
+.ch-shell .ch-markup-menu button.ch-act:disabled { color: var(--ch-ink-3); cursor: default; }
+.ch-markup-menu .ch-markup-about { margin: 6px 0 0; font: italic 400 var(--ch-t-marg)/1.5 var(--ch-serif); color: var(--ch-marg); }
 
 /* The screens map (stage 14, piece 4; C259; parliament_screens_v1.html). It
    stands where the boards are; they stay drawn underneath, out of sight. */

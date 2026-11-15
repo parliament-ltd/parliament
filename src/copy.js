@@ -802,10 +802,6 @@ export const COPY = {
     arrangeNameSame: /*i18n*/ { id: 'enter.arrangeNameSame', message: "It is called {to} already" },
     nameWhichKindAll: /*i18n*/ { id: 'enter.nameWhichKindAll', message: "{name} names more than one thing. Add search, collection, framework or arrangement after it", comment: 'Commands stay English' },
     // calm: (stage 14, piece 2; C255).
-    calmOn: /*i18n*/ { id: 'enter.calmOn', message: "Enter reads replies as they stand until markup:on, and hides the details on boards until you come near them" },
-    calmOff: /*i18n*/ { id: 'enter.calmOff', message: "Enter shows markup and every detail again" },
-    calmSameOn: /*i18n*/ { id: 'enter.calmSameOn', message: "Markup and details are hidden already. calm:off shows them", comment: 'Commands stay English' },
-    calmSameOff: /*i18n*/ { id: 'enter.calmSameOff', message: "Markup and details show already. calm: reads replies as they stand and hides details until you come near", comment: 'Commands stay English' },
     // Focus sets, kept with a room (stage 14, piece 1; C253).
     focusTheChat: /*i18n*/ { id: 'enter.focusTheChat', message: "the chat" },
     focusInLab: /*i18n*/ { id: 'enter.focusInLab', message: "focus: works outside the Lab. done: leaves it first", comment: 'Commands stay English' },
@@ -1133,13 +1129,20 @@ export const COPY = {
     promptTellToReader: /*i18n*/ { id: 'enter.promptTellToReader', message: '{count, plural, one {Your note goes} other {Your # notes go}} to {name} at the same time · {source} reads none' },
     promptTellWait: /*i18n*/ { id: 'enter.promptTellWait', message: '{source} reads no notes. {count, plural, one {Yours waits} other {Your # notes wait}} for a model with a key: api:', comment: 'Commands stay English' },
     // markup · clean (stage 11, piece 1; editing spec).
-    markupOn: /*i18n*/ { id: 'enter.markupOn', message: 'Enter shows replies marked up: struck words and yours in blue, editable' },
-    markupOff: /*i18n*/ { id: 'enter.markupOff', message: 'Enter shows replies clean: the result only, read-only until markup:on' },
+    // The markup menu (C301 (b)): markup: opens it, and each click runs one of these.
+    markupMenu: /*i18n*/ { id: 'enter.markupMenu', message: 'Enter opens the markup menu: what shows in the text, and how your typing is kept' },
+    markupShowAll: /*i18n*/ { id: 'enter.markupShowAll', message: 'Enter shows every mark in the text: edits, highlights and prompts' },
+    markupHideAll: /*i18n*/ { id: 'enter.markupHideAll', message: 'Enter hides every mark in the text. Replies read as they stand, and stay editable' },
+    markupShowKind: /*i18n*/ { id: 'enter.markupShowKind', message: '{kind, select, edits {Enter shows edits in the text} highlights {Enter shows highlights in the text} other {Enter shows prompts in the text}}', comment: 'kind is edits, highlights or prompts' },
+    markupHideKind: /*i18n*/ { id: 'enter.markupHideKind', message: '{kind, select, edits {Enter hides edits in the text: replies read as they stand, and stay editable} highlights {Enter hides highlights in the text. They are still kept} other {Enter hides prompts in the text. They are still kept}}', comment: 'kind is edits, highlights or prompts' },
+    markupShownAlready: /*i18n*/ { id: 'enter.markupShownAlready', message: '{kind, select, edits {Edits show already} highlights {Highlights show already} prompts {Prompts show already} other {Every mark shows already}}' },
+    markupHiddenAlready: /*i18n*/ { id: 'enter.markupHiddenAlready', message: '{kind, select, edits {Edits are hidden already} highlights {Highlights are hidden already} prompts {Prompts are hidden already} other {Every mark is hidden already}}' },
+    markupEditing: /*i18n*/ { id: 'enter.markupEditing', message: 'Enter switches to editing: what you type is the text, and goes with your next prompt' },
+    markupSuggesting: /*i18n*/ { id: 'enter.markupSuggesting', message: 'Enter switches to suggesting: what you type is held back, marked, until you accept it' },
+    markupModeSame: /*i18n*/ { id: 'enter.markupModeSame', message: '{mode, select, suggesting {Suggesting already: what you type waits until you accept it} other {Editing already: what you type is the text}}' },
+    markupColGone: /*i18n*/ { id: 'enter.markupColGone', message: 'Marks always show on the collection board now. markup:off hides them in the text', comment: 'Commands stay English' },
+    markupCommentsLater: /*i18n*/ { id: 'enter.markupCommentsLater', message: 'Comments come into the text next. Until then, notes are kept on the collection board' },
     // In calm (C296): the markup switch shows a reply's edits, or reads it as it stands again.
-    markupCalmOn: /*i18n*/ { id: 'enter.markupCalmOn', message: 'Enter shows the edits in replies. Calm stays on for everything else' },
-    markupCalmOff: /*i18n*/ { id: 'enter.markupCalmOff', message: 'Enter reads replies as they stand again, as calm does. markup:on shows the edits' },
-    markupCalmSame: /*i18n*/ { id: 'enter.markupCalmSame', message: '{on, select, on {The edits in replies show already} other {Replies read as they stand already}}' },
-    markupSame: /*i18n*/ { id: 'enter.markupSame', message: '{on, select, on {Replies are marked up already} other {Replies are clean already}}' },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
     sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },
@@ -1346,7 +1349,10 @@ export const COPY = {
     undoAskUse: /*i18n*/ { id: 'enter.undoAskUse', message: 'An ask waiting to go is dropped with delete:{num}', comment: 'Commands stay English' },
     settleAccept: /*i18n*/ { id: 'enter.settleAccept', message: 'Enter keeps the {count, plural, one {answer to ask} other {answers to asks}} {nums} in the reply, and the passage goes' },
     settleReject: /*i18n*/ { id: 'enter.settleReject', message: 'Enter takes back the {count, plural, one {answer to ask} other {answers to asks}} {nums}, and the passage stays' },
-    settleNoneHere: /*i18n*/ { id: 'enter.settleNoneHere', message: 'No answers or suggestions wait in the chat here' },
+    settleNoneHere: /*i18n*/ { id: 'enter.settleNoneHere', message: 'No answers, suggestions or held edits wait in the chat here' },
+    // Your edits held back, as Suggesting keeps them (C301 (b)).
+    settleEditsLetGo: /*i18n*/ { id: 'enter.settleEditsLetGo', message: 'Enter lets your held {count, plural, one {edit} other {edits}} {nums} go: {count, plural, one {it goes} other {they go}} with your next prompt' },
+    settleEditsTakeBack: /*i18n*/ { id: 'enter.settleEditsTakeBack', message: 'Enter takes back your held {count, plural, one {edit} other {edits}} {nums}: the struck words stand again' },
     // Suggestions (stage 12, piece 1; C229 (e)).
     settleSugRipple: /*i18n*/ { id: 'enter.settleSugRipple', message: 'Enter accepts {count, plural, one {Ripple’s suggestion} other {Ripple’s suggestions}} {nums}: each becomes an edit of yours in its branch, and goes with your next prompt there' },
     settleSugSweep: /*i18n*/ { id: 'enter.settleSugSweep', message: 'Enter accepts the {count, plural, one {sweep’s suggestion} other {sweep’s suggestions}} {nums}: the suggested words become the reply’s, and the struck ones go' },
@@ -1362,9 +1368,6 @@ export const COPY = {
     deleteAskSent: /*i18n*/ { id: 'enter.deleteAskSent', message: 'Ask {num} has gone to a model, so it stays. accept: or reject: settles its answer', comment: 'Commands stay English' },
     deleteEditUse: /*i18n*/ { id: 'enter.deleteEditUse', message: 'An edit is taken back with undo:{num}', comment: 'Commands stay English' },
     changeGone: /*i18n*/ { id: 'enter.changeGone', message: '{num} is no longer where it was, so nothing changed' },
-    markupColOn: /*i18n*/ { id: 'enter.markupColOn', message: 'Enter shows the cards marked up: struck words, yours in blue, answers in green' },
-    markupColOff: /*i18n*/ { id: 'enter.markupColOff', message: 'Enter shows the cards clean: each edit as it reads now, each answer alone' },
-    markupColSame: /*i18n*/ { id: 'enter.markupColSame', message: '{on, select, on {The cards are marked up already} other {The cards are clean already}}' },
     holdEditTold: /*i18n*/ { id: 'enter.holdEditTold', message: '{num} was told already, so it cannot be held back' },
     holdEditNotHere: /*i18n*/ { id: 'enter.holdEditNotHere', message: '{num} is not an edit in the chat here' },
     planMove: /*i18n*/ { id: 'enter.planMove', message: 'Enter moves {address} {where, select, after {after} other {before}} {other}. It keeps its letter' },
@@ -1495,6 +1498,27 @@ export const COPY = {
     turnedOff: /*i18n*/ { id: 'lock.turnedOff', message: 'The lock is off. The page reloads.' },
     passkeyItem: /*i18n*/ { id: 'lock.passkeyItem', message: 'A passkey, added {day}' },
     passkeyRemove: /*i18n*/ { id: 'lock.passkeyRemove', message: 'remove it' },
+  },
+
+  // The markup menu (C301 (b); parliament-markup-v1.html), where calm: was.
+  markupMenu: {
+    title: /*i18n*/ { id: 'markupMenu.title', message: 'Markup' },
+    mode: /*i18n*/ { id: 'markupMenu.mode', message: 'Mode' },
+    editing: /*i18n*/ { id: 'markupMenu.editing', message: 'Editing' },
+    editingAbout: /*i18n*/ { id: 'markupMenu.editingAbout', message: 'What you type is the text, and goes with your next prompt' },
+    suggesting: /*i18n*/ { id: 'markupMenu.suggesting', message: 'Suggesting' },
+    suggestingAbout: /*i18n*/ { id: 'markupMenu.suggestingAbout', message: 'What you type is marked, and waits until you accept it' },
+    show: /*i18n*/ { id: 'markupMenu.show', message: 'Show' },
+    kind: /*i18n*/ { id: 'markupMenu.kind', message: '{kind, select, edits {Edits} highlights {Highlights} prompts {Prompts} other {Comments}}', comment: 'A row of the menu: edits, highlights, prompts or comments' },
+    kindAbout: /*i18n*/ { id: 'markupMenu.kindAbout', message: '{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Next: comments written in the text}}' },
+    waiting: /*i18n*/ { id: 'markupMenu.waiting', message: 'Waiting' },
+    waitingCount: /*i18n*/ { id: 'markupMenu.waitingCount', message: '{count, plural, =0 {nothing waits in {where}} one {# waits in {where}} other {# wait in {where}}}', comment: '{where} is a chat number, as 214' },
+    noRoom: /*i18n*/ { id: 'markupMenu.noRoom', message: 'Open a room to accept or reject what waits in it' },
+    acceptAll: /*i18n*/ { id: 'markupMenu.acceptAll', message: 'Accept all' },
+    rejectAll: /*i18n*/ { id: 'markupMenu.rejectAll', message: 'Reject all' },
+    allAbout: /*i18n*/ { id: 'markupMenu.allAbout', message: 'Answers, suggestions and your held edits, in the room here' },
+    runs: /*i18n*/ { id: 'markupMenu.runs', message: 'Runs {command}', comment: 'Commands stay English' },
+    foot: /*i18n*/ { id: 'markupMenu.foot', message: 'Each click runs its command, as markup:off highlights or accept:all, and undo: takes it back. Escape or a click outside closes it.', comment: 'Commands stay English' },
   },
 
   // The languages' picker (stage 9, piece 4; C184).
@@ -1945,9 +1969,6 @@ export const COPY = {
     rippleOn: /*i18n*/ { id: 'room.rippleOn', message: 'ripple: on' },
     rippleHelp: /*i18n*/ { id: 'room.rippleHelp', message: 'Writes {command} in the bar', comment: 'Commands stay English' },
     // markup · clean in a room's head, as the Collection has (inline editing v5; 29 October).
-    markupWord: /*i18n*/ { id: 'room.markupWord', message: 'markup', comment: 'Show replies with their edits marked up' },
-    cleanWord: /*i18n*/ { id: 'room.cleanWord', message: 'clean', comment: 'Show replies as they read now, without marks' },
-    markupRuns: /*i18n*/ { id: 'room.markupRuns', message: 'Runs {command}', comment: 'Commands stay English' },
     notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },
     unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
     // The Parliament mark at the top of a narrow room (C252, after).
@@ -2248,8 +2269,6 @@ export const COPY = {
     acceptAnswer: /*i18n*/ { id: 'collection.acceptAnswer', message: 'accept' },
     undoAnswer: /*i18n*/ { id: 'collection.undoAnswer', message: 'undo' },
     runs: /*i18n*/ { id: 'collection.runs', message: 'Runs {command}', comment: 'Commands stay English' },
-    markupWord: /*i18n*/ { id: 'collection.markupWord', message: 'markup' },
-    cleanWord: /*i18n*/ { id: 'collection.cleanWord', message: 'clean' },
     // The legend folded while calm (stage 14, piece 2; C255 (a)).
     coloursFold: /*i18n*/ { id: 'collections.coloursFold', message: 'colours ▾' },
     legendStruck: /*i18n*/ { id: 'collection.legendStruck', message: 'struck' },
@@ -2784,11 +2803,11 @@ export const COPY = {
     focusOff: /*i18n*/ { id: 'shell.focusOff', message: 'focus: off', comment: 'focus is the command word, kept English' },
     focusOn: /*i18n*/ { id: 'shell.focusOn', message: 'focus: on', comment: 'focus is the command word, kept English' },
     focusRuns: /*i18n*/ { id: 'shell.focusRuns', message: 'Runs {command}', comment: 'Commands stay English' },
-    // The strip's calm and focus on hover, so the two read apart (C286 (e)).
-    calmTitle: /*i18n*/ { id: 'shell.calmTitle', message: 'Replies read as they stand until markup:on, and the details on boards wait until you come near them. Runs {command}', comment: 'Commands stay English' },
+    // The strip's markup and focus on hover, so the two read apart (C286 (e); C301 (b)).
+    markupTitle: /*i18n*/ { id: 'shell.markupTitle', message: 'What shows in the text, and how your typing is kept. Runs {command}', comment: 'Commands stay English' },
     focusTitle: /*i18n*/ { id: 'shell.focusTitle', message: 'Only the chat, or the boards you pick, stay on screen. Runs {command}', comment: 'Commands stay English' },
-    calmOff: /*i18n*/ { id: 'shell.calmOff', message: 'calm: off', comment: 'calm is the command word, kept English' },
-    calmOn: /*i18n*/ { id: 'shell.calmOn', message: 'calm: on', comment: 'calm is the command word, kept English' },
+    // Where "calm: off" was (C301 (b)).
+    markupMenu: /*i18n*/ { id: 'shell.markupMenu', message: 'markup', comment: 'markup is the command word, kept English' },
     boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },
     sampleReply: /*i18n*/ { id: 'shell.sampleReply', message: 'A stand-in reply until rooms arrive. Click into this line to edit it, and the bar folds into a circle.', comment: 'Editable text on a placeholder board; nothing typed here is kept' },
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },

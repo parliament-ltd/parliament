@@ -1389,10 +1389,6 @@ msgid "collection.chats"
 msgstr "对话"
 
 #. js-lingui-explicit-id
-msgid "collection.cleanWord"
-msgstr "无标注"
-
-#. js-lingui-explicit-id
 msgid "collection.count"
 msgstr "{count, plural, =0 {没有卡片} other {# 张卡片}}"
 
@@ -1513,10 +1509,6 @@ msgstr "取消搁置"
 #. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "合集"
-
-#. js-lingui-explicit-id
-msgid "collection.markupWord"
-msgstr "标注"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -2343,24 +2335,6 @@ msgstr "在每两个名称之间加上 then，例如 by:wikipedia then sonnet"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} 可能是 {names}。请指明是哪个，例如 {example}"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOff"
-msgstr "按 Enter 重新显示标注和所有细节"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOn"
-msgstr "按 Enter 在 markup:on 之前按回复现有的样子显示，并隐藏面板上的细节，等你靠近时再显示"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOff"
-msgstr "标注和细节已经显示。calm: 可按回复现有的样子显示，并隐藏细节，等你靠近时再显示"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOn"
-msgstr "标注和细节已经隐藏。calm:off 可显示它们"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3717,41 +3691,56 @@ msgstr "{count, plural, other {{nums} 未运行：运行条件未满足}}"
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {前面没有找到内容时运行} failed {前一个失败时运行} always {无论前一个结果如何都运行} other {前一个完成后运行}}"
 
+#. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOff"
-msgstr "按 Enter 像 calm 一样，再次按回复现有的样子显示。markup:on 可显示标注"
+msgid "enter.markupColGone"
+msgstr "合集现在始终显示其中的标注。markup:off 可在正文中隐藏它们"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOn"
-msgstr "按 Enter 显示回复中的标注。其他部分保持安静"
+msgid "enter.markupCommentsLater"
+msgstr "批注接下来会进入正文。在此之前，笔记保存在合集中"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmSame"
-msgstr "{on, select, on {回复中的标注已经显示} other {回复已经按现有的样子显示}}"
+msgid "enter.markupEditing"
+msgstr "按 Enter 切换到编辑模式：你输入的内容直接成为正文，并随你的下一条提示词发送"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOff"
-msgstr "按 Enter 以无标注方式显示卡片：每处编辑只显示现在的样子，每个回答单独显示"
+msgid "enter.markupHiddenAlready"
+msgstr "{kind, select, edits {编辑已隐藏} highlights {高亮已隐藏} prompts {提示词已隐藏} other {所有标注已隐藏}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOn"
-msgstr "按 Enter 以标注方式显示卡片：删去的文字加删除线，你的文字为蓝色，回答为绿色"
+msgid "enter.markupHideAll"
+msgstr "按 Enter 隐藏正文中的所有标注。回复按现有的样子显示，仍可编辑"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupHideKind"
+msgstr "{kind, select, edits {按 Enter 隐藏正文中的编辑：回复按现有的样子显示，仍可编辑} highlights {按 Enter 隐藏正文中的高亮。高亮仍会保留} other {按 Enter 隐藏正文中的提示词。提示词仍会保留}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColSame"
-msgstr "{on, select, on {卡片已经带标注} other {卡片已经是无标注的}}"
+msgid "enter.markupMenu"
+msgstr "按 Enter 打开标注菜单：正文中显示什么，以及你输入的内容如何处理"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOff"
-msgstr "按 Enter 以无标注方式显示回复：只显示结果，在 markup:on 之前为只读"
+msgid "enter.markupModeSame"
+msgstr "{mode, select, suggesting {已是建议模式：你输入的内容会等你接受} other {已是编辑模式：你输入的内容直接成为正文}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOn"
-msgstr "按 Enter 以标注方式显示回复：删去的文字加删除线，你的文字为蓝色，可编辑"
+msgid "enter.markupShowAll"
+msgstr "按 Enter 显示正文中的所有标注：编辑、高亮和提示词"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupShowKind"
+msgstr "{kind, select, edits {按 Enter 在正文中显示编辑} highlights {按 Enter 在正文中显示高亮} other {按 Enter 在正文中显示提示词}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupSame"
-msgstr "{on, select, on {回复已经带标注} other {回复已经是无标注的}}"
+msgid "enter.markupShownAlready"
+msgstr "{kind, select, edits {编辑已显示} highlights {高亮已显示} prompts {提示词已显示} other {所有标注已显示}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupSuggesting"
+msgstr "按 Enter 切换到建议模式：你输入的内容会带着标注被搁置，直到你接受"
 
 #. js-lingui-explicit-id
 msgid "enter.messageFailed"
@@ -5565,8 +5554,16 @@ msgid "enter.settleCardOnly"
 msgstr "提问 {num} 所针对的原文在提问后已改动，因此它的回答只显示在卡片上。reject:{num} 可将其放弃"
 
 #. js-lingui-explicit-id
+msgid "enter.settleEditsLetGo"
+msgstr "按 Enter 取消搁置你的{count, plural, other {编辑}} {nums}：它们将随你的下一条提示词发送"
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsTakeBack"
+msgstr "按 Enter 撤回你搁置的{count, plural, other {编辑}} {nums}：被删去的文字恢复原样"
+
+#. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr "此处对话中没有待处理的回答或建议"
+msgstr "此处对话中没有待处理的回答、建议或搁置的编辑"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
@@ -7784,6 +7781,78 @@ msgstr "改用密码短语"
 msgid "lock.wrong"
 msgstr "输入的内容无法解锁。"
 
+#. js-lingui-explicit-id
+msgid "markupMenu.acceptAll"
+msgstr "全部接受"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.allAbout"
+msgstr "此房间中的回答、建议和你搁置的编辑"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editing"
+msgstr "编辑模式"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editingAbout"
+msgstr "你输入的内容直接成为正文，并随你的下一条提示词发送"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.foot"
+msgstr "每次点击都会执行对应的命令，例如 markup:off highlights 或 accept:all，undo: 可撤销。按 Esc 或点击外部即可关闭。"
+
+#. A row of the menu: edits, highlights, prompts or comments
+#. js-lingui-explicit-id
+msgid "markupMenu.kind"
+msgstr "{kind, select, edits {编辑} highlights {高亮} prompts {提示词} other {批注}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.kindAbout"
+msgstr "{kind, select, edits {你的编辑，以及向你建议的修改} highlights {你标记的文字} prompts {正文中的提问，待发送或已回答} other {下一步：写在正文中的批注}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.mode"
+msgstr "模式"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.noRoom"
+msgstr "打开一个房间，即可接受或拒绝其中待处理的内容"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.rejectAll"
+msgstr "全部拒绝"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.runs"
+msgstr "执行 {command}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.show"
+msgstr "显示"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggesting"
+msgstr "建议模式"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggestingAbout"
+msgstr "你输入的内容会被标注，等你接受"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.title"
+msgstr "标注"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.waiting"
+msgstr "待处理"
+
+#. {where} is a chat number, as 214
+#. js-lingui-explicit-id
+msgid "markupMenu.waitingCount"
+msgstr "{count, plural, =0 {{where} 中没有待处理的内容} other {{where} 中有 # 项待处理}}"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -8446,11 +8515,6 @@ msgstr "你正在查看的回复。你在各条回复间切换时，提示词会
 msgid "room.chatSheet"
 msgstr "对话"
 
-#. Show replies as they read now, without marks
-#. js-lingui-explicit-id
-msgid "room.cleanWord"
-msgstr "无标注"
-
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -8493,16 +8557,6 @@ msgstr "隐藏边注栏"
 #. js-lingui-explicit-id
 msgid "room.home"
 msgstr "前往 Parliament 首页"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "room.markupRuns"
-msgstr "执行 {command}"
-
-#. Show replies with their edits marked up
-#. js-lingui-explicit-id
-msgid "room.markupWord"
-msgstr "标注"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -9346,21 +9400,6 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "此面板将在后续阶段实现。"
 
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOff"
-msgstr "calm: off"
-
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOn"
-msgstr "calm: on"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "shell.calmTitle"
-msgstr "在 markup:on 之前，回复按现有的样子显示，面板上的细节等你靠近时再显示。执行 {command}"
-
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9412,6 +9451,16 @@ msgstr "全屏"
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
 msgstr "退出全屏"
+
+#. markup is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.markupMenu"
+msgstr "markup"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.markupTitle"
+msgstr "正文中显示什么，以及你输入的内容如何处理。执行 {command}"
 
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
@@ -9681,9 +9730,10 @@ msgstr "在页面上移动输入栏"
 msgid "verb.by"
 msgstr "选择此对话由谁回答：模型，或不耗 token 的来源"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "在 markup:on 之前按回复现有的样子显示，并隐藏面板上的细节，等你靠近时再显示。calm:off 可全部显示"
+msgstr "旧名称：calm: 与 markup:off 一样隐藏正文中的所有标注，calm:off 则显示它们"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9829,9 +9879,10 @@ msgstr "把资源库放到当前屏幕内容旁边"
 msgid "verb.local"
 msgstr "设定房间是否只发送给本机上的模型"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "标注：在回复中显示你的编辑，或以无标注方式显示回复"
+msgstr "标注：markup: 打开菜单。markup:on 和 markup:off 显示或隐藏正文中的所有标注，或某一类，例如 markup:off highlights。markup:suggesting 会搁置你输入的内容直到你接受，markup:editing 则让它直接成为正文"
 
 #. js-lingui-explicit-id
 msgid "verb.model"

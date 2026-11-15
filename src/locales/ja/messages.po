@@ -1389,10 +1389,6 @@ msgid "collection.chats"
 msgstr "チャット"
 
 #. js-lingui-explicit-id
-msgid "collection.cleanWord"
-msgstr "清書"
-
-#. js-lingui-explicit-id
 msgid "collection.count"
 msgstr "{count, plural, =0 {なし} other {カード#枚}}"
 
@@ -1513,10 +1509,6 @@ msgstr "保留を解除"
 #. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "コレクション"
-
-#. js-lingui-explicit-id
-msgid "collection.markupWord"
-msgstr "変更表示"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -2343,24 +2335,6 @@ msgstr "名前と名前の間に then を入れます。例：by:wikipedia then 
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} は{names}のいずれかを指します。{example} のように指定してください"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOff"
-msgstr "Enterで、変更表示とすべての詳細を再び表示します"
-
-#. js-lingui-explicit-id
-msgid "enter.calmOn"
-msgstr "Enterで、返答を markup:on まで今の形のまま表示し、ボードの詳細を近づくまで隠します"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOff"
-msgstr "変更表示と詳細はすでに表示されています。calm: で、返答を今の形のまま表示し、詳細を近づくまで隠せます"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.calmSameOn"
-msgstr "変更表示と詳細はすでに隠れています。calm:off で表示できます"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3717,41 +3691,56 @@ msgstr "{count, plural, other {{nums}は、条件を満たさなかったため�
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {何も見つからなければ} failed {前のものが失敗したら} always {前のものの結果にかかわらず} other {前のものが終わったら}}"
 
+#. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOff"
-msgstr "Enterで、calm と同じく返答を再び今の形のまま表示します。markup:on で変更表示を出せます"
+msgid "enter.markupColGone"
+msgstr "コレクションは常にすべてのマークを表示するようになりました。markup:off でテキスト内のマークを隠せます"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmOn"
-msgstr "Enterで、返答の変更表示を出します。ほかは落ち着いた表示のままです"
+msgid "enter.markupCommentsLater"
+msgstr "コメントは次にテキスト内に入ります。それまでメモはコレクションに残ります"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCalmSame"
-msgstr "{on, select, on {返答の変更表示はすでに出ています} other {返答はすでに今の形のまま表示されています}}"
+msgid "enter.markupEditing"
+msgstr "Enterで編集モードに切り替えます：入力した内容がそのまま本文になり、次のプロンプトと一緒に送られます"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOff"
-msgstr "Enterで、カードを清書で表示します：編集は今の内容だけ、回答はそれだけを表示します"
+msgid "enter.markupHiddenAlready"
+msgstr "{kind, select, edits {編集はすでに非表示です} highlights {ハイライトはすでに非表示です} prompts {プロンプトはすでに非表示です} other {すべてのマークはすでに非表示です}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColOn"
-msgstr "Enterで、カードを変更表示にします：取り消し線の言葉、青で自分の言葉、緑で回答"
+msgid "enter.markupHideAll"
+msgstr "Enterでテキスト内のすべてのマークを隠します。返答は今の形のまま表示され、編集もできます"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupHideKind"
+msgstr "{kind, select, edits {Enterでテキスト内の編集を隠します：返答は今の形のまま表示され、編集もできます} highlights {Enterでテキスト内のハイライトを隠します。ハイライト自体は残ります} other {Enterでテキスト内のプロンプトを隠します。プロンプト自体は残ります}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupColSame"
-msgstr "{on, select, on {カードはすでに変更表示です} other {カードはすでに清書です}}"
+msgid "enter.markupMenu"
+msgstr "Enterで変更表示メニューを開きます：テキストに何を表示するか、入力をどう扱うか"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOff"
-msgstr "Enterで、返答を清書で表示します：結果だけを表示し、markup:on まで編集できません"
+msgid "enter.markupModeSame"
+msgstr "{mode, select, suggesting {すでに提案モードです：入力した内容は受け入れるまで待機します} other {すでに編集モードです：入力した内容がそのまま本文になります}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupOn"
-msgstr "Enterで、返答を変更表示にします：取り消し線の言葉と青の自分の言葉を表示し、編集できます"
+msgid "enter.markupShowAll"
+msgstr "Enterでテキスト内のすべてのマークを表示します：編集、ハイライト、プロンプト"
+
+#. kind is edits, highlights or prompts
+#. js-lingui-explicit-id
+msgid "enter.markupShowKind"
+msgstr "{kind, select, edits {Enterでテキスト内の編集を表示します} highlights {Enterでテキスト内のハイライトを表示します} other {Enterでテキスト内のプロンプトを表示します}}"
 
 #. js-lingui-explicit-id
-msgid "enter.markupSame"
-msgstr "{on, select, on {返答はすでに変更表示です} other {返答はすでに清書です}}"
+msgid "enter.markupShownAlready"
+msgstr "{kind, select, edits {編集はすでに表示されています} highlights {ハイライトはすでに表示されています} prompts {プロンプトはすでに表示されています} other {すべてのマークはすでに表示されています}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupSuggesting"
+msgstr "Enterで提案モードに切り替えます：入力した内容はマークされたまま保留され、受け入れるまで待機します"
 
 #. js-lingui-explicit-id
 msgid "enter.messageFailed"
@@ -5565,8 +5554,16 @@ msgid "enter.settleCardOnly"
 msgstr "依頼{num}の箇所は依頼のあとに変わったため、回答はカードにだけあります。reject:{num} で破棄できます"
 
 #. js-lingui-explicit-id
+msgid "enter.settleEditsLetGo"
+msgstr "{count, plural, other {Enterで保留中の編集{nums}の保留を解除します：次のプロンプトと一緒に送られます}}"
+
+#. js-lingui-explicit-id
+msgid "enter.settleEditsTakeBack"
+msgstr "{count, plural, other {Enterで保留中の編集{nums}を取り消します：取り消し線の言葉が元に戻ります}}"
+
+#. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr "ここのチャットには、確認待ちの回答も提案もありません"
+msgstr "ここのチャットには、確認待ちの回答も提案も保留中の編集もありません"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
@@ -7784,6 +7781,78 @@ msgstr "代わりにパスフレーズを使う"
 msgid "lock.wrong"
 msgstr "これでは開けません。"
 
+#. js-lingui-explicit-id
+msgid "markupMenu.acceptAll"
+msgstr "すべて受け入れる"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.allAbout"
+msgstr "このルームの回答、提案、保留中の自分の編集"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editing"
+msgstr "編集モード"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.editingAbout"
+msgstr "入力した内容がそのまま本文になり、次のプロンプトと一緒に送られます"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.foot"
+msgstr "クリックするとそれぞれのコマンド（markup:off highlights、accept:all など）が実行され、undo: で元に戻せます。Esc か外側のクリックで閉じます。"
+
+#. A row of the menu: edits, highlights, prompts or comments
+#. js-lingui-explicit-id
+msgid "markupMenu.kind"
+msgstr "{kind, select, edits {編集} highlights {ハイライト} prompts {プロンプト} other {コメント}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.kindAbout"
+msgstr "{kind, select, edits {自分の編集と、提案された変更} highlights {マークした言葉} prompts {テキスト内の質問（待機中または回答済み）} other {次の段階：テキストに書くコメント}}"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.mode"
+msgstr "モード"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.noRoom"
+msgstr "ルームを開くと、そこで待機中のものを受け入れたり却下したりできます"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.rejectAll"
+msgstr "すべて却下する"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "markupMenu.runs"
+msgstr "{command} を実行します"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.show"
+msgstr "表示"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggesting"
+msgstr "提案モード"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.suggestingAbout"
+msgstr "入力した内容はマークされ、受け入れるまで待機します"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.title"
+msgstr "変更表示"
+
+#. js-lingui-explicit-id
+msgid "markupMenu.waiting"
+msgstr "確認待ち"
+
+#. {where} is a chat number, as 214
+#. js-lingui-explicit-id
+msgid "markupMenu.waitingCount"
+msgstr "{count, plural, =0 {{where}で確認待ちのものはありません} other {{where}で#件が確認待ち}}"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -8446,11 +8515,6 @@ msgstr "表示中の返答。返答を切り替えると、プロンプトもそ
 msgid "room.chatSheet"
 msgstr "チャット"
 
-#. Show replies as they read now, without marks
-#. js-lingui-explicit-id
-msgid "room.cleanWord"
-msgstr "清書"
-
 #. The button on a room's left column, while it is open
 #. js-lingui-explicit-id
 msgid "room.closeLeft"
@@ -8493,16 +8557,6 @@ msgstr "余白を隠す"
 #. js-lingui-explicit-id
 msgid "room.home"
 msgstr "Parliamentの最初の画面へ"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "room.markupRuns"
-msgstr "{command} を実行します"
-
-#. Show replies with their edits marked up
-#. js-lingui-explicit-id
-msgid "room.markupWord"
-msgstr "変更表示"
 
 #. js-lingui-explicit-id
 msgid "room.newTitle"
@@ -9346,21 +9400,6 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "このボードは、後の段階で作ります。"
 
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOff"
-msgstr "calm: オフ"
-
-#. calm is the command word, kept English
-#. js-lingui-explicit-id
-msgid "shell.calmOn"
-msgstr "calm: オン"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "shell.calmTitle"
-msgstr "返答は markup:on まで今の形のまま表示され、ボードの詳細は近づいたときに表示されます。{command} を実行します"
-
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9412,6 +9451,16 @@ msgstr "全画面表示"
 #. js-lingui-explicit-id
 msgid "shell.leaveFullScreen"
 msgstr "全画面表示を終了"
+
+#. markup is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.markupMenu"
+msgstr "markup"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.markupTitle"
+msgstr "テキストに何を表示するか、入力をどう扱うか。{command} を実行します"
 
 #. Beside the heading of the ? reference
 #. js-lingui-explicit-id
@@ -9681,9 +9730,10 @@ msgstr "ページ上でバーを移動する"
 msgid "verb.by"
 msgstr "このチャットで答えるものを選ぶ：モデル、またはトークン不要の情報源"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.calm"
-msgstr "返答を markup:on まで今の形のまま表示し、ボードの詳細を近づくまで隠す。calm:off ですべて表示します"
+msgstr "以前の名前：calm: は markup:off と同じくテキスト内のすべてのマークを隠し、calm:off で表示します"
 
 #. js-lingui-explicit-id
 msgid "verb.check"
@@ -9829,9 +9879,10 @@ msgstr "画面の横にライブラリを出す"
 msgid "verb.local"
 msgstr "ルームの送信先を、このコンピュータ上のモデルだけにするかどうかを指定する"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.markup"
-msgstr "変更表示：返答に自分の編集を表示する、または清書で表示する"
+msgstr "変更表示：markup: でメニューを開きます。markup:on と markup:off でテキスト内のすべてのマーク、または一種類（markup:off highlights など）を表示・非表示にします。markup:suggesting では入力した内容を受け入れるまで保留し、markup:editing ではそのまま本文にします"
 
 #. js-lingui-explicit-id
 msgid "verb.model"

@@ -770,12 +770,15 @@ export function ChatProvider({ children }) {
   // A reply edited in place: its editable form and its edits, kept in one
   // write (stage 11, piece 1; C212). Its content, what the model wrote, stays.
   // A prompt is saved the same way, its edits marked as the prompt's (piece 2).
-  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply' }) => {
-    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, suggestions, part })
+  // held: in Suggesting, a new edit starts held back (C301 (b)).
+  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', held = false }) => {
+    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, suggestions, part, held })
     updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
     // An edit or an ask starts a collection when there is none, as a first
-    // highlight does (C300). An id only, never the words.
-    if ((edits?.length ?? 0) > 0 || (asks?.length ?? 0) > 0) {
+    // highlight does (C300). An id only, never the words. Edits and asks
+    // come as Maps.
+    const count = (x) => x?.size ?? x?.length ?? 0
+    if (count(edits) > 0 || count(asks) > 0) {
       window.dispatchEvent(new CustomEvent('parliament-marked', { detail: { chatId: conversationId } }))
     }
     return counts
