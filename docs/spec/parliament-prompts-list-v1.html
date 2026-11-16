@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompts' list</title>
+<!--
+  C301 (d) and (e), the rest, proposed (15 November): the bar's list of what
+  Enter sends, by branch, one request to each branch ticked; and "as a
+  reply" on a prompt's row, with the one change it needs to what is stored.
+  The list as parliament-markup-v1.html drew it and Stefan ruled; values from
+  src/styles/tokens.css and src/chrome/chrome.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --wash: rgba(25, 25, 25, .045);
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --prompt-tint: rgba(194, 65, 12, .07);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .right { margin-inline-start: auto; }
+  .chead .on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .chead .new { color: var(--ai); }
+  .reply { padding: 14px 22px 18px; font: 400 15.5px/1.7 var(--serif); }
+  .reply p { margin: 0 0 .8em; }
+  .reply .who { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); margin-bottom: 6px; }
+  .pr-at { background: var(--prompt-tint); border-radius: 2px; }
+  .pr-at::before, .pr-at::after { content: ""; display: inline-block; width: 5px; height: .78em; border: 0 solid var(--prompt); }
+  .pr-at::before { border-width: 1.5px 0 0 1.5px; vertical-align: text-top; margin-inline-end: 1px; }
+  .pr-at::after { border-width: 0 1.5px 1.5px 0; vertical-align: baseline; margin-inline-start: 1px; }
+  .pr { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--prompt); }
+  .pr b, .pl b { font: 600 10.5px var(--mono); font-style: normal; margin-inline-end: 3px; letter-spacing: -.02em; }
+  .pr .as { color: var(--marg); }
+  .reply s.struck { color: var(--ink-3); }
+  .reply ins.added { color: var(--you); text-decoration: underline; text-underline-offset: 3px; margin-inline-start: .22em; }
+
+  .bar { margin-top: 16px; background: var(--surface); border: .5px solid var(--border); border-radius: 14px; }
+  .field { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 0 0 14px 14px; background: var(--subtle); }
+  .field .chip { padding: 2px 7px; border-radius: 9px; background: var(--ink); color: #fff; font: 600 9px var(--sans); letter-spacing: .06em; }
+  .field .v { font: 400 14px var(--sans); }
+  .enter { margin: 7px 6px 0; }
+  .enter b { font-weight: 400; color: var(--ink); }
+  .enter a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  .list { padding: 10px 14px 6px; border-bottom: .5px solid var(--border-2); }
+  .list-head { display: flex; align-items: baseline; gap: 8px; padding: 0 0 6px; }
+  .list-head h3 { margin: 0; font: 600 12px var(--sans); }
+  .list-head .right { margin-inline-start: auto; }
+  .br { padding: 6px 0 4px; border-top: .5px solid var(--border-2); }
+  .br-row, .it { display: flex; align-items: baseline; gap: 8px; }
+  .br-row { font: 400 12.5px var(--sans); }
+  .br-row .addr { font: 600 11px var(--mono); }
+  .br-row .who { font: 600 12px var(--sans); }
+  .br-row .what { color: var(--ink-2); }
+  .it { padding: 3px 0 3px 22px; font: 400 12.5px/1.45 var(--sans); }
+  .it .on-what { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .it .how { margin-inline-start: auto; flex: none; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .it .how .on { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+  .it.held { color: var(--ink-3); }
+  .it.held .pl { color: var(--ink-3); }
+  .pl { color: var(--prompt); flex: none; }
+  .el { flex: none; }
+  .el s { color: var(--ink-3); }
+  .el ins { color: var(--you); text-decoration: underline; text-underline-offset: 2px; }
+  .br.none .br-row { color: var(--ink-3); }
+  .box { flex: none; display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .col-card { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 10px 16px; }
+  .mk-q { font: italic 400 var(--t-small)/1.5 var(--serif); border-inline-start: 2px solid var(--prompt); padding-inline-start: 9px; color: var(--ink-2); }
+  .mk-t { margin-top: 4px; font: 400 var(--t-small)/1.5 var(--sans); }
+  .mk-marg { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; }
+  .mk-marg .id { font: 400 var(--t-id) var(--mono); font-style: normal; }
+  .mk-marg a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  pre { margin: 0; padding: 12px 14px; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; font: 400 12px/1.6 var(--mono); color: var(--ink-2); overflow-x: auto; white-space: pre-wrap; }
+  pre .add { color: var(--you); }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 780px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair h3 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 4px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Prompts' list</h1>
+    <p>C301 (d) and (e), the rest, proposed. The list above the bar's field, by branch, as the markup mockup drew it and you ruled; Enter sends one request to each branch ticked. Then "as a reply" on a prompt's row, which needs one small change to what is stored, shown in section 3. Built in two pieces, the list first.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · What Enter sends, by branch</h2>
+    <p class="lede">Prompts wait in 201a and 201b, so the list opens by itself above the field. Each branch is answered by its own answerer, as <code>to:</code> sends to several branches now: 201a by Sonnet 5.5, 201b by Haiku 4.5. An unticked prompt or edit is held back, as Hold back does in the Collection, and waits for a later Enter.</p>
+    <div class="bar">
+      <div class="list">
+        <div class="list-head"><h3>What Enter sends</h3><span class="marg right">2 requests · about 3¢</span></div>
+        <div class="br">
+          <div class="br-row"><span class="box on"></span><span class="addr">201a</span><span class="who">Sonnet 5.5</span><span class="what">your words, 2 prompts and an edit</span><span class="marg">on screen</span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>keep the date, say it plainer</span><span class="on-what">on "Tuesday the 4th of November"</span><span class="how"><span class="on">in the text</span> · as a reply</span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>is this too strict? say why</span><span class="on-what">on "a freeze until March"</span><span class="how">in the text · <span class="on">as a reply</span></span></div>
+          <div class="it"><span class="box on"></span><span class="el">edit <s>three</s> <ins>four</ins></span></div>
+        </div>
+        <div class="br">
+          <div class="br-row"><span class="box on"></span><span class="addr">201b</span><span class="who">Haiku 4.5</span><span class="what">your words and a prompt</span><span class="marg">1 held back</span></div>
+          <div class="it"><span class="box on"></span><span class="pl"><b>p&gt;</b>shorter, for the minutes</span><span class="on-what">on "The budget comes first because"</span><span class="how"><span class="on">in the text</span> · as a reply</span></div>
+          <div class="it held"><span class="box"></span><span class="pl"><b>p&gt;</b>add last year's figures</span><span class="on-what">on "spending rose again"</span><span class="how">waits</span></div>
+        </div>
+        <div class="br none">
+          <div class="br-row"><span class="box"></span><span class="addr">201c</span><span class="who">Mistral Medium</span><span class="what">nothing waits</span><span class="marg">tick to send your words here too</span></div>
+        </div>
+      </div>
+      <div class="field"><span class="chip">PROMPT</span><span class="v">tighten the whole thing, keep it under a page</span></div>
+    </div>
+    <div class="enter marg"><b>Enter sends your words, 2 prompts and an edit to Sonnet 5.5 in 201a, and a prompt to Haiku 4.5 in 201b, about 3¢</b> · <a>fold the list</a></div>
+    <ul class="notes">
+      <li>Each answer lands in its own branch. The room stays on the branch it shows; the branch tabs say when another branch's answer has come.</li>
+      <li>A tick on a prompt or an edit is Hold back, the same field the Collection's foot sets (C298): it changes at once, says so under the bar, and <code>undo:</code> takes it back. A branch unticked sends nothing now, and what waits in it keeps waiting.</li>
+      <li>With prompts in one branch only, the list stays folded and the line says it all; "see what goes" opens it. Comments are not in the list: they are never sent.</li>
+      <li>The branches listed are the room's chat and its plan's other branches. Prompts waiting in another room go when that room is addressed, as ruled.</li>
+      <li>Asking several answerers at once stays as it is today, on one branch, each answer a new branch. Across branches, each branch has its one answerer; several to a branch can come later, if wanted.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · As a reply</h2>
+    <p class="lede">A prompt that asks rather than asks for a change wants a reply, not an edit. On its row, "as a reply". The model is told to answer it in its reply, and nothing lands in the text: once the reply has come, the prompt's brackets go and its passage stays as it was.</p>
+    <div class="two">
+      <div>
+        <span class="tag">Waiting</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="marg right">branch <span class="on">201a</span> · 201b</span></div>
+          <div class="reply">
+            <p>Second, the hiring plan, with <span class="pr-at">a freeze until March</span><span class="pr"><b>p&gt;</b>is this too strict? say why <span class="as">· as a reply</span></span>. Third, the move.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="tag">Answered</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="marg right">branch <span class="on">201a</span> · 201b</span></div>
+          <div class="reply">
+            <p>Second, the hiring plan, with a freeze until March. Third, the move.</p>
+            <div class="who">Sonnet 5.5 answered, 10:51</div>
+            <p>A freeze until March is strict but defensible: it covers the budget vote, and the two hires you most need can be made the week after.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="two" style="margin-top:14px">
+      <div>
+        <span class="tag">What the model is told</span>
+<pre>The person asks about your reply 1, in their own words.
+Answer each of these in your reply itself, not in a block:
+- Prompt 242, about "a freeze until March": is this
+  too strict? say why</pre>
+      </div>
+      <div>
+        <span class="tag">Its card in the Collection</span>
+        <div class="col-card">
+          <div class="mk-q">a freeze until March</div>
+          <div class="mk-t">is this too strict? say why</div>
+          <div class="mk-marg marg"><span class="id">242</span><span>Prompt</span><span>201a</span><span>answered in the reply</span><a>find it</a></div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>Prompts in the text keep going as now: answered in a block, placed after their passage, to accept or reject (C218). "As a reply" is chosen on the row, and kept until changed.</li>
+      <li>Accept and reject do not apply to a prompt answered in the reply: there is nothing in the text to settle. Find it opens the reply.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · What is stored: shown before building</h2>
+    <p class="lede">Ticking and unticking use the field an ask has now, held. "As a reply" needs one more, and the answer that comes in the reply needs a state of its own.</p>
+    <div class="pair">
+      <div>
+        <h3>A prompt in the text, now</h3>
+<pre>{
+  id: "m-91c2…:q4f1…",
+  num: 242,
+  conversationId: "c-201a",
+  messageId: "m-91c2…",
+  question: "is this too strict? say why",
+  passage: "a freeze until March",
+  state: "open",
+  held: false,
+  sent: null,
+  answer: null
+}</pre>
+      </div>
+      <div>
+        <h3>As a reply, sent and answered</h3>
+<pre>{
+  id: "m-91c2…:q4f1…",
+  num: 242,
+  conversationId: "c-201a",
+  messageId: "m-91c2…",
+  question: "is this too strict? say why",
+  passage: "a freeze until March",
+<span class="add">  reply: true,</span>
+<span class="add">  state: "replied",</span>
+  held: false,
+  sent: { to: "claude-sonnet-5-5", at: "…" },
+<span class="add">  answer: { by: "claude-sonnet-5-5", at: "…",
+            inReply: "m-a7d0…" }</span>
+}</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><code>reply</code>: optional, true for "as a reply"; a prompt without it is answered in the text, as now.</li>
+      <li><code>state: "replied"</code>: a new value beside open, answered, accepted and taken back, for a prompt whose answer is the reply; <code>answer</code> then names who answered, when, and the reply, with no words of its own.</li>
+      <li>No migration: no record is rewritten, and no store, index or database version changes. Backups carry the field and the state from this version on; one made before reads as now.</li>
+      <li>An older Parliament restoring a newer backup drops <code>reply</code>, and shows a replied prompt as sent, never sending it again.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>Each branch answered by its own answerer,</b> as <code>to:</code> does, the line naming each; rather than one answerer for every branch ticked.</li>
+        <li><b>The stored change:</b> <code>reply</code> on a prompt, and the state <code>replied</code> with its answer, as section 3 shows.</li>
+        <li><b>A prompt answered as a reply leaves the text,</b> its passage as it was, and its card says "answered in the reply".</li>
+        <li><b>The order:</b> the list and the send by branch first, with no stored change; then "as a reply".</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
