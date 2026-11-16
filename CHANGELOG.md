@@ -3,6 +3,15 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.18.0, 16 November 2026
+
+- Parliament opens on an empty room, with the bar at its foot. Closing the welcome page and reset: leave an empty room too, and tour: brings the welcome steps back.
+- The strip starts with the birds, and has import: and tour: after Plan:.
+- Notes are comments now. Select words in a reply and press Ctrl+Alt+M (⌘⌥M on a Mac) to comment on them, or write comment:reply for the whole reply. Comments show in the text and are never sent.
+- Asks are prompts in the text now. Select words and press Ctrl+Alt+P (⌘⌥P on a Mac): the words sit between brackets with your prompt after them, and the answer comes back to accept or reject, or in the reply itself if you choose "as a reply".
+- Above the bar, a list shows what Enter sends to each branch: your words, your prompts in the text and your edits, each to that branch's own model. Untick one to hold it back. With nothing typed, Enter sends just what waits.
+- Your first mark in a chat brings the Collection up beside the room. Its order is a Sort by menu next to its tabs, and its name and sources sit on one line.
+
 ## 0.17.0, 15 November 2026
 
 - markup ▾ at the end of the strip, where calm was, opens one menu for what shows in the text: edits, highlights and prompts, each shown or hidden. With edits hidden, a reply reads as it stands and you can still type in it.
