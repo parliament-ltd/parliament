@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { strip, wordFor, isRoom } from '../shell/boards'
@@ -34,9 +35,34 @@ import BirdsMark from './BirdsMark'
 export default function Strip({ arrangement, onPick, onRun = null, markup = null, phone = null, globe = null }) {
   const { i18n } = useLingui()
   const on = Boolean(arrangement.focus)
+  // The birds fold the boards away and bring them back (C301 (f); Stefan,
+  // 16 November: "when a user selects 'Focus: On' that 'Room:' 'Collection:'
+  // etc. slide to the left. Clicking the bird icon opens the top nav to the
+  // right ... Clicking the bird icon again hides the menu"). Focus folds
+  // them and focus:off brings them back; a click on the birds does either.
+  // Kept in this tab only. On a phone the strip is how you move, so it stays.
+  const [folded, setFolded] = useState(on)
+  // Focus turning on or off folds or opens them, once, as it changes.
+  const [wasOn, setWasOn] = useState(on)
+  if (wasOn !== on) {
+    setWasOn(on)
+    setFolded(on)
+  }
+  const foldable = !phone
+  const hidden = foldable && folded
   return (
-    <nav className="ch-strip" aria-label={i18n._(COPY.shell.strip)}>
-      <BirdsMark className="ch-sbirds" />
+    <nav className={`ch-strip${hidden ? ' folded' : ''}`} aria-label={i18n._(COPY.shell.strip)}>
+      {foldable
+        ? (
+          <button type="button" className="ch-sbirds-b" aria-expanded={!folded} aria-controls="ch-sboards"
+            title={i18n._(folded ? COPY.shell.boardsShow : COPY.shell.boardsHide)}
+            aria-label={i18n._(folded ? COPY.shell.boardsShow : COPY.shell.boardsHide)}
+            onClick={() => setFolded((f) => !f)}>
+            <BirdsMark className="ch-sbirds" />
+          </button>
+        )
+        : <BirdsMark className="ch-sbirds" />}
+      <span id="ch-sboards" className="ch-sboards" inert={hidden || undefined}>
       {strip(arrangement).flatMap((b) => (phone && b.board === 'room' && phone.rooms.length
         ? phone.rooms.map((r) => ({ board: r.board, title: b.title, context: r.num, here: true, exact: true, addressed: arrangement.addressed === r.board }))
         : [b])).map((b) => (
@@ -54,11 +80,14 @@ export default function Strip({ arrangement, onPick, onRun = null, markup = null
           {b.context != null && <span className="ch-ctx">{String(b.context)}</span>}
         </button>
       ))}
-      {onRun && ['import:', 'tour:'].map((command) => (
+      {/* Written as the boards are, capitalised (Stefan, 16 November); the
+          commands they run stay English. */}
+      {onRun && [['import:', 'Import:'], ['tour:', 'Tour:']].map(([command, shown]) => (
         <button key={command} type="button" className="ch-btitle ch-scmd" dir="ltr" title={i18n._(COPY.shell.focusRuns, { command })} onClick={() => onRun(command)}>
-          {command}
+          {shown}
         </button>
       ))}
+      </span>
       {markup && (
         <span className="ch-marg ch-smarkup">
           <button type="button" className={markup.open ? 'on' : undefined} aria-expanded={markup.open} aria-haspopup="true"

@@ -7,7 +7,7 @@ import { withoutWaiting, START,
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
-  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare, planBeside, firstScreen, settle,
+  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare, planBeside, firstScreen, settle, emptyRoom,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -334,11 +334,21 @@ describe('focus: (stage 5, piece 6; W §7)', () => {
     expect(back.focus).toBeUndefined()
   })
 
-  it('takes the last chat when the space has no room, and refuses with nothing to focus on', () => {
+  it('takes the last chat when the space has no room, and an empty room with no chat at all (C301 (f))', () => {
     const a = { ...shipped('welcome'), id: SPACE }
     expect(planFocus(a, 'c9').next.context.room).toBe('c9')
-    expect(planFocus(a).says.message).toBe('focusNothing')
+    const empty = planFocus(a)
+    expect(empty.next.columns).toEqual([['room']])
+    expect(empty.next.context.room).toBeNull()
+    expect(empty.says.message).toBe('focusClosingEmpty')
     expect(planFocusOff(a).says.message).toBe('focusOffNot')
+  })
+
+  it('keeps an empty room on screen as it is, rather than bringing the last chat (C301 (f))', () => {
+    const a = emptyRoom({ ...shipped('room'), id: SPACE })
+    const f = planFocus(a, 'c9')
+    expect(f.next.context.room).toBeNull()
+    expect(f.says.message).toBe('focusAloneEmpty')
   })
 
   it('reset: ends focus', () => {

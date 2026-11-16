@@ -3123,12 +3123,20 @@ msgid "enter.focusAlone"
 msgstr "Enter leaves the chat alone here, with the bar under it"
 
 #. js-lingui-explicit-id
+msgid "enter.focusAloneEmpty"
+msgstr "Enter leaves the empty room alone here, to write in, with the bar under it"
+
+#. js-lingui-explicit-id
 msgid "enter.focusAlready"
 msgstr "The chat is in focus already. focus:off brings back what was here"
 
 #. js-lingui-explicit-id
 msgid "enter.focusClosing"
 msgstr "Enter clears the screen to the chat, closing {boards}. Nothing is lost, and focus:off brings them back"
+
+#. js-lingui-explicit-id
+msgid "enter.focusClosingEmpty"
+msgstr "Enter clears the screen to the empty room, closing {boards}. Nothing is lost, and focus:off brings them back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -9574,6 +9582,14 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "This board is drawn in a later stage."
 
+#. js-lingui-explicit-id
+msgid "shell.boardsHide"
+msgstr "Hide the boards"
+
+#. js-lingui-explicit-id
+msgid "shell.boardsShow"
+msgstr "Show the boards"
+
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9598,15 +9614,15 @@ msgstr "the welcome page"
 msgid "shell.field"
 msgstr "Search, command or prompt"
 
-#. focus is the command word, kept English
+#. Focus is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.focusOff"
-msgstr "focus: off"
+msgstr "Focus: off"
 
-#. focus is the command word, kept English
+#. Focus is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.focusOn"
-msgstr "focus: on"
+msgstr "Focus: on"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -9626,10 +9642,10 @@ msgstr "full screen"
 msgid "shell.leaveFullScreen"
 msgstr "leave full screen"
 
-#. markup is the command word, kept English
+#. Markup is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.markupMenu"
-msgstr "markup"
+msgstr "Markup"
 
 #. Commands stay English
 #. js-lingui-explicit-id

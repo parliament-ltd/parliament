@@ -187,3 +187,4 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - The type: words stay English, in the English order: type: に highlight、quote、note のいずれかを指定します.
 - verb.has follows the new English order: メモ、引用、ハイライトを含むものを表示する.
 - blockAbout.highlights (the passages you highlighted, each in its colour where you marked it) → チャットでハイライトした箇所を、マークしたその場所にそれぞれの色で示します. passage → 箇所, as enter.jumpOpen; marked → マークした.
+- The strip, 16 November: "Markup ▾", "Focus: オフ" and "Focus: オン", "Import:" and "Tour:" capitalised as the boards are (Stefan: "capitalize the 'f' in focus and 'm' in markup"); the command words stay English. ボードを隠す and ボードを表示 on the birds, which fold the boards away. 空のルーム for focus on an empty room, a page to write in.

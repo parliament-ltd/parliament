@@ -771,6 +771,9 @@ export const COPY = {
     // focus: and focus:off, the first form (W §7; stage 5, piece 6). {boards} is a list of board names.
     focusClosing: /*i18n*/ { id: 'enter.focusClosing', message: 'Enter clears the screen to the chat, closing {boards}. Nothing is lost, and focus:off brings them back' },
     focusAlone: /*i18n*/ { id: 'enter.focusAlone', message: 'Enter leaves the chat alone here, with the bar under it' },
+    // focus: on an empty room, a page to write in (C301 (f)).
+    focusClosingEmpty: /*i18n*/ { id: 'enter.focusClosingEmpty', message: 'Enter clears the screen to the empty room, closing {boards}. Nothing is lost, and focus:off brings them back' },
+    focusAloneEmpty: /*i18n*/ { id: 'enter.focusAloneEmpty', message: 'Enter leaves the empty room alone here, to write in, with the bar under it' },
     focusAlready: /*i18n*/ { id: 'enter.focusAlready', message: 'The chat is in focus already. focus:off brings back what was here' },
     focusNothing: /*i18n*/ { id: 'enter.focusNothing', message: 'Nothing to focus on yet. p> starts a chat' },
     focusOff: /*i18n*/ { id: 'enter.focusOff', message: 'Enter brings back {boards}' },
@@ -2839,14 +2842,17 @@ export const COPY = {
     field: /*i18n*/ { id: 'shell.field', message: 'Search, command or prompt', comment: 'The name of the field, read by screen readers' },
     strip: /*i18n*/ { id: 'shell.strip', message: 'Boards', comment: 'The name of the board strip, read by screen readers' },
     // Focus at the end of the strip (stage 14, piece 1; C253).
-    focusOff: /*i18n*/ { id: 'shell.focusOff', message: 'focus: off', comment: 'focus is the command word, kept English' },
-    focusOn: /*i18n*/ { id: 'shell.focusOn', message: 'focus: on', comment: 'focus is the command word, kept English' },
+    focusOff: /*i18n*/ { id: 'shell.focusOff', message: 'Focus: off', comment: 'Focus is the command word, kept English, capitalised as the boards are' },
+    focusOn: /*i18n*/ { id: 'shell.focusOn', message: 'Focus: on', comment: 'Focus is the command word, kept English, capitalised as the boards are' },
+    // The birds at the strip's start fold the boards away and back (C301 (f)).
+    boardsHide: /*i18n*/ { id: 'shell.boardsHide', message: 'Hide the boards' },
+    boardsShow: /*i18n*/ { id: 'shell.boardsShow', message: 'Show the boards' },
     focusRuns: /*i18n*/ { id: 'shell.focusRuns', message: 'Runs {command}', comment: 'Commands stay English' },
     // The strip's markup and focus on hover, so the two read apart (C286 (e); C301 (b)).
     markupTitle: /*i18n*/ { id: 'shell.markupTitle', message: 'What shows in the text, and how your typing is kept. Runs {command}', comment: 'Commands stay English' },
     focusTitle: /*i18n*/ { id: 'shell.focusTitle', message: 'Only the chat, or the boards you pick, stay on screen. Runs {command}', comment: 'Commands stay English' },
     // Where "calm: off" was (C301 (b)).
-    markupMenu: /*i18n*/ { id: 'shell.markupMenu', message: 'markup', comment: 'markup is the command word, kept English' },
+    markupMenu: /*i18n*/ { id: 'shell.markupMenu', message: 'Markup', comment: 'Markup is the command word, kept English, capitalised as the boards are' },
     boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },
     sampleReply: /*i18n*/ { id: 'shell.sampleReply', message: 'A stand-in reply until rooms arrive. Click into this line to edit it, and the bar folds into a circle.', comment: 'Editable text on a placeholder board; nothing typed here is kept' },
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },

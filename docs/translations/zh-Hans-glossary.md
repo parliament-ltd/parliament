@@ -200,3 +200,4 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - highlights counted alone → # 处高亮 (reflection.markTerms), as edits are counted 处, since a highlight is a place in a reply. In a list shared with notes and quotes the list keeps its 条 (# 条笔记、高亮和摘录)
 - The type: words stay as typed, in the English order: type: 可接 highlight、quote 或 note 之一
 - blockAbout.highlights (the passages you highlighted, each in its colour where you marked it) → 你在对话中高亮的文字，各以自己的颜色显示在你标记的位置. passage → 文字, as enter.jumpOpen's 一段文字; to highlight → 高亮 as a verb
+- The strip, 16 November: "Markup ▾", "Focus: off" and "Focus: on", "Import:" and "Tour:" capitalised as the boards are (Stefan: "capitalize the 'f' in focus and 'm' in markup"); the command words stay English. 隐藏面板 and 显示面板 on the birds, which fold the boards away. 空房间 for focus on an empty room, a page to write in.

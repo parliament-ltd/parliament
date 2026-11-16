@@ -39,9 +39,19 @@
 .ch-smarkup { margin-inline-start: auto; }
 /* The language at the end of the header, and alone in the top corner (1 November). */
 .ch-sglobe { margin-inline-start: 14px; }
-/* The birds at the strip's start, and import: and tour: after the boards (C302 (e)). */
+/* The birds at the strip's start, and Import: and Tour: after the boards (C302 (e)),
+   written as the boards are (16 November). */
 .ch-sbirds { flex: none; align-self: center; width: 22px; height: 19px; color: var(--ch-ink); }
-.ch-shell .ch-btitle.ch-scmd { font-family: var(--ch-mono); font-weight: 400; }
+/* The birds fold the boards away to the left and bring them back to the
+   right (C301 (f)): the boards keep their place, so nothing else moves. */
+.ch-shell button.ch-sbirds-b { flex: none; align-self: center; display: inline-flex; padding: 3px; margin: -3px; border-radius: 6px; }
+.ch-shell button.ch-sbirds-b:focus-visible { outline: 1.5px solid var(--ch-ink); outline-offset: 1px; }
+.ch-sboards { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; min-width: 0;
+  clip-path: inset(-6px -12px -10px -12px);
+  transition: clip-path .32s ease, transform .32s ease, opacity .24s ease, visibility 0s linear 0s; }
+.ch-strip.folded .ch-sboards { clip-path: inset(-6px 100% -10px -12px); transform: translateX(-14px); opacity: 0; visibility: hidden;
+  transition: clip-path .32s ease, transform .32s ease, opacity .24s ease, visibility 0s linear .32s; }
+@media (prefers-reduced-motion: reduce) { .ch-sboards, .ch-strip.folded .ch-sboards { transition: none; } }
 .ch-headcorner { position: fixed; top: 10px; inset-inline-end: 18px; z-index: 30; }
 /* With the language alone in the corner, the page starts below it, so it
    never covers a board's edge (C293), in an installed app's narrow window too. */
@@ -108,7 +118,8 @@
 .ch-shell.size-phone .ch-card.addressed::before { display: none; }
 /* The strip: one line that scrolls sideways. */
 .ch-shell.size-phone .ch-strip { flex-wrap: nowrap; overflow-x: auto; gap: 6px 18px; padding-inline: 12px; scrollbar-width: none; }
-.ch-shell.size-phone .ch-strip > * { flex: none; white-space: nowrap; }
+.ch-shell.size-phone .ch-strip > *, .ch-shell.size-phone .ch-sboards > * { flex: none; white-space: nowrap; }
+.ch-shell.size-phone .ch-sboards { display: contents; }
 /* The board on screen: a navy underline, the others open in ink. */
 .ch-shell.size-phone .ch-strip .ch-btitle[aria-current] { color: var(--ch-ink); text-decoration: underline; text-decoration-color: rgb(var(--ch-navy)); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 
@@ -540,11 +551,15 @@
 .ch-card.room { flex: none; }
 .ch-chead .ch-aside { margin-inline-start: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .ch-chead .ch-sep { flex-shrink: 0; opacity: .45; }
-.ch-shell { --room-chrome: 180px; }
-.ch-shell.bar-bottom { --room-chrome: 250px; }
+/* A room fills the window under the strip, down to the bar; in a short
+   window it shrinks rather than make the page scroll, which drew a
+   scrollbar down the right edge under the language (Stefan, 16 November:
+   "There's a bar under 'English' ... let's get rid of that bar"). */
+.ch-shell { --room-chrome: 186px; --room-least: 280px; }
+.ch-shell.bar-bottom { --room-chrome: 256px; }
 /* An empty room is as tall as one with a chat (C302 (e)). */
-.ch-cbody.ch-room-empty { flex: none; height: max(480px, calc(100dvh - var(--room-chrome))); }
-.ch-room { flex: none; height: max(480px, calc(100dvh - var(--room-chrome))); overflow: hidden; display: flex; flex-direction: column;
+.ch-cbody.ch-room-empty { flex: none; height: max(var(--room-least), calc(100dvh - var(--room-chrome))); }
+.ch-room { flex: none; height: max(var(--room-least), calc(100dvh - var(--room-chrome))); overflow: hidden; display: flex; flex-direction: column;
   background: var(--p-bg-base); color: var(--p-text-primary); font: 400 16px/1.5 var(--font-sans, ui-sans-serif, system-ui, sans-serif); text-align: start; }
 .ch-room > * { flex: 1; min-height: 0; }
 /* A room built for a phone, in a phone's width (stage 13, piece 5; C246 (a)). */

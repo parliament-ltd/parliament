@@ -315,7 +315,8 @@ describe('focus: (stage 5, piece 6)', () => {
     expect(p.text).toBe('Enter clears the screen to the chat, closing Welcome page. Nothing is lost, and focus:off brings them back')
     expect(p.after).toBe('prompt')
     expect(at('>focus:off', p.next)).toMatchObject({ text: 'Enter brings back Welcome page', after: null })
-    expect(at('>focus:', shipped(SPACE)).text).toBe('Nothing to focus on yet. p> starts a chat')
+    // With no chat at all, focus clears to an empty room, a page to write in (C301 (f)).
+    expect(at('>focus:', shipped(SPACE)).text).toBe('Enter clears the screen to the empty room, closing Records and Collection. Nothing is lost, and focus:off brings them back')
     expect(at('>focus:save').text).toBe('A focus is kept with its room. Open one first: room:')
   })
 })

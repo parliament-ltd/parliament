@@ -785,8 +785,10 @@ export function planFocus(a, chat = null) {
   if (a.lab) return refuse('focusInLab')
   if (a.focus) return refuse('focusAlready')
   const here = roomOnScreen(a)
-  const target = typeof here === 'string' ? here : chat
-  if (!target) return refuse('focusNothing')
+  // An empty room on screen is a page to write in, and focus keeps it as it
+  // is; with no room here, the last chat, or an empty room (C301 (f);
+  // Stefan, 16 November: "users should be able to select Focus:on right away").
+  const target = typeof here === 'string' ? here : currentRoom(a) ? null : chat
   // The room the prompt goes to stays; every other board goes, other rooms too.
   const room = currentRoom(a) ?? 'room'
   const closing = [...onPage(a), ...a.popped.map((p) => p.board)].filter((b) => b !== room)
@@ -797,8 +799,9 @@ export function planFocus(a, chat = null) {
   next.addressed = room
   // The bar stays where it is: only bar: moves it (C300; Stefan, 15 November).
   next.bar = { ...a.bar }
-  next.context[room] = target
-  return go2(next, closing.length ? 'focusClosing' : 'focusAlone', { boards: closing.map((b) => (isRoom(b) ? 'room' : b)) })
+  next.context[room] = target ?? null
+  const said = closing.length ? (target ? 'focusClosing' : 'focusClosingEmpty') : (target ? 'focusAlone' : 'focusAloneEmpty')
+  return go2(next, said, { boards: closing.map((b) => (isRoom(b) ? 'room' : b)) })
 }
 
 /** The boards a focus set can hold (C253 (a)): those on the strip, in its order. */
@@ -823,8 +826,8 @@ export function planFocusSet(a, all, chat = null) {
   const wantsRoom = boards.includes('room')
   const room = currentRoom(a) ?? 'room'
   const here = roomOnScreen(a)
-  const target = typeof here === 'string' ? here : chat
-  if (wantsRoom && !target) return refuse('focusNothing')
+  // An empty room is kept as it is, as planFocus keeps it (C301 (f)).
+  const target = typeof here === 'string' ? here : currentRoom(a) ? null : chat
   const keys = boards.map((b) => (b === 'room' ? room : b))
   if (a.focus && JSON.stringify(a.columns) === JSON.stringify(keys.map((k) => [k])) && !a.popped.length) return refuse('focusSetAlready')
   const next = copy(a)

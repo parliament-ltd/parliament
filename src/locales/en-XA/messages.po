@@ -3123,11 +3123,19 @@ msgid "enter.focusAlone"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.focusAloneEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.focusAlready"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.focusClosing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusClosingEmpty"
 msgstr ""
 
 #. Commands stay English
@@ -9574,6 +9582,14 @@ msgstr ""
 msgid "shell.boardLater"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "shell.boardsHide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.boardsShow"
+msgstr ""
+
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9598,12 +9614,12 @@ msgstr ""
 msgid "shell.field"
 msgstr ""
 
-#. focus is the command word, kept English
+#. Focus is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.focusOff"
 msgstr ""
 
-#. focus is the command word, kept English
+#. Focus is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.focusOn"
 msgstr ""
@@ -9626,7 +9642,7 @@ msgstr ""
 msgid "shell.leaveFullScreen"
 msgstr ""
 
-#. markup is the command word, kept English
+#. Markup is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.markupMenu"
 msgstr ""

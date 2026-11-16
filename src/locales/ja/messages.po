@@ -3123,12 +3123,20 @@ msgid "enter.focusAlone"
 msgstr "Enterで、ここにチャットだけを残し、その下にバーを置きます"
 
 #. js-lingui-explicit-id
+msgid "enter.focusAloneEmpty"
+msgstr "Enterで、ここに書き込むための空のルームだけを残し、その下にバーを置きます"
+
+#. js-lingui-explicit-id
 msgid "enter.focusAlready"
 msgstr "すでにチャットに集中しています。focus:off で元の画面に戻ります"
 
 #. js-lingui-explicit-id
 msgid "enter.focusClosing"
 msgstr "Enterで{boards}を閉じ、画面をチャットだけにします。何も失われず、focus:off で戻せます"
+
+#. js-lingui-explicit-id
+msgid "enter.focusClosingEmpty"
+msgstr "Enterで{boards}を閉じ、画面を空のルームだけにします。何も失われず、focus:off で戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -9574,6 +9582,14 @@ msgstr "Parliament"
 msgid "shell.boardLater"
 msgstr "このボードは、後の段階で作ります。"
 
+#. js-lingui-explicit-id
+msgid "shell.boardsHide"
+msgstr "ボードを隠す"
+
+#. js-lingui-explicit-id
+msgid "shell.boardsShow"
+msgstr "ボードを表示"
+
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
 msgid "shell.edge"
@@ -9598,15 +9614,15 @@ msgstr "ようこそページ"
 msgid "shell.field"
 msgstr "検索、コマンド、プロンプト"
 
-#. focus is the command word, kept English
+#. Focus is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.focusOff"
-msgstr "focus: オフ"
+msgstr "Focus: オフ"
 
-#. focus is the command word, kept English
+#. Focus is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.focusOn"
-msgstr "focus: オン"
+msgstr "Focus: オン"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -9626,10 +9642,10 @@ msgstr "全画面表示"
 msgid "shell.leaveFullScreen"
 msgstr "全画面表示を終了"
 
-#. markup is the command word, kept English
+#. Markup is the command word, kept English, capitalised as the boards are
 #. js-lingui-explicit-id
 msgid "shell.markupMenu"
-msgstr "markup"
+msgstr "Markup"
 
 #. Commands stay English
 #. js-lingui-explicit-id
