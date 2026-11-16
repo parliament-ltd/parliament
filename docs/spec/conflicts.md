@@ -4973,6 +4973,16 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(a), (b) and (c) ruled 16 November by Stefan:** "Yes, build both", to "Build alarms and the dictionary as drawn?" So alarms v1 and dictionary v1 as drawn, with their points to rule; breaks kept out of a backup, as drawn.
 - **(c) A calculator, proposed in words, not as a board:** `calc:48000*2/12` answered on the line under the bar, and figures selected in a reply summed there (sum, count, average), since models are unreliable at arithmetic and replies are full of figures. Worked out by a small reader of sums written for Parliament (the security policy forbids running text as code), exact with decimals. A board only if a tape of past sums is wanted. **To rule.**
 
+**C304. Found in testing 0.19.0, to take up next** (brought by Stefan, 16 November, while C303 was being built; not started, at his "can you find a place to pause?"):
+- **Questions:** how a person tabs within text (an indent); how text is aligned to the centre, left and right; whether the Collection's "your order" and "date" orders say the same thing.
+- **A comment kept while its words change:** editing a highlighted or commented word, even by one letter, takes the comment away. "let's not delete the comment unless all letters are deleted. i have a habit of editing words that are commented to retain the comment and adjust the word."
+- **The comment pop-up:** its line "For you and anyone you share it with. Never sent…" taken away, or shortened to "Never shared with model."
+- **A comment added opens the Collection.**
+- **The "/" menu's box in the text** cannot be clicked; to make it clickable.
+- **The text field within the board** to have side padding as its top padding.
+- **The Collection:** no boxes on its items to tick; "struck yours" aligned left with "All"; the legend's "yours, removed" to read "removed", "yours, added" "added", and "green, dotted" "model answer".
+- **A full page:** with the page full, a new board does not open (since the page fit, cefa6a6).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
