@@ -44,15 +44,25 @@ export const ENDED = Object.freeze(['stopped', 'failed', 'stalled', 'left', 'unm
 // What may hold a later step back (A15; C196 (e)); null: none.
 export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothing'])
 
-/** A step written ahead of any run, ready unless held. */
-export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, now }) {
+/** A step written ahead of any run, ready unless held. todo: a to-do's words (C301 (g)). */
+export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, todo = null, now }) {
   return {
-    id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: String(prompt ?? ''), model,
+    id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: todo != null ? '' : String(prompt ?? ''), model: todo != null ? null : model,
     ...(room ? { room } : {}), condition, addedAt: now,
     // The prompt to several, one after another, this step is one of (C202).
     ...(group ? { group } : {}),
+    // Your own to-do (C301 (g), ruled 16 November): its words and when it
+    // was ticked, its prompt empty, so it is never sent, by this Parliament
+    // or an older one restoring it.
+    ...(todo != null ? { todo: { text: String(todo).slice(0, TODO_MOST), doneAt: null } } : {}),
   }
 }
+
+/** The most words a to-do holds (C301 (g)). */
+export const TODO_MOST = 2000
+
+/** Whether a step is a to-do of yours, ticked or not (C301 (g)). */
+export const isTodo = (step) => Boolean(step?.todo && typeof step.todo === 'object')
 
 /** Whether a step was planned ahead and has not been sent. */
 export const isPlanned = (step) => !step?.messageId

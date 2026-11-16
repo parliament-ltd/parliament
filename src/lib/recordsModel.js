@@ -14,7 +14,7 @@
 //   follow it when the chat is renamed, unless they were named otherwise.
 
 import { letterAt } from './addresses'
-import { STATUS, branchStatus } from './docketModel'
+import { STATUS, branchStatus, isTodo } from './docketModel'
 import { nameFromChat } from './chatTitles'
 
 /** A docket and its first run for a chat that starts one; the chat is branch a. */
@@ -123,11 +123,13 @@ export function withSteps(runBranch, fresh) {
   })
   const rest = planned.filter((s) => !sent.has(s.id))
   // A step that waited because its condition was not met is settled: it
-  // keeps its place after the step before it that ran (C201). The others
-  // planned ahead follow every step that started.
-  const settled = (s) => s.status === STATUS.WAITING && s.ended === 'unmet'
+  // keeps its place after the step before it (C201). So does a to-do of
+  // yours, which is never sent, ticked or not (C301 (g)). The others planned
+  // ahead follow every step that started, in their own order.
+  const settled = (s) => (s.status === STATUS.WAITING && s.ended === 'unmet') || isTodo(s)
   const steps = [...ran]
-  for (const u of rest.filter(settled)) {
+  for (const u of rest) {
+    if (!settled(u)) { steps.push(u); continue }
     let at = -1
     for (let k = old.indexOf(u) - 1; k >= 0 && at < 0; k--) {
       const o = old[k]
@@ -135,7 +137,6 @@ export function withSteps(runBranch, fresh) {
     }
     steps.splice(at + 1, 0, u)
   }
-  steps.push(...rest.filter((s) => !settled(s)))
   return { ...runBranch, steps, status: branchStatus(steps) }
 }
 
@@ -162,6 +163,8 @@ export function runFromRun(prev, { id, n, now, newId, promptOf, order }) {
       ...(s.room ? { room: s.room } : {}),
       condition: s.condition ?? null,
       addedAt: now,
+      // A to-do comes forward unticked, never a prompt (C301 (g)).
+      ...(isTodo(s) ? { prompt: '', model: null, todo: { text: String(s.todo.text ?? ''), doneAt: null } } : {}),
     }))
     branches[letter] = { status: branchStatus(steps), room: b.room ?? null, chatId: null, steps }
   }

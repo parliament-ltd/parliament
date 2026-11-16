@@ -82,7 +82,7 @@ import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCar
 import CollectionBoard from './CollectionBoard'
 import { showOf, modeOf, hiddenClasses } from '../lib/markupShow'
 import { settleable } from '../lib/editVerbs'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, tickTodo, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
@@ -165,7 +165,7 @@ const BAR = 'command' // the popped bar's key among the windows
 const FEATURES = detectFeatures()
 const NONE = Object.freeze([])
 // What the plan commands do, carried out by planAct (stage 10, piece 2; C198).
-const PLAN_ACTS = new Set(['newPlan', 'planStep', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete', 'run', 'stop', 'stopReply'])
+const PLAN_ACTS = new Set(['newPlan', 'planStep', 'tickTodo', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete', 'run', 'stop', 'stopReply'])
 
 // The interface language a source answers in. The test languages (en-XA,
 // ar-XB) stand for English.
@@ -3008,6 +3008,8 @@ export default function Shell() {
   // Lock per plan), each step sent as a prompt typed in its chat is, to who
   // answers it. stop: reaches the tab that runs it over the bus.
   const [runningHere, setRunningHere] = useState([])
+  // The to-dos a lane waits at in a run here, by step id (C301 (g)).
+  const waitingForYou = useMemo(() => new Set(runningHere.map((r) => r.yours).filter(Boolean)), [runningHere])
   const runDeps = useRef({})
   useEffect(() => {
     runDeps.current = {
@@ -3174,11 +3176,20 @@ export default function Shell() {
         return { done: true, says: { message: 'planNewDone', values: { num: made.docket.num } } }
       }
       if (what.kind === 'planStep') {
-        const out = await planStep(db.current, { docketId: what.docketId, n: what.n, letter: what.letter, prompt: what.prompt ?? '', newId, now })
+        // A to-do of yours, or a prompt (C301 (g)).
+        const out = await planStep(db.current, { docketId: what.docketId, n: what.n, letter: what.letter, prompt: what.todo ? '' : what.prompt ?? '', todo: what.todo ? what.prompt ?? '' : null, newId, now })
         keep(out.back)
         setPlanPick({ num: what.num, letter: what.letter })
         said()
-        return { done: true, says: { message: 'planStepDone', values: { index: out.index, address: what.address } } }
+        return { done: true, says: { message: what.todo ? 'planTodoDone' : 'planStepDone', values: { index: out.index, address: what.address } } }
+      }
+      // tick: and tick:off (C301 (g)): a lane waiting at the to-do goes on at once.
+      if (what.kind === 'tickTodo') {
+        const out = await tickTodo(db.current, { docketId: what.docketId, n: what.n, letter: what.letter, stepId: what.stepId, done: what.done, now })
+        keep(out.back)
+        if (what.done) runnerRef.current?.ticked({ docketId: what.docketId, letter: what.letter, stepId: what.stepId })
+        said()
+        return null
       }
       if (what.kind === 'planRun') {
         const made = await newRun(db.current, { docketId: what.docketId, newId, now })
@@ -4539,6 +4550,7 @@ export default function Shell() {
         <PlanBoard
           key="docket" plan={planBoard} loading={planOnScreen && planNum != null && !planBoard && !(planRead?.num === planNum && planRead?.run === planRun && !planRead?.plan)} addressed={arrangement.addressed === 'docket'}
           nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onDelete={onPlanDelete} onCondition={onPlanCondition} onWho={onPlanWho} onRun={(n) => runCommand(`open:run ${n}`)}
+          onTick={runClicked} waitingFor={waitingForYou}
         />
       )
     }

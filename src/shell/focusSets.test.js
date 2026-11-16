@@ -49,11 +49,11 @@ describe('focus:room collection and focus:save on the Enter line (C253 (a), (b))
   })
   it('takes boards by their names, and says which it does not know', () => {
     expect(at('>focus:records plan').act.after.focus).toEqual(['almanac', 'docket'])
-    expect(at('>focus:room owls').text).toBe('focus: takes boards by name: room, collection, reflection, records, and plan. owls is not one')
+    expect(at('>focus:room owls').text).toBe('focus: takes boards by name: room, collection, reflection, records, and tasks. owls is not one')
   })
   it('keeps what is on screen with focus:save, and uses the set with focus: alone', () => {
     const s = at('>focus:save')
-    expect(s.text).toBe('Enter keeps what is on screen now as the focus of Essay room: the chat, Records, and Plan')
+    expect(s.text).toBe('Enter keeps what is on screen now as the focus of Essay room: the chat, Records, and Tasks')
     expect(s.act.after.focus).toEqual(['room', 'almanac', 'docket'])
     expect(s.next ?? null).toBeNull()
     const alone = at('>focus:', { focus: { room: { id: 'mode_1', name: 'Essay room', mode }, set: ['room', 'collection'] } })

@@ -345,6 +345,10 @@ function validateDocket(item) {
 }
 
 const STEP_STATUSES = new Set(['ready', 'running', 'done', 'waiting', 'paused'])
+const isTodoNote = (t) => Boolean(t) && typeof t === 'object' && !Array.isArray(t)
+  && typeof t.text === 'string' && t.text.length <= 2000
+  && (t.doneAt === null || t.doneAt === undefined || isISODate(t.doneAt))
+  && Object.keys(t).every((k) => k === 'text' || k === 'doneAt')
 const ENDED_REASONS = new Set(['stopped', 'failed', 'stalled', 'left', 'unmet']) // C196 (d), C201
 const STEP_CONDITIONS = new Set(['finished', 'failed', 'always', 'nothing'])
 function validateRun(item) {
@@ -365,6 +369,8 @@ function validateRun(item) {
       if (s.group !== undefined && !isId(s.group)) return 'run.step.group invalid'
       if (s.model != null && !isString(s.model, 200)) return 'run.step.model invalid'
       if (s.condition != null && !STEP_CONDITIONS.has(s.condition)) return 'run.step.condition invalid'
+      // A to-do of yours (C301 (g)): its words, and when it was ticked or null.
+      if (s.todo !== undefined && !isTodoNote(s.todo)) return 'run.step.todo invalid'
     }
   }
   return null

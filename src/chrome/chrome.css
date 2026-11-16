@@ -1061,6 +1061,17 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-pl-text { width: 100%; border: none; background: transparent; padding: 0; margin: 0; resize: none; overflow: hidden; font: 400 var(--ch-t-body)/1.55 var(--ch-sans); color: var(--ch-ink); display: block; }
 .ch-pl-text::placeholder { color: var(--ch-ink-3); }
 .ch-pl-text.ro { white-space: pre-wrap; overflow-wrap: anywhere; cursor: text; }
+/* A to-do of yours (C301 (g)): a box, your words in the serif, never sent;
+   ticked, struck through; where a run waits for you, said in the prompt colour. */
+.ch-pl-todo { display: flex; align-items: baseline; gap: 8px; }
+.ch-pl-todo .ch-pl-text { font-family: var(--ch-serif); font-size: var(--ch-t-lead); }
+.ch-shell button.ch-pl-box { flex: none; position: relative; top: 2px; width: 14px; height: 14px; padding: 0; border: 1px solid var(--ch-soft); border-radius: 3px; background: var(--ch-surface); cursor: pointer; }
+.ch-shell button.ch-pl-box.on { background: var(--ch-ink); border-color: var(--ch-ink); }
+.ch-shell button.ch-pl-box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.ch-shell button.ch-pl-box:focus-visible { outline: var(--ch-focus); outline-offset: 2px; }
+.ch-shell button.ch-pl-box:disabled { cursor: default; }
+.ch-pl-line.todo.ticked .ch-pl-text { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-soft); }
+.ch-pl-waits { color: var(--ch-prompt); }
 .ch-pl-line.waiting .ch-pl-pick, .ch-pl-line.waiting .ch-pl-text { color: var(--ch-ink-3); }
 /* One pip per run: filled where that run reached the step, ringed in ink
    for the run on the board. */

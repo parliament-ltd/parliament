@@ -126,11 +126,11 @@ msgstr "Notes, highlights, quotes, favourites and collections"
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
-msgstr "Chats and plans"
+msgstr "Chats and lists of tasks"
 
 #. js-lingui-explicit-id
 msgid "backup.catChatsAbout"
-msgstr "Every chat with its messages and files, and the plans they belong to"
+msgstr "Every chat with its messages and files, and the lists they belong to"
 
 #. js-lingui-explicit-id
 msgid "backup.catLayouts"
@@ -452,7 +452,7 @@ msgstr "Finds where one part of a draft no longer agrees with another, here and 
 
 #. js-lingui-explicit-id
 msgid "blockAbout.steps"
-msgstr "The plan’s steps, following this room’s conversation. The whole plan is a board of its own."
+msgstr "The list’s tasks, following this room’s conversation. The whole list is a board of its own."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
@@ -468,7 +468,7 @@ msgstr "The conversation’s headings, to jump to any point in it."
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsEmpty"
-msgstr "a step not yet written"
+msgstr "a task not yet written"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsFollowing"
@@ -476,15 +476,15 @@ msgstr "following this chat, {address}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoChat"
-msgstr "No chat in this room yet, so no steps"
+msgstr "No chat in this room yet, so no tasks"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoPlan"
-msgstr "No plan here has the number {num}"
+msgstr "No list here has the number {num}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsPinned"
-msgstr "plan {num}, pinned"
+msgstr "list {num}, pinned"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsSent"
@@ -492,7 +492,7 @@ msgstr "sent, in its chat"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsWhole"
-msgstr "shows the whole plan"
+msgstr "shows the whole list"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.add"
@@ -736,10 +736,10 @@ msgstr "Collection"
 msgid "board.commands"
 msgstr "Command menu"
 
-#. Prompts set out in branches and steps, to run (C131)
+#. Prompts and to-dos set out in branches, to run and to tick (C131; C301 (g))
 #. js-lingui-explicit-id
 msgid "board.docket"
-msgstr "Plan"
+msgstr "Tasks"
 
 #. Where rooms are built
 #. js-lingui-explicit-id
@@ -1427,7 +1427,7 @@ msgstr "taken back"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {prompt {num}} suggestion {suggestion {num}} other {{num}}}"
+msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {list {num}} edit {edit {num}} ask {prompt {num}} suggestion {suggestion {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1480,7 +1480,7 @@ msgstr "What it holds has no comments, highlights or quotes yet. They show here 
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {chat {num}, deleted} plan {plan {num}, deleted} message {a message, deleted} other {{num}, deleted}}"
+msgstr "{what, select, chat {chat {num}, deleted} plan {list {num}, deleted} message {a message, deleted} other {{num}, deleted}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
@@ -1505,7 +1505,7 @@ msgstr "from"
 
 #. js-lingui-explicit-id
 msgid "collection.fromHelp"
-msgstr "The chats and plans it holds. A click lists them"
+msgstr "The chats and lists of tasks it holds. A click lists them"
 
 #. js-lingui-explicit-id
 msgid "collection.fromNothing"
@@ -1525,7 +1525,7 @@ msgstr "Chat {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.groupPlan"
-msgstr "Plan {num}"
+msgstr "List {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.holdBack"
@@ -1615,7 +1615,7 @@ msgstr "pinned"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
-msgstr "Plans"
+msgstr "Lists"
 
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
@@ -1942,11 +1942,11 @@ msgstr "{count, plural, one {# chat} other {# chats}}"
 
 #. js-lingui-explicit-id
 msgid "count.dockets"
-msgstr "{count, plural, one {# plan} other {# plans}}"
+msgstr "{count, plural, one {# list} other {# lists}}"
 
 #. js-lingui-explicit-id
 msgid "count.steps"
-msgstr "{count, plural, one {# step} other {# steps}}"
+msgstr "{count, plural, one {# task} other {# tasks}}"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
@@ -2742,7 +2742,7 @@ msgstr "Nothing is sent to an AI model"
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
 msgid "enter.comparePlan"
-msgstr "{num} is a plan. {example} compares the last replies of two of its branches"
+msgstr "{num} is a list. {example} compares the last replies of two of its branches"
 
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
@@ -2851,7 +2851,7 @@ msgstr "Prompt {num} has gone to a model, so it stays. accept: or reject: settle
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteBranch"
-msgstr "Enter deletes {address}, which has never run, from every run of plan {num}. undo: brings it back"
+msgstr "Enter deletes {address}, which has never run, from every run of list {num}. undo: brings it back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2865,12 +2865,12 @@ msgstr "Deleted. For 20 seconds the chat offers to bring it back"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
-msgstr "Plan {num} is deleted. undo: brings it back"
+msgstr "List {num} is deleted. undo: brings it back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
-msgstr "Step {index} of {address} is deleted. undo: brings it back"
+msgstr "Task {index} of {address} is deleted. undo: brings it back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2896,20 +2896,20 @@ msgstr "For 20 seconds the chat offers to bring it back"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletePlan"
-msgstr "Enter deletes plan {num}, which has no chat yet. undo: brings it back"
+msgstr "Enter deletes list {num}, which has no chat yet. undo: brings it back"
 
 #. js-lingui-explicit-id
 msgid "enter.deletePlanToo"
-msgstr "It is the plan’s last branch, so plan {num} goes too"
+msgstr "It is the list’s last branch, so list {num} goes too"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteStep"
-msgstr "Enter deletes step {index} of {address} in run {run}. undo: brings it back"
+msgstr "Enter deletes task {index} of {address} in run {run}. undo: brings it back"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
-msgstr "Step {index} of {address} has started, so it stays with its chat"
+msgstr "Task {index} of {address} has started, so it stays with its chat"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2953,7 +2953,7 @@ msgstr "Enter sets run {other} beside run {run}, marking in ink what differs"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffOneRun"
-msgstr "Plan {num} has one run. new:run makes another to compare"
+msgstr "List {num} has one run. new:run makes another to compare"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3056,7 +3056,7 @@ msgstr "{count, plural, one {# comment, highlight or quote stays, marked as from
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
-msgstr "{count, plural, one {Plan {nums} goes with its last chat} other {Plans {nums} go with their last chats}}"
+msgstr "{count, plural, one {List {nums} goes with its last chat} other {Lists {nums} go with their last chats}}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseUndo"
@@ -3317,7 +3317,7 @@ msgstr "{word} could be {names}. Say which, like {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.fromWhat"
-msgstr "Nothing comes from {num}. from: takes a chat, a plan, a branch or a run"
+msgstr "Nothing comes from {num}. from: takes a chat, a list, a branch or a run"
 
 #. js-lingui-explicit-id
 msgid "enter.goNewRoom"
@@ -3966,7 +3966,7 @@ msgstr "Enter starts {next} from {address}, a copy of its whole history, in a ro
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchAt"
-msgstr "Enter starts {next} from {address} after step {step}, a copy up to there, in a room of its own. No call"
+msgstr "Enter starts {next} from {address} after task {step}, a copy up to there, in a room of its own. No call"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchDone"
@@ -3991,7 +3991,7 @@ msgstr "Enter starts {next}, an empty branch beside {address}, in a room of its 
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
-msgstr "{count, plural, =0 {{address} has no steps yet} one {{address} has one step} other {{address} has # steps}}"
+msgstr "{count, plural, =0 {{address} has no tasks yet} one {{address} has one task} other {{address} has # tasks}}"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGo"
@@ -4085,7 +4085,7 @@ msgstr "Enter shows {address} in the room here, with its whole history. No call,
 
 #. js-lingui-explicit-id
 msgid "enter.openBranchUnrun"
-msgstr "{address} has not run yet. Enter shows its steps on the {board} board"
+msgstr "{address} has not run yet. Enter shows its tasks on the {board} board"
 
 #. js-lingui-explicit-id
 msgid "enter.openChat"
@@ -4133,11 +4133,11 @@ msgstr "Enter opens the chat {num} is in, at its place"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
-msgstr "Enter opens plan {num} on the {board} board"
+msgstr "Enter opens list {num} on the {board} board"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlanHere"
-msgstr "Plan {num} is on the {board} board. Enter points the bar at it"
+msgstr "List {num} is on the {board} board. Enter points the bar at it"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -4319,20 +4319,20 @@ msgstr "{address} is added, with no chat until it runs"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchNew"
-msgstr "Enter adds {address} to plan {num}, with no chat until it runs. Nothing is sent"
+msgstr "Enter adds {address} to list {num}, with no chat until it runs. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planChanged"
-msgstr "The plan changed meanwhile. Look again, then Enter"
+msgstr "The list changed meanwhile. Look again, then Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.planFailed"
-msgstr "The plan could not be changed"
+msgstr "The list could not be changed"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planFixed"
-msgstr "That step has started, so it is fixed now. new:run plans it again"
+msgstr "That task has started, so it is fixed now. new:run plans it again"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldAlready"
@@ -4353,7 +4353,7 @@ msgstr "Enter lets {nums} go again in run {run}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldOn"
-msgstr "Enter holds {nums} in run {run}. Their steps wait until hold:off"
+msgstr "Enter holds {nums} in run {run}. Their tasks wait until hold:off"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4375,19 +4375,19 @@ msgstr "{address} is {where, select, after {after} other {before}} {other} alrea
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planMoveWhich"
-msgstr "Name two branches of one plan, as move:201c after 201a"
+msgstr "Name two branches of one list, as move:201c after 201a"
 
 #. js-lingui-explicit-id
 msgid "enter.planNew"
-msgstr "Enter makes a plan with nothing in it and opens it on the {board} board. Nothing is sent"
+msgstr "Enter makes a list with nothing in it and opens it on the {board} board. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewDone"
-msgstr "Plan {num} is made, with nothing in it yet"
+msgstr "List {num} is made, with nothing in it yet"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewTitled"
-msgstr "Enter makes the plan “{title}”, with nothing in it, and opens it on the {board} board. Nothing is sent"
+msgstr "Enter makes the list “{title}”, with nothing in it, and opens it on the {board} board. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoBranch"
@@ -4396,33 +4396,33 @@ msgstr "{address} is not in run {run}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
-msgstr "No plan is on the {board} board. open: and a plan’s number shows one, or new:plan makes one"
+msgstr "No list is on the {board} board. open: and a list’s number shows one, or new:tasks makes one"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoStep"
-msgstr "{address} has no step {index} in run {run}"
+msgstr "{address} has no task {index} in run {run}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNotShown"
-msgstr "Plan {num} is not on the {board} board. open:{num} shows it"
+msgstr "List {num} is not on the {board} board. open:{num} shows it"
 
 #. js-lingui-explicit-id
 msgid "enter.planOnePlan"
-msgstr "Name branches of one plan at a time"
+msgstr "Name branches of one list at a time"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptEmpty"
-msgstr "Write the step. Enter adds it as step {index} of {address}. Nothing is sent"
+msgstr "Write the task. Enter adds it as task {index} of {address}. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptStep"
-msgstr "Enter adds this as step {index} of {address} in run {run}. Nothing is sent"
+msgstr "Enter adds this as task {index} of {address} in run {run}. Nothing is sent"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planRecord"
-msgstr "Run {run} is an earlier run, kept as it was. open:run {latest} to change the plan"
+msgstr "Run {run} is an earlier run, kept as it was. open:run {latest} to change the list"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunDone"
@@ -4434,32 +4434,45 @@ msgstr "Run {run} is on the {board} board already"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNew"
-msgstr "Enter makes run {next} of plan {num} from run {from}: every step planned again, nothing started. Nothing is sent"
+msgstr "Enter makes run {next} of list {num} from run {from}: every task planned again, nothing started. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNone"
-msgstr "{runs, plural, one {Plan {num} has one run} other {Plan {num} has # runs}}"
+msgstr "{runs, plural, one {List {num} has one run} other {List {num} has # runs}}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunOpen"
-msgstr "Enter shows run {run} of plan {num}"
+msgstr "Enter shows run {run} of list {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepAdd"
-msgstr "Enter adds step {index} to {address} in run {run}. Nothing is sent"
+msgstr "Enter adds task {index} to {address} in run {run}. Nothing is sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepDone"
-msgstr "Step {index} is planned in {address}. Nothing was sent"
+msgstr "Task {index} is planned in {address}. Nothing was sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepEmpty"
-msgstr "Enter adds an empty step {index} to {address} in run {run}, to write on the board. Nothing is sent"
+msgstr "Enter adds an empty task {index} to {address} in run {run}, to write on the board. Nothing is sent"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planStepHeld"
-msgstr "{address} is held, so the step waits too. hold:off {address} lets them go"
+msgstr "{address} is held, so the task waits too. hold:off {address} lets them go"
+
+#. js-lingui-explicit-id
+msgid "enter.planTodoAdd"
+msgstr "Enter adds a to-do of yours as task {index} of {address}. It is never sent: you tick it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planTodoDone"
+msgstr "Task {index} of {address} is a to-do of yours. tick:{address} {index} ticks it"
+
+#. js-lingui-explicit-id
+msgid "enter.planTodoEmpty"
+msgstr "Enter adds an empty to-do as task {index} of {address}, to write on the board. It is never sent"
 
 #. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
@@ -5321,29 +5334,29 @@ msgstr "Ripple works on the chat in a room. Open one first: room:"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleNothing"
-msgstr "Ripple carries edits to the other branches of a plan, and this chat has none yet"
+msgstr "Ripple carries edits to the other branches of a list, and this chat has none yet"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOff"
-msgstr "Enter turns Ripple off for plan {num}: edits stay in their branch"
+msgstr "Enter turns Ripple off for list {num}: edits stay in their branch"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOffAlready"
-msgstr "Ripple is off for plan {num} already"
+msgstr "Ripple is off for list {num} already"
 
 #. {nums} are the other branches, as 201b and 201c
 #. js-lingui-explicit-id
 msgid "enter.rippleOn"
-msgstr "Enter turns Ripple on for plan {num}: when edits go with a prompt, {name} checks {nums} for the same change, one call per branch"
+msgstr "Enter turns Ripple on for list {num}: when edits go with a prompt, {name} checks {nums} for the same change, one call per branch"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOnAlready"
-msgstr "Ripple is on for plan {num} already"
+msgstr "Ripple is on for list {num} already"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleOnNoKey"
-msgstr "Enter turns Ripple on for plan {num}. Checking {nums} needs a model with a key: api:"
+msgstr "Enter turns Ripple on for list {num}. Checking {nums} needs a model with a key: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -5391,27 +5404,27 @@ msgstr "{verb} shares a line only with commands like it, for now"
 
 #. js-lingui-explicit-id
 msgid "enter.runChanged"
-msgstr "The plan changed meanwhile. Look again, then Enter"
+msgstr "The list changed meanwhile. Look again, then Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.runCost"
-msgstr "At least {tokens, number} tokens to send, {cost}. Each step also sends the replies before it"
+msgstr "At least {tokens, number} tokens to send, {cost}. Each task also sends the replies before it"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAll"
-msgstr "If every step runs, at least {tokens, number} tokens to send, {cost}. Each step also sends the replies before it"
+msgstr "If every task runs, at least {tokens, number} tokens to send, {cost}. Each task also sends the replies before it"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllCheap"
-msgstr "If every step runs, at least {tokens, number} tokens to send, under {cost}. Each step also sends the replies before it"
+msgstr "If every task runs, at least {tokens, number} tokens to send, under {cost}. Each task also sends the replies before it"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllUnpriced"
-msgstr "If every step runs, at least {tokens, number} tokens to send. Each step also sends the replies before it"
+msgstr "If every task runs, at least {tokens, number} tokens to send. Each task also sends the replies before it"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostCheap"
-msgstr "At least {tokens, number} tokens to send, under {cost}. Each step also sends the replies before it"
+msgstr "At least {tokens, number} tokens to send, under {cost}. Each task also sends the replies before it"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostly"
@@ -5419,15 +5432,15 @@ msgstr "At least {cost} to send: more than the {warn} you asked to be warned at.
 
 #. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
-msgstr "At least {tokens, number} tokens to send. Each step also sends the replies before it"
+msgstr "At least {tokens, number} tokens to send. Each task also sends the replies before it"
 
 #. js-lingui-explicit-id
 msgid "enter.runDone"
-msgstr "Run {run} of plan {num} is done"
+msgstr "Run {run} of list {num} is done"
 
 #. js-lingui-explicit-id
 msgid "enter.runElsewhere"
-msgstr "Plan {num} is running in another tab"
+msgstr "List {num} is running in another tab"
 
 #. js-lingui-explicit-id
 msgid "enter.runFailed"
@@ -5435,19 +5448,19 @@ msgstr "The run could not start"
 
 #. js-lingui-explicit-id
 msgid "enter.runGone"
-msgstr "Step {index} of {address} goes to {name}, which is no longer offered"
+msgstr "Task {index} of {address} goes to {name}, which is no longer offered"
 
 #. js-lingui-explicit-id
 msgid "enter.runHead"
-msgstr "{count, plural, one {Enter runs one step of {nums}, in run {run}} other {Enter runs # steps of {nums}, in run {run}, one after another}}"
+msgstr "{count, plural, one {Enter runs one task of {nums}, in run {run}} other {Enter runs # tasks of {nums}, in run {run}, one after another}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadMany"
-msgstr "Enter runs {count, number} steps of {nums}, in run {run}: the branches side by side, each one step after another"
+msgstr "Enter runs {count, number} tasks of {nums}, in run {run}: the branches side by side, each one task after another"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadNew"
-msgstr "{count, plural, one {Enter makes run {run} and runs one step of {address} in it. The other branches wait} other {Enter makes run {run} and runs # steps of {address} in it, one after another. The other branches wait}}"
+msgstr "{count, plural, one {Enter makes run {run} and runs one task of {address} in it. The other branches wait} other {Enter makes run {run} and runs # tasks of {address} in it, one after another. The other branches wait}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5456,11 +5469,11 @@ msgstr "{address} is held. hold:off {address} lets it go"
 
 #. js-lingui-explicit-id
 msgid "enter.runIf"
-msgstr "{count, plural, one {One step runs only if the one before fails or finds nothing} other {# steps run only if the one before fails or finds nothing}}"
+msgstr "{count, plural, one {One task runs only if the one before fails or finds nothing} other {# tasks run only if the one before fails or finds nothing}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
-msgstr "Step {index} of {address} goes to {name}, which is not built yet"
+msgstr "Task {index} of {address} goes to {name}, which is not built yet"
 
 #. js-lingui-explicit-id
 msgid "enter.runLocal"
@@ -5469,12 +5482,12 @@ msgstr "Steps answered on this computer send nothing out"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNeedsKey"
-msgstr "Step {index} of {address} goes to {name}, which needs a key for {provider}. {command} adds one"
+msgstr "Task {index} of {address} goes to {name}, which needs a key for {provider}. {command} adds one"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNoSteps"
-msgstr "{address} has no steps to run. new:step {address} plans one"
+msgstr "{address} has no tasks to run. new:step {address} plans one"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5483,7 +5496,7 @@ msgstr "Nothing in run {run} is ready to run. new:step plans one"
 
 #. js-lingui-explicit-id
 msgid "enter.runPaused"
-msgstr "Run {run} of plan {num} ended. {nums} paused; the {board} board says why"
+msgstr "Run {run} of list {num} ended. {nums} paused; the {board} board says why"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5497,12 +5510,12 @@ msgstr "{address} is running. stop:{address} halts it"
 
 #. js-lingui-explicit-id
 msgid "enter.runSkipped"
-msgstr "{count, plural, one {One empty step is skipped} other {# empty steps are skipped}}"
+msgstr "{count, plural, one {One empty task is skipped} other {# empty tasks are skipped}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runStarted"
-msgstr "Run {run} of plan {num} has started. stop: halts it"
+msgstr "Run {run} of list {num} has started. stop: halts it"
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
@@ -5511,11 +5524,15 @@ msgstr "They go to {answering}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runUnchecked"
-msgstr "Step {index} of {address} goes to {name} on this computer, which {provider} has not listed since this page opened. {command} checks"
+msgstr "Task {index} of {address} goes to {name} on this computer, which {provider} has not listed since this page opened. {command} checks"
 
 #. js-lingui-explicit-id
 msgid "enter.runUndo"
 msgstr "Undo stops at a run: what it writes stays"
+
+#. js-lingui-explicit-id
+msgid "enter.runWaitsYou"
+msgstr "{address} waits for you at task {index}, \"{words}\", and goes on when you tick it"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -5869,7 +5886,7 @@ msgstr "Enter stops every run and reply, in every window. What is done stays don
 
 #. js-lingui-explicit-id
 msgid "enter.stopBranch"
-msgstr "Enter stops {address}. What is done stays done and paid for; the step running now stops where it is"
+msgstr "Enter stops {address}. What is done stays done and paid for; the task running now stops where it is"
 
 #. js-lingui-explicit-id
 msgid "enter.stopDone"
@@ -5885,7 +5902,7 @@ msgstr "Nothing is running in {what}"
 
 #. js-lingui-explicit-id
 msgid "enter.stopPlan"
-msgstr "Enter stops plan {num}. What is done stays done and paid for; the steps running now stop where they are"
+msgstr "Enter stops list {num}. What is done stays done and paid for; the tasks running now stop where they are"
 
 #. js-lingui-explicit-id
 msgid "enter.stopReply"
@@ -6045,7 +6062,7 @@ msgstr "{address} was answered by a source, whose words are not swept"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepWhichBranch"
-msgstr "Plan {num} has branches: name one, as sweep:{num}a"
+msgstr "List {num} has branches: name one, as sweep:{num}a"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"
@@ -6196,6 +6213,32 @@ msgstr "Enter lets models that can think do so before answering, shown as they g
 #. js-lingui-explicit-id
 msgid "enter.thinkingSame"
 msgstr "{on, select, on {Thinking is on already} other {Thinking is off already}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tickAlready"
+msgstr "Task {index} of {address} is ticked already. tick:off {address} {index} unticks it"
+
+#. js-lingui-explicit-id
+msgid "enter.tickGo"
+msgstr "Enter ticks task {index} of {address}, \"{words}\". A lane waiting there goes on"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tickHow"
+msgstr "tick: takes a lane and a task: tick:201a 2"
+
+#. js-lingui-explicit-id
+msgid "enter.tickNotTodo"
+msgstr "Task {index} of {address} is a prompt: it is done when its answer comes"
+
+#. js-lingui-explicit-id
+msgid "enter.tickOffAlready"
+msgstr "Task {index} of {address} is not ticked"
+
+#. js-lingui-explicit-id
+msgid "enter.tickOffGo"
+msgstr "Enter unticks task {index} of {address}, \"{words}\""
 
 #. js-lingui-explicit-id
 msgid "enter.toAll"
@@ -6360,7 +6403,7 @@ msgstr "A prompt waiting to go is dropped with delete:{num}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAtRun"
-msgstr "Run {run} of plan {num} has started, and undo stops there. The plan is still yours to change: new:run plans it again"
+msgstr "Run {run} of list {num} has started, and undo stops there. The list is still yours to change: new:run plans it again"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -6519,7 +6562,7 @@ msgstr "The browser was told not to let Parliament place windows, so it opens he
 
 #. js-lingui-explicit-id
 msgid "erase.about"
-msgstr "Removes every chat, plan, marking, room you built, key and setting from this browser. Undo cannot reach it, and nothing is kept anywhere else."
+msgstr "Removes every chat, list of tasks, marking, room you built, key and setting from this browser. Undo cannot reach it, and nothing is kept anywhere else."
 
 #. js-lingui-explicit-id
 msgid "erase.backupFirst"
@@ -6551,7 +6594,7 @@ msgstr "Delete it all"
 
 #. js-lingui-explicit-id
 msgid "erase.goesChats"
-msgstr "{chats, plural, one {# chat} other {# chats}} and {plans, plural, one {# plan} other {# plans}}, with their messages and files"
+msgstr "{chats, plural, one {# chat} other {# chats}} and {plans, plural, one {# list} other {# lists}}, with their messages and files"
 
 #. js-lingui-explicit-id
 msgid "erase.goesKeys"
@@ -7296,9 +7339,10 @@ msgstr "Prompt"
 msgid "kind.chat"
 msgstr "Chat"
 
+#. A list of tasks, as a kind of record (C301 (g))
 #. js-lingui-explicit-id
 msgid "kind.docket"
-msgstr "Plan"
+msgstr "List"
 
 #. js-lingui-explicit-id
 msgid "kind.edit"
@@ -8341,7 +8385,11 @@ msgstr "add a branch"
 
 #. js-lingui-explicit-id
 msgid "plan.addStep"
-msgstr "add a step to {address}"
+msgstr "add a task to {address}"
+
+#. js-lingui-explicit-id
+msgid "plan.addTodo"
+msgstr "add a to-do of yours to {address}"
 
 #. A step’s model or room, when it is the branch’s own
 #. js-lingui-explicit-id
@@ -8369,15 +8417,15 @@ msgstr "open:{num} opens it"
 #. When a step runs (C201)
 #. js-lingui-explicit-id
 msgid "plan.condition"
-msgstr "{condition, select, failed {runs if the step before fails} nothing {runs if nothing is found} always {runs whatever happens} other {runs once the step before finishes}}"
+msgstr "{condition, select, failed {runs if the task before fails} nothing {runs if nothing is found} always {runs whatever happens} other {runs once the task before finishes}}"
 
 #. js-lingui-explicit-id
 msgid "plan.conditionHelp"
-msgstr "When this step runs. A click changes it"
+msgstr "When this task runs. A click changes it"
 
 #. js-lingui-explicit-id
 msgid "plan.counts"
-msgstr "{branches, plural, one {one branch} other {# branches}}, {steps, plural, =0 {no steps} one {one step} other {# steps}}"
+msgstr "{branches, plural, one {one branch} other {# branches}}, {steps, plural, =0 {no tasks} one {one task} other {# tasks}}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteBranch"
@@ -8385,7 +8433,7 @@ msgstr "Delete {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
-msgstr "Delete step {index} of {address}"
+msgstr "Delete task {index} of {address}"
 
 #. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
@@ -8395,7 +8443,7 @@ msgstr "{why, select, stopped {stopped} failed {it failed} stalled {the network 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
-msgstr "This step started in run {run}, so its prompt is fixed. new:run plans it again"
+msgstr "This task started in run {run}, so its prompt is fixed. new:run plans it again"
 
 #. js-lingui-explicit-id
 msgid "plan.held"
@@ -8404,12 +8452,12 @@ msgstr "{count, plural, one {one held} other {# held}}"
 #. The plan’s number, at the top of the Plan board
 #. js-lingui-explicit-id
 msgid "plan.label"
-msgstr "Plan {num}"
+msgstr "List {num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.latest"
-msgstr "open:run {run} to change the plan"
+msgstr "open:run {run} to change the list"
 
 #. js-lingui-explicit-id
 msgid "plan.newInRun"
@@ -8421,12 +8469,12 @@ msgstr "no chat until it runs"
 
 #. js-lingui-explicit-id
 msgid "plan.none"
-msgstr "No plan here yet"
+msgstr "No list here yet"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.noneHow"
-msgstr "open: and a plan’s number shows one here. new:plan makes one"
+msgstr "open: and a list’s number shows one here. new:tasks makes one"
 
 #. js-lingui-explicit-id
 msgid "plan.onlyIn"
@@ -8434,7 +8482,7 @@ msgstr "not in run {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.pip"
-msgstr "{reached, select, yes {run {run}} other {run {run}, which did not reach this step}}"
+msgstr "{reached, select, yes {run {run}} other {run {run}, which did not reach this task}}"
 
 #. js-lingui-explicit-id
 msgid "plan.pipHelp"
@@ -8470,27 +8518,57 @@ msgstr "waiting"
 
 #. js-lingui-explicit-id
 msgid "plan.step"
-msgstr "Step {index} of {address}"
+msgstr "Task {index} of {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.steps"
-msgstr "{count, plural, =0 {no steps yet} one {one step} other {# steps}}"
+msgstr "{count, plural, =0 {no tasks yet} one {one task} other {# tasks}}"
+
+#. js-lingui-explicit-id
+msgid "plan.tick"
+msgstr "Tick task {index} of {address}"
+
+#. js-lingui-explicit-id
+msgid "plan.ticked"
+msgstr "ticked"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.tickHelp"
+msgstr "Runs {command}"
+
+#. js-lingui-explicit-id
+msgid "plan.untick"
+msgstr "Untick task {index} of {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.untitled"
-msgstr "Untitled plan"
+msgstr "Untitled list"
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
 msgstr "Untitled branch"
 
 #. js-lingui-explicit-id
+msgid "plan.waitsHere"
+msgstr "the run waits for you here"
+
+#. js-lingui-explicit-id
 msgid "plan.whoHelp"
-msgstr "Who answers step {index} of {address}. A click shows who can"
+msgstr "Who answers task {index} of {address}. A click shows who can"
 
 #. js-lingui-explicit-id
 msgid "plan.write"
-msgstr "Write the step"
+msgstr "Write the task"
+
+#. A to-do of the person, never sent
+#. js-lingui-explicit-id
+msgid "plan.yours"
+msgstr "yours"
+
+#. js-lingui-explicit-id
+msgid "plan.yoursCount"
+msgstr "{count, plural, one {one to-do of yours} other {# to-dos of yours}}"
 
 #. js-lingui-explicit-id
 msgid "privacy.card"
@@ -9012,7 +9090,7 @@ msgstr "Appearance"
 
 #. js-lingui-explicit-id
 msgid "settings.backupHelp"
-msgstr "Chats, plans, rooms, the library and every marking, in one .parliament file. Backups are format {version}. Any older backup restores; one from a newer Parliament asks you to update first."
+msgstr "Chats, lists of tasks, rooms, the library and every marking, in one .parliament file. Backups are format {version}. Any older backup restores; one from a newer Parliament asks you to update first."
 
 #. js-lingui-explicit-id
 msgid "settings.backupLabel"
@@ -9345,7 +9423,7 @@ msgstr "{count, plural, =0 {Nothing spent in {month} yet.} one {{cost} spent in 
 
 #. js-lingui-explicit-id
 msgid "settings.monthSpentRuns"
-msgstr "{cost} spent in {month}: {runs, plural, one {# run of a plan} other {# runs of plans}} and {count, plural, =0 {no chat on its own} one {# chat on its own} other {# chats on their own}}. Estimated from token counts; your provider’s bill is the record."
+msgstr "{cost} spent in {month}: {runs, plural, one {# run of a list} other {# runs of lists}} and {count, plural, =0 {no chat on its own} one {# chat on its own} other {# chats on their own}}. Estimated from token counts; your provider’s bill is the record."
 
 #. js-lingui-explicit-id
 msgid "settings.monthUnknown"
@@ -9485,7 +9563,7 @@ msgstr "Reply language"
 
 #. js-lingui-explicit-id
 msgid "settings.roomHelp"
-msgstr "The room a new chat, and its plan, start in."
+msgstr "The room a new chat, and its list, start in."
 
 #. js-lingui-explicit-id
 msgid "settings.roomLabel"
@@ -9497,7 +9575,7 @@ msgstr "run {run}"
 
 #. js-lingui-explicit-id
 msgid "settings.runRowHelp"
-msgstr "Shows run {run} of plan {num} on the {board} board"
+msgstr "Shows run {run} of list {num} on the {board} board"
 
 #. js-lingui-explicit-id
 msgid "settings.sources"
@@ -9517,7 +9595,7 @@ msgstr "Spending"
 
 #. js-lingui-explicit-id
 msgid "settings.storageCounts"
-msgstr "{chats, plural, one {# chat} other {# chats}}, {plans, plural, one {# plan} other {# plans}}, {markings, plural, one {# marking} other {# markings}}."
+msgstr "{chats, plural, one {# chat} other {# chats}}, {plans, plural, one {# list} other {# lists}}, {markings, plural, one {# marking} other {# markings}}."
 
 #. js-lingui-explicit-id
 msgid "settings.storageLabel"
@@ -10147,7 +10225,7 @@ msgstr "Name what the bar is pointed at: a room, a collection or a chat. With tw
 
 #. js-lingui-explicit-id
 msgid "verb.new"
-msgstr "Make a chat, plan, room, collection, framework, branch, step, run or block"
+msgstr "Make a chat, list of tasks, room, collection, framework, branch, step, to-do, run or block"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10166,9 +10244,10 @@ msgstr "Keep something at the top of its list"
 msgid "verb.place"
 msgstr "Put a block in a slot of the room, or move it"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.plan"
-msgstr "Bring the Plan board beside what is on screen"
+msgstr "An older name: plan: brings the Tasks board, as tasks: does"
 
 #. js-lingui-explicit-id
 msgid "verb.pop"
@@ -10287,6 +10366,10 @@ msgid "verb.tagadd"
 msgstr "Tag things, what is selected, or the reply you are in"
 
 #. js-lingui-explicit-id
+msgid "verb.tasks"
+msgstr "Bring the Tasks board beside what is on screen"
+
+#. js-lingui-explicit-id
 msgid "verb.tell"
 msgstr "Write a note the model reads with your next prompt"
 
@@ -10297,6 +10380,10 @@ msgstr "Choose a room's colours and type"
 #. js-lingui-explicit-id
 msgid "verb.thinking"
 msgstr "Let models that can think do so before answering, shown as they go, or not"
+
+#. js-lingui-explicit-id
+msgid "verb.tick"
+msgstr "Tick a to-do of yours on a list of tasks, or untick it"
 
 #. js-lingui-explicit-id
 msgid "verb.to"

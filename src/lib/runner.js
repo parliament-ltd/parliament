@@ -14,7 +14,7 @@
 // Only one tab runs a plan at a time (a Web Lock per plan, bus.js); stop:
 // reaches the tab that runs it over the bus, as ids and signals only.
 
-import { STATUS, isPlanned } from './docketModel'
+import { STATUS, isPlanned, isTodo } from './docketModel'
 
 // How a step ended, for the conditions of the steps after it (C196 (e);
 // C201): read from its status, never from what a model or source wrote.
@@ -45,21 +45,36 @@ export function outcomeOf(step) {
   return null
 }
 
-const hasWords = (s) => String(s?.text ?? s?.prompt ?? '').trim().length > 0
+const hasWords = (s) => !isTodo(s) && String(s?.text ?? s?.prompt ?? '').trim().length > 0
 const isReady = (s) => s.status === STATUS.READY && (s.planned ?? isPlanned(s))
+// A to-do of yours not yet ticked (C301 (g)): the lane waits there for you.
+const openTodo = (s) => isTodo(s) && isReady(s)
+// Whether a prompt is still to run after index i, for a to-do to wait for.
+const promptAfter = (steps, i) => steps.slice(i + 1).some((s) => isReady(s) && hasWords(s))
 
-/** The next step a branch runs after index `after`: ready, planned and with words. Empty ones are skipped. */
+/**
+ * The next step a branch runs after index `after`: ready, planned and with
+ * words, or a to-do of yours not yet ticked with a prompt after it, where
+ * the lane waits. Empty ones are skipped.
+ */
 export function nextStep(steps, after = -1) {
   for (let i = after + 1; i < steps.length; i++) {
     const s = steps[i]
     if (s.status === STATUS.RUNNING) return null
     if (isReady(s) && hasWords(s)) return { index: i, step: s }
+    if (openTodo(s) && promptAfter(steps, i)) return { index: i, step: s, yours: true }
   }
   return null
 }
 
+/** Where a lane would wait for you: its first to-do not ticked with a prompt after it, numbered from 1, or null (C301 (g)). */
+export function waitsAt(steps) {
+  const i = (steps ?? []).findIndex((s, k) => openTodo(s) && promptAfter(steps, k))
+  return i < 0 ? null : { n: i + 1, text: String(steps[i].todo?.text ?? '') }
+}
+
 const readyOf = (b) => b.steps.filter((s) => isReady(s) && hasWords(s))
-const emptyOf = (b) => b.steps.filter((s) => isReady(s) && !hasWords(s)).length
+const emptyOf = (b) => b.steps.filter((s) => isReady(s) && !hasWords(s) && !isTodo(s)).length
 // Held by hold:, not waiting because a condition was not met (C201).
 const heldOf = (b) => {
   const open = b.steps.filter((s) => s.planned && s.ended !== 'unmet')
@@ -125,6 +140,8 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
 
   const active = () => [...jobs.entries()].flatMap(([docketId, job]) => [...job.letters].map((letter) => ({
     docketId, num: job.num, n: job.n, letter, chatId: job.current.get(letter) ?? null, stopping: job.stopping.has(letter),
+    // Waiting for you at a to-do (C301 (g)): its step's id.
+    yours: job.waits?.get(letter)?.stepId ?? null,
   })))
   const changed = () => onChange(active())
 
@@ -151,6 +168,32 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
     await markStep({ docketId, n: job.n, letter, stepId: step.id, status: answered ? STATUS.DONE : STATUS.PAUSED, ended: answered ? null : outcome }).catch(() => {})
     changed()
     return outcome
+  }
+
+  // A lane waiting for you at a to-do (C301 (g)): until it is ticked, here
+  // (ticked()) or in another tab (read again every two seconds), or stopped.
+  function untilTicked(docketId, job, letter, step) {
+    if (job.stopping.has(letter)) return Promise.resolve('stopped')
+    return new Promise((resolve) => {
+      let timer = 0
+      const done = (how) => {
+        clearTimeout(timer)
+        if (job.waits.get(letter)?.stepId === step.id) job.waits.delete(letter)
+        changed()
+        resolve(how)
+      }
+      job.waits.set(letter, { stepId: step.id, done })
+      changed()
+      const look = async () => {
+        if (!job.waits.has(letter)) return
+        const branch = await readBranch({ docketId, n: job.n, letter }).catch(() => null)
+        const now = branch?.steps.find((s) => s.id === step.id)
+        if (!now) { done('ticked'); return }
+        if (now.status !== STATUS.READY) { done('ticked'); return }
+        timer = setTimeout(look, 2000)
+      }
+      timer = setTimeout(look, 2000)
+    })
   }
 
   // A step whose condition is not met waits, and says so (C201).
@@ -181,6 +224,13 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         if (FAILED.has(before)) return before
         await unmet(docketId, job, letter, step)
         changed()
+        continue
+      }
+      // Your to-do: the lane waits until you tick it, then goes on as after
+      // a step that finished (C301 (g)). stop: ends the wait.
+      if (next.yours) {
+        if (await untilTicked(docketId, job, letter, step) === 'stopped') return 'stopped'
+        before = 'done'
         continue
       }
       const outcome = await runStep(docketId, job, letter, branch.chatId, step)
@@ -225,7 +275,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
     let begun
     const head = new Promise((resolve) => { begun = resolve })
     const finished = Promise.resolve(lock(docketId, async () => {
-      const job = { num, n, letters: new Set(letters), stopping: new Set(), current: new Map() }
+      const job = { num, n, letters: new Set(letters), stopping: new Set(), current: new Map(), waits: new Map() }
       jobs.set(docketId, job)
       going += 1
       const ended = {}
@@ -274,11 +324,19 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         hit += 1
         const chat = job.current.get(l)
         if (chat) stopChat(chat)
+        // A lane waiting for you stops waiting (C301 (g)).
+        job.waits.get(l)?.done('stopped')
       }
     }
     if (hit) changed()
     return hit
   }
 
-  return { start, stop, active, runs: (docketId) => jobs.has(docketId) }
+  /** A to-do ticked in this tab: the lane waiting at it goes on at once (C301 (g)). */
+  function ticked({ docketId, letter, stepId }) {
+    const w = jobs.get(docketId)?.waits.get(letter)
+    if (w && w.stepId === stepId) w.done('ticked')
+  }
+
+  return { start, stop, ticked, active, runs: (docketId) => jobs.has(docketId) }
 }

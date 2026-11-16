@@ -48,7 +48,7 @@ describe('the boards registry', () => {
     const a = { ...almanac(), context: { collection: 'Q2 evidence' } }
     const s = strip(a)
     // The Library waits with the Lab, off the strip (C295).
-    expect(s.map((x) => x.title)).toEqual(['Room:', 'Collection:', 'Reflection:', 'Records:', 'Plan:'])
+    expect(s.map((x) => x.title)).toEqual(['Room:', 'Collection:', 'Reflection:', 'Records:', 'Tasks:'])
     expect(s.find((x) => x.board === 'almanac')).toMatchObject({ here: true, addressed: true })
     expect(s.find((x) => x.board === 'collection')).toMatchObject({ here: true, addressed: false, context: 'Q2 evidence' })
     expect(s.find((x) => x.board === 'docket').here).toBe(false)

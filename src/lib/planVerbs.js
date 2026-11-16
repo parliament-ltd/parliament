@@ -11,8 +11,8 @@
 // a new branch would have; selected: the branch picked on the board.
 
 import { planOpen, address } from '../shell/arrangement'
-import { STATUS } from './docketModel'
-import { runScope } from './runner'
+import { STATUS, TODO_MOST } from './docketModel'
+import { runScope, waitsAt } from './runner'
 import { CHARS_PER_TOKEN, inputCost } from '../shell/estimate'
 import { queryLines } from './languageVerbs'
 
@@ -93,7 +93,7 @@ export function planNewPlan(step) {
  * step planned at the end of a branch in the last run, to write on the
  * board when no text is given. Nothing is sent.
  */
-export function planNewStep(step, screens = {}) {
+export function planNewStep(step, screens = {}, { todo = false } = {}) {
   const [, a2, a3] = step.match?.values ?? []
   const arg = a2?.kind === 'address' ? a2 : null
   const text = a3 ? typed(a3) : isWords(a2) ? typed(a2) : ''
@@ -105,13 +105,46 @@ export function planNewStep(step, screens = {}) {
   const b = branchOf(p, arg, screens.records?.rows ?? [])
   if (b.bad) return { says: b.bad, act: null }
   const values = { index: b.branch.steps.length + 1, address: b.branch.address, run: p.n }
+  // new:todo (C301 (g)): a to-do of yours, never sent, ticked when done.
+  const words = todo ? text.trim().slice(0, TODO_MOST) : text.trim()
   return {
     says: {
-      message: text.trim() ? 'planStepAdd' : 'planStepEmpty',
+      message: todo ? (words ? 'planTodoAdd' : 'planTodoEmpty') : words ? 'planStepAdd' : 'planStepEmpty',
       values,
       ...(held(b.branch) ? { also: [{ message: 'planStepHeld', values: { address: b.branch.address } }] } : {}),
     },
-    act: { kind: 'planStep', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, address: b.branch.address, prompt: text.trim() },
+    act: { kind: 'planStep', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, address: b.branch.address, prompt: words, ...(todo ? { todo: true } : {}) },
+  }
+}
+
+/**
+ * tick:201a 2 and tick:off 201a 2 (C301 (g), ruled 16 November): a to-do of
+ * yours ticked done, or open again, in the run on the board. A prompt is done
+ * when its answer comes, so it is refused. A lane waiting for you there goes
+ * on once it is ticked.
+ */
+export function planTick(step, screens = {}) {
+  const vals = step.match?.values ?? []
+  const off = vals[0]?.kind === 'word' && vals[0].value === 'off'
+  const [arg, num] = off ? vals.slice(1) : vals
+  if (arg?.kind !== 'address' || !arg.letter || num?.kind !== 'number') return { says: { message: 'tickHow' }, act: null }
+  const s = shown(screens, arg.num)
+  if (s.bad) return { says: s.bad, act: null }
+  const p = s.plan
+  const old = record(p)
+  if (old) return { says: old, act: null }
+  const b = branchOf(p, arg, screens.records?.rows ?? [])
+  if (b.bad) return { says: b.bad, act: null }
+  const index = Number(num.value)
+  const one = b.branch.steps[index - 1]
+  const values = { index, address: b.branch.address, run: p.n, words: one?.todo?.text ?? '' }
+  if (!one) return { says: { message: 'planNoStep', values }, act: null }
+  if (!one.todo) return { says: { message: 'tickNotTodo', values }, act: null }
+  const ticked = Boolean(one.todo.doneAt)
+  if (off ? !ticked : ticked) return { says: { message: off ? 'tickOffAlready' : 'tickAlready', values }, act: null }
+  return {
+    says: { message: off ? 'tickOffGo' : 'tickGo', values },
+    act: { kind: 'tickTodo', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, stepId: one.stepId, index, address: b.branch.address, done: !off },
   }
 }
 
@@ -270,7 +303,8 @@ export function planDeleteUnsent(step, screens = {}) {
     const one = b.branch.steps[index - 1]
     const values = { index, address: b.branch.address, run: p.n }
     if (!one) return { says: { message: 'planNoStep', values }, act: null }
-    if (!one.planned || (one.status !== STATUS.READY && one.status !== STATUS.WAITING)) return { says: { message: 'deleteStepStarted', values }, act: null }
+    // A to-do was never sent, ticked or not, so it can always go (C301 (g)).
+    if (!one.todo && (!one.planned || (one.status !== STATUS.READY && one.status !== STATUS.WAITING))) return { says: { message: 'deleteStepStarted', values }, act: null }
     return {
       says: { message: 'deleteStep', values },
       act: { kind: 'planDelete', what: 'step', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, stepId: one.stepId, index, address: b.branch.address },
@@ -380,6 +414,13 @@ export function planRun(step, screens = {}) {
   if (askingQuery) also.push(...queryLines(askingQuery, asking, f.nameOf ?? ((t) => t)))
   if (local) also.push({ message: 'runLocal' })
   if (scope.skipped) also.push({ message: 'runSkipped', values: { count: scope.skipped } })
+  // Where a lane will wait for you, at a to-do not yet ticked (C301 (g)).
+  if (!scope.newRun) {
+    for (const b of scope.branches) {
+      const w = waitsAt(p.branches.find((x) => x.letter === b.letter)?.steps ?? [])
+      if (w) also.push({ message: 'runWaitsYou', values: { address: b.address, index: w.n, words: w.text } })
+    }
+  }
   also.push({ message: 'runUndo' })
   const head = scope.newRun
     ? { message: 'runHeadNew', values: { count, run: scope.run, address: nums[0] } }

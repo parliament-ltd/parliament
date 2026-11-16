@@ -28,7 +28,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | --- | --- | --- | --- | --- |
 | `records:` | Bring Records and the Collection beside what is on screen | `records:` | everywhere | no |
 | `collection:` | Bring the Collection beside what is on screen | `collection:` | everywhere | no |
-| `plan:` | Bring the Plan board beside what is on screen | `plan:` | everywhere | no |
+| `tasks:` | Bring the Tasks board beside what is on screen | `tasks:` | everywhere | no |
+| `plan:` | An older name: plan: brings the Tasks board, as tasks: does | `plan:` | everywhere | no |
 | `settings:` | Bring Settings beside what is on screen, or one section of it | `settings:`, `settings:data` | everywhere | no |
 | `room:` | Bring the last room beside what is on screen, or a room by name | `room:`, `room:"Owl notes"` | everywhere | no |
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |
@@ -39,7 +40,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `new:chat` | Make a chat, plan, room, collection, framework, branch, step, run or block | `new:chat`, `new:plan`, `new:plan "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:run` | everywhere | yes |
+| `new:chat` | Make a chat, list of tasks, room, collection, framework, branch, step, to-do, run or block | `new:chat`, `new:tasks`, `new:tasks "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:todo "Check the figures"`, `new:todo 201a "Check the figures"`, `new:run` | everywhere | yes |
 | `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Owl notes"`, `open:collection`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
 | `close:records` | Take a board off the screen, or close the letter. Nothing is lost | `close:records`, `close:204`, `close:room`, `close:welcome` | everywhere | yes |
 
@@ -47,9 +48,9 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `run:201b` | Run one branch. The Enter line says which run and what it costs Costs: the line names the model and the price first. | `run:201b` | Plan, Records | no |
+| `run:201b` | Run one branch. The Enter line says which run and what it costs Costs: the line names the model and the price first. | `run:201b` | Tasks, Records | no |
 | `stop:201b` | Halt a run, or every run in every window | `stop:`, `stop:201b`, `stop:all` | everywhere | no |
-| `diff:` | Set two runs of a plan side by side, and mark what differs | `diff:`, `diff:1`, `diff:off` | Plan | no |
+| `diff:` | Set two runs of a plan side by side, and mark what differs | `diff:`, `diff:1`, `diff:off` | Tasks | no |
 | `again:201a` | Ask again from the edited prompt, as a new branch Costs: the line names the model and the price first. | `again:201a` | everywhere | no |
 
 ## Filters
@@ -109,14 +110,15 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
 | `tell:"Keep it under a page"` | Write a note the model reads with your next prompt | `tell:"Keep it under a page"` | Rooms | yes |
-| `prompt:"Add the year it opened"` | Write a prompt in the text, on the words selected in a reply. It goes with your next Enter | `prompt:`, `prompt:"Add the year it opened"` | Rooms, Plan, Reflection, Collection | no |
-| `answers:242 reply` | Have a prompt in the text answered in the reply itself, or in the text after its passage | `answers:242 reply`, `answers:242 text` | Rooms, Plan, Reflection, Collection | yes |
-| `ask:"Add the year it opened"` | An older name: ask: writes a prompt in the text, as prompt: does | `ask:"Add the year it opened"` | Rooms, Plan, Reflection, Collection | no |
-| `strikethrough:` | Strike the selected words in a reply. Its number with undo: takes it back | `strikethrough:` | Rooms, Plan, Reflection, Collection | no |
+| `prompt:"Add the year it opened"` | Write a prompt in the text, on the words selected in a reply. It goes with your next Enter | `prompt:`, `prompt:"Add the year it opened"` | Rooms, Tasks, Reflection, Collection | no |
+| `answers:242 reply` | Have a prompt in the text answered in the reply itself, or in the text after its passage | `answers:242 reply`, `answers:242 text` | Rooms, Tasks, Reflection, Collection | yes |
+| `ask:"Add the year it opened"` | An older name: ask: writes a prompt in the text, as prompt: does | `ask:"Add the year it opened"` | Rooms, Tasks, Reflection, Collection | no |
+| `strikethrough:` | Strike the selected words in a reply. Its number with undo: takes it back | `strikethrough:` | Rooms, Tasks, Reflection, Collection | no |
 | `to:201a` | Send the next prompt to one branch, or to all | `to:201a`, `to:201a, 201c`, `to:all` | everywhere | yes |
-| `accept:244` | Accept a suggestion | `accept:244`, `accept:all` | Rooms, Plan, Reflection, Collection | yes |
-| `reject:244` | Turn down a suggestion | `reject:244`, `reject:all` | Rooms, Plan, Reflection, Collection | yes |
-| `hold:242` | Keep a branch or an edit from going until you say | `hold:242`, `hold:201c`, `hold:off 242` | Rooms, Plan, Reflection, Collection | yes |
+| `accept:244` | Accept a suggestion | `accept:244`, `accept:all` | Rooms, Tasks, Reflection, Collection | yes |
+| `reject:244` | Turn down a suggestion | `reject:244`, `reject:all` | Rooms, Tasks, Reflection, Collection | yes |
+| `hold:242` | Keep a branch or an edit from going until you say | `hold:242`, `hold:201c`, `hold:off 242` | Rooms, Tasks, Reflection, Collection | yes |
+| `tick:201a 2` | Tick a to-do of yours on a list of tasks, or untick it | `tick:201a 2`, `tick:off 201a 2` | everywhere | yes |
 | `markup:` | Markup: markup: opens the menu. markup:on and markup:off show or hide every mark in the text, or one kind, as markup:off highlights. markup:suggesting keeps what you type held back until you accept it, and markup:editing makes it the text | `markup:`, `markup:off`, `markup:on prompts`, `markup:suggesting` | everywhere | yes |
 | `by:haiku` | Choose who answers in this chat: a model, or a source with no tokens | `by:`, `by:haiku`, `by:mistral small`, `by:wikipedia` | everywhere | yes |
 | `thinking:off` | Let models that can think do so before answering, shown as they go, or not | `thinking:`, `thinking:on`, `thinking:off` | everywhere | yes |

@@ -28,7 +28,7 @@ export const BOARDS = Object.freeze({
   reflection: { title: 'Reflection', resting: 'prompt', can: [], closable: true, strip: 3 },
   almanac: { title: 'Records', resting: 'search', can: ['execute'], closable: true, strip: 4 },
   library: { title: 'Library', resting: 'search', can: [], closable: true, strip: 5 },
-  docket: { title: 'Plan', resting: 'prompt', can: ['execute'], closable: true, strip: 6 },
+  docket: { title: 'Tasks', resting: 'prompt', can: ['execute'], closable: true, strip: 6 },
   settings: { title: null, resting: 'search', can: [], closable: true, strip: null },
   // The Lab's boards (Lab v7, A2).
   canvas: { title: null, resting: 'search', can: [], closable: true, strip: null },
@@ -84,7 +84,8 @@ export const boardEntry = (key) => (Object.hasOwn(BOARDS, key) ? BOARDS[key] : M
 // (C131): people read Records and Plan; inside the app, and in what is
 // stored, the boards keep their ids, so nothing kept changes.
 // commandmenu, since command alone is the bar's own word (pop:command).
-const WORDS = Object.freeze({ records: 'almanac', plan: 'docket', commandmenu: 'commands' })
+// tasks: names the Tasks board, and plan:, its older name, still does (C301 (g)).
+const WORDS = Object.freeze({ records: 'almanac', tasks: 'docket', plan: 'docket', commandmenu: 'commands' })
 
 /** The board a command's word names, or null. */
 export const boardFor = (word) => (word == null ? null : WORDS[word] ?? (boardEntry(word) ? word : null))
@@ -93,7 +94,7 @@ export const boardFor = (word) => (word == null ? null : WORDS[word] ?? (boardEn
 export const wordFor = (board) => Object.keys(WORDS).find((w) => WORDS[w] === board) ?? board
 
 // The strip's short titles before C131, still taken by focus: (stage 14).
-const OLD_TITLES = Object.freeze({ sym: 'room', col: 'collection', ref: 'reflection', alm: 'almanac', lib: 'library', dkt: 'docket' })
+const OLD_TITLES = Object.freeze({ sym: 'room', col: 'collection', ref: 'reflection', alm: 'almanac', lib: 'library', dkt: 'docket', plan: 'docket' })
 
 /** The board a strip title names, for focus:room collection; null if none. */
 export function boardByTitle(word) {

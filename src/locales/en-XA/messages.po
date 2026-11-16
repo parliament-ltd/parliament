@@ -736,7 +736,7 @@ msgstr ""
 msgid "board.commands"
 msgstr ""
 
-#. Prompts set out in branches and steps, to run (C131)
+#. Prompts and to-dos set out in branches, to run and to tick (C131; C301 (g))
 #. js-lingui-explicit-id
 msgid "board.docket"
 msgstr ""
@@ -4462,6 +4462,19 @@ msgid "enter.planStepHeld"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.planTodoAdd"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planTodoDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planTodoEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
 msgstr ""
 
@@ -5518,6 +5531,10 @@ msgid "enter.runUndo"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runWaitsYou"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.savedFailed"
 msgstr ""
 
@@ -6195,6 +6212,32 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingSame"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tickAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tickGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tickHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tickNotTodo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tickOffAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tickOffGo"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7296,6 +7339,7 @@ msgstr ""
 msgid "kind.chat"
 msgstr ""
 
+#. A list of tasks, as a kind of record (C301 (g))
 #. js-lingui-explicit-id
 msgid "kind.docket"
 msgstr ""
@@ -8343,6 +8387,10 @@ msgstr ""
 msgid "plan.addStep"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "plan.addTodo"
+msgstr ""
+
 #. A step’s model or room, when it is the branch’s own
 #. js-lingui-explicit-id
 msgid "plan.asBranch"
@@ -8477,6 +8525,23 @@ msgid "plan.steps"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "plan.tick"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.ticked"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.tickHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.untick"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "plan.untitled"
 msgstr ""
 
@@ -8485,11 +8550,24 @@ msgid "plan.untitledBranch"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "plan.waitsHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "plan.whoHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.write"
+msgstr ""
+
+#. A to-do of the person, never sent
+#. js-lingui-explicit-id
+msgid "plan.yours"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.yoursCount"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -10166,6 +10244,7 @@ msgstr ""
 msgid "verb.place"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.plan"
 msgstr ""
@@ -10287,6 +10366,10 @@ msgid "verb.tagadd"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.tasks"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.tell"
 msgstr ""
 
@@ -10296,6 +10379,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.thinking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tick"
 msgstr ""
 
 #. js-lingui-explicit-id

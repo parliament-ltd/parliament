@@ -2,7 +2,7 @@
 // Docket v12; C196 (a); C198), worked out from the stored plan. The board
 // draws it; the plan commands read it (planVerbs.js, as screens.plan).
 
-import { STATUS, isPlanned } from './docketModel'
+import { STATUS, isPlanned, isTodo } from './docketModel'
 import { letterAt } from './addresses'
 
 /**
@@ -38,7 +38,9 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
       index: i + 1,
       status: s.status,
       planned: isPlanned(s),
-      text: isPlanned(s) ? String(s.prompt ?? '') : String(textOf(s.messageId) ?? s.prompt ?? ''),
+      text: isTodo(s) ? String(s.todo.text ?? '') : isPlanned(s) ? String(s.prompt ?? '') : String(textOf(s.messageId) ?? s.prompt ?? ''),
+      // A to-do of yours (C301 (g)): its words and when it was ticked.
+      todo: isTodo(s) ? { text: String(s.todo.text ?? ''), doneAt: s.todo.doneAt ?? null } : null,
       model: s.model ?? null,
       room: s.room ?? null,
       condition: s.condition ?? null,
@@ -76,6 +78,8 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
     counts: {
       branches: branches.length,
       steps: branches.reduce((k, b) => k + b.steps.length, 0),
+      // To-dos of yours among them (C301 (g)).
+      yours: branches.reduce((k, b) => k + b.steps.filter((s) => s.todo).length, 0),
       held: branches.filter((b) => open(b).length && open(b).every((s) => s.status === STATUS.WAITING)).length,
     },
   }

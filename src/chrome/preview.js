@@ -41,7 +41,7 @@ import { planReflect, reflectTalkPreview } from '../lib/reflection'
 import { LAB, boardOffered } from '../lib/release'
 import { LETTERS, letterOf, newestLetter } from './letters'
 import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate, planLocal } from '../lib/lab'
-import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
+import { planNewPlan, planNewStep, planTick, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
@@ -57,7 +57,7 @@ import { searchWords } from '../lib/searchWords'
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
 // Verbs that bring an arrangement, or a board, into the space (C95, C125).
-const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan', 'settings'])
+const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan', 'tasks', 'settings'])
 // Verbs that act on what the bar points at, rather than only on the space:
 // name: (C40), tour:, which also shows the welcome steps (A20), and
 // inspect:, which shows one thing in detail under the bar, and api:, which
@@ -71,7 +71,7 @@ const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan'
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'answers', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
+const ACTS = Object.freeze(['name', 'tick', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'answers', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -308,7 +308,8 @@ const newStep = (a, step, screens) => {
     return planNewBranch(step, screens)
   }
   // A plan, a step and a run, on this device; nothing is sent (C198).
-  if (what === 'plan') return planNewPlan(step)
+  if (what === 'plan' || what === 'tasks') return planNewPlan(step)
+  if (what === 'todo') return planNewStep(step, screens, { todo: true })
   if (what === 'step') return planNewStep(step, screens)
   if (what === 'run') return planNewRun(screens)
   return planNew(step, screens)
@@ -494,7 +495,7 @@ function bring(a, step, screens = {}) {
   if (step.verb === 'collection') return planOpen(a, 'collection')
   if (step.verb === 'room') return named ? roomByName(a, typed(step.match.values[0]), screens) : planRoom(a, screens.lastRoom?.id ?? null)
   if (step.verb === 'library') return named ? null : planOpen(a, 'library')
-  if (step.verb === 'plan') return planOpen(a, 'docket')
+  if (step.verb === 'plan' || step.verb === 'tasks') return planOpen(a, 'docket')
   if (step.verb === 'settings') return named ? planOpenSettings(a, step.match.values[0].value) : planOpen(a, 'settings')
   return null
 }
@@ -1213,6 +1214,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       // hold: and hold:off for a plan's branches (stage 10, piece 2; C198).
       // Edits first, by their numbers (C216 (f)); else a plan's branches.
       hold: (a1, s1, sc) => planHoldEdits(s1, sc) ?? planHold(s1, sc),
+      // tick: a to-do of yours (C301 (g)).
+      tick: (a1, s1, sc) => planTick(s1, sc),
       // run: and stop: (stage 10, piece 3; C200).
       run: (a1, s1, sc) => planRun(s1, sc),
       stop: (a1, s1, sc) => planStop(s1, sc, a1.addressed),

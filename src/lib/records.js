@@ -15,7 +15,7 @@ import { FIRST_NUM } from './addresses'
 import { tabBus } from './bus'
 import { stepsFromTurns, storedSteps, forkStep, collabsFromPersonas } from './migrations/v6Plan'
 import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch } from './recordsModel'
-import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED } from './docketModel'
+import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED, isTodo, TODO_MOST } from './docketModel'
 import { placeAnswer } from '../editing/answers'
 import { withoutSuggestions } from '../editing/blocks'
 import { readIt } from './writing'
@@ -1326,14 +1326,14 @@ export async function putPlanBack(db, back) {
  * A step planned ahead in one branch of a run (new:step), after the first
  * `after` steps or at the end; never before a step that has started.
  */
-export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
+export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, todo = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
   return write(db, ['dockets', 'runs'], async (tx) => {
     const { docket, run } = await planAt(tx, docketId, n)
     const branch = run.branches[letter]
     if (!branch) throw new PlanError('noBranch')
     const steps = [...branch.steps]
     const at = Math.max(startedCount(steps), Math.min(after ?? steps.length, steps.length))
-    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
+    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, todo, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
     steps.splice(at, 0, step)
     const changes = []
     const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
@@ -1351,14 +1351,45 @@ export async function changeStep(db, { docketId, n = null, letter, stepId, set, 
     if (i < 0) throw new PlanError('noStep')
     if (isFixed(branch.steps[i].status) || branch.steps[i].messageId) throw new PlanError('fixed')
     const next = { ...branch.steps[i] }
-    if (set.prompt !== undefined) next.prompt = String(set.prompt)
-    if (set.model !== undefined) next.model = set.model
-    if (set.room !== undefined) { if (set.room) next.room = set.room; else delete next.room }
+    // A to-do's words are its own, never a prompt (C301 (g)).
+    if (isTodo(next)) {
+      if (set.prompt !== undefined || set.text !== undefined) next.todo = { ...next.todo, text: String(set.text ?? set.prompt).slice(0, TODO_MOST) }
+    } else {
+      if (set.prompt !== undefined) next.prompt = String(set.prompt)
+      if (set.model !== undefined) next.model = set.model
+      if (set.room !== undefined) { if (set.room) next.room = set.room; else delete next.room }
+    }
     if (set.condition !== undefined) next.condition = CONDITIONS.includes(set.condition) ? set.condition : null
     const steps = branch.steps.map((s, k) => (k === i ? next : s))
     const changes = []
     await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
     return { result: next, changes }
+  })
+}
+
+/**
+ * tick: and tick:off (C301 (g), ruled 16 November): a to-do of yours ticked
+ * done, or open again, in one run. Refused on a prompt, which is done when
+ * its answer comes. Returns the step as it is now.
+ */
+export async function tickTodo(db, { docketId, n = null, letter, stepId, done, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    const i = branch.steps.findIndex((s) => s.id === stepId)
+    if (i < 0) throw new PlanError('noStep')
+    const was = branch.steps[i]
+    if (!isTodo(was)) throw new PlanError('notTodo')
+    if (Boolean(was.todo.doneAt) === Boolean(done)) return { result: { step: was, back: null }, changes: [] }
+    const next = done
+      ? { ...was, status: STATUS.DONE, todo: { ...was.todo, doneAt: now } }
+      : { ...was, status: STATUS.READY, todo: { ...was.todo, doneAt: null } }
+    delete next.ended
+    const steps = branch.steps.map((s, k) => (k === i ? next : s))
+    const changes = []
+    const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { step: next, back }, changes }
   })
 }
 
@@ -1439,7 +1470,8 @@ export async function removeStep(db, { docketId, n = null, letter, stepId, now =
     if (!branch) throw new PlanError('noBranch')
     const i = branch.steps.findIndex((s) => s.id === stepId)
     if (i < 0) throw new PlanError('noStep')
-    if (isFixed(branch.steps[i].status) || branch.steps[i].messageId) throw new PlanError('fixed')
+    // A to-do was never sent, ticked or not, so it can always go (C301 (g)).
+    if (!isTodo(branch.steps[i]) && (isFixed(branch.steps[i].status) || branch.steps[i].messageId)) throw new PlanError('fixed')
     const steps = branch.steps.filter((_, k) => k !== i)
     const changes = []
     const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)

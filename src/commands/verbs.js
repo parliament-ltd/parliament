@@ -43,7 +43,7 @@
 // so only open: takes its name.
 // The words for boards (C131): Records is the Almanac's board, Plan the
 // docket's (boards.js maps them to the boards' ids).
-export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'commandmenu', 'letter', 'canvas', 'blocks'])
+export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'tasks', 'plan', 'reflection', 'settings', 'commandmenu', 'letter', 'canvas', 'blocks'])
 // The boards, and room: the room the bar points at, or the one last used
 // (arrangement.js, currentRoom). For the verbs that act on a board on
 // screen (30 October); open: and new: make rooms their own way.
@@ -114,8 +114,11 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.records', message: 'Bring Records and the Collection beside what is on screen' } }),
   v({ verb: 'collection', group: 'go', example: 'collection:', takes: [[]], stage: 15, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.collection', message: 'Bring the Collection beside what is on screen' } }),
+  // The Plan board is Tasks (C301 (g), ruled 16 November); plan: is still read.
+  v({ verb: 'tasks', group: 'go', example: 'tasks:', takes: [[]], stage: 15, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.tasks', message: 'Bring the Tasks board beside what is on screen' } }),
   v({ verb: 'plan', group: 'go', example: 'plan:', takes: [[]], stage: 5, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.plan', message: 'Bring the Plan board beside what is on screen' } }),
+    gloss: /*i18n*/ { id: 'verb.plan', message: 'An older name: plan: brings the Tasks board, as tasks: does', comment: 'Commands stay English' } }),
   v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:'], takes: [[]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.library', message: 'Bring the Library beside what is on screen' } }),
   // settings: is open:settings, and settings:data open:settings data
@@ -139,15 +142,17 @@ export const VERBS = Object.freeze([
 
   // Start
   v({ verb: 'new', group: 'start', example: 'new:chat',
-    forms: ['new:chat', 'new:plan', 'new:plan "Grant application"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:run'],
+    forms: ['new:chat', 'new:tasks', 'new:tasks "Grant application"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:todo "Check the figures"', 'new:todo 201a "Check the figures"', 'new:run'],
     // new:framework "Name" "What it asks": a framework of your own (C164).
     // new:branch 201a 2: a fork after step 2 of 201a (C178).
     // new:step 201b "…", new:plan "…" and new:branch "…" (C198): an address
     // is read before text, which an address would also fill.
-    takes: [[['chat', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['branch'], 'address', 'number'], [['branch'], 'text'], [['framework'], 'text', 'text'],
-      [['step'], 'address'], [['step'], 'text'], [['step'], 'address', 'text'], [['plan'], 'text']],
+    // new:tasks, a list of tasks, is new:plan by its new name, still read;
+    // new:todo, a to-do of yours (C301 (g)).
+    takes: [[['chat', 'tasks', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'todo', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['branch'], 'address', 'number'], [['branch'], 'text'], [['framework'], 'text', 'text'],
+      [['step'], 'address'], [['step'], 'text'], [['step'], 'address', 'text'], [['todo'], 'address'], [['todo'], 'text'], [['todo'], 'address', 'text'], [['plan'], 'text'], [['tasks'], 'text']],
     stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
+    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, list of tasks, room, collection, framework, branch, step, to-do, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     // Several at once, and spread across the screens (C284).
     forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Owl notes"', 'open:collection', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
@@ -300,6 +305,9 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.reject', message: 'Turn down a suggestion' } }),
   v({ verb: 'hold', group: 'editing', example: 'hold:242', forms: ['hold:242', 'hold:201c', 'hold:off 242'], takes: [['addresses'], [['off'], { opt: 'addresses' }]], on: EDITING, stage: 10, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.hold', message: 'Keep a branch or an edit from going until you say' } }),
+  // A to-do of yours ticked or not (C301 (g)); done: is the Lab's.
+  v({ verb: 'tick', group: 'editing', example: 'tick:201a 2', forms: ['tick:201a 2', 'tick:off 201a 2'], takes: [['address', 'number'], [['off'], 'address', 'number']], stage: 15, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.tick', message: 'Tick a to-do of yours on a list of tasks, or untick it' } }),
   // The markup menu (C301 (b)): from any board, as the strip's "markup ▾"
   // is. col, the Collection's own switch before, is still read (it says the
   // Collection always shows its marks now).

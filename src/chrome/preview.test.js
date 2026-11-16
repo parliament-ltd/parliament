@@ -283,7 +283,7 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
   it('opens a plan on the Plan board, and a marking in its chat (C287)', () => {
     // Its first branch until the board was built (C127); the board now (C196 (g)).
     const plan = at('>open:203')
-    expect(plan.text).toBe('Enter opens plan 203 on the Plan board')
+    expect(plan.text).toBe('Enter opens list 203 on the Tasks board')
     expect(plan.next.addressed).toBe('docket')
     expect(plan.next.context.docket).toBe('203')
     expect(at('>open:210').text).toMatch(/^Enter opens the chat 210 is in|^210 is a note of its own/)
@@ -519,7 +519,7 @@ describe('search and filters on Records (stage 6, piece 1; C132)', () => {
     expect(at('>cost:lots').text).toBe('cost: takes an amount, like >0.50, <1 or 0.18')
     expect(at('>since:soon').text).toBe('since: takes 7d, 3w, a month, or a date like 2026-09-01')
     expect(at('>from:299').text).toBe('Nothing here has the number 299')
-    expect(at('>from:211').text).toBe('Nothing comes from 211. from: takes a chat, a plan, a branch or a run')
+    expect(at('>from:211').text).toBe('Nothing comes from 211. from: takes a chat, a list, a branch or a run')
   })
 
   it('clears one kind of filter, the search, or everything (C132 (c))', () => {
@@ -668,8 +668,8 @@ describe('delete: of what has been sent (stage 6, piece 4; C137; C199)', () => {
   }
 
   it('names everything that goes, what stays, that it is for good, and asks for a second Enter', () => {
-    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 comment, highlight or quote stays, marked as from a deleted chat. Add all to delete it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
-    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 comment, highlight or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
+    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 comment, highlight or quote stays, marked as from a deleted chat. Add all to delete it too · List 203 goes with its last chat · Undo cannot bring it back, and stops here')
+    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 comment, highlight or quote goes too · Lists 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
     expect(at('>delete:204').act).toMatchObject({ kind: 'erase', confirm: true, chats: [{ id: 'c204', num: 204 }], keepMarks: true })
   })
 
@@ -979,7 +979,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
     expect(withPlan('>compare:202 229C').act.sides).toEqual([{ chatId: 'chat-202', address: '202' }, { chatId: 'chat-231', address: '229c' }])
     expect(withPlan('>compare:229a 229A').text).toBe('Those are the same thing twice')
     // The plan's number alone names its branches to pick from.
-    expect(withPlan('>compare:229 229a').text).toBe('229 is a plan. compare:229a 229c compares the last replies of two of its branches')
+    expect(withPlan('>compare:229 229a').text).toBe('229 is a list. compare:229a 229c compares the last replies of two of its branches')
     expect(withPlan('>compare:229a 214').text).toBe('compare: takes two comments, highlights or quotes, or two chats or branches, not one of each')
     expect(withPlan('>compare:229b 229a').text).toBe('Nothing here has the number 229b')
 
@@ -1086,7 +1086,7 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
 
   it('opens several at once, spreads them, and keeps the line with arrange:save (C284)', () => {
     const open = at('>open:reflection plan 206')
-    expect(open.text).toBe('Enter opens Reflection, Plan, and 206')
+    expect(open.text).toBe('Enter opens Reflection, Tasks, and 206')
     expect(open.next.columns.flat()).toEqual(expect.arrayContaining(['reflection', 'docket']))
     const two = { can: true, extended: true, list: [{ n: 1, current: true }, { n: 2, current: false }] }
     const sp = preview('>open:reflection plan 206 spread', { mode: 'command', arrangement: room, screens: { records: { rows }, displays: two } })

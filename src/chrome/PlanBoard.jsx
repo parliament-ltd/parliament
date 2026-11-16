@@ -23,6 +23,9 @@ const STATUS_WORDS = {
 }
 // Commands, which stay English.
 const NEW_STEP = (address) => `>new:step ${address}`
+// A to-do of yours (C301 (g)): written in, ticked by its box.
+const NEW_TODO = (address) => `>new:todo ${address}`
+const TICK = (address, index, on) => `tick:${on ? '' : 'off '}${address} ${index}`
 const NEW_BRANCH = '>new:branch'
 const OPEN = (num) => `>open:${num}`
 
@@ -125,7 +128,7 @@ function Washed({ text, other }) {
   return wordDiff(other ?? '', text).filter((p) => p.op !== 'gone').map((p, i) => (p.op === 'added' ? <span key={i} className="ch-pl-dw">{p.text}</span> : p.text))
 }
 
-function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition, onWho, marks = null, otherRun = null, still = false }) {
+function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition, onWho, onTick, waitingFor, marks = null, otherRun = null, still = false }) {
   const { i18n } = useLingui()
   const changes = plan.n === plan.latest && !still
   const markOf = (s) => marks?.get(`${branch.letter}:${s.index}`) ?? null
@@ -159,6 +162,41 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
       {branch.steps.map((s) => {
         const open = changes && s.planned && (s.status === 'ready' || s.status === 'waiting')
         const mark = markOf(s)
+        // A to-do of yours (C301 (g)): a box, your words, never sent.
+        if (s.todo) {
+          const ticked = Boolean(s.todo.doneAt)
+          const waits = waitingFor?.has(s.stepId)
+          return (
+            <div key={s.id} className={`ch-pl-line step todo${ticked ? ' ticked' : ''}${waits ? ' yours' : ''}`}>
+              <div className="ch-pl-gut"><span className="ch-pl-ord">{s.index}</span></div>
+              <div className="ch-pl-main">
+                <div className="ch-pl-todo">
+                  <button
+                    type="button" className={`ch-pl-box${ticked ? ' on' : ''}`} role="checkbox" aria-checked={ticked}
+                    disabled={!changes || still}
+                    aria-label={i18n._(ticked ? COPY.plan.untick : COPY.plan.tick, { index: s.index, address: branch.address })}
+                    title={i18n._(COPY.plan.tickHelp, { command: TICK(branch.address, s.index, !ticked) })}
+                    onClick={() => onTick?.(TICK(branch.address, s.index, !ticked))}
+                  />
+                  {open && !ticked
+                    ? <StepText step={s} address={branch.address} onText={(text) => onText(branch.letter, s.stepId, text)} onFocus={() => { if (!picked) onPick(branch.letter) }} />
+                    : <div className="ch-pl-text ro" dir="auto">{s.text}</div>}
+                </div>
+                <div className="ch-marg ch-pl-marg">
+                  <span>{i18n._(COPY.plan.yours)}</span>
+                  {waits && <><Sep /><span className="ch-pl-waits">{i18n._(COPY.plan.waitsHere)}</span></>}
+                  {s.index > 1 && (open && !ticked
+                    ? <><Sep /><button type="button" className="ch-pl-cond" title={i18n._(COPY.plan.conditionHelp)} onClick={() => onCondition(branch.letter, s.stepId, NEXT_CONDITION[s.condition ?? 'finished'])}>{i18n._(COPY.plan.condition, { condition: s.condition ?? 'finished' })}</button></>
+                    : s.condition && s.condition !== 'finished' && <><Sep /><span>{i18n._(COPY.plan.condition, { condition: s.condition })}</span></>)}
+                  {ticked && <><Sep /><span>{i18n._(COPY.plan.ticked)}</span></>}
+                </div>
+              </div>
+              <div className="ch-pl-end">
+                {changes && !still && <Cross label={i18n._(COPY.plan.deleteStep, { index: s.index, address: branch.address })} onClick={() => onDelete(DELETE_STEP(branch.address, s.index))} />}
+              </div>
+            </div>
+          )
+        }
         return (
           <div key={s.id} className={`ch-pl-line step${s.status === 'waiting' ? ' waiting' : ''}${mark?.chg ? ' chg' : ''}`}>
             <div className="ch-pl-gut">
@@ -198,16 +236,24 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
         )
       })}
       {changes && (
-        <button type="button" className="ch-pl-add" onClick={() => onWrite(NEW_STEP(branch.address))}>
-          <span className="ch-pl-plus">{PLUS}</span>
-          <span className="ch-marg">{i18n._(COPY.plan.addStep, { address: branch.address })}</span>
-        </button>
+        <div className="ch-pl-adds">
+          <button type="button" className="ch-pl-add" onClick={() => onWrite(NEW_STEP(branch.address))}>
+            <span className="ch-pl-plus">{PLUS}</span>
+            <span className="ch-marg">{i18n._(COPY.plan.addStep, { address: branch.address })}</span>
+          </button>
+          <button type="button" className="ch-pl-add" onClick={() => onWrite(NEW_TODO(branch.address))}>
+            <span className="ch-pl-plus">{PLUS}</span>
+            <span className="ch-marg">{i18n._(COPY.plan.addTodo, { address: branch.address })}</span>
+          </button>
+        </div>
       )}
     </>
   )
 }
 
-export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete, onCondition, onWho }) {
+// onTick(line): a to-do's box, run at once as tick: (C301 (g)); waitingFor:
+// the to-dos a lane is waiting at in a run here, by their step ids.
+export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete, onCondition, onWho, onTick, waitingFor = null }) {
   const { i18n } = useLingui()
   return (
     <article
@@ -234,6 +280,7 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
             <div className="ch-marg ch-pl-marg ch-pl-dmarg">
               <span>{i18n._(COPY.plan.runOf, { run: plan.n, runs: plan.latest })}</span>
               <Sep /><span>{i18n._(COPY.plan.counts, { branches: plan.counts.branches, steps: plan.counts.steps })}</span>
+              {plan.counts.yours > 0 && <><Sep /><span>{i18n._(COPY.plan.yoursCount, { count: plan.counts.yours })}</span></>}
               {plan.counts.held > 0 && <><Sep /><span>{i18n._(COPY.plan.held, { count: plan.counts.held })}</span></>}
               {plan.n !== plan.latest && (
                 <>
@@ -253,7 +300,7 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
               {plan.beside && <p className="ch-pl-runhead">{i18n._(COPY.plan.runHead, { run: plan.n })}</p>}
               {plan.branches.map((b) => (
                 <Fragment key={b.letter}>
-                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} onWho={onWho} marks={plan.marks ?? null} otherRun={plan.beside?.n ?? null} />
+                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} onWho={onWho} onTick={onTick} waitingFor={waitingFor} marks={plan.marks ?? null} otherRun={plan.beside?.n ?? null} />
                 </Fragment>
               ))}
               {plan.n === plan.latest && (
