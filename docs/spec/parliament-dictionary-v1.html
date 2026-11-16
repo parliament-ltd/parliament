@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dictionary, v1</title>
+<!--
+  C303 (b) and (c), v1 (16 November): the dictionary and thesaurus as one
+  board, opened by dictionary: or thesaurus:, its words from lists shipped
+  with Parliament, English first ("good with lean"); and sums, answered on
+  the line under the bar. Values from tokens.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --mark: rgba(43, 92, 184, .14);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-marg: 11.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .tabs { display: inline-flex; gap: 14px; margin-inline-start: 8px; font: 400 12.5px var(--sans); color: var(--ink-3); }
+  .chead .tabs .on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .body { padding: 10px 22px 16px; }
+  .word { margin: 0 0 2px; font: 400 26px/1.25 var(--serif); }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 10px; }
+  @media (min-width: 720px) { .grid { grid-template-columns: 1.3fr 1fr; } }
+  .pos { margin: 10px 0 2px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  ol.means { margin: 0; padding: 0 0 0 20px; font: 400 14px/1.55 var(--serif); color: var(--ink); }
+  ol.means li + li { margin-top: 4px; }
+  .eg { display: block; font: italic 400 13px/1.5 var(--serif); color: var(--ink-3); }
+  .h { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .same { display: flex; flex-wrap: wrap; gap: 6px; }
+  .w { padding: 1px 9px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 13px var(--serif); color: var(--ink); }
+  .w.on { border-color: var(--ink); }
+  .src { margin-top: 14px; padding-top: 8px; border-top: .5px solid var(--border-2); }
+  .l { font: 400 12.5px var(--mono); color: var(--ink-3); text-decoration: underline; text-decoration-color: var(--soft); text-underline-offset: 3px; }
+  .bar { border-radius: 14px; padding: 9px 14px; background: rgb(var(--navy)); color: #fff; font: 400 13.5px var(--mono); }
+  .bar .m { display: inline-block; margin-inline-end: 10px; padding: 1px 7px; border-radius: 8px; background: rgba(255,255,255,.14); font: 600 9.5px var(--sans); letter-spacing: .06em; }
+  .under { margin: 5px 0 16px 14px; font: italic 400 12px/1.5 var(--serif); color: var(--marg); }
+  .reply { padding: 12px 16px; border: .5px solid var(--border); border-radius: 12px; background: var(--surface); font: 400 14.5px/1.6 var(--serif); }
+  .reply .by { display: block; margin-bottom: 4px; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .sel { background: var(--mark); border-radius: 2px; }
+  .del { color: var(--ink-3); text-decoration: line-through; }
+  .ins { color: var(--you); text-decoration: underline; text-decoration-color: var(--you); text-underline-offset: 3px; }
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  ul.notes { margin: 12px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 13px/1.6 var(--sans); max-width: 760px; }
+  ul.notes li + li { margin-top: 4px; }
+  .flow { display: grid; grid-template-columns: 1fr; gap: 8px; max-width: 760px; }
+  .flow div { padding: 8px 12px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 13px/1.5 var(--sans); color: var(--ink-2); }
+  .flow b { color: var(--ink); }
+  .asks ol { margin: 0; padding: 0 0 0 20px; font: 400 13.5px/1.6 var(--sans); max-width: 760px; }
+  .asks li + li { margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Dictionary, v1</h1>
+    <p>A dictionary and a thesaurus as one board, opened from the bar: <code>dictionary:reluctant</code> on what the word means, <code>thesaurus:reluctant</code> on words that mean the same. Its words come from lists shipped with Parliament and looked up on this computer: nothing is sent, nothing costs, and it works offline. English first, as ruled.</p>
+    <p>And sums, which models get wrong: <code>calc:</code> answered on the line under the bar, and figures you select added up there. No board for them.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The board</h2>
+    <p class="lede">The word, what it means by kind, and beside it the words that mean the same, and its opposite where the lists know one. A word on the board is a click: it looks that word up, or, with a word selected in your text, puts it in its place.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Dictionary</h2><span class="tabs"><span class="on">Meanings</span><span>Same meaning</span></span></div>
+      <div class="body">
+        <p class="word">reluctant</p>
+        <div class="grid">
+          <div>
+            <p class="pos">Adjective</p>
+            <ol class="means">
+              <li>not eager; unwilling to do something <span class="eg">"reluctant to help"; "a reluctant smile"</span></li>
+              <li>slow to act, from doubt or dislike <span class="eg">"a reluctant witness"</span></li>
+            </ol>
+          </div>
+          <div>
+            <p class="h">Same meaning</p>
+            <div class="same"><span class="w">unwilling</span><span class="w on">hesitant</span><span class="w">loath</span><span class="w">disinclined</span><span class="w">averse</span></div>
+            <p class="h" style="margin-top:12px">Opposite</p>
+            <div class="same"><span class="w">willing</span><span class="w">eager</span></div>
+          </div>
+        </div>
+        <div class="src marg">Words from Open English WordNet (CC BY 4.0), shipped with Parliament. Nothing is sent.</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>"Meanings" and "Same meaning" are the two halves of one board: on a wide screen side by side, on a narrow one as the two tabs, <code>thesaurus:</code> opening the second.</li>
+      <li>Looked-up words are not kept: no history, nothing in Records. A list of your own words, with notes, could come later.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · From your text</h2>
+    <p class="lede">Select a word, in a reply or in what you write, and look it up without leaving it: <code>dictionary:</code> with nothing after it takes the selection, and so does a key, Ctrl+Alt+L ("look up"). A word clicked on the board then takes the selection's place, as an edit, marked as your edits are.</p>
+    <div class="two">
+      <div>
+        <span class="tag">Selected in your text</span>
+        <div class="reply"><span class="by">your text, 213</span>The board was <span class="sel">reluctant</span> to fund a second year without last year's figures.</div>
+        <div class="bar" style="margin-top:10px"><span class="m">COMMAND</span>&gt;dictionary:</div>
+        <div class="under">Enter looks up "reluctant", selected in 213 · Ctrl+Alt+L does the same</div>
+      </div>
+      <div>
+        <span class="tag">"hesitant" clicked on the board</span>
+        <div class="reply"><span class="by">your text, 213</span>The board was <span class="del">reluctant</span> <span class="ins">hesitant</span> to fund a second year without last year's figures.</div>
+        <p class="marg" style="margin:8px 0 0">An edit like any other: undo: takes it back. In a draft it is made without marks, as your drafts are, unless Suggesting is on.</p>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>Not read from what is typed in the text itself: the text cannot tell your typing from pasted text, and text from outside never runs a command. The selection and the bar are yours alone.</li>
+      <li>A word the lists do not have is answered with the nearest they do: <code>dictionary:recieve</code>, "No "recieve" in the word lists. Did you mean receive?". A misspelt command, <code>thesarus:</code>, gets the bar's own "Did you mean thesaurus:?".</li>
+      <li>In Swedish, Finnish, Japanese or Chinese the board says its words are English for now.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · Kept light</h2>
+    <div class="flow">
+      <div><b>Nothing until asked.</b> No checking of what you type, no list loaded on the first screen. The board's own code loads the first time it opens.</div>
+      <div><b>A piece at a time.</b> The lists are split by the first letters of a word. Looking up "reluctant" fetches the "re" piece from Parliament's own site, a small file, and nothing else.</div>
+      <div><b>Kept after.</b> The browser keeps each piece, as it keeps Parliament, so a word looked up twice, or offline, needs nothing fetched.</div>
+      <div><b>Off the page's own thread.</b> A piece is read and searched beside the page, so typing and scrolling never wait for it.</div>
+    </div>
+    <ul class="notes">
+      <li>The lists ship in the release archive and are hashed with everything else. Their size is measured when built, and said here before it ships.</li>
+      <li>No new host, and the security policy does not change: the pieces come from Parliament's own address.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · Sums, on the line under the bar</h2>
+    <p class="lede">A sum written in the bar is worked out as you type, and the line under it says what it comes to. Figures selected in a reply are added up there too, as a spreadsheet says what its selection adds up to. Nothing opens.</p>
+    <div class="two">
+      <div>
+        <span class="tag">Written</span>
+        <div class="bar"><span class="m">COMMAND</span>&gt;calc:48000*2/12</div>
+        <div class="under">= 8,000 · Enter puts it in the bar's history</div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;calc:(1250+3400)*1.25</div>
+        <div class="under">= 5,812.50</div>
+      </div>
+      <div>
+        <span class="tag">Selected in a reply</span>
+        <div class="reply"><span class="by">Sonnet 5.5, 204</span>Staff <span class="sel">31,000</span>, materials <span class="sel">9,500</span>, and outreach <span class="sel">7,500</span>, for 48,000 a year.</div>
+        <div class="under" style="margin-top:8px">3 figures selected: sum 48,000 · average 16,000</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>Worked out by a small reader of sums written for Parliament, exact with decimals: + − × ÷, brackets, percentages and powers. The security policy forbids running text as code, so nothing typed is ever run.</li>
+      <li>Figures are read as the reply's language writes them: 31,000 and 31 000 and 31.000,50 each as meant.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>One board, two commands:</b> <code>dictionary:</code> on the meanings, <code>thesaurus:</code> on the same meaning; the two halves side by side, or as tabs when narrow.</li>
+        <li><b>From your text:</b> the selection, with <code>dictionary:</code> alone or Ctrl+Alt+L (⌘⌥L on a Mac, to be tried there, where a browser may keep it for itself); a word clicked takes its place as an edit.</li>
+        <li><b>The lists:</b> Open English WordNet, shipped, fetched a piece at a time, nothing sent; the size said before it ships.</li>
+        <li><b>Looked-up words not kept;</b> your own word list later.</li>
+        <li><b>Sums:</b> <code>calc:</code> on the line under the bar, and a selection's sum there; no calculator board.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
