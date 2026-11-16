@@ -1327,14 +1327,14 @@ export async function putPlanBack(db, back) {
  * A step planned ahead in one branch of a run (new:step), after the first
  * `after` steps or at the end; never before a step that has started.
  */
-export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, todo = null, title = '', command = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
+export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, todo = null, title = '', command = null, into = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
   return write(db, ['dockets', 'runs'], async (tx) => {
     const { docket, run } = await planAt(tx, docketId, n)
     const branch = run.branches[letter]
     if (!branch) throw new PlanError('noBranch')
     const steps = [...branch.steps]
     const at = Math.max(startedCount(steps), Math.min(after ?? steps.length, steps.length))
-    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, todo, title, command, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
+    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, todo, title, command, into, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
     steps.splice(at, 0, step)
     const changes = []
     const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
@@ -1368,6 +1368,8 @@ export async function changeStep(db, { docketId, n = null, letter, stepId, set, 
       if (set.prompt !== undefined) next.prompt = String(set.prompt)
       if (set.model !== undefined) next.model = set.model
       if (set.room !== undefined) { if (set.room) next.room = set.room; else delete next.room }
+      // Where it goes (C301 (g)): a room's chat, 'own', or as its task (none).
+      if (set.into !== undefined) { if (typeof set.into === 'string' && set.into) next.into = set.into.slice(0, 128); else delete next.into }
     }
     if (set.condition !== undefined) next.condition = CONDITIONS.includes(set.condition) ? set.condition : null
     const steps = branch.steps.map((s, k) => (k === i ? next : s))

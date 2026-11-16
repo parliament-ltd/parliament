@@ -10022,6 +10022,11 @@ msgstr ""
 msgid "tasks.asTaskChip"
 msgstr ""
 
+#. A sub-task’s room, when it is its task’s
+#. js-lingui-explicit-id
+msgid "tasks.asTaskWhere"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "tasks.cancel"
 msgstr ""
@@ -10078,6 +10083,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -10204,10 +10213,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "tasks.subCount"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "tasks.subRooms"
 msgstr ""
 
 #. js-lingui-explicit-id

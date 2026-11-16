@@ -10022,6 +10022,11 @@ msgstr "Sama kuin tehtävällä: {name}"
 msgid "tasks.asTaskChip"
 msgstr "{name}, sama kuin tehtävällä"
 
+#. A sub-task’s room, when it is its task’s
+#. js-lingui-explicit-id
+msgid "tasks.asTaskWhere"
+msgstr "sama kuin tehtävällä"
+
 #. js-lingui-explicit-id
 msgid "tasks.cancel"
 msgstr "Peruuta"
@@ -10079,6 +10084,10 @@ msgstr "Nimi"
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
 msgstr "Kehote"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRoom"
+msgstr "Huone"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldRooms"
@@ -10205,10 +10214,6 @@ msgstr "odottaa kohdassa ”{title}”"
 #. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, one {yksi alitehtävä} other {# alitehtävää}}"
-
-#. js-lingui-explicit-id
-msgid "tasks.subRooms"
-msgstr "Sen vastaus menee sinne, minne tehtävänkin vastaukset"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

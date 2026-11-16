@@ -10022,6 +10022,11 @@ msgstr "跟随任务：{name}"
 msgid "tasks.asTaskChip"
 msgstr "{name}，跟随任务"
 
+#. A sub-task’s room, when it is its task’s
+#. js-lingui-explicit-id
+msgid "tasks.asTaskWhere"
+msgstr "跟随任务"
+
 #. js-lingui-explicit-id
 msgid "tasks.cancel"
 msgstr "取消"
@@ -10079,6 +10084,10 @@ msgstr "名称"
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
 msgstr "提示词"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRoom"
+msgstr "房间"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldRooms"
@@ -10205,10 +10214,6 @@ msgstr "在“{title}”处等待"
 #. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, other {# 项子任务}}"
-
-#. js-lingui-explicit-id
-msgid "tasks.subRooms"
-msgstr "其回答会放在与任务的回答相同的地方"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

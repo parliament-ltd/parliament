@@ -46,6 +46,13 @@ describe('a task and its sub-tasks, read from what they hold', () => {
     expect(modelOf({ command: 'export:204' }, { model: 'claude-sonnet-5-5' })).toBe(null)
   })
 
+  it('lets a sub-task say where it goes, over its task', () => {
+    expect(targetOf({ rooms: ['c-204'] }, { into: 'own' })).toEqual({ own: true })
+    expect(targetOf({ flow: 'together' }, { into: 'c-199' })).toEqual({ chat: 'c-199' })
+    expect(plannedStep({ id: 's', prompt: 'x', into: 'c-199', now: 'x' }).into).toBe('c-199')
+    expect(plannedStep({ id: 's', todo: 'x', into: 'c-199', now: 'x' }).into).toBeUndefined()
+  })
+
   it('sends one by one into the first room, else the task chat; all at once, each into its own', () => {
     expect(targetOf({ rooms: ['c-204'] })).toEqual({ chat: 'c-204' })
     expect(targetOf({})).toEqual({ task: true })
@@ -122,6 +129,8 @@ describe('restoring a task', () => {
   it('checks a sub-task title and command', () => {
     expect(check({}, { id: 's1', status: 'ready', prompt: '', title: 'Compare', command: 'compare:204 199' }).valid).toBe(true)
     expect(check({}, { id: 's1', status: 'ready', prompt: '', command: 3 }).valid).toBe(false)
+    expect(check({}, { id: 's1', status: 'ready', prompt: 'x', into: 'own' }).valid).toBe(true)
+    expect(check({}, { id: 's1', status: 'ready', prompt: 'x', into: 7 }).valid).toBe(false)
     expect(check({}, { id: 's1', status: 'ready', prompt: '', title: 'x'.repeat(201) }).valid).toBe(false)
   })
 
@@ -232,5 +241,25 @@ describe('a task run', () => {
     r.ticked({ docketId: 'd', letter: 'a', stepId: 'c3' })
     expect(await out.finished).toEqual({ n: 1, ended: { a: 'done' } })
     expect(lane.steps[1].status).toBe(STATUS.READY)
+  })
+
+  it('sends a sub-task into its own room, or a chat of its own, one by one and all at once (into)', async () => {
+    const lane = { chatId: 'c-a', steps: [step('p1'), step('p2', { chatId: 'c-204' }), step('p3', { own: true })] }
+    const sent = []
+    const r = createRunner(depsFor(lane, { sent, offered: [] }))
+    expect(await (await r.start({ docketId: 'd', num: 207, n: 1, letters: ['a'] })).finished).toEqual({ n: 1, ended: { a: 'done' } })
+    expect(sent).toEqual(['p1@c-a', 'p2@c-204', 'p3@own-p3'])
+
+    const both = { chatId: null, steps: [step('q1', { chatId: 'c-204' }), step('q2', { chatId: 'c-204' }), step('q3')] }
+    const order = []
+    const deps = depsFor(both, { sent: order, offered: [] })
+    let open = 0
+    let most = 0
+    deps.sendStep = async ({ step: st, chatId }) => { open += chatId === 'c-204' ? 1 : 0; most = Math.max(most, open); await new Promise((res) => setTimeout(res, 5)); open -= chatId === 'c-204' ? 1 : 0; order.push(`${st.id}@${chatId}`); return 'done' }
+    const t = createRunner(deps)
+    await (await t.start({ docketId: 'd', num: 207, n: 1, letters: ['a'], together: true })).finished
+    expect(order.sort()).toEqual(['q1@c-204', 'q2@c-204', 'q3@own-q3'])
+    // Two into one room go one after another.
+    expect(most).toBe(1)
   })
 })

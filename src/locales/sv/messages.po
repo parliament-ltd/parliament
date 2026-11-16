@@ -10022,6 +10022,11 @@ msgstr "Samma som uppgiften: {name}"
 msgid "tasks.asTaskChip"
 msgstr "{name}, samma som uppgiften"
 
+#. A sub-task’s room, when it is its task’s
+#. js-lingui-explicit-id
+msgid "tasks.asTaskWhere"
+msgstr "samma som uppgiften"
+
 #. js-lingui-explicit-id
 msgid "tasks.cancel"
 msgstr "Avbryt"
@@ -10079,6 +10084,10 @@ msgstr "Namn"
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
 msgstr "Prompt"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRoom"
+msgstr "Rum"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldRooms"
@@ -10205,10 +10214,6 @@ msgstr "väntar vid ”{title}”"
 #. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, one {en deluppgift} other {# deluppgifter}}"
-
-#. js-lingui-explicit-id
-msgid "tasks.subRooms"
-msgstr "Svaret hamnar där uppgiftens svar hamnar"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

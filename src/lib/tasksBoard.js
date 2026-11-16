@@ -64,8 +64,12 @@ export function openTaskOf(plan, { answers = new Map(), isSource = () => false, 
     const asks = kind === 'prompt' || kind === 'search'
     let where = null
     if (asks) {
+      const room = typeof s.into === 'string' && s.into !== 'own' ? chatOf(s.into) : null
       if (landed?.branch && landed.docketNum === docket.num) where = { branch: `${docket.num}${landed.branch}`, chatNum: landed.num }
       else if (landed) where = { room: landed.num }
+      // Its own room, or a chat of its own (C301 (g), "Yes, add into").
+      else if (s.into === 'own') where = { ownBranch: true }
+      else if (room) where = { room: room.num }
       else if (t.flow === 'together') where = { ownBranch: true }
       else if (roomChat) where = { room: roomChat.num }
       else where = { branch: `${docket.num}a`, chatNum: own?.num ?? null }
@@ -78,6 +82,8 @@ export function openTaskOf(plan, { answers = new Map(), isSource = () => false, 
       named: typeof s.title === 'string' && s.title.trim() !== '',
       words: isTodo(s) ? String(s.todo.text ?? '') : isCommand(s) ? '' : String(s.prompt ?? ''),
       command: isCommand(s) ? s.command : null,
+      into: typeof s.into === 'string' && s.into ? s.into : null,
+      ownModel: s.model ?? null,
       kind,
       model: asks ? modelOf(s, docket) : null,
       asTask: asks && !s.model,

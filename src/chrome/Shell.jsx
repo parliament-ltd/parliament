@@ -3036,10 +3036,16 @@ export default function Shell() {
         // A task (v4): each sub-task asks its own model, else the task's;
         // with neither, it is yours. One by one, into the task's room if it
         // still has its chat, else the task's own chat.
+        const rooms = new Map()
+        for (const st of b.steps ?? []) {
+          if (typeof st.into === 'string' && st.into !== 'own' && !rooms.has(st.into)) rooms.set(st.into, Boolean(await getConversation(st.into).catch(() => null)))
+        }
         const steps = (b.steps ?? []).map((st) => {
           if (isTodo(st) || isCommand(st)) return st
           const model = modelOf(st, d)
-          return model ? { ...st, model } : { ...st, yours: true }
+          // Its own room, if its chat is still there, or a chat of its own.
+          const into = st.into === 'own' ? { own: true } : rooms.get(st.into) ? { chatId: st.into } : {}
+          return model ? { ...st, model, ...into } : { ...st, yours: true }
         })
         let chatId = b.chatId ?? null
         if (d.flow !== 'together' && d.rooms?.length) {
@@ -3296,7 +3302,7 @@ export default function Shell() {
         const out = await planStep(db.current, {
           docketId: what.docketId, n: what.n, letter: what.letter,
           prompt: what.todo || what.command ? '' : what.prompt ?? '', todo: what.todo ? what.words ?? what.prompt ?? '' : null,
-          title: what.title ?? '', command: what.command ?? null, model: what.model ?? null, newId, now,
+          title: what.title ?? '', command: what.command ?? null, model: what.model ?? null, into: what.into ?? null, newId, now,
         })
         keep(out.back)
         setPlanPick({ num: what.num, letter: what.letter })
@@ -4331,6 +4337,7 @@ export default function Shell() {
     ...(fields.kind === 'yours' ? { todo: true, words: fields.words ?? '' } : {}),
     ...(fields.kind === 'command' ? { command: fields.command } : {}),
     model: fields.kind === 'prompt' || fields.kind === 'search' ? fields.model ?? null : null,
+    into: fields.kind === 'prompt' || fields.kind === 'search' ? fields.into ?? null : null,
   }, `new:subtask ${num} "${fields.title}"`), [taskDo])
   const subChange = useCallback((docketId, stepId, set) => {
     const p = planBoardNow.current

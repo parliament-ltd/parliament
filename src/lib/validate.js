@@ -380,6 +380,8 @@ function validateRun(item) {
       // A sub-task's title, and a command of yours, kept as written, its prompt empty (v4).
       if (s.title !== undefined && !isString(s.title, 200)) return 'run.step.title invalid'
       if (s.command !== undefined && !isString(s.command, 2000)) return 'run.step.command invalid'
+      // Where a sub-task goes: a room's chat id, or 'own' (C301 (g)).
+      if (s.into != null && !isId(s.into)) return 'run.step.into invalid'
     }
   }
   return null

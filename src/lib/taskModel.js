@@ -13,7 +13,8 @@
 // and where one goes from its task: one by one, into the task's room (the
 // chat it shows), after what is there, or with none into the task's own chat
 // (branch a, 207a); all at once, each into a chat of its own, a branch of
-// the task (207b, 207c, …), made as it first runs.
+// the task (207b, 207c, …), made as it first runs. A sub-task's own `into`
+// wins: a room's chat, or 'own' for a chat of its own ("Yes, add into").
 
 import { STATUS, isTodo, TITLE_MOST, COMMAND_MOST } from './docketModel'
 
@@ -60,9 +61,12 @@ export function kindOf(step, task, isSource = () => false) {
 /**
  * Where a task's prompts go: { own: true } each into a chat of its own (all
  * at once), { chat } into a room's chat (one by one, its first room), or
- * { task: true } into the task's own chat, branch a.
+ * { task: true } into the task's own chat, branch a. A sub-task's own
+ * `into` wins (C301 (g), "Yes, add into"): a room's chat, or 'own'.
  */
-export function targetOf(task) {
+export function targetOf(task, step = null) {
+  if (step?.into === 'own') return { own: true }
+  if (typeof step?.into === 'string' && step.into) return { chat: step.into }
   const t = taskOf(task)
   if (t.flow === 'together') return { own: true }
   if (t.rooms.length) return { chat: t.rooms[0] }

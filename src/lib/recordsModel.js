@@ -173,6 +173,7 @@ export function runFromRun(prev, { id, n, now, newId, promptOf, order, keep = nu
       ...(isTodo(s) ? { prompt: '', model: null, todo: { text: String(s.todo.text ?? ''), doneAt: null } } : {}),
       // A sub-task's title and a command of yours come forward as written (v4).
       ...(typeof s.title === 'string' && s.title ? { title: s.title } : {}),
+      ...(typeof s.into === 'string' && s.into && !isTodo(s) ? { into: s.into } : {}),
       ...(typeof s.command === 'string' && s.command ? { prompt: '', model: null, command: s.command } : {}),
     }))
     branches[letter] = { status: branchStatus(steps), room: b.room ?? null, chatId: null, steps }

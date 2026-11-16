@@ -86,7 +86,7 @@ export function rebuildRecord(store, record) {
 const RUN_BRANCH_FIELDS = ['status', 'room', 'chatId', 'steps']
 // todo: a to-do of yours, its words and when it was ticked (C301 (g)); a
 // backup without it reads as before.
-const STEP_FIELDS = ['id', 'status', 'model', 'room', 'messageId', 'prompt', 'condition', 'addedAt', 'ended', 'tokens', 'cost', 'group', 'todo', 'title', 'command']
+const STEP_FIELDS = ['id', 'status', 'model', 'room', 'messageId', 'prompt', 'condition', 'addedAt', 'ended', 'tokens', 'cost', 'group', 'todo', 'title', 'command', 'into']
 function pick(record, fields) {
   const out = {}
   for (const f of fields) if (record?.[f] !== undefined) out[f] = record[f]

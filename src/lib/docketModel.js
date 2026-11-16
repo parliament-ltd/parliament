@@ -49,7 +49,7 @@ export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothin
  * (C301 (g)); title: a sub-task's name; command: a command line of yours,
  * put in the bar when a run reaches it (v4).
  */
-export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, todo = null, title = '', command = null, now }) {
+export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, todo = null, title = '', command = null, into = null, now }) {
   const cmd = todo == null && command != null && String(command).trim() ? String(command).trim().slice(0, COMMAND_MOST) : null
   const name = String(title ?? '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
   return {
@@ -57,6 +57,9 @@ export function plannedStep({ id, prompt, model = null, room = null, condition =
     ...(name ? { title: name } : {}),
     // Its prompt stays empty, so an older Parliament sees an empty step and runs nothing.
     ...(cmd ? { command: cmd } : {}),
+    // Where a prompt goes, if not where its task's do (C301 (g), "Yes, add
+    // into"): a room's chat id, or 'own' for a chat of its own.
+    ...(todo == null && !cmd && typeof into === 'string' && into ? { into: into.slice(0, 128) } : {}),
     ...(room ? { room } : {}), condition, addedAt: now,
     // The prompt to several, one after another, this step is one of (C202).
     ...(group ? { group } : {}),

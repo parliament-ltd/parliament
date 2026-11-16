@@ -10022,6 +10022,11 @@ msgstr "As the task: {name}"
 msgid "tasks.asTaskChip"
 msgstr "{name}, as the task"
 
+#. A sub-task’s room, when it is its task’s
+#. js-lingui-explicit-id
+msgid "tasks.asTaskWhere"
+msgstr "as the task"
+
 #. js-lingui-explicit-id
 msgid "tasks.cancel"
 msgstr "Cancel"
@@ -10079,6 +10084,10 @@ msgstr "Name"
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
 msgstr "Prompt"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRoom"
+msgstr "Room"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldRooms"
@@ -10205,10 +10214,6 @@ msgstr "waits at “{title}”"
 #. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, one {one sub-task} other {# sub-tasks}}"
-
-#. js-lingui-explicit-id
-msgid "tasks.subRooms"
-msgstr "Its answer goes where the task’s do"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

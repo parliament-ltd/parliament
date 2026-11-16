@@ -10022,6 +10022,11 @@ msgstr "タスクと同じ：{name}"
 msgid "tasks.asTaskChip"
 msgstr "{name}（タスクと同じ）"
 
+#. A sub-task’s room, when it is its task’s
+#. js-lingui-explicit-id
+msgid "tasks.asTaskWhere"
+msgstr "タスクと同じ"
+
 #. js-lingui-explicit-id
 msgid "tasks.cancel"
 msgstr "キャンセル"
@@ -10079,6 +10084,10 @@ msgstr "名前"
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
 msgstr "プロンプト"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRoom"
+msgstr "ルーム"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldRooms"
@@ -10205,10 +10214,6 @@ msgstr "「{title}」で待機中"
 #. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, other {サブタスク#件}}"
-
-#. js-lingui-explicit-id
-msgid "tasks.subRooms"
-msgstr "回答は、タスクの回答と同じ場所に届きます"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

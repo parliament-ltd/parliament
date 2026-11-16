@@ -19,7 +19,9 @@
 // those after it until you tick it; a command of yours is put in the bar and
 // holds the rest until you run it there or tick it. All at once, its prompts
 // and searches go together, each into a chat of its own, then its commands
-// one at a time; yours hold nothing up.
+// one at a time; yours hold nothing up. A sub-task whose `into` names a
+// room goes into that room's chat (`chatId`, as read for the run), one
+// whose `into` is 'own' into a chat of its own (`own`).
 
 import { STATUS, isPlanned, isTodo } from './docketModel'
 
@@ -262,7 +264,9 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         before = 'done'
         continue
       }
-      const outcome = await runStep(docketId, job, letter, branch.chatId, step)
+      // A sub-task's own room, or a chat of its own (C301 (g), "Yes, add into").
+      const outcome = step.own ? await runStep(docketId, job, letter, null, step, null, null, true)
+        : await runStep(docketId, job, letter, step.chatId ?? branch.chatId, step)
       if (outcome === 'stopped') return 'stopped'
       before = outcome
       ran = outcome === 'nothing' ? 'done' : outcome
@@ -276,7 +280,23 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
     const branch = await readBranch({ docketId, n: job.n, letter })
     if (!branch) return 'gone'
     const prompts = branch.steps.filter((s) => isReady(s) && hasWords(s))
-    const outcomes = await Promise.all(prompts.map((step) => (job.stopping.has(letter) ? 'stopped' : runStep(docketId, job, letter, null, step, null, null, true))))
+    // Each into a chat of its own; those into one room go there one after
+    // another, as a chat answers one prompt at a time.
+    const byRoom = new Map()
+    const alone = []
+    for (const step of prompts) {
+      if (step.chatId && !step.own) byRoom.set(step.chatId, [...(byRoom.get(step.chatId) ?? []), step])
+      else alone.push(step)
+    }
+    const send = (chatId, step) => (job.stopping.has(letter) ? 'stopped' : runStep(docketId, job, letter, chatId, step, null, null, true))
+    const outcomes = (await Promise.all([
+      ...alone.map((step) => send(null, step)),
+      ...[...byRoom.entries()].map(async ([chatId, list]) => {
+        const outs = []
+        for (const step of list) outs.push(await send(chatId, step))
+        return outs
+      }),
+    ])).flat()
     if (job.stopping.has(letter)) return 'stopped'
     for (const step of branch.steps.filter(openLine)) {
       const now = (await readBranch({ docketId, n: job.n, letter }))?.steps.find((s) => s.id === step.id)

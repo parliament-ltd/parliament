@@ -65,6 +65,13 @@ describe('the open task', () => {
     expect(open.subs[1].where).toEqual({ ownBranch: true })
   })
 
+  it('names a sub-task’s own room, or its own branch, over its task’s (into)', () => {
+    const plan = task(207, { model: 'claude-sonnet-5-5', rooms: ['c-204'] }, [step('p1', { into: 'c-210' }), step('p2', { into: 'own' }), step('p3')])
+    const open = openTaskOf(plan, { isSource, chatOf })
+    expect(open.subs.map((x) => x.where)).toEqual([{ room: 210 }, { ownBranch: true }, { room: 204 }])
+    expect(open.subs.map((x) => x.into)).toEqual(['c-210', 'own', null])
+  })
+
   it('lists its runs, the one waiting for you with where', () => {
     const plan = task(207, {}, [step('t1', { prompt: '', title: 'Check', todo: { text: '', doneAt: null } }), step('p2')])
     const open = openTaskOf(plan, { chatOf, waitsAt: 't1', running: true })

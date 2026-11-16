@@ -64,14 +64,18 @@ function modelOptions(kind, models) {
 
 // A task or a sub-task, added in place (v4, §2). sub: { task } for a
 // sub-task, which starts with its task's kind and model.
-function TaskForm({ sub = null, models, rooms, validate, nameOf, onKeep, onCancel, start = null, defaultModel = null }) {
+// A sub-task's room (C301 (g), "Yes, add into"): as its task's (null), a
+// room's chat, or 'own' for a chat of its own. fixedKind: a sub-task being
+// changed keeps its kind.
+function TaskForm({ sub = null, models, rooms, validate, nameOf, onKeep, onCancel, start = null, defaultModel = null, fixedKind = false }) {
   const { i18n } = useLingui()
   const taskKind = sub ? kindOfModel(sub.task.model, models) : 'yours'
   const [title, setTitle] = useState(start?.title ?? '')
   const [words, setWords] = useState(start?.description ?? '')
   const [kind, setKind] = useState(start?.kind ?? taskKind)
   const [model, setModel] = useState(start?.model ?? null)
-  const [command, setCommand] = useState('')
+  const [command, setCommand] = useState(start?.command ?? '')
+  const [into, setInto] = useState(start?.into ?? null)
   const [picked, setPicked] = useState(start?.rooms ?? [])
   const [find, setFind] = useState('')
   const [flow, setFlow] = useState(start?.flow ?? 'oneByOne')
@@ -86,13 +90,15 @@ function TaskForm({ sub = null, models, rooms, validate, nameOf, onKeep, onCance
   const refused = kind === 'command' && (!line || (checked && !checked.act && !checked.next))
   const canKeep = title.trim() !== '' && !refused && (kind !== 'prompt' && kind !== 'search' ? true : Boolean(chosen) || Boolean(sub))
   const found = find.trim()
-    ? rooms.filter((r) => !picked.includes(r.chatId) && (String(r.num).startsWith(find.trim()) || r.title.toLocaleLowerCase().includes(find.trim().toLocaleLowerCase()))).slice(0, 6)
+    ? rooms.filter((r) => !picked.includes(r.chatId) && r.chatId !== into && (String(r.num).startsWith(find.trim()) || r.title.toLocaleLowerCase().includes(find.trim().toLocaleLowerCase()))).slice(0, 6)
     : []
+  const asks = kind === 'prompt' || kind === 'search'
+  const intoRoom = into && into !== 'own' ? rooms.find((r) => r.chatId === into) : null
   const keep = () => {
     if (!canKeep) return
     onKeep({
       title: title.trim(), kind,
-      ...(sub ? { words: words.trim() } : { description: words.trim(), rooms: picked, flow }),
+      ...(sub ? { words: words.trim(), into: asks ? into : null } : { description: words.trim(), rooms: picked, flow }),
       model: kind === 'prompt' || kind === 'search' ? chosen : null,
       ...(kind === 'command' ? { command: line } : {}),
     })
@@ -113,7 +119,7 @@ function TaskForm({ sub = null, models, rooms, validate, nameOf, onKeep, onCance
         <span className="ch-tk-k">{i18n._(COPY.tasks.fieldKind)}</span>
         <span className="ch-tk-pick">
           {KINDS.map((k) => (
-            <button key={k} type="button" role="radio" aria-checked={kind === k ? 'true' : 'false'} className={`ch-tk-opt${kind === k ? ' on' : ''}`} onClick={() => { setKind(k); setModel(null) }}>{i18n._(KIND_WORDS[k])}</button>
+            <button key={k} type="button" role="radio" aria-checked={kind === k ? 'true' : 'false'} className={`ch-tk-opt${kind === k ? ' on' : ''}`} disabled={fixedKind && kind !== k} onClick={() => { setKind(k); setModel(null) }}>{i18n._(KIND_WORDS[k])}</button>
           ))}
         </span>
       </div>
@@ -174,8 +180,25 @@ function TaskForm({ sub = null, models, rooms, validate, nameOf, onKeep, onCance
           </div>
         </>
       )}
-      {sub && (kind === 'prompt' || kind === 'search') && (
-        <div className="ch-tk-f"><span className="ch-tk-k" /><span className="ch-marg">{i18n._(COPY.tasks.subRooms)}</span></div>
+      {sub && asks && (
+        <div className="ch-tk-f" role="radiogroup" aria-label={i18n._(COPY.tasks.fieldRoom)}>
+          <span className="ch-tk-k">{i18n._(COPY.tasks.fieldRoom)}</span>
+          <span className="ch-tk-pick">
+            <button type="button" role="radio" aria-checked={into == null ? 'true' : 'false'} className={`ch-tk-opt${into == null ? ' on' : ''}`} onClick={() => setInto(null)}>{i18n._(COPY.tasks.asTaskWhere)}</button>
+            {intoRoom && <span className="ch-tk-opt on" role="radio" aria-checked="true">{i18n._(COPY.tasks.room, { num: intoRoom.num })}</span>}
+            <button type="button" role="radio" aria-checked={into === 'own' ? 'true' : 'false'} className={`ch-tk-opt${into === 'own' ? ' on' : ''}`} onClick={() => setInto('own')}>{i18n._(COPY.tasks.ownBranch)}</button>
+            <span className="ch-tk-find">
+              <input className="ch-tk-in" value={find} placeholder={i18n._(COPY.tasks.findRooms)} aria-label={i18n._(COPY.tasks.findRooms)} onChange={(e) => setFind(e.target.value)} />
+              {found.length > 0 && (
+                <span className="ch-tk-menu" role="listbox">
+                  {found.map((r) => (
+                    <button key={r.chatId} type="button" role="option" aria-selected="false" onClick={() => { setInto(r.chatId); setFind('') }}>{r.num} · {r.title}</button>
+                  ))}
+                </span>
+              )}
+            </span>
+          </span>
+        </div>
       )}
       <div className="ch-tk-f">
         <span className="ch-tk-k" />
@@ -188,8 +211,29 @@ function TaskForm({ sub = null, models, rooms, validate, nameOf, onKeep, onCance
   )
 }
 
-function Sub({ task, s, nameOf, onRun, onDelete }) {
+// A sub-task not yet sent can be changed in place, its kind kept: its name,
+// its words, its model and its room (C301 (g), "Yes, add into").
+function Sub({ task, s, nameOf, onRun, onDelete, form = null, onChangeSub }) {
   const { i18n } = useLingui()
+  const [changing, setChanging] = useState(false)
+  if (changing && form) {
+    return (
+      <TaskForm
+        {...form} sub={{ task }} fixedKind
+        start={{ title: s.title, description: s.command ? '' : s.words, kind: s.kind, model: s.ownModel, into: s.into, command: s.command ?? '' }}
+        onCancel={() => setChanging(false)}
+        onKeep={(f) => {
+          const asks = f.kind === 'prompt' || f.kind === 'search'
+          onChangeSub(task.docketId, s.stepId, {
+            title: f.title,
+            ...(f.kind === 'yours' ? { text: f.words } : f.kind === 'command' ? { command: f.command } : { prompt: f.words || f.title }),
+            ...(asks ? { model: f.model ?? null, into: f.into ?? null } : {}),
+          })
+          setChanging(false)
+        }}
+      />
+    )
+  }
   return (
     <div className={`ch-tk-sub${s.status === 'done' ? ' done' : ''}${s.waits ? ' waits' : ''}`}>
       <Box
@@ -201,6 +245,7 @@ function Sub({ task, s, nameOf, onRun, onDelete }) {
       <span className="ch-tk-end">
         {s.status === 'done' && <span className="ch-tk-state">{i18n._(COPY.plan.statusDone)}</span>}
         {s.status === 'running' && <span className="ch-tk-state running"><span className="ch-pl-dot" aria-hidden="true" />{i18n._(COPY.plan.statusRunning)}</span>}
+        {s.changes && s.status !== 'done' && form && <button type="button" className="ch-tk-l" onClick={() => setChanging(true)}>{i18n._(COPY.tasks.change)}</button>}
         {s.changes && s.status !== 'done' && <button type="button" className="ch-tk-del" aria-label={i18n._(COPY.tasks.deleteSub, { n: s.n, num: task.num })} title={i18n._(COPY.tasks.deleteSub, { n: s.n, num: task.num })} onClick={() => onDelete(DELETE_SUB(task.num, s.n))}>×</button>}
       </span>
       {s.words && s.named && s.words.trim() !== s.title && <span className="ch-tk-words" dir="auto">{s.words}</span>}
@@ -226,7 +271,7 @@ function Sub({ task, s, nameOf, onRun, onDelete }) {
   )
 }
 
-function Open({ task, nameOf, models, rooms, validate, defaultModel = null, onRun, onWrite, onChange, onAddSub, onDelete }) {
+function Open({ task, nameOf, models, rooms, validate, defaultModel = null, onRun, onWrite, onChange, onAddSub, onChangeSub, onDelete }) {
   const { i18n } = useLingui()
   const [adding, setAdding] = useState(false)
   const [changing, setChanging] = useState(false)
@@ -261,7 +306,7 @@ function Open({ task, nameOf, models, rooms, validate, defaultModel = null, onRu
           </span>
         </div>
       )}
-      {task.subs.map((s) => <Sub key={s.stepId ?? s.n} task={task} s={s} nameOf={nameOf} onRun={onRun} onDelete={onDelete} />)}
+      {task.subs.map((s) => <Sub key={s.stepId ?? s.n} task={task} s={s} nameOf={nameOf} onRun={onRun} onDelete={onDelete} onChangeSub={onChangeSub} form={{ models, rooms, validate, nameOf, defaultModel }} />)}
       {adding
         ? <TaskForm sub={{ task }} models={models} rooms={rooms} validate={validate} nameOf={nameOf} defaultModel={defaultModel} onCancel={() => setAdding(false)} onKeep={(f) => { onAddSub(task.num, task.docketId, task.n, f); setAdding(false) }} />
         : <Plus sub label={i18n._(COPY.tasks.addSubPlus)} onClick={() => setAdding(true)} />}
@@ -292,7 +337,6 @@ function Open({ task, nameOf, models, rooms, validate, defaultModel = null, onRu
 export default function TasksBoard({ tasks, open, addressed, onAddress, nameOf = (id) => id, defaultModel = null, models, rooms = [], validate = () => null, onOpen, onRun, onWrite, onAdd, onChange, onAddSub, onChangeSub, onDelete }) {
   const { i18n } = useLingui()
   const [adding, setAdding] = useState(false)
-  void onChangeSub
   return (
     <article className={`ch-card ch-plan ch-tasks${addressed ? ' addressed' : ''}`} aria-current={addressed ? 'true' : undefined} onMouseDown={() => onAddress('docket')}>
       <header className="ch-chead">
@@ -309,7 +353,7 @@ export default function TasksBoard({ tasks, open, addressed, onAddress, nameOf =
           </div>
         )}
         {(tasks ?? []).map((t) => (t.num === open?.num
-          ? <Open key={t.num} task={open} nameOf={nameOf} defaultModel={defaultModel} models={models} rooms={rooms} validate={validate} onRun={onRun} onWrite={onWrite} onChange={onChange} onAddSub={onAddSub} onDelete={onDelete} />
+          ? <Open key={t.num} task={open} nameOf={nameOf} defaultModel={defaultModel} models={models} rooms={rooms} validate={validate} onRun={onRun} onWrite={onWrite} onChange={onChange} onAddSub={onAddSub} onChangeSub={onChangeSub} onDelete={onDelete} />
           : (
             <div key={t.num} className={`ch-tk-task${t.done ? ' done' : ''}`}>
               <Box on={t.done} label={i18n._(COPY.tasks.tickTask, { num: t.num, title: t.title })} onClick={() => onRun(TICK(t.num, null, !t.ticked))} />
@@ -329,7 +373,7 @@ export default function TasksBoard({ tasks, open, addressed, onAddress, nameOf =
             </div>
           )))}
         {open && !(tasks ?? []).some((t) => t.num === open.num) && (
-          <Open task={open} nameOf={nameOf} defaultModel={defaultModel} models={models} rooms={rooms} validate={validate} onRun={onRun} onWrite={onWrite} onChange={onChange} onAddSub={onAddSub} onDelete={onDelete} />
+          <Open task={open} nameOf={nameOf} defaultModel={defaultModel} models={models} rooms={rooms} validate={validate} onRun={onRun} onWrite={onWrite} onChange={onChange} onAddSub={onAddSub} onChangeSub={onChangeSub} onDelete={onDelete} />
         )}
       </div>
     </article>
