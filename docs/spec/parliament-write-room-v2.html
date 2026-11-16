@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A room to write in</title>
+<!--
+  C301 (f), redrawn (16 November) after Stefan's two rulings: branches keep
+  their own copy of your text (A), and in a draft Suggesting marks your
+  changes (the middle way). Adds Suggesting in a draft, and branches, with
+  the moment they are made. v1 kept as it was. The first screen as C302
+  built it; the marks as parliament-comments-v1.html and
+  parliament-prompts-list-v1.html drew them. Values from
+  src/styles/tokens.css and src/editing/editing.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --prompt-tint: rgba(194, 65, 12, .07);
+    --note: #5A4AB0; --note-tint: rgba(124, 108, 212, .16); --high-tint: rgba(236, 72, 153, .16);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+
+  .screen { background: var(--paper); border: .5px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .strip { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 8px 16px; border-bottom: .5px solid var(--border-2); font: 400 12.5px var(--sans); color: var(--ink-2); }
+  .strip img { width: 22px; height: auto; display: block; }
+  .strip .on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .strip .cmd { font: 400 12px var(--mono); color: var(--ink-2); }
+  .strip .right { margin-inline-start: auto; display: flex; gap: 14px; }
+  .stage { padding: 18px 16px 14px; }
+  .room { max-width: 620px; margin: 0 auto; }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .num { font: 400 var(--t-id) var(--mono); color: var(--ink-3); }
+  .chead .right { margin-inline-start: auto; }
+  .chead .on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .text { padding: 16px 22px 18px; font: 400 15.5px/1.7 var(--serif); min-height: 120px; }
+  .text h3 { margin: 0 0 .4em; font: 600 17px/1.4 var(--serif); }
+  .text p { margin: 0 0 .8em; }
+  .text .who { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); margin: 0 0 6px; }
+  .text.empty { min-height: 260px; }
+  .text .caret { display: inline-block; width: 1.5px; height: 1.1em; background: var(--ink); vertical-align: text-bottom; margin-inline-end: 2px; }
+  .text .ph { color: var(--ink-3); font-style: italic; }
+  .rule { height: 0; border-top: .5px solid var(--border-2); margin: 4px 0 12px; }
+
+  .pr-at { background: var(--prompt-tint); border-radius: 2px; }
+  .pr-at::before, .pr-at::after { content: ""; display: inline-block; width: 5px; height: .78em; border: 0 solid var(--prompt); }
+  .pr-at::before { border-width: 1.5px 0 0 1.5px; vertical-align: text-top; margin-inline-end: 1px; }
+  .pr-at::after { border-width: 0 1.5px 1.5px 0; vertical-align: baseline; margin-inline-start: 1px; }
+  .pr { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--prompt); }
+  .pr b, .pl b { font: 600 10.5px var(--mono); font-style: normal; margin-inline-end: 3px; letter-spacing: -.02em; }
+  .pr .as { color: var(--marg); }
+  .cm-at { background: var(--note-tint); border-radius: 2px; padding: 0 1px; }
+  .cm { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--note); }
+  .hl { background: var(--high-tint); border-radius: 2px; padding: 0 1px; }
+  s.was { color: var(--ink-3); }
+  s.held { color: var(--ink-3); text-decoration-style: dashed; }
+  ins.ans { color: var(--ai); text-decoration: underline dotted; text-underline-offset: 3px; margin-inline-start: .22em; }
+  ins.you { color: var(--you); text-decoration: underline; text-underline-offset: 3px; margin-inline-start: .22em; }
+  ins.held { color: var(--you); text-decoration: underline dashed; text-underline-offset: 3px; margin-inline-start: .22em; }
+  .ac { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--ai); white-space: nowrap; }
+  .ac a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+  .bar { max-width: 620px; margin: 14px auto 0; background: var(--surface); border: .5px solid var(--border); border-radius: 14px; }
+  .bar.alone { margin-top: 16px; }
+  .field { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border-radius: 0 0 14px 14px; background: var(--subtle); }
+  .bar.plain .field { border-radius: 14px; }
+  .field .chip { padding: 2px 7px; border-radius: 9px; background: var(--ink); color: #fff; font: 600 9px var(--sans); letter-spacing: .06em; }
+  .field .v { font: 400 14px var(--sans); }
+  .field .who-s { margin-inline-start: auto; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); text-align: end; }
+  .enter { max-width: 620px; margin: 7px auto 0; padding: 0 6px; }
+  .enter b { font-weight: 400; color: var(--ink); }
+
+  .list { padding: 10px 14px 6px; border-bottom: .5px solid var(--border-2); }
+  .list-head { display: flex; align-items: baseline; gap: 8px; padding: 0 0 6px; }
+  .list-head h3 { margin: 0; font: 600 12px var(--sans); }
+  .list-head .right { margin-inline-start: auto; }
+  .br { padding: 6px 0 4px; border-top: .5px solid var(--border-2); }
+  .br-row, .it { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+  .br-row { font: 400 12.5px var(--sans); }
+  .br-row .addr { font: 600 11px var(--mono); }
+  .br-row .who { font: 600 12px var(--sans); }
+  .br-row .what { color: var(--ink-2); }
+  .br.none .br-row { color: var(--ink-3); }
+  .it { padding: 3px 0 3px 22px; font: 400 12.5px/1.45 var(--sans); }
+  .el s { color: var(--ink-3); }
+  .el ins { color: var(--you); text-decoration: underline; text-underline-offset: 2px; }
+  .box { flex: none; display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .col-card { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 10px 16px; }
+  .col-card + .col-card { margin-top: 10px; }
+  .mk-e { font: 400 15px/1.6 var(--serif); }
+  .mk-marg { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px 8px; }
+  .mk-marg .id { font: 400 var(--t-id) var(--mono); font-style: normal; }
+  .mk-marg a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  pre { margin: 0; padding: 12px 14px; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; font: 400 12px/1.6 var(--mono); color: var(--ink-2); overflow-x: auto; white-space: pre-wrap; }
+  pre .add { color: var(--you); }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 780px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair h3 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks h3 { margin: 0; font: 600 12px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .asks h3 + ol, .asks h3 + ul { margin-top: 6px; }
+  .asks ol, .asks ul { margin: 0 0 12px; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>A room to write in</h1>
+    <p>C301 (f), redrawn after your two rulings. The first screen is already an empty room (C302). Here it becomes a page you can type into: your own text, never sent by itself, marked like any reply, with prompts written in it and answered in it. A prompt typed in the bar still starts a chat as now.</p>
+    <p>Ruled since v1: <b>branches keep their own copy of your text</b>, and <b>in a draft, Suggesting marks your changes</b>. New here: section 3 (Suggesting in a draft) and section 6 (branches, and the moment they are made). Your text is one new kind of message, shown in full in section 7.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The first screen: a page</h2>
+    <p class="lede">The empty room as it is now, with one line changed: a click in it puts the caret there. The bar keeps the focus when the page opens, so <code>?</code> and commands work at once, as now.</p>
+    <div class="screen">
+      <div class="strip"><img src="parliament-birds.svg" alt=""><span class="on">Room</span><span>Plan</span><span class="cmd">import:</span><span class="cmd">tour:</span><span class="right marg"><span>markup ▾</span><span>focus</span></span></div>
+      <div class="stage">
+        <div class="room">
+          <div class="card addressed">
+            <div class="chead"><h2>New room</h2></div>
+            <div class="text empty"><span class="caret"></span><span class="ph">Write here, or type a prompt in the bar.</span></div>
+          </div>
+        </div>
+        <div class="bar alone plain"><div class="field"><span class="chip">PROMPT</span><span class="v"></span></div></div>
+        <div class="enter marg">Type a command, or ? for every command</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>The first words you write make the room's chat, numbered as any chat is (212), titled from its first words, here, with nothing sent. It is in Records at once, and a backup carries it.</li>
+      <li>Pasted text comes in as plain text, as it does in a reply: the page never reads pasted HTML.</li>
+      <li>A prompt typed in the bar, with nothing written in the room, starts a chat exactly as today.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · Writing, and marking it</h2>
+    <p class="lede">What you write is yours, and is never sent by itself. Everything a reply takes, it takes: headings and lists as you type them, a comment (Ctrl+Alt+M), a highlight, a prompt in the text (Ctrl+Alt+P), "as a reply" on a prompt's row. Until a model has read it, it is a draft: in Editing, what you type is simply your text, nothing marked and nothing numbered.</p>
+    <div class="screen">
+      <div class="strip"><img src="parliament-birds.svg" alt=""><span class="on">Room: 212</span><span>Plan</span><span class="cmd">import:</span><span class="cmd">tour:</span><span class="right marg"><span>markup ▾</span><span>focus</span></span></div>
+      <div class="stage">
+        <div class="room">
+          <div class="card addressed">
+            <div class="chead"><h2>Committee notes</h2><span class="num">212</span><span class="marg right">your text</span></div>
+            <div class="text">
+              <h3>Committee notes</h3>
+              <p>First, the budget. <span class="pr-at">Spending rose again this year</span><span class="pr"><b>p&gt;</b>add last year's figures</span>, and the board wants a plan before the vote.</p>
+              <p>Second, the hiring plan, with <span class="pr-at">a freeze until March</span><span class="pr"><b>p&gt;</b>is this too strict? say why <span class="as">· as a reply</span></span>. <span class="cm-at">Third, the move</span><span class="cm">ask Anna about the lease</span>, which <span class="hl">waits on the landlord</span>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="bar alone plain"><div class="field"><span class="chip">PROMPT</span><span class="v"></span></div></div>
+        <div class="enter marg"><b>Nothing typed: Enter sends your text and its 2 prompts to Sonnet 5.5, about 1¢</b> · see what goes</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><b>Sent with a prompt:</b> nothing typed, Enter sends your text with the prompts in it; words typed go with your text, "Enter sends your words and your text, with its 2 prompts, to Sonnet 5.5". Ctrl+Enter in your text does what Enter in the bar would, as C301 (a) drew it, so you need not leave the page.</li>
+      <li><b>Never by itself:</b> with nothing typed and no prompt in it, Enter says "Your text is never sent by itself. Ctrl+Alt+P writes a prompt in it, or type one here", and sends nothing.</li>
+      <li><b>Comments</b> stay unsent, as ruled. A source (Wikipedia, Hacker News, OpenAlex) reads only the words you type, never your text, and the line says so.</li>
+      <li>The markup menu shows and hides these marks here as in any reply. Your prompts and comments are in the Collection, "from 212".</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · Suggesting, in a draft</h2>
+    <p class="lede">As ruled: with the markup menu on Suggesting, your changes to your own draft are marked, dashed, as a held edit is, numbered, and listed in the Collection. Accept one and it goes into your text, with nothing to tell, since no model has read it; reject it and it is taken back.</p>
+    <div class="two">
+      <div>
+        <span class="tag">In the room, Suggesting</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="num">212</span><span class="marg right">your text · Suggesting</span></div>
+          <div class="text">
+            <p>First, the budget. Spending rose again this year, and the board wants <s class="held">a plan</s><ins class="held">a costed plan</ins> before the vote.</p>
+            <p>Second, the hiring plan, with a freeze until March. Third, the move, which waits on <s class="held">the landlord</s><ins class="held">the landlord's answer</ins>.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="tag">In the Collection</span>
+        <div class="col-card">
+          <div class="mk-e"><s class="held">a plan</s><ins class="held">a costed plan</ins></div>
+          <div class="mk-marg marg"><span class="id">216</span><span>Edit</span><span>212</span><span>waits · your draft</span><a>accept</a><a>reject</a></div>
+        </div>
+        <div class="col-card">
+          <div class="mk-e"><s class="held">the landlord</s><ins class="held">the landlord's answer</ins></div>
+          <div class="mk-marg marg"><span class="id">217</span><span>Edit</span><span>212</span><span>waits · your draft</span><a>accept</a><a>reject</a></div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><b>Editing</b> in a draft stays as section 2 says: what you type is the text. Switching to Suggesting marks only what you change from then on.</li>
+      <li><b>Accepted</b> in a draft, a change is simply your text, and the model will read it as such. Accept all and Reject all in the markup menu take them all, as they do held edits now.</li>
+      <li><b>Sent while one waits:</b> a prompt sent meanwhile carries your text without it, the struck words kept and the added ones left out, since a held edit never goes.</li>
+      <li><b>Still waiting once a model has read the text,</b> it becomes an edit held back like any other: accepted, it goes with your next prompt and is told, as section 5 shows.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · The answer, in your text</h2>
+    <p class="lede">Each prompt in the text comes back where it was asked, as the model's suggestion, to accept or reject. With nothing typed, the model is told to answer only in those places, so a reply that holds nothing else is one line under your text, not a card. A prompt "as a reply", or words you typed, still bring a reply, under it.</p>
+    <div class="two">
+      <div>
+        <span class="tag">In the room</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="num">212</span><span class="marg right">your text</span></div>
+          <div class="text">
+            <p>First, the budget. <s class="was">Spending rose again this year</s><ins class="ans">Spending rose 6% this year, after 4% last year</ins><span class="ac">Sonnet 5.5 suggests · <a>accept</a> · <a>reject</a></span>, and the board wants a plan before the vote.</p>
+            <p>Second, the hiring plan, with a freeze until March. <span class="cm-at">Third, the move</span><span class="cm">ask Anna about the lease</span>, which <span class="hl">waits on the landlord</span>.</p>
+            <div class="rule"></div>
+            <div class="who">Sonnet 5.5, 10:51 · answered 1 prompt in your text</div>
+            <p>A freeze until March is strict but defensible: it covers the budget vote, and the two hires you most need can be made the week after.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="tag">What the model is told</span>
+<pre>The person's own text, which they wrote
+here and have not sent as a prompt:
+
+&lt;writing&gt;
+# Committee notes
+
+First, the budget. Spending rose again this
+year, and the board wants a plan before the
+vote.
+
+Second, the hiring plan, with a freeze until
+March. Third, the move, which waits on the
+landlord.
+&lt;/writing&gt;
+
+The person asks about their own text, in their
+own words. Answer each ask in a block of its
+own, as plain text: [ask N] on a line, then your
+answer, which takes the place of the passage,
+then [/ask]. With nothing else asked, write
+nothing more.
+- Ask 214, about "Spending rose again this
+  year": add last year's figures
+
+The person asks about their own text, in their
+own words, and wants these answered in your
+reply itself, not in a block:
+- Ask 215, about "a freeze until March": is
+  this too strict? say why</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>The comment and the highlight are not in what goes: comments are never sent, and a highlight is yours.</li>
+      <li>Accept, reject and <code>undo:</code> work as they do on any reply (C218). Later prompts typed in the bar go on below, as in any room; your text stays the chat's first message.</li>
+      <li>"With nothing else asked, write nothing more" goes only when nothing is typed, in every room: a reply's own prompts in the text get it too, since nothing else was asked.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · Once a model has read it</h2>
+    <p class="lede">From the first answer on, your text is a message the model has read, and changes to it are your edits, as on any reply or prompt: marked, in the Collection, and told once with the next prompt (C216), so what the model said about it still makes sense. Suggesting holds them back, as it does elsewhere.</p>
+    <div class="two">
+      <div>
+        <span class="tag">In the room, Editing</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="num">212</span><span class="marg right">your text · edits kept · 1 waits for your next prompt</span></div>
+          <div class="text">
+            <p>First, the budget. Spending rose 6% this year, after 4% last year, and the board wants a plan before <s class="was">the vote</s><ins class="you">the vote on the 4th</ins>.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="tag">Told with the next prompt</span>
+<pre>The person edited their own text since you
+read it:
+- "the vote" now reads "the vote on the 4th"</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · Branches: each keeps its own copy</h2>
+    <p class="lede">As ruled: a branch keeps its own copy of your text. An edit or a prompt belongs to the branch it is made in and goes only to that branch's model; no model is sent another branch's changes. The bar's list sends each branch its own, all at once or one at a time, as it does now.</p>
+    <div class="two">
+      <div>
+        <span class="tag">Asking three at once</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="num">212</span><span class="marg right">your text</span></div>
+          <div class="text">
+            <p>First, the budget. <span class="pr-at">Spending rose again this year</span><span class="pr"><b>p&gt;</b>add last year's figures</span>, and the board wants a plan before the vote.</p>
+            <p>Second, the hiring plan, with <span class="pr-at">a freeze until March</span><span class="pr"><b>p&gt;</b>is this too strict?</span>.</p>
+          </div>
+        </div>
+        <div class="bar plain"><div class="field"><span class="chip">PROMPT</span><span class="v"></span><span class="who-s">Opus 5.5 · Mistral Medium 3.5 · Gemma 4</span></div></div>
+        <div class="enter marg"><b>Nothing typed: Enter asks Opus 5.5, Mistral Medium 3.5 and Gemma 4 on this computer, each in its own branch of 212, each with your text and its 2 prompts, about 4¢</b></div>
+      </div>
+      <div>
+        <span class="tag">After: 212b, an edit of yours there</span>
+        <div class="card addressed">
+          <div class="chead"><h2>Committee notes</h2><span class="marg right">branch 212a · <span class="on">212b</span> · 212c</span></div>
+          <div class="text">
+            <p>First, the budget. <s class="was">Spending rose again this year</s><ins class="ans">Spending rose by six per cent</ins><span class="ac">Mistral Medium 3.5 suggests · <a>accept</a> · <a>reject</a></span>, and the board wants a plan before <s class="was">the vote</s><ins class="you">the vote on the 4th</ins>.</p>
+          </div>
+        </div>
+        <div class="bar">
+          <div class="list">
+            <div class="list-head"><h3>What Enter sends</h3><span class="marg right">1 request · about 1¢</span></div>
+            <div class="br none"><div class="br-row"><span class="box"></span><span class="addr">212a</span><span class="who">Opus 5.5</span><span class="what">nothing waits</span></div></div>
+            <div class="br">
+              <div class="br-row"><span class="box on"></span><span class="addr">212b</span><span class="who">Mistral Medium 3.5</span><span class="what">an edit</span><span class="marg">on screen</span></div>
+              <div class="it"><span class="box on"></span><span class="el">edit <s>the vote</s> <ins>the vote on the 4th</ins></span></div>
+            </div>
+            <div class="br none"><div class="br-row"><span class="box"></span><span class="addr">212c</span><span class="who">Gemma 4</span><span class="what">nothing waits</span></div></div>
+          </div>
+          <div class="field"><span class="chip">PROMPT</span><span class="v"></span></div>
+        </div>
+        <div class="enter marg"><b>Nothing typed: Enter sends 1 edit to Mistral Medium 3.5 in 212b, about 1¢</b></div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><b>The moment branches are made, suggested:</b> what waits in your text when you ask several at once goes to each of them, since you made it before the branches split. Each new branch copies your text with those prompts and edits, as its own, so each model answers them in its own copy. After that the branches are apart, as ruled.</li>
+      <li><b>Found:</b> today only the first branch's model is told what waits. A new branch copies the text with its marks drawn in, but the records that send them stay with the first branch, so the other models get the typed words alone. Replies work the same way now; the suggestion would change it for them too.</li>
+      <li><b>Each model reads in its own way.</b> Gemma 4 runs on this computer: nothing leaves it, and it costs nothing, but it is slower. A small model may not keep to the answer format; its answers then read in its reply instead of landing in the text, and the line under the room says so. Opus and Mistral go through the privacy filter when it is on.</li>
+      <li><b>Length:</b> a long text may not fit a small model. The line says so before Enter, naming the branch, rather than after.</li>
+      <li>The branch tabs switch which copy the room shows; <code>compare:212a 212b</code> sets their last replies side by side, as now.</li>
+    </ul>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2>7 · What is stored: shown before building</h2>
+    <p class="lede">Your text is a message on your side of the chat, as a prompt is, with one new field saying it is your text and not a prompt. Everything else it holds, a message holds already. The two rulings need no field of their own.</p>
+    <div class="pair">
+      <div>
+        <h3>A prompt, now</h3>
+<pre>{
+  id: "m-3b8e…",
+  conversationId: "c-201a…",
+  role: "user",
+  content: "tighten the whole thing",
+  tokenCount: 0,
+  incomplete: false,
+  createdAt: "…"
+}</pre>
+      </div>
+      <div>
+        <h3>Your text</h3>
+<pre>{
+  id: "m-5e1a…",
+  conversationId: "c-212…",
+  role: "user",
+<span class="add">  writing: true,</span>
+  content: "# Committee notes\n\nFirst, the budget…",
+  blocks: [ { type: "heading", level: 1, … },
+            { type: "paragraph", … }, … ],
+  tokenCount: 0,
+  incomplete: false,
+  createdAt: "…"
+}</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><code>writing</code>: optional, true for your own text. A message without it reads as now. Its words go to a model only with a prompt, under the lead line section 4 shows.</li>
+      <li><code>content</code> and <code>blocks</code> are a message's own fields: <code>blocks</code> is the form a reply keeps once edited in place (C212 (b)), and <code>content</code> its words. Until a model has read your text, both follow what you type; after, <code>content</code> stays as it was read and <code>blocks</code> carries your edits, as for any message.</li>
+      <li>Whether a model has read it is not stored: it has once a model's reply follows it in its chat. An answer from a source does not count.</li>
+      <li><b>Suggesting in a draft</b> uses the edit records there are, held back (C298). One accepted in a draft is marked gone into your text, with the field an edit has when it goes into a prompt instead of being told (<code>sent: { into, at }</code>, C214 (c)), so it is never told.</li>
+      <li><b>Branches made by asking several at once</b> copy, with your text, the records of what waits in it, each copy with its own number, as a branch has its own letter. Records of the same kind, in the same stores.</li>
+      <li>Its chat is an ordinary chat. No migration: no record is rewritten, and no store, index or database version changes. A restore checks <code>writing</code> (true, or not there). Backups carry it from this version on; one made before reads as now.</li>
+      <li>An older Parliament restoring a newer backup drops <code>writing</code>, and shows your text as a prompt of yours that had no reply, its marks intact.</li>
+      <li>Drafting Desk's documents, the earlier room for writing your own (R39), are untouched: they stay in their own store, readable in Drafting Desk, hidden as ruled (C288 (a)). Copying one into a room to write in can come with R39, after the refactor.</li>
+      <li>Emptied again, your text's chat stays, empty, until <code>delete:212</code>: nothing you made is removed for you.</li>
+    </ul>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <h2>8 · Ruled, and to rule</h2>
+    <div class="asks">
+      <h3>Ruled</h3>
+      <ul>
+        <li><b>Branches keep their own copy of your text,</b> each branch's edits and prompts its own.</li>
+        <li><b>In a draft, Suggesting marks your changes;</b> Editing makes them your text.</li>
+      </ul>
+      <h3>To rule</h3>
+      <ol>
+        <li><b>The stored change:</b> one optional field on a message, <code>writing: true</code>, marking it as your own text rather than a prompt, as section 7 shows. Nothing migrated.</li>
+        <li><b>Asking several at once:</b> what waits in the text goes to each model asked, each branch then holding its own copy. In every room, replies included.</li>
+        <li><b>With nothing typed, answers only in the text:</b> the model is told to write nothing beyond its answers, so a reply of answers alone is one line under your text. In every room.</li>
+        <li><b>Ctrl+Enter in your text</b> does what Enter in the bar would, the line under the bar saying what first.</li>
+        <li><b>One text per room,</b> its chat's first message; later prompts in the bar go on below it. Writing more of your own further down can come later.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
