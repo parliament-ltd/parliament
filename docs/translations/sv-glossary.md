@@ -31,6 +31,7 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - marking (notes, keywords, quotes, favourites together) → markering (markeringar).
 - highlight (one passage marked where it sits) → markering as well. Reading apps in Swedish call highlights "markeringar", and "överstrykning" also means crossing out. Hard choice: the same word covers the collective and one kind (see doubts).
 - note → anteckning; keyword → nyckelord; quote → citat (verb: citera); favourite → favorit; collection → samling.
+- comment → kommentar (C301 (c), 15 November: notes became comments, and every line that said anteckning of one now says kommentar; the type: word is comment). A tell: note stays anteckning.
 - tag → tagg (verb tagga: "taggar 207 med …"); pin → fästa; unpin → lossa; pinned → fäst.
 - card → kort; row → rad; step → steg; run → körning; heading → rubrik.
 - saved search → sparad sökning; forget (a saved search, a collection) → glömma.

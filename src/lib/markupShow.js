@@ -9,8 +9,8 @@
 /** Every kind the menu lists, in its order. */
 export const MARK_KINDS = Object.freeze(['edits', 'highlights', 'prompts', 'comments'])
 
-/** The kinds drawn in the text today. Comments come into the text with C301 (c); until then their row waits. */
-export const SHOWN_KINDS = Object.freeze(['edits', 'highlights', 'prompts'])
+/** The kinds drawn in the text: every one, since comments came into it (C301 (c)). */
+export const SHOWN_KINDS = MARK_KINDS
 
 /** A stored markupShow as four booleans: anything not set to false shows. */
 export function showOf(stored) {

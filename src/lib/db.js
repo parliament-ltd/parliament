@@ -583,20 +583,34 @@ export async function deleteHighlight(id) {
 
 // ─── Notes ───────────────────────────────────────────────
 
-export async function addNote({ conversationId, messageId, text }) {
+// passage, nth: a comment on words, the words and which time they come in
+// the message (C301 (c)); a note on the whole message has neither.
+export async function addNote({ conversationId, messageId, text, passage = null, nth = 0 }) {
   const db = await initDB()
-  return addNumbered(db, 'notes', {
+  const record = {
     id: generateId(),
     conversationId,
     messageId,
     text,
     createdAt: new Date().toISOString(),
-  })
+  }
+  if (typeof passage === 'string' && passage) {
+    record.passage = passage
+    record.nth = Number.isInteger(nth) && nth >= 0 ? nth : 0
+  }
+  return addNumbered(db, 'notes', record)
 }
 
 export async function getNotes(conversationId) {
   const db = await initDB()
   return db.getAllFromIndex('notes', 'conversationId', conversationId)
+}
+
+// Notes of their own quoting one number: a comment on a whole message, as
+// comment:reply writes it, is one of these (C301 (c); C286 (b)).
+export async function getOwnNotes() {
+  const db = await initDB()
+  return (await db.getAll('notes')).filter((n) => n.conversationId == null && Array.isArray(n.quotes) && n.quotes.length === 1)
 }
 
 export async function updateNote(id, text) {

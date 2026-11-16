@@ -47,6 +47,8 @@ export function cardsOf(collection, rows, messages = new Map()) {
     createdAt: r.createdAt ?? null, tags: r.tags ?? [], via, gone: r.erasedFrom != null,
     // A note of its own: what it quotes beneath it, or what it summarizes (C145).
     quotes: r.quotes ?? [], summary: r.summarized ?? null, own: r.kind === 'note' && !r.chatId && r.erasedFrom == null,
+    // A comment on words: the words, above its own (C301 (c)).
+    passage: r.kind === 'note' ? r.passage ?? null : null,
     // An edit or an ask: what it changed or asks, its state, and its branch (C220 (b), (c)).
     change: r.change ?? null, branch: r.branch ?? null, docketNum: r.docketNum ?? null,
   })

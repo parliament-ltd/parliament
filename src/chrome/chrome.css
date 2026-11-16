@@ -703,6 +703,8 @@
 .ch-mk { display: flex; gap: 10px; padding: 10px 0 9px; border-bottom: .5px solid var(--ch-border-2); }
 .ch-mk-body { flex: 1; min-width: 0; }
 .ch-mk .t { font: 400 var(--ch-t-small)/1.5 var(--ch-sans); color: var(--ch-ink); white-space: pre-wrap; }
+/* A comment on words: the words above it, in its purple (C301 (c)). */
+.ch-mk .q.ch-cm-q { margin-bottom: 4px; border-inline-start-color: var(--ch-kind-note); background: rgba(124, 108, 212, .06); }
 .ch-mk .q { font: italic 400 var(--ch-t-small)/1.5 var(--ch-serif); color: var(--ch-ink); border-inline-start: 2px solid var(--ch-soft); padding-inline-start: 9px; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
 .ch-mk.ck-term .q { border-inline-start-color: var(--ch-kind-high); }
 .ch-mk.gone { border-inline-start: 1px dashed var(--ch-soft); padding-inline-start: 9px; }
@@ -1206,6 +1208,11 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 
 /* Highlights hidden: their colour, which each carries on itself, goes. */
 .ch-shell.hide-highlights :is(.p-pair-host, .p-edit) .p-text .pm-hl { background-color: transparent !important; }
+
+/* Comments hidden (C301 (c)): the tint, the words after the passage, and
+   those under a message. */
+.ch-shell.hide-comments :is(.p-pair-host, .p-edit) .p-text .pm-cm-at { background: none; padding: 0; }
+.ch-shell.hide-comments :is(.p-pair-host, .p-edit) .p-text .pm-cm, .ch-shell.hide-comments .p-cm-msgs { display: none; }
 
 /* The menu's own (MarkupMenu.jsx): the count at its heading, Accept all and
    Reject all as the Collection's foot draws its buttons (C298), and a line. */

@@ -115,6 +115,19 @@
 
 /* Highlights and quoted passages, drawn over the words as before. */
 .p-text .pm-hl { border-radius: 2px; padding: 0 1px; }
+/* Comments (C301 (c); parliament-comments-v1.html): a purple tint over the
+   words, then a bubble and the comment, small, after them; a comment on the
+   whole message under it, with a purple rule. Never sent. */
+.p-text .pm-cm-at { background: rgba(124, 108, 212, .16); border-radius: 2px; padding: 0 1px; }
+.p-text .pm-cm { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--ch-serif); color: var(--ch-kind-note); user-select: none; }
+.pm-cm-ico { display: inline-block; width: 11px; height: 11px; vertical-align: -1px; margin-inline-end: 3px; }
+.p-text .pm-cm .pm-cm-more { margin-inline-start: 4px; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }
+.p-cm-msgs { display: flex; flex-direction: column; gap: 4px; margin: 2px 0 0; }
+.p-cm-msg { padding: 6px 10px; border-inline-start: 2px solid var(--ch-kind-note); border-radius: 0 6px 6px 0; background: rgba(124, 108, 212, .06); font: italic 400 12.5px/1.5 var(--ch-serif); color: var(--ch-kind-note); }
+.p-cm-msg .p-marg { margin-inline-start: 6px; }
+.p-cm-box { min-width: 440px; border-color: var(--ch-kind-note); }
+.p-cm-box .p-ask-label { color: var(--ch-kind-note); }
+.p-cm-box .p-cm-keys { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
 
 /* clean: the result only, read-only (editing spec, markup · clean). */
 .clean .p-text del { display: none; }

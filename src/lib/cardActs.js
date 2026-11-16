@@ -44,12 +44,12 @@ export function planNote(step, screens = {}, addressed = null) {
     quoted = t.rows
     text = last.value
   } else if (args.length && args.every(isNumberArg)) {
-    return { says: { message: 'noteWords', values: { example: `note:${flat(args).map((a) => a.num ?? a.value).join(', ')} "…"` } }, act: null }
+    return { says: { message: 'noteWords', values: { example: `comment:${flat(args).map((a) => a.num ?? a.value).join(', ')} "…"` } }, act: null }
   } else {
     text = step.match?.values?.[0] ?? ''
   }
   text = String(text ?? '').trim()
-  if (!text) return { says: { message: 'noteWords', values: { example: quoted.length ? `note:${quoted.map((r) => r.num).join(', ')} "…"` : 'note:"Check the dates"' } }, act: null }
+  if (!text) return { says: { message: 'noteWords', values: { example: quoted.length ? `comment:${quoted.map((r) => r.num).join(', ')} "…"` : 'comment:"Check the dates"' } }, act: null }
   if ([...text].length > NOTE_MAX) return { says: { message: 'noteLong', values: { max: NOTE_MAX } }, act: null }
   const nums = quoted.map((r) => r.num)
   const shown = shownHere(addressed, screens)
@@ -289,7 +289,8 @@ export function sharedActs(picked) {
 
 /** The commands the four acts write into the bar, with the numbers (C145 (d)). */
 export const actCommand = {
-  note: (nums) => (nums.length ? `>note:${nums.join(', ')} ""` : '>note:""'),
+  // Comment, the foot's first act (C301 (c)).
+  note: (nums) => (nums.length ? `>comment:${nums.join(', ')} ""` : '>comment:""'),
   tag: (nums) => `>tagadd:"" ${nums.join(', ')}`,
   summarize: (nums) => (nums.length ? `>summarize:${nums.join(', ')}` : '>summarize:'),
 }

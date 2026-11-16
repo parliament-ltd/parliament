@@ -39,7 +39,9 @@ export const FIELDS = Object.freeze({
     'citations', 'from', 'group', 'summary', 'included', 'step', 'blocks', 'told'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
-  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
+  // passage, nth: the words a comment is on, and which time they come in its
+  // message (C301 (c)); a backup without them reads as before.
+  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary', 'passage', 'nth'],
   // nth: where a highlight was selected (C285); a backup without it reads as before.
   highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'nth'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],

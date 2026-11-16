@@ -83,4 +83,10 @@ describe('what a backup keeps of collections and notes (C144 (j), C145)', () => 
     expect(note.quotes).toEqual([214])
     expect(note.summary).toEqual({ from: [214], at: 't', model: 'claude-haiku' })
   })
+
+  it('keeps the words a comment is on, and which time they come (C301 (c))', () => {
+    const note = rebuildRecord('notes', { id: 'n1', conversationId: 'c1', messageId: 'm1', text: 'Ask Anna', createdAt: 't', passage: 'the hiring plan', nth: 1 })
+    expect(note).toMatchObject({ passage: 'the hiring plan', nth: 1 })
+    expect(rebuildRecord('notes', { id: 'n2', text: 'x', createdAt: 't' })).not.toHaveProperty('passage')
+  })
 })

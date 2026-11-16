@@ -52,7 +52,8 @@ const TABLES = ['almanac', 'collection']
 const EDITING = ['room', 'docket', 'reflection', 'collection']
 const BUILDING = ['lab', 'room']
 // The kinds as people name them (C131: a term is a keyword, a docket a plan).
-const KINDS = ['chat', 'note', 'highlight', 'keyword', 'quote', 'plan', 'edit', 'ask', 'suggestion']
+// comment: a note, by its new name (C301 (c)); note still reads.
+const KINDS = ['chat', 'comment', 'note', 'highlight', 'keyword', 'quote', 'plan', 'edit', 'ask', 'suggestion']
 const FRAMEWORKS = ['challenge', 'reasoning', 'pushback', 'alts', 'uncertain']
 
 export const GROUPS = Object.freeze([
@@ -89,7 +90,7 @@ export const LEADERS = Object.freeze({
 export const EVERYDAY = Object.freeze({
   title: /*i18n*/ { id: 'group.everyday', message: 'Everyday' },
   leaders: ['>', 'p>', '?', 'Esc'],
-  verbs: ['records', 'settings', 'open', 'close', 'new', 'name', 'by', 'api', 'note', 'delete', 'undo', 'pop', 'bar', 'backup'],
+  verbs: ['records', 'settings', 'open', 'close', 'new', 'name', 'by', 'api', 'comment', 'delete', 'undo', 'pop', 'bar', 'backup'],
 })
 
 // Lines of several commands to copy, in the command menu after the bar's
@@ -171,7 +172,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.again', message: 'Ask again from the edited prompt, as a new branch' } }),
 
   // Filters: they narrow the table, and several can share a line.
-  v({ verb: 'type', group: 'filters', example: 'type:chat', forms: ['type:chat', 'type:note,chat', 'type:edit'], takes: [[{ list: KINDS }]], minus: true, on: TABLES, stage: 6, click: 'apply',
+  v({ verb: 'type', group: 'filters', example: 'type:chat', forms: ['type:chat', 'type:comment,chat', 'type:edit'], takes: [[{ list: KINDS }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.type', message: 'Show some kinds of thing' } }),
   v({ verb: 'tag', group: 'filters', example: 'tag:research', forms: ['tag:research', '-tag:research', 'tag:essay,research'], takes: [[{ list: 'text' }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.tag', message: 'Show what carries a tag. A minus leaves it out' } }),
@@ -186,9 +187,9 @@ export const VERBS = Object.freeze([
     takes: [[{ list: 'text' }, { opt: ['room', 'collection'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.in', message: 'Show what is in a collection, or was made in a room' } }),
   // keyword stays a word has: and type: read, for searches kept before keywords became highlights (C285).
-  v({ verb: 'has', group: 'filters', example: 'has:highlight', forms: ['has:note', 'has:quote', 'has:highlight'],
-    takes: [[{ list: ['note', 'keyword', 'quote', 'highlight'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds notes, quotes or highlights' } }),
+  v({ verb: 'has', group: 'filters', example: 'has:highlight', forms: ['has:comment', 'has:quote', 'has:highlight'],
+    takes: [[{ list: ['comment', 'note', 'keyword', 'quote', 'highlight'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds comments, quotes or highlights' } }),
   v({ verb: 'cost', group: 'filters', example: 'cost:>0.50', takes: [['text']], on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cost', message: 'Show plans by what they cost' } }),
   v({ verb: 'since', group: 'filters', example: 'since:7d', forms: ['since:7d', 'since:3w', 'since:september', 'since:09/01/26'], takes: [['text']], on: TABLES, stage: 6, click: 'apply',
@@ -252,9 +253,14 @@ export const VERBS = Object.freeze([
   v({ verb: 'export', group: 'items', example: 'export:md 201', forms: ['export:md 201', 'export:jsonl 207, 216', 'export:md records'],
     takes: [[], [['md', 'jsonl'], { opt: 'addresses' }], [['md', 'jsonl'], ['records']]], on: TABLES, stage: 6,
     gloss: /*i18n*/ { id: 'verb.export', message: 'Download as Markdown or JSONL to read elsewhere. It cannot be restored' } }),
-  v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"', 'note:reply "Check this figure"'],
+  // Notes became comments (C301 (c)): comment: writes one, and note:, its
+  // older name, still does. In the text, Ctrl+Alt+M writes one on words.
+  v({ verb: 'comment', group: 'items', example: 'comment:203 "Try it without the ending"', forms: ['comment:203 "Try it without the ending"', 'comment:"Check the dates"', 'comment:reply "Check this figure"'],
+    rest: true, takes: [['text']], stage: 15, undoable: true,
+    gloss: /*i18n*/ { id: 'verb.comment', message: 'Write a comment for people. It is never sent' } }),
+  v({ verb: 'note', group: 'items', example: 'note:"Check the dates"', forms: ['note:"Check the dates"'],
     rest: true, takes: [['text']], stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.note', message: 'Write a note for people. It is never sent' } }),
+    gloss: /*i18n*/ { id: 'verb.note', message: 'An older name: note: writes a comment, as comment: does', comment: 'Commands stay English' } }),
   // delete: (C199): the one word for removing. What has been sent goes for
   // good after a second Enter (C137); what has not (a planned step, a branch
   // that never ran, a plan with no chat) goes on one Enter, and undo: brings

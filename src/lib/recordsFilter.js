@@ -25,8 +25,8 @@ export const EMPTY_VIEW = Object.freeze({ search: '', filters: Object.freeze([])
 
 // The kinds as people name them (C131) and as rows carry them.
 // A highlight is kept as a term, as keywords were: keyword reads as highlight, for searches kept before (C285).
-const TYPE_KIND = Object.freeze({ chat: 'chat', note: 'note', keyword: 'term', quote: 'quote', plan: 'docket', highlight: 'term', edit: 'edit', ask: 'ask', suggestion: 'suggestion' })
-const HAS_KIND = Object.freeze({ note: 'note', keyword: 'term', quote: 'quote', highlight: 'term' })
+const TYPE_KIND = Object.freeze({ chat: 'chat', comment: 'note', note: 'note', keyword: 'term', quote: 'quote', plan: 'docket', highlight: 'term', edit: 'edit', ask: 'ask', suggestion: 'suggestion' })
+const HAS_KIND = Object.freeze({ comment: 'note', note: 'note', keyword: 'term', quote: 'quote', highlight: 'term' })
 // Rows only when filtered for, or found by a search (A19; C133). One line.
 const ON_REQUEST = new Set(['term', 'quote'])
 // Rows only under their own type: filter (C56, C220 (j)): not even a search finds them.

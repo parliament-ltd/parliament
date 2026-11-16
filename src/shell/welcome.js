@@ -67,7 +67,7 @@ export const ADVANCED_STEPS = Object.freeze([
   { id: 'compare', group: 'sources', shows: 'compare:', writes: '>compare:' },
   { id: 'highlight', group: 'collection', shows: null, writes: null },
   { id: 'collection', group: 'collection', shows: 'new:collection', writes: '>new:collection' },
-  { id: 'noteQuotes', group: 'collection', shows: 'note:"…"', writes: '>note:""' },
+  { id: 'noteQuotes', group: 'collection', shows: 'comment:"…"', writes: '>comment:""' },
   // The one step that spends tokens: optional, with a key (W §13).
   { id: 'summary', group: 'collection', shows: 'summarize:', writes: '>summarize:' },
   { id: 'arrange', group: 'space', shows: 'arrange:save "research"', writes: '>arrange:save "research"' },

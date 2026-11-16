@@ -12,6 +12,8 @@ import { shownPlugin, shownKey } from '../../editing/shown'
 import { chartView } from '../../editing/chartView'
 import { useBlockMenu } from './useBlockMenu'
 import { useAskBox } from './useAskBox'
+import { useCommentBox } from './useCommentBox'
+import { commentsPlugin, commentsKey } from '../../editing/comments'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
@@ -49,6 +51,8 @@ const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it s
 const NO_ASKS = new Map()
 const NO_TITLES = Object.freeze([])
 const NO_TITLE_WORDS = { ask: '', help: () => '' }
+const NO_COMMENTS = Object.freeze([])
+const NO_COMMENT_WORDS = { label: 'COMMENT', placeholder: '', keys: 'Ctrl+Alt+M', more: 'more', less: 'less', title: () => '', pick: '', block: '' }
 // closedEdits: edits already told to a model; typing beside one starts a new edit (C216 (i)).
 // heldEdits: edits held back, as Suggesting keeps them, drawn dashed (C301 (b)).
 // askInfo: each ask's number and state, by its id; onSettleAsk(askId, how) when
@@ -56,7 +60,9 @@ const NO_TITLE_WORDS = { ask: '', help: () => '' }
 // sugInfo, onSettleSuggestion(suggestionId, how), sugWords: suggestions, as asks (C229).
 // titles: a source's answer's lines that are titles of pages it links to;
 // titleWords: the "ask" after each, and what it says it does (C287).
-export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titles = NO_TITLES, titleWords = NO_TITLE_WORDS }) {
+// comments: its comments on words; onComment({ messageId, passage, nth, text })
+// keeps one written with Ctrl+Alt+M; commentWords: their words (C301 (c)).
+export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titles = NO_TITLES, titleWords = NO_TITLE_WORDS, comments = NO_COMMENTS, onComment, commentWords }) {
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
   const host = useRef(null)
@@ -78,6 +84,13 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
   useEffect(() => { onSettleSugRef.current = onSettleSuggestion }, [onSettleSuggestion])
   const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords)
   const askOptions = askBox.options
+  // Comments on words (C301 (c)), as in a prompt and its reply.
+  const cw = commentWords ?? NO_COMMENT_WORDS
+  const commentWordsRef = useRef(cw)
+  const commentsWas = useRef('')
+  useEffect(() => { commentWordsRef.current = cw })
+  const commentBox = useCommentBox(view, (c) => onComment?.(c), cw, (line) => setSaid(line), { pick: cw.pick, block: cw.block }, id)
+  const commentOptions = commentBox.options
 
   useEffect(() => { onSaveRef.current = onSave }, [onSave])
   const titlesRef = useRef(titles)
@@ -110,8 +123,15 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     idsRef.current = ids
     const doc = fromBlocks(blocks, ids.block) ?? (plain ? promptFromText(content, ids.block) : replyFromMarkdown(content, ids.block, { anchors: `msg-${id}` }))
     saved.current = JSON.stringify(toBlocks(doc))
+    // A new editor has no comments yet: given them again below.
+    commentsWas.current = ''
     const plugins = [
-      ...editingPlugins({ ids, blocks: true, onNote: (text) => setSaid(text), ...menuOptions, ...askOptions }),
+      ...editingPlugins({ ids, blocks: true, onNote: (text) => setSaid(text), ...menuOptions, ...askOptions, ...commentOptions }),
+      commentsPlugin({ words: {
+        get more() { return commentWordsRef.current.more },
+        get less() { return commentWordsRef.current.less },
+        label: (num) => commentWordsRef.current.title(num),
+      } }),
       // Edits held back, dashed (C301 (b)).
       heldPlugin(),
       // Accept or undo an answered ask, in place (C218).
@@ -196,6 +216,14 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     view.current.dispatch(view.current.state.tr.setMeta(shownKey, { terms, quotes, whole: content }))
   }, [terms, quotes, content])
 
+  // Its comments on words, drawn again only when they change (C301 (c)).
+  const commentsNow = JSON.stringify(comments)
+  useEffect(() => {
+    if (commentsNow === commentsWas.current || !view.current) return
+    commentsWas.current = commentsNow
+    view.current.dispatch(view.current.state.tr.setMeta(commentsKey, { list: JSON.parse(commentsNow) }))
+  }, [commentsNow])
+
   // markup · clean: the result only, and read-only while it is shown.
   useEffect(() => {
     cleanRef.current = clean
@@ -212,6 +240,7 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
       {said && <p className="p-edit-said" role="status">{said}</p>}
       {blockMenu.element}
       {askBox.element}
+      {commentBox.element}
     </div>
   )
 }

@@ -956,7 +956,7 @@ msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "Parliamentに保存された{kind, select, note {メモ{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} other {{num}}}"
+msgstr "Parliamentに保存された{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1000,6 +1000,42 @@ msgstr "取り消す"
 #. js-lingui-explicit-id
 msgid "chat.close"
 msgstr "閉じる"
+
+#. js-lingui-explicit-id
+msgid "chat.commentBlock"
+msgstr "コメントは1つの段落の中の言葉に付けます"
+
+#. The label of the box a comment is written in
+#. js-lingui-explicit-id
+msgid "chat.commentLabel"
+msgstr "コメント"
+
+#. After a long comment shown whole: back to its first line
+#. js-lingui-explicit-id
+msgid "chat.commentLess"
+msgstr "閉じる"
+
+#. After the first line of a long comment in the text: shows the rest
+#. js-lingui-explicit-id
+msgid "chat.commentMore"
+msgstr "続き"
+
+#. js-lingui-explicit-id
+msgid "chat.commentOnMessage"
+msgstr "この{part, select, prompt {プロンプト} other {返答}}へのコメント{num}"
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Alt+M or ⌘⌥M
+#. js-lingui-explicit-id
+msgid "chat.commentPick"
+msgstr "先に言葉を選択してから{keys}を押すと、そこにコメントを書けます"
+
+#. js-lingui-explicit-id
+msgid "chat.commentPlaceholder"
+msgstr "自分と、共有する相手のためのもの。モデルには送信されません"
+
+#. js-lingui-explicit-id
+msgid "chat.commentTitle"
+msgstr "コメント{num}。送信されることはありません"
 
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
@@ -1288,7 +1324,7 @@ msgstr "新しいチャット"
 
 #. js-lingui-explicit-id
 msgid "collection.actNote"
-msgstr "メモ"
+msgstr "コメント"
 
 #. js-lingui-explicit-id
 msgid "collection.actNoteQuoting"
@@ -1362,7 +1398,7 @@ msgstr "並べ替え"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {メモ{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} edit {編集{num}} ask {質問{num}} suggestion {提案{num}} other {{num}}}"
+msgstr "{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} edit {編集{num}} ask {質問{num}} suggestion {提案{num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1411,7 +1447,7 @@ msgstr "まだ何もありません。add:207 で追加するか、上の一覧�
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "含まれているものには、まだメモもハイライトも引用もありません。作るとここに表示されます。"
+msgstr "含まれているものには、まだコメントもハイライトも引用もありません。作るとここに表示されます。"
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1536,7 +1572,7 @@ msgstr "バーに open:{num} と入力します"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "クリックすると、バーに add: または rm: と入力されます。番号は出典ごとの並び順を決めます。add:218 のように、メモ、ハイライト、引用を1つだけ入れることもできます。"
+msgstr "クリックすると、バーに add: または rm: と入力されます。番号は出典ごとの並び順を決めます。add:218 のように、コメント、ハイライト、引用を1つだけ入れることもできます。"
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1691,7 +1727,7 @@ msgstr "メッセージ"
 
 #. js-lingui-explicit-id
 msgid "collection.tabNote"
-msgstr "メモ"
+msgstr "コメント"
 
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
@@ -2541,7 +2577,7 @@ msgstr "{sort, select, yours {Enterで自分の並び順で表示します} sour
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {Enterでハイライトを表示します} quote {Enterで引用を表示します} note {Enterでメモを表示します} other {Enterでハイライトを表示します}}"
+msgstr "{kind, select, term {Enterでハイライトを表示します} quote {Enterで引用を表示します} note {Enterでコメントを表示します} other {Enterでハイライトを表示します}}"
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTabAll"
@@ -2572,13 +2608,17 @@ msgid "enter.colsUnknown"
 msgstr "{word} という列はありません。{words} を試してください"
 
 #. js-lingui-explicit-id
+msgid "enter.commentKept"
+msgstr "コメント{num}として残しました。送信されることはありません"
+
+#. js-lingui-explicit-id
 msgid "enter.compare"
 msgstr "Enterで{a}と{b}を並べ、違う語に印を付けます"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num}はメモ、ハイライト、引用、チャット、ブランチのいずれでもありません。compare: で比べられるのはこの5つです"
+msgstr "{num}はコメント、ハイライト、引用、チャット、ブランチのいずれでもありません。compare: で比べられるのはこの5つです"
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
@@ -2623,7 +2663,7 @@ msgstr "この呼び出しで、両方が{model}に送信されます"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareMixed"
-msgstr "compare: には、メモ、ハイライト、引用から2つ、またはチャットかブランチから2つを指定します。両方から1つずつは指定できません"
+msgstr "compare: には、コメント、ハイライト、引用から2つ、またはチャットかブランチから2つを指定します。両方から1つずつは指定できません"
 
 #. {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -2942,12 +2982,12 @@ msgstr "Enter、もう一度Enterで、{erasing}を完全に削除します"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, other {メモ、ハイライト、引用#件も消えます}}"
+msgstr "{count, plural, other {コメント、ハイライト、引用#件も消えます}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, other {メモ、ハイライト、引用#件は、削除されたチャットのものと表示して残ります。これらも削除するには all を付けます}}"
+msgstr "{count, plural, other {コメント、ハイライト、引用#件は、削除されたチャットのものと表示して残ります。これらも削除するには all を付けます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2959,7 +2999,7 @@ msgstr "{count, plural, other {取り消しでは元に戻せず、取り消し�
 
 #. js-lingui-explicit-id
 msgid "enter.exportCardsOut"
-msgstr "{count, plural, other {表示中のカード#枚は含めません。書き出すのはメモ、ハイライト、引用だけです}}"
+msgstr "{count, plural, other {表示中のカード#枚は含めません。書き出すのはコメント、ハイライト、引用だけです}}"
 
 #. js-lingui-explicit-id
 msgid "enter.exportCollection"
@@ -3697,10 +3737,6 @@ msgid "enter.markupColGone"
 msgstr "コレクションは常にすべてのマークを表示するようになりました。markup:off でテキスト内のマークを隠せます"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCommentsLater"
-msgstr "コメントは次にテキスト内に入ります。それまでメモはコレクションに残ります"
-
-#. js-lingui-explicit-id
 msgid "enter.markupEditing"
 msgstr "Enterで編集モードに切り替えます：入力した内容がそのまま本文になり、次のプロンプトと一緒に送られます"
 
@@ -3727,7 +3763,7 @@ msgstr "{mode, select, suggesting {すでに提案モードです：入力した
 
 #. js-lingui-explicit-id
 msgid "enter.markupShowAll"
-msgstr "Enterでテキスト内のすべてのマークを表示します：編集、ハイライト、プロンプト"
+msgstr "Enterでテキスト内のすべてのマークを表示します：編集、ハイライト、プロンプト、コメント"
 
 #. kind is edits, highlights or prompts
 #. js-lingui-explicit-id
@@ -3911,11 +3947,11 @@ msgstr "コマンドは、open:201 のように動詞とコロンで始まりま
 
 #. js-lingui-explicit-id
 msgid "enter.noteAlone"
-msgstr "Enterで、{board}に独立したメモを書きます"
+msgstr "Enterで、{board}に独立したコメントを書きます"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAloneQuoting"
-msgstr "Enterで、{board}に独立したメモを書き、その下に{nums}を引用します"
+msgstr "Enterで、{board}に独立したコメントを書き、その下に{nums}を引用します"
 
 #. js-lingui-explicit-id
 msgid "enter.noteDone"
@@ -3923,27 +3959,27 @@ msgstr "{num}を書きました"
 
 #. js-lingui-explicit-id
 msgid "enter.noteIn"
-msgstr "Enterで、{name}にメモを書きます"
+msgstr "Enterで、{name}にコメントを書きます"
 
 #. js-lingui-explicit-id
 msgid "enter.noteInQuoting"
-msgstr "Enterで、{name}にメモを書き、その下に{nums}を引用します"
+msgstr "Enterで、{name}にコメントを書き、その下に{nums}を引用します"
 
 #. js-lingui-explicit-id
 msgid "enter.noteLong"
-msgstr "メモは{max}文字までです"
+msgstr "コメントは{max}文字までです"
 
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
-msgstr "メモは人のためのもので、送信されることはありません"
+msgstr "コメントは人のためのもので、送信されることはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.noteOnMessage"
-msgstr "Enterで、「{opening}」で始まる{part, select, prompt {プロンプト} other {返答}}にメモを書き、それを引用します"
+msgstr "Enterで、「{opening}」で始まる{part, select, prompt {プロンプト} other {返答}}にコメントを書き、それを引用します"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
-msgstr "メモには言葉が必要です。例：{example}"
+msgstr "コメントには言葉が必要です。例：{example}"
 
 #. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
 #. js-lingui-explicit-id
@@ -4016,7 +4052,7 @@ msgstr "これを開く機能は後日追加します。今は inspect:{num} で
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr "{num}は独立したメモで、開くチャットはありません。Enterでバーの下に表示します"
+msgstr "{num}は独立したコメントで、開くチャットはありません。Enterでバーの下に表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
@@ -5772,7 +5808,7 @@ msgstr "要約が返ってこなかったため、何も書いていません"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num}はメモ、ハイライト、引用のいずれでもありません。今のところ summarize: で要約できるのはこの3つです"
+msgstr "{num}はコメント、ハイライト、引用のいずれでもありません。今のところ summarize: で要約できるのはこの3つです"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -6176,7 +6212,7 @@ msgstr "翻訳しています。その間もバーは使えます"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "{board}では、type: に highlight、quote、note のいずれかを指定します"
+msgstr "{board}では、type: に highlight、quote、comment のいずれかを指定します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7147,7 +7183,7 @@ msgstr "メッセージ"
 
 #. js-lingui-explicit-id
 msgid "kind.note"
-msgstr "メモ"
+msgstr "コメント"
 
 #. A passage kept beside the chat, never sent
 #. js-lingui-explicit-id
@@ -7809,7 +7845,7 @@ msgstr "{kind, select, edits {編集} highlights {ハイライト} prompts {プ�
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {自分の編集と、提案された変更} highlights {マークした言葉} prompts {テキスト内の質問（待機中または回答済み）} other {次の段階：テキストに書くコメント}}"
+msgstr "{kind, select, edits {自分の編集と、提案された変更} highlights {マークした言葉} prompts {テキスト内の質問（待機中または回答済み）} other {言葉やメッセージ全体に付けた自分のコメント。送信されません}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -9756,6 +9792,10 @@ msgid "verb.cols"
 msgstr "表の列を隠す、または表示する"
 
 #. js-lingui-explicit-id
+msgid "verb.comment"
+msgstr "人のためのコメントを書く。送信されることはありません"
+
+#. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "2つを並べて、違う語に印を付ける：メモ、ハイライト、引用、または2つのブランチの最後の返答。AIモデルには何も送信されません。meaning と書き足すと、意味の違いをモデルに尋ねます"
 
@@ -9817,7 +9857,7 @@ msgstr "チャット、プラン、ブランチ、実行から来たものを表
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "メモ、引用、ハイライトを含むものを表示する"
+msgstr "コメント、引用、ハイライトを含むものを表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"
@@ -9900,9 +9940,10 @@ msgstr "バーの対象に名前を付ける：ルーム、コレクション、
 msgid "verb.new"
 msgstr "チャット、プラン、ルーム、コレクション、方針、ブランチ、ステップ、実行、ブロックを作る"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.note"
-msgstr "人のためのメモを書く。送信されることはありません"
+msgstr "以前の名前：note: は comment: と同じくコメントを書きます"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
@@ -10271,9 +10312,9 @@ msgstr "{command}、ルームの番号、続けて名前"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotes"
-msgstr "それらを引用したメモを書く"
+msgstr "それらを引用したコメントを書く"
 
-#. {command} is note:"…", which stays English
+#. {command} is comment:"…", which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotesHow"
 msgstr "カードを選択して、{command} と入力"

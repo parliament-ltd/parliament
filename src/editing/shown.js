@@ -10,7 +10,7 @@ import { indexOfWord } from '../lib/textUtils'
 export const shownKey = new PluginKey('replyShown')
 
 // A block's words, and the document position of each character in them.
-function wordsOf(block, start) {
+export function wordsOf(block, start) {
   let text = ''
   const at = []
   block.forEach((child, offset) => {

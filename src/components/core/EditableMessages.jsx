@@ -16,6 +16,8 @@ import { withoutAnswers } from '../../editing/answers'
 import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import { useBlockMenu } from './useBlockMenu'
 import { useAskBox } from './useAskBox'
+import { useCommentBox } from './useCommentBox'
+import { commentsPlugin, commentsKey } from '../../editing/comments'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
@@ -82,13 +84,16 @@ const SUG_WORDS = { ripple: 'ripple', sweep: 'sweep', accept: 'accept', reject: 
 const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it shorter, or add the year it opened', ask: 'ask', accept: 'accept', undo: 'undo' }
 const NO_ASKS = new Map()
 const NO_TITLE_WORDS = { ask: '', help: () => '' }
+const COMMENT_WORDS = { label: 'COMMENT', placeholder: '', keys: 'Ctrl+Alt+M', more: 'more', less: 'less', title: () => '', pick: '', block: '' }
 // askInfo: each ask's number and state, by its id; onSettleAsk(messageId, askId, how)
 // when one is accepted or undone; askWords: the ASK box's and markers' words (C218).
 // sugInfo: each suggestion's number, by its id; onSettleSuggestion(messageId,
 // suggestionId, how) when one is accepted or rejected in place (C229).
 // titleWords: the "ask" after a line of a source's answer that is the title
 // of a page it links to, and what it says it does, for a title (C287).
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS }) {
+// onComment({ messageId, passage, nth, text }): a comment kept on words by
+// Ctrl+Alt+M (C301 (c)); commentWords: its box's and the text's words.
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -111,6 +116,12 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   useEffect(() => { onSettleSugRef.current = onSettleSuggestion }, [onSettleSuggestion])
   const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords, inReply)
   const askOptions = askBox.options
+  // Comments on words (C301 (c)): their words read when drawn, so a change of language shows.
+  const commentWordsRef = useRef(commentWords)
+  const commentsWas = useRef('')
+  useEffect(() => { commentWordsRef.current = commentWords })
+  const commentBox = useCommentBox(view, (c) => onComment?.(c), commentWords, (line) => setSaid(line), { pick: commentWords.pick, block: commentWords.block })
+  const commentOptions = commentBox.options
   const blockMenu = useBlockMenu(view, idsRef)
   const menuOptions = blockMenu.options
   const closeMenu = blockMenu.close
@@ -186,10 +197,18 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       return schema.nodes.section.create({ part: s.part, message: m.id }, inner.content)
     })
     const doc = schema.nodes.doc.create(null, made)
+    // A new editor has no comments yet: given them again below.
+    commentsWas.current = ''
     savedKeys.current = {}
     doc.forEach((sec) => { savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
-      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), ...menuOptions, ...askOptions }),
+      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), ...menuOptions, ...askOptions, ...commentOptions }),
+      // Comments on words, after their passage (C301 (c)).
+      commentsPlugin({ words: {
+        get more() { return commentWordsRef.current.more },
+        get less() { return commentWordsRef.current.less },
+        label: (num) => commentWordsRef.current.title(num),
+      } }),
       // Edits held back, dashed (C301 (b)).
       heldPlugin(),
       // Accept or undo an answered ask, in place; its message is the card it is in (C218).
@@ -353,6 +372,14 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     view.current.dispatch(view.current.state.tr.setMeta(shownKey, JSON.parse(shownKeyNow)))
   }, [shownKeyNow, sectionsKey])
 
+  // Each card's comments on words, drawn again only when they change (C301 (c)).
+  const commentsNow = JSON.stringify({ sections: Object.fromEntries(sections.map((s) => [s.message.id, s.comments ?? []])) })
+  useEffect(() => {
+    if (commentsNow === commentsWas.current || !view.current) return
+    commentsWas.current = commentsNow
+    view.current.dispatch(view.current.state.tr.setMeta(commentsKey, JSON.parse(commentsNow)))
+  }, [commentsNow, sectionsKey])
+
   // markup · clean: the result only, read-only while it is shown.
   useEffect(() => {
     cleanRef.current = clean
@@ -373,6 +400,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       {said && <p className="p-edit-said" role="status">{said}</p>}
       {blockMenu.element}
       {askBox.element}
+      {commentBox.element}
     </div>
   )
 }

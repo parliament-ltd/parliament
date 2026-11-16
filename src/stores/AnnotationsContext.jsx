@@ -29,9 +29,11 @@
 // plumbing" rule treats it as another existing context that catalog
 // components self-bind to.
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import {
   getNotes,
+  getOwnNotes,
+  getPins,
   addNote as dbAddNote,
   updateNote as dbUpdateNote,
   deleteNote as dbDeleteNote,
@@ -42,6 +44,8 @@ import {
 import { useChat } from './ChatContext'
 import { useMessages } from './chatHooks'
 import { includesWord } from '../lib/textUtils'
+import { onRecordsChanged } from '../lib/records'
+import { commentsOf } from '../lib/comments'
 
 const AnnotationsContext = createContext(null)
 
@@ -66,6 +70,12 @@ export function AnnotationsProvider({ children, conversationId = null }) {
   // retired into the tag favorite (R6, approved 2 November; C286 (m)):
   // tagadd:favorite reply does what the heart did.
   const [notes, setNotes] = useState(new Map())
+  // Comments (C301 (c)): every note of the chat, the notes of their own and
+  // the chat's quotes, read for the comments on words and on whole messages.
+  const [chatNotes, setChatNotes] = useState([])
+  const [ownNotes, setOwnNotes] = useState([])
+  const [chatPins, setChatPins] = useState([])
+  const [notesRev, setNotesRev] = useState(0)
   const [highlights, setHighlights] = useState([])
   // showNotes is per-conversation UI state — which note panels are
   // currently expanded inline on a MessageCard. Lives here rather than
@@ -92,12 +102,20 @@ export function AnnotationsProvider({ children, conversationId = null }) {
     Promise.all([
       getNotes(activeConversationId),
       getHighlights(activeConversationId),
-    ]).then(([ns, hls]) => {
+      getOwnNotes().catch(() => []),
+      getPins(activeConversationId).catch(() => []),
+    ]).then(([ns, hls, own, pins]) => {
       if (cancelled) return
-      setNotes(new Map(ns.map(n => [n.messageId, n])))
+      // The card's note panel holds the note on the whole message; a comment on words is not it.
+      setNotes(new Map(ns.filter(n => !n.passage).map(n => [n.messageId, n])))
+      setChatNotes(ns)
+      setOwnNotes(own)
+      setChatPins(pins)
       setHighlights(hls)
-      setShowNotes(new Set())
-      setHighlightCursor({})
+      if (loadedFor !== activeConversationId) {
+        setShowNotes(new Set())
+        setHighlightCursor({})
+      }
       setLoadedFor(activeConversationId)
     }).catch(err => {
       if (cancelled) return
@@ -106,7 +124,12 @@ export function AnnotationsProvider({ children, conversationId = null }) {
       if (import.meta.env.DEV) console.warn('[AnnotationsContext] load failed:', err)
     })
     return () => { cancelled = true }
-  }, [activeConversationId])
+    // loadedFor is read, not followed: a reload keeps the open panels.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeConversationId, notesRev])
+  // A note or quote written, changed or taken back elsewhere (the bar, the
+  // Collection, undo:, another tab): read again, so its comment shows or goes.
+  useEffect(() => onRecordsChanged((c) => { if (c.kind === 'note' || c.kind === 'quote') setNotesRev((n) => n + 1) }), [])
 
   // Derived: true only when our loaded data corresponds to the
   // currently-active conversation. Consumers check this to avoid
@@ -158,6 +181,25 @@ export function AnnotationsProvider({ children, conversationId = null }) {
       return n
     })
   }, [])
+
+  /**
+   * A comment on words (C301 (c)): the words, which time they come in the
+   * message, and the comment. Said by its number under the bar, and a
+   * collection started with the chat when there is none, as a highlight does.
+   */
+  const addComment = useCallback(async (messageId, { passage, nth = 0, text }) => {
+    const words = String(text ?? '').trim()
+    if (!activeConversationId || !messageId || !words || !passage) return null
+    try {
+      const rec = await dbAddNote({ conversationId: activeConversationId, messageId, text: words, passage, nth })
+      setChatNotes(prev => [...prev, rec])
+      // An id and a number, never the words.
+      window.dispatchEvent(new CustomEvent('parliament-commented', { detail: { chatId: activeConversationId, num: Number.isInteger(rec?.num) ? rec.num : null } }))
+      return rec
+    } catch {
+      return null
+    }
+  }, [activeConversationId])
 
   // ─── Highlights ──────────────────────────────────────────
 
@@ -264,12 +306,18 @@ export function AnnotationsProvider({ children, conversationId = null }) {
   const exposedNotes = loaded ? notes : EMPTY_MAP
   const exposedHighlights = loaded ? highlights : EMPTY_ARRAY
   const exposedShowNotes = loaded ? showNotes : EMPTY_SET
+  const comments = useMemo(
+    () => (loaded ? commentsOf({ notes: chatNotes, own: ownNotes, pins: chatPins, messages, conversationId: activeConversationId }) : EMPTY_MAP),
+    [loaded, chatNotes, ownNotes, chatPins, messages, activeConversationId],
+  )
 
   const value = {
     // State
     notes: exposedNotes,
     highlights: exposedHighlights,
     showNotes: exposedShowNotes,
+    // Each message's comments, on words and on the whole of it (C301 (c)).
+    comments,
     activeConversationId,
     loaded,
 
@@ -277,6 +325,7 @@ export function AnnotationsProvider({ children, conversationId = null }) {
     toggleNotePanel,
     saveNote,
     deleteNote,
+    addComment,
     addHighlight,
     addHighlightFromSidebar,
     deleteHighlights,

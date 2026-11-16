@@ -56,12 +56,12 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `type:chat` | Show some kinds of thing | `type:chat`, `type:note,chat`, `type:edit` | Records, Collection | no |
+| `type:chat` | Show some kinds of thing | `type:chat`, `type:comment,chat`, `type:edit` | Records, Collection | no |
 | `tag:research` | Show what carries a tag. A minus leaves it out | `tag:research`, `-tag:research`, `tag:essay,research` | Records, Collection | no |
 | `model:opus` | Show what a model or a source answered | `model:opus`, `model:wikipedia` | Records, Collection | no |
 | `from:201b` | Show what came from a chat, a plan, a branch or a run | `from:203`, `from:201b`, `from:run 3` | Records, Collection | no |
 | `in:"Q2 evidence"` | Show what is in a collection, or was made in a room | `in:"Q2 evidence"`, `in:"Code Lab"`, `in:"Code Lab" room` | Records, Collection | no |
-| `has:highlight` | Show what holds notes, quotes or highlights | `has:note`, `has:quote`, `has:highlight` | Records, Collection | no |
+| `has:highlight` | Show what holds comments, quotes or highlights | `has:comment`, `has:quote`, `has:highlight` | Records, Collection | no |
 | `cost:>0.50` | Show plans by what they cost | `cost:>0.50` | Records, Collection | no |
 | `since:7d` | Show what was made since a date | `since:7d`, `since:3w`, `since:september`, `since:09/01/26` | Records, Collection | no |
 | `until:09/10/26` | Show what was made until a date | `until:09/10/26` | Records, Collection | no |
@@ -99,7 +99,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `copy:207` | Copy something as Markdown, or the reply you are in | `copy:207`, `copy:reply` | everywhere | no |
 | `quote:reply` | Keep a quote of the whole reply you are in, beside its chat or in another. It is never sent | `quote:reply`, `quote:prompt`, `quote:reply 207` | everywhere | yes |
 | `export:md 201` | Download as Markdown or JSONL to read elsewhere. It cannot be restored | `export:md 201`, `export:jsonl 207, 216`, `export:md records` | Records, Collection | no |
-| `note:203 "Try it without the ending"` | Write a note for people. It is never sent | `note:203 "Try it without the ending"`, `note:"Check the dates"`, `note:reply "Check this figure"` | everywhere | yes |
+| `comment:203 "Try it without the ending"` | Write a comment for people. It is never sent | `comment:203 "Try it without the ending"`, `comment:"Check the dates"`, `comment:reply "Check this figure"` | everywhere | yes |
+| `note:"Check the dates"` | An older name: note: writes a comment, as comment: does | `note:"Check the dates"` | everywhere | yes |
 | `delete:207` | Delete something by its number. What has been sent goes for good, after a second Enter Asks for a second Enter. | `delete:207`, `delete:207, 216`, `delete:201c`, `delete:201c all`, `delete:201a 2`, `delete:reply` | everywhere | no |
 | `undo:` | Take back the last command, or one edit. It stops at a run | `undo:`, `undo:242` | everywhere | no |
 

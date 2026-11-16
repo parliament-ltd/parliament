@@ -956,7 +956,7 @@ msgstr "Writes {command} in the bar"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"
+msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1000,6 +1000,42 @@ msgstr "undo"
 #. js-lingui-explicit-id
 msgid "chat.close"
 msgstr "Close"
+
+#. js-lingui-explicit-id
+msgid "chat.commentBlock"
+msgstr "A comment goes on words in one paragraph"
+
+#. The label of the box a comment is written in
+#. js-lingui-explicit-id
+msgid "chat.commentLabel"
+msgstr "COMMENT"
+
+#. After a long comment shown whole: back to its first line
+#. js-lingui-explicit-id
+msgid "chat.commentLess"
+msgstr "less"
+
+#. After the first line of a long comment in the text: shows the rest
+#. js-lingui-explicit-id
+msgid "chat.commentMore"
+msgstr "more"
+
+#. js-lingui-explicit-id
+msgid "chat.commentOnMessage"
+msgstr "comment {num}, on this {part, select, prompt {prompt} other {reply}}"
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Alt+M or ⌘⌥M
+#. js-lingui-explicit-id
+msgid "chat.commentPick"
+msgstr "Select some words first, then {keys} writes a comment on them"
+
+#. js-lingui-explicit-id
+msgid "chat.commentPlaceholder"
+msgstr "For you and anyone you share it with. Never sent to a model"
+
+#. js-lingui-explicit-id
+msgid "chat.commentTitle"
+msgstr "Comment {num}. It is never sent"
 
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
@@ -1288,7 +1324,7 @@ msgstr "new chat"
 
 #. js-lingui-explicit-id
 msgid "collection.actNote"
-msgstr "Note"
+msgstr "Comment"
 
 #. js-lingui-explicit-id
 msgid "collection.actNoteQuoting"
@@ -1362,7 +1398,7 @@ msgstr "by"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}"
+msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1411,7 +1447,7 @@ msgstr "Nothing here yet. add:207 puts something in, or pick a chat from the lis
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "What it holds has no notes, highlights or quotes yet. They show here as they are made."
+msgstr "What it holds has no comments, highlights or quotes yet. They show here as they are made."
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1536,7 +1572,7 @@ msgstr "Writes open:{num} in the bar"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one note, highlight or quote."
+msgstr "A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one comment, highlight or quote."
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1691,7 +1727,7 @@ msgstr "Messages"
 
 #. js-lingui-explicit-id
 msgid "collection.tabNote"
-msgstr "Notes"
+msgstr "Comments"
 
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
@@ -2541,7 +2577,7 @@ msgstr "{sort, select, yours {Enter shows your order} source {Enter groups the c
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}"
+msgstr "{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the comments} other {Enter shows the highlights}}"
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTabAll"
@@ -2572,13 +2608,17 @@ msgid "enter.colsUnknown"
 msgstr "No column is called {word}. Try {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.commentKept"
+msgstr "Kept comment {num}. It is never sent"
+
+#. js-lingui-explicit-id
 msgid "enter.compare"
 msgstr "Enter sets {a} and {b} side by side and marks the words that differ"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} is not a note, highlight, quote, chat or branch, which are what compare: takes"
+msgstr "{num} is not a comment, highlight, quote, chat or branch, which are what compare: takes"
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
@@ -2623,7 +2663,7 @@ msgstr "Both are sent to {model} in this call"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareMixed"
-msgstr "compare: takes two notes, highlights or quotes, or two chats or branches, not one of each"
+msgstr "compare: takes two comments, highlights or quotes, or two chats or branches, not one of each"
 
 #. {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -2942,12 +2982,12 @@ msgstr "Enter, then Enter again, deletes {erasing} for good"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, one {# note, highlight or quote goes too} other {# notes, highlights and quotes go too}}"
+msgstr "{count, plural, one {# comment, highlight or quote goes too} other {# comments, highlights and quotes go too}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, one {# note, highlight or quote stays, marked as from a deleted chat. Add all to delete it too} other {# notes, highlights and quotes stay, marked as from a deleted chat. Add all to delete them too}}"
+msgstr "{count, plural, one {# comment, highlight or quote stays, marked as from a deleted chat. Add all to delete it too} other {# comments, highlights and quotes stay, marked as from a deleted chat. Add all to delete them too}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2959,7 +2999,7 @@ msgstr "{count, plural, one {Undo cannot bring it back, and stops here} other {U
 
 #. js-lingui-explicit-id
 msgid "enter.exportCardsOut"
-msgstr "{count, plural, one {# card shown stays out: only notes, highlights and quotes are exported} other {# cards shown stay out: only notes, highlights and quotes are exported}}"
+msgstr "{count, plural, one {# card shown stays out: only comments, highlights and quotes are exported} other {# cards shown stay out: only comments, highlights and quotes are exported}}"
 
 #. js-lingui-explicit-id
 msgid "enter.exportCollection"
@@ -3697,10 +3737,6 @@ msgid "enter.markupColGone"
 msgstr "Marks always show on the collection board now. markup:off hides them in the text"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCommentsLater"
-msgstr "Comments come into the text next. Until then, notes are kept on the collection board"
-
-#. js-lingui-explicit-id
 msgid "enter.markupEditing"
 msgstr "Enter switches to editing: what you type is the text, and goes with your next prompt"
 
@@ -3727,7 +3763,7 @@ msgstr "{mode, select, suggesting {Suggesting already: what you type waits until
 
 #. js-lingui-explicit-id
 msgid "enter.markupShowAll"
-msgstr "Enter shows every mark in the text: edits, highlights and prompts"
+msgstr "Enter shows every mark in the text: edits, highlights, prompts and comments"
 
 #. kind is edits, highlights or prompts
 #. js-lingui-explicit-id
@@ -3911,11 +3947,11 @@ msgstr "A command starts with a verb and a colon, like open:201"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAlone"
-msgstr "Enter writes a note of its own in {board}"
+msgstr "Enter writes a comment of its own in {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAloneQuoting"
-msgstr "Enter writes a note of its own in {board}, quoting {nums} beneath it"
+msgstr "Enter writes a comment of its own in {board}, quoting {nums} beneath it"
 
 #. js-lingui-explicit-id
 msgid "enter.noteDone"
@@ -3923,27 +3959,27 @@ msgstr "Wrote {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteIn"
-msgstr "Enter writes a note in {name}"
+msgstr "Enter writes a comment in {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteInQuoting"
-msgstr "Enter writes a note in {name}, quoting {nums} beneath it"
+msgstr "Enter writes a comment in {name}, quoting {nums} beneath it"
 
 #. js-lingui-explicit-id
 msgid "enter.noteLong"
-msgstr "A note is at most {max} characters"
+msgstr "A comment is at most {max} characters"
 
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
-msgstr "A note is for people and is never sent"
+msgstr "A comment is for people and is never sent"
 
 #. js-lingui-explicit-id
 msgid "enter.noteOnMessage"
-msgstr "Enter writes a note on the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, quoting it"
+msgstr "Enter writes a comment on the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, quoting it"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
-msgstr "A note needs some words, like {example}"
+msgstr "A comment needs some words, like {example}"
 
 #. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
 #. js-lingui-explicit-id
@@ -4016,7 +4052,7 @@ msgstr "Opening this comes later. inspect:{num} shows it now"
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr "{num} is a note of its own, with no chat to open. Enter shows it under the bar"
+msgstr "{num} is a comment of its own, with no chat to open. Enter shows it under the bar"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
@@ -5772,7 +5808,7 @@ msgstr "No summary came back, so nothing was written"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num} is not a note, highlight or quote, which are what summarize: takes for now"
+msgstr "{num} is not a comment, highlight or quote, which are what summarize: takes for now"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -6176,7 +6212,7 @@ msgstr "Translating. The bar is free meanwhile"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "On {board}, type: takes one of highlight, quote or note"
+msgstr "On {board}, type: takes one of highlight, quote or comment"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7147,7 +7183,7 @@ msgstr "Message"
 
 #. js-lingui-explicit-id
 msgid "kind.note"
-msgstr "Note"
+msgstr "Comment"
 
 #. A passage kept beside the chat, never sent
 #. js-lingui-explicit-id
@@ -7809,7 +7845,7 @@ msgstr "{kind, select, edits {Edits} highlights {Highlights} prompts {Prompts} o
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Next: comments written in the text}}"
+msgstr "{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Yours, on words and on whole messages, never sent}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -9756,6 +9792,10 @@ msgid "verb.cols"
 msgstr "Hide or show columns of the table"
 
 #. js-lingui-explicit-id
+msgid "verb.comment"
+msgstr "Write a comment for people. It is never sent"
+
+#. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "Set two side by side and mark the words that differ: notes, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ"
 
@@ -9817,7 +9857,7 @@ msgstr "Show what came from a chat, a plan, a branch or a run"
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "Show what holds notes, quotes or highlights"
+msgstr "Show what holds comments, quotes or highlights"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"
@@ -9900,9 +9940,10 @@ msgstr "Name what the bar is pointed at: a room, a collection or a chat. With tw
 msgid "verb.new"
 msgstr "Make a chat, plan, room, collection, framework, branch, step, run or block"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.note"
-msgstr "Write a note for people. It is never sent"
+msgstr "An older name: note: writes a comment, as comment: does"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
@@ -10271,9 +10312,9 @@ msgstr "{command}, the room’s number then its name"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotes"
-msgstr "Write a note that quotes them"
+msgstr "Write a comment that quotes them"
 
-#. {command} is note:"…", which stays English
+#. {command} is comment:"…", which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotesHow"
 msgstr "select the cards, then {command}"

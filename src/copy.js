@@ -47,7 +47,7 @@ export const COPY = {
   // The kinds that take a number (C17, C56, A19).
   kinds: {
     chat: /*i18n*/ { id: 'kind.chat', message: 'Chat' },
-    note: /*i18n*/ { id: 'kind.note', message: 'Note' },
+    note: /*i18n*/ { id: 'kind.note', message: 'Comment' },
     highlight: /*i18n*/ { id: 'kind.highlight', message: 'Highlight', comment: 'One passage marked where it sits' },
     term: /*i18n*/ { id: 'kind.term', message: 'Highlight', comment: 'Words marked in a chat where they were selected (C131; keywords retired into highlights, C285)' },
     quote: /*i18n*/ { id: 'kind.quote', message: 'Quote', comment: 'A passage kept beside the chat, never sent' },
@@ -351,7 +351,7 @@ export const COPY = {
     deleteMessageAgain: /*i18n*/ { id: 'enter.deleteMessageAgain', message: 'Enter again deletes it. Escape keeps it' },
     deleteMessageUndo: /*i18n*/ { id: 'enter.deleteMessageUndo', message: 'For 20 seconds the chat offers to bring it back' },
     deletedMessage: /*i18n*/ { id: 'enter.deletedMessage', message: 'Deleted. For 20 seconds the chat offers to bring it back' },
-    noteOnMessage: /*i18n*/ { id: 'enter.noteOnMessage', message: 'Enter writes a note on the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, quoting it' },
+    noteOnMessage: /*i18n*/ { id: 'enter.noteOnMessage', message: 'Enter writes a comment on the {part, select, prompt {prompt} other {reply}} that begins “{opening}”, quoting it' },
     tagMessage: /*i18n*/ { id: 'enter.tagMessage', message: 'Enter tags the {part, select, prompt {prompt} other {reply}} that begins “{opening}” {tag}, through a quote of it beside its chat' },
     tagMessageAlready: /*i18n*/ { id: 'enter.tagMessageAlready', message: 'It carries {tag} already, as {num}' },
     tagMessageDone: /*i18n*/ { id: 'enter.tagMessageDone', message: 'Tagged {tag}, as {num}' },
@@ -404,9 +404,9 @@ export const COPY = {
     sortRecords: /*i18n*/ { id: 'enter.sortRecords', message: 'On {board}, sort: takes created, active, oldest or newest', comment: 'The words stay English' },
     collectionTab: /*i18n*/ {
       id: 'enter.collectionTab',
-      message: '{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}',
+      message: '{kind, select, term {Enter shows the highlights} quote {Enter shows the quotes} note {Enter shows the comments} other {Enter shows the highlights}}',
     },
-    typeCollection: /*i18n*/ { id: 'enter.typeCollection', message: 'On {board}, type: takes one of highlight, quote or note', comment: 'The words stay English' },
+    typeCollection: /*i18n*/ { id: 'enter.typeCollection', message: 'On {board}, type: takes one of highlight, quote or comment', comment: 'The words stay English' },
     // clear:type and clear:sort on the Collection: the tab and the order (C287).
     collectionTabAll: /*i18n*/ { id: 'enter.collectionTabAll', message: 'Enter shows every kind of card' },
     collectionOrderYours: /*i18n*/ { id: 'enter.collectionOrderYours', message: 'The cards are in your order already' },
@@ -416,16 +416,16 @@ export const COPY = {
     pinWhich: /*i18n*/ { id: 'enter.pinWhich', message: 'More than one collection starts that way: {words}' },
     // The four acts, compare: and jump: (stage 6, piece 7; C145). {nums} is
     // a list of numbers, {name} a collection's name.
-    noteIn: /*i18n*/ { id: 'enter.noteIn', message: 'Enter writes a note in {name}' },
-    noteInQuoting: /*i18n*/ { id: 'enter.noteInQuoting', message: 'Enter writes a note in {name}, quoting {nums} beneath it' },
-    noteAlone: /*i18n*/ { id: 'enter.noteAlone', message: 'Enter writes a note of its own in {board}' },
-    noteAloneQuoting: /*i18n*/ { id: 'enter.noteAloneQuoting', message: 'Enter writes a note of its own in {board}, quoting {nums} beneath it' },
-    noteNeverSent: /*i18n*/ { id: 'enter.noteNeverSent', message: 'A note is for people and is never sent' },
-    noteWords: /*i18n*/ { id: 'enter.noteWords', message: 'A note needs some words, like {example}' },
-    noteLong: /*i18n*/ { id: 'enter.noteLong', message: 'A note is at most {max} characters' },
+    noteIn: /*i18n*/ { id: 'enter.noteIn', message: 'Enter writes a comment in {name}' },
+    noteInQuoting: /*i18n*/ { id: 'enter.noteInQuoting', message: 'Enter writes a comment in {name}, quoting {nums} beneath it' },
+    noteAlone: /*i18n*/ { id: 'enter.noteAlone', message: 'Enter writes a comment of its own in {board}' },
+    noteAloneQuoting: /*i18n*/ { id: 'enter.noteAloneQuoting', message: 'Enter writes a comment of its own in {board}, quoting {nums} beneath it' },
+    noteNeverSent: /*i18n*/ { id: 'enter.noteNeverSent', message: 'A comment is for people and is never sent' },
+    noteWords: /*i18n*/ { id: 'enter.noteWords', message: 'A comment needs some words, like {example}' },
+    noteLong: /*i18n*/ { id: 'enter.noteLong', message: 'A comment is at most {max} characters' },
     summarizeWhere: /*i18n*/ { id: 'enter.summarizeWhere', message: 'summarize: writes a summary note on {board}. Rewriting a summary line here comes later', comment: 'summarize: stays English' },
     summarizeNothing: /*i18n*/ { id: 'enter.summarizeNothing', message: 'Nothing here to summarize yet' },
-    summarizeKinds: /*i18n*/ { id: 'enter.summarizeKinds', message: '{num} is not a note, highlight or quote, which are what summarize: takes for now', comment: 'summarize: stays English' },
+    summarizeKinds: /*i18n*/ { id: 'enter.summarizeKinds', message: '{num} is not a comment, highlight or quote, which are what summarize: takes for now', comment: 'summarize: stays English' },
     summarizeMany: /*i18n*/ { id: 'enter.summarizeMany', message: 'summarize: takes at most {max} at a time', comment: 'summarize: stays English' },
     summarizeNoKey: /*i18n*/ { id: 'enter.summarizeNoKey', message: 'A summary needs a key for {provider}. api: adds one', comment: 'api: stays English' },
     summarize: /*i18n*/ { id: 'enter.summarize', message: 'Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, at most {cost}' },
@@ -444,11 +444,11 @@ export const COPY = {
     compareWordsOnly: /*i18n*/ { id: 'enter.compareWordsOnly', message: 'Words, not meaning. Add meaning at the end to ask a model how they differ', comment: 'meaning is a word added to the command, and stays English' },
     compareTwo: /*i18n*/ { id: 'enter.compareTwo', message: 'compare: takes two, like compare:218 231 or compare:201a 201b', comment: 'Commands stay English' },
     compareSame: /*i18n*/ { id: 'enter.compareSame', message: 'Those are the same thing twice' },
-    compareKinds: /*i18n*/ { id: 'enter.compareKinds', message: '{num} is not a note, highlight, quote, chat or branch, which are what compare: takes', comment: 'compare: stays English' },
+    compareKinds: /*i18n*/ { id: 'enter.compareKinds', message: '{num} is not a comment, highlight, quote, chat or branch, which are what compare: takes', comment: 'compare: stays English' },
     // compare: with branches (C289): each one's last reply.
     compareReplies: /*i18n*/ { id: 'enter.compareReplies', message: 'Enter sets the last replies in {a} and {b} side by side and marks the words that differ', comment: '{a} and {b} are branches like 201a, or chat numbers' },
     comparePlan: /*i18n*/ { id: 'enter.comparePlan', message: '{num} is a plan. {example} compares the last replies of two of its branches', comment: '{example} is a command like compare:201a 201b, which stays English' },
-    compareMixed: /*i18n*/ { id: 'enter.compareMixed', message: 'compare: takes two notes, highlights or quotes, or two chats or branches, not one of each', comment: 'compare: stays English' },
+    compareMixed: /*i18n*/ { id: 'enter.compareMixed', message: 'compare: takes two comments, highlights or quotes, or two chats or branches, not one of each', comment: 'compare: stays English' },
     // compare:201a 201b meaning (C290): one call to the helper, named and priced first.
     compareMeaningGo: /*i18n*/ { id: 'enter.compareMeaningGo', message: 'Enter marks the words that differ between {a} and {b}, and asks {model} how they differ in meaning: one call, about {cost}', comment: '{model} is a model name, from the list' },
     compareMeaningGoCheap: /*i18n*/ { id: 'enter.compareMeaningGoCheap', message: 'Enter marks the words that differ between {a} and {b}, and asks {model} how they differ in meaning: one call, under {cost}', comment: '{model} is a model name, from the list' },
@@ -489,7 +489,7 @@ export const COPY = {
     },
     exportCardsOut: /*i18n*/ {
       id: 'enter.exportCardsOut',
-      message: '{count, plural, one {# card shown stays out: only notes, highlights and quotes are exported} other {# cards shown stay out: only notes, highlights and quotes are exported}}',
+      message: '{count, plural, one {# card shown stays out: only comments, highlights and quotes are exported} other {# cards shown stay out: only comments, highlights and quotes are exported}}',
     },
     exported: /*i18n*/ { id: 'enter.exported', message: 'Downloaded {file}' },
     exportFailed: /*i18n*/ { id: 'enter.exportFailed', message: 'The file was not made. Try again' },
@@ -498,12 +498,12 @@ export const COPY = {
     eraseItem: /*i18n*/ { id: 'enter.eraseItem', message: '{num} “{title}”', comment: "A number and the start of its title or words, in the language's quotation marks" },
     eraseMarksStay: /*i18n*/ {
       id: 'enter.eraseMarksStay',
-      message: '{count, plural, one {# note, highlight or quote stays, marked as from a deleted chat. Add all to delete it too} other {# notes, highlights and quotes stay, marked as from a deleted chat. Add all to delete them too}}',
+      message: '{count, plural, one {# comment, highlight or quote stays, marked as from a deleted chat. Add all to delete it too} other {# comments, highlights and quotes stay, marked as from a deleted chat. Add all to delete them too}}',
       comment: 'all stays English: it is a word of the command',
     },
     eraseMarksGo: /*i18n*/ {
       id: 'enter.eraseMarksGo',
-      message: '{count, plural, one {# note, highlight or quote goes too} other {# notes, highlights and quotes go too}}',
+      message: '{count, plural, one {# comment, highlight or quote goes too} other {# comments, highlights and quotes go too}}',
     },
     erasePlanGoes: /*i18n*/ {
       id: 'enter.erasePlanGoes',
@@ -616,7 +616,7 @@ export const COPY = {
     roomNameNone: /*i18n*/ { id: 'enter.roomNameNone', message: 'No chat is called “{name}”. records: lists them by name', comment: 'Commands stay English' },
     roomNameWhich: /*i18n*/ { id: 'enter.roomNameWhich', message: 'Several chats are called “{name}”: {nums}. Open one by its number', comment: '{nums} is a list of numbers' },
     openPassage: /*i18n*/ { id: 'enter.openPassage', message: 'Enter opens the chat {num} is in, at its place' },
-    openOwnNote: /*i18n*/ { id: 'enter.openOwnNote', message: '{num} is a note of its own, with no chat to open. Enter shows it under the bar' },
+    openOwnNote: /*i18n*/ { id: 'enter.openOwnNote', message: '{num} is a comment of its own, with no chat to open. Enter shows it under the bar' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
     // new:branch, a fork (stage 8, piece 6; C8; C178). {step} counts the person's prompts.
     newBranch: /*i18n*/ { id: 'enter.newBranch', message: 'Enter starts {next} from {address}, a copy of its whole history, in a room of its own. No call' },
@@ -953,6 +953,7 @@ export const COPY = {
     labAlready: /*i18n*/ { id: 'enter.labAlready', message: 'The Lab is open already' },
     // A highlight kept on the colour's click (C291 (k)).
     highlightKept: /*i18n*/ { id: 'enter.highlightKept', message: 'Kept highlight {num}' },
+    commentKept: /*i18n*/ { id: 'enter.commentKept', message: 'Kept comment {num}. It is never sent' },
     roomRan: /*i18n*/ { id: 'enter.roomRan', message: 'Ran {command}. undo: takes it back', comment: 'Commands stay English' },
     ranOnly: /*i18n*/ { id: 'enter.ranOnly', message: 'Ran {command}', comment: 'Said under the field after a click ran a command that undo: cannot take back. Commands stay English' },
     labOpen: /*i18n*/ { id: 'enter.labOpen', message: 'Enter opens {name} in the Lab. Each change there is saved as you make it, and undo: takes it back', comment: 'Commands stay English' },
@@ -1131,7 +1132,7 @@ export const COPY = {
     // markup · clean (stage 11, piece 1; editing spec).
     // The markup menu (C301 (b)): markup: opens it, and each click runs one of these.
     markupMenu: /*i18n*/ { id: 'enter.markupMenu', message: 'Enter opens the markup menu: what shows in the text, and how your typing is kept' },
-    markupShowAll: /*i18n*/ { id: 'enter.markupShowAll', message: 'Enter shows every mark in the text: edits, highlights and prompts' },
+    markupShowAll: /*i18n*/ { id: 'enter.markupShowAll', message: 'Enter shows every mark in the text: edits, highlights, prompts and comments' },
     markupHideAll: /*i18n*/ { id: 'enter.markupHideAll', message: 'Enter hides every mark in the text. Replies read as they stand, and stay editable' },
     markupShowKind: /*i18n*/ { id: 'enter.markupShowKind', message: '{kind, select, edits {Enter shows edits in the text} highlights {Enter shows highlights in the text} other {Enter shows prompts in the text}}', comment: 'kind is edits, highlights or prompts' },
     markupHideKind: /*i18n*/ { id: 'enter.markupHideKind', message: '{kind, select, edits {Enter hides edits in the text: replies read as they stand, and stay editable} highlights {Enter hides highlights in the text. They are still kept} other {Enter hides prompts in the text. They are still kept}}', comment: 'kind is edits, highlights or prompts' },
@@ -1141,7 +1142,6 @@ export const COPY = {
     markupSuggesting: /*i18n*/ { id: 'enter.markupSuggesting', message: 'Enter switches to suggesting: what you type is held back, marked, until you accept it' },
     markupModeSame: /*i18n*/ { id: 'enter.markupModeSame', message: '{mode, select, suggesting {Suggesting already: what you type waits until you accept it} other {Editing already: what you type is the text}}' },
     markupColGone: /*i18n*/ { id: 'enter.markupColGone', message: 'Marks always show on the collection board now. markup:off hides them in the text', comment: 'Commands stay English' },
-    markupCommentsLater: /*i18n*/ { id: 'enter.markupCommentsLater', message: 'Comments come into the text next. Until then, notes are kept on the collection board' },
     // In calm (C296): the markup switch shows a reply's edits, or reads it as it stands again.
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
@@ -1510,7 +1510,7 @@ export const COPY = {
     suggestingAbout: /*i18n*/ { id: 'markupMenu.suggestingAbout', message: 'What you type is marked, and waits until you accept it' },
     show: /*i18n*/ { id: 'markupMenu.show', message: 'Show' },
     kind: /*i18n*/ { id: 'markupMenu.kind', message: '{kind, select, edits {Edits} highlights {Highlights} prompts {Prompts} other {Comments}}', comment: 'A row of the menu: edits, highlights, prompts or comments' },
-    kindAbout: /*i18n*/ { id: 'markupMenu.kindAbout', message: '{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Next: comments written in the text}}' },
+    kindAbout: /*i18n*/ { id: 'markupMenu.kindAbout', message: '{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Yours, on words and on whole messages, never sent}}' },
     waiting: /*i18n*/ { id: 'markupMenu.waiting', message: 'Waiting' },
     waitingCount: /*i18n*/ { id: 'markupMenu.waitingCount', message: '{count, plural, =0 {nothing waits in {where}} one {# waits in {where}} other {# wait in {where}}}', comment: '{where} is a chat number, as 214' },
     noRoom: /*i18n*/ { id: 'markupMenu.noRoom', message: 'Open a room to accept or reject what waits in it' },
@@ -1903,8 +1903,8 @@ export const COPY = {
     stepCompareHow: /*i18n*/ { id: 'welcome.step.compareHow', message: '{command} with two branches, like {example}', comment: '{command} is compare: and {example} a command like compare:201a 201b, which stay English' },
     stepPassage: /*i18n*/ { id: 'welcome.step.passage', message: 'Highlight a passage' },
     stepCollection: /*i18n*/ { id: 'welcome.step.collection', message: 'Start a collection' },
-    stepNoteQuotes: /*i18n*/ { id: 'welcome.step.noteQuotes', message: 'Write a note that quotes them' },
-    stepNoteQuotesHow: /*i18n*/ { id: 'welcome.step.noteQuotesHow', message: 'select the cards, then {command}', comment: '{command} is note:"…", which stays English' },
+    stepNoteQuotes: /*i18n*/ { id: 'welcome.step.noteQuotes', message: 'Write a comment that quotes them' },
+    stepNoteQuotesHow: /*i18n*/ { id: 'welcome.step.noteQuotesHow', message: 'select the cards, then {command}', comment: '{command} is comment:"…", which stays English' },
     stepSummary: /*i18n*/ { id: 'welcome.step.summary', message: 'Summarize them' },
     stepSummaryHow: /*i18n*/ { id: 'welcome.step.summaryHow', message: '{command}, optional, with an AI API key', comment: '{command} is summarize:, which stays English. The one step that spends tokens' },
     stepArrange: /*i18n*/ { id: 'welcome.step.arrange', message: 'Save your screen' },
@@ -2236,12 +2236,12 @@ export const COPY = {
     plans: /*i18n*/ { id: 'collection.plans', message: 'Plans' },
     chats: /*i18n*/ { id: 'collection.chats', message: 'Chats' },
     pickHelp: /*i18n*/ { id: 'collection.pickHelp', message: 'Writes {command} in the bar', comment: '{command} is add: or rm: with a number' },
-    pickFoot: /*i18n*/ { id: 'collection.pickFoot', message: 'A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one note, highlight or quote.', comment: 'add: and rm: stay English' },
+    pickFoot: /*i18n*/ { id: 'collection.pickFoot', message: 'A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one comment, highlight or quote.', comment: 'add: and rm: stay English' },
     tabAll: /*i18n*/ { id: 'collection.tabAll', message: 'All' },
     tabHighlight: /*i18n*/ { id: 'collection.tabHighlight', message: 'Highlights' },
     tabTerm: /*i18n*/ { id: 'collection.tabTerm', message: 'Highlights' },
     tabQuote: /*i18n*/ { id: 'collection.tabQuote', message: 'Quotes' },
-    tabNote: /*i18n*/ { id: 'collection.tabNote', message: 'Notes' },
+    tabNote: /*i18n*/ { id: 'collection.tabNote', message: 'Comments' },
     tabMessage: /*i18n*/ { id: 'collection.tabMessage', message: 'Messages' },
     // Edits and asks (stage 11, piece 5; C220).
     tabEdit: /*i18n*/ { id: 'collection.tabEdit', message: 'Edits' },
@@ -2307,7 +2307,7 @@ export const COPY = {
     date: /*i18n*/ { id: 'collection.date', message: 'date' },
     none: /*i18n*/ { id: 'collection.none', message: 'No collection yet. new:collection makes one.', comment: 'new:collection stays English' },
     empty: /*i18n*/ { id: 'collection.empty', message: 'Nothing here yet. add:207 puts something in, or pick a chat from the list above.', comment: 'add: stays English' },
-    emptyHeld: /*i18n*/ { id: 'collection.emptyHeld', message: 'What it holds has no notes, highlights or quotes yet. They show here as they are made.' },
+    emptyHeld: /*i18n*/ { id: 'collection.emptyHeld', message: 'What it holds has no comments, highlights or quotes yet. They show here as they are made.' },
     noneMatch: /*i18n*/ { id: 'collection.noneMatch', message: 'Nothing in this collection matches.' },
     // Filters on the cards (C287).
     noneMatchFiltered: /*i18n*/ { id: 'collection.noneMatchFiltered', message: 'Nothing here matches the search and filters. clear:filters removes them.', comment: 'clear:filters stays English' },
@@ -2328,7 +2328,7 @@ export const COPY = {
     select: /*i18n*/ { id: 'collection.select', message: 'Select {card}' },
     selected: /*i18n*/ { id: 'collection.selected', message: '{count} selected' },
     selectClear: /*i18n*/ { id: 'collection.selectClear', message: 'clear' },
-    actNote: /*i18n*/ { id: 'collection.actNote', message: 'Note' },
+    actNote: /*i18n*/ { id: 'collection.actNote', message: 'Comment' },
     // A picked edit's, ask's or suggestion's own actions, at the foot (C298 (a)).
     actHoldBack: /*i18n*/ { id: 'collection.actHoldBack', message: 'Hold back', comment: 'Keeps an edit or ask from going with the next prompt; runs hold:' },
     actLetGo: /*i18n*/ { id: 'collection.actLetGo', message: 'Let it go', comment: 'An edit or ask held back goes with the next prompt again; runs hold:off' },
@@ -2349,7 +2349,7 @@ export const COPY = {
     summaryOf: /*i18n*/ { id: 'collection.summaryOf', message: 'summary, written {day} from {nums}' },
     quotedGone: /*i18n*/ { id: 'collection.quotedGone', message: '{num}, no longer here' },
     // A card by its kind and number, in a sentence: "note 214".
-    card: /*i18n*/ { id: 'collection.card', message: '{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}' },
+    card: /*i18n*/ { id: 'collection.card', message: '{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}' },
   },
 
   // The Library (stage 5, piece 4; Lab v7): the catalogue, read-only.
@@ -2868,6 +2868,15 @@ export const COPY = {
     // Asks (stage 11, piece 4; C218).
     askLabel: /*i18n*/ { id: 'chat.askLabel', message: 'ASK', comment: 'The label of the box an ask is written in' },
     askPlaceholder: /*i18n*/ { id: 'chat.askPlaceholder', message: 'Ask in your own words: make it shorter, or add the year it opened' },
+    // Comments (C301 (c)): written with Ctrl+Alt+M on selected words, never sent.
+    commentLabel: /*i18n*/ { id: 'chat.commentLabel', message: 'COMMENT', comment: 'The label of the box a comment is written in' },
+    commentPlaceholder: /*i18n*/ { id: 'chat.commentPlaceholder', message: 'For you and anyone you share it with. Never sent to a model' },
+    commentMore: /*i18n*/ { id: 'chat.commentMore', message: 'more', comment: 'After the first line of a long comment in the text: shows the rest' },
+    commentLess: /*i18n*/ { id: 'chat.commentLess', message: 'less', comment: 'After a long comment shown whole: back to its first line' },
+    commentTitle: /*i18n*/ { id: 'chat.commentTitle', message: 'Comment {num}. It is never sent' },
+    commentPick: /*i18n*/ { id: 'chat.commentPick', message: 'Select some words first, then {keys} writes a comment on them', comment: '{keys} is the shortcut as this computer writes it: Ctrl+Alt+M or ⌘⌥M' },
+    commentBlock: /*i18n*/ { id: 'chat.commentBlock', message: 'A comment goes on words in one paragraph' },
+    commentOnMessage: /*i18n*/ { id: 'chat.commentOnMessage', message: 'comment {num}, on this {part, select, prompt {prompt} other {reply}}' },
     askMarker: /*i18n*/ { id: 'chat.askMarker', message: 'ask', comment: 'Before an ask number in the text: ask 241' },
     askAccept: /*i18n*/ { id: 'chat.askAccept', message: 'accept' },
     askUndo: /*i18n*/ { id: 'chat.askUndo', message: 'undo' },
@@ -2888,7 +2897,7 @@ export const COPY = {
     quotesHelp: /*i18n*/ { id: 'chat.quotesHelp', message: 'Kept beside this chat. They are never sent' },
     quoteRemove: /*i18n*/ { id: 'chat.quoteRemove', message: 'Remove this quote' },
     // What a prompt about some cards says of each, for the model.
-    aboutCard: /*i18n*/ { id: 'chat.aboutCard', message: '{kind, select, note {note {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament' },
+    aboutCard: /*i18n*/ { id: 'chat.aboutCard', message: '{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament' },
     // An answer from a source (stage 4). {source} is its name, from the list.
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },

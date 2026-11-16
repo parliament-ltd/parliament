@@ -185,6 +185,9 @@ function validateNote(item) {
     const s = item.summary
     if (typeof s !== 'object' || !isNumList(s.from) || !isISODate(s.at) || !isStringOrNull(s.model ?? null, 200)) return 'note.summary invalid'
   }
+  // A comment on words: the words, and which time they come in the message (C301 (c)).
+  if (item.passage !== undefined && !isString(item.passage, 50_000)) return 'note.passage invalid or too large'
+  if (item.nth !== undefined && !(Number.isInteger(item.nth) && item.nth >= 0)) return 'note.nth invalid'
   return rowFields(item, 'note')
 }
 

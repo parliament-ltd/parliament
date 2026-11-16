@@ -117,7 +117,7 @@ describe('the second list, tour:advanced (welcome spec §13; A20)', () => {
       ['collection', 'highlight'], ['collection', 'collection'], ['collection', 'noteQuotes'], ['collection', 'summary'],
       ['space', 'arrange'],
     ])
-    expect(ADVANCED_STEPS.map((s) => s.shows)).toEqual(['p>', 'compare:', null, 'new:collection', 'note:"…"', 'summarize:', 'arrange:save "research"'])
+    expect(ADVANCED_STEPS.map((s) => s.shows)).toEqual(['p>', 'compare:', null, 'new:collection', 'comment:"…"', 'summarize:', 'arrange:save "research"'])
     // Every command it writes is a command, led by > (or p> for a prompt).
     for (const s of ADVANCED_STEPS.filter((x) => x.writes)) expect(s.writes, s.id).toMatch(/^(>|p>)/)
     for (const hidden of ['layout:', 'place:', 'edit:', 'new:block']) {

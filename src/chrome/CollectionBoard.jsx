@@ -60,6 +60,8 @@ function Card({ card, under, onWrite, picked, onPick, onFind, rowOf }) {
         ? <button type="button" className="ch-mk-box" aria-pressed={picked} aria-label={i18n._(COPY.collections.select, { card: name })} onClick={() => onPick(card.num)}>{picked ? '✓' : ''}</button>
         : <span className="ch-mk-box none" aria-hidden="true" />}
       <div className="ch-mk-body">
+        {/* A comment on words shows them above its own, in its purple (C301 (c)). */}
+        {card.passage && <div className="q ch-cm-q" dir="auto">{card.passage}</div>}
         {card.text
           ? <div className={QUOTED.has(card.kind) ? 'q' : 't'} dir="auto">{card.text}</div>
           : <div className="t gonetext">{i18n._(COPY.collections.erased, { what: card.what ?? 'other', num: card.num ?? '' })}</div>}

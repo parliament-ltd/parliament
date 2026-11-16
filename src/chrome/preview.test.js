@@ -667,8 +667,8 @@ describe('delete: of what has been sent (stage 6, piece 4; C137; C199)', () => {
   }
 
   it('names everything that goes, what stays, that it is for good, and asks for a second Enter', () => {
-    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 note, highlight or quote stays, marked as from a deleted chat. Add all to delete it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
-    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 note, highlight or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
+    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 comment, highlight or quote stays, marked as from a deleted chat. Add all to delete it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
+    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 comment, highlight or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
     expect(at('>delete:204').act).toMatchObject({ kind: 'erase', confirm: true, chats: [{ id: 'c204', num: 204 }], keepMarks: true })
   })
 
@@ -858,7 +858,9 @@ describe('filters, export: and pin: on the Collection (C287)', () => {
     expect(p.text).toBe('Enter shows 1 card')
     expect(p.act.view).toMatchObject({ tab: 'note', sort: 'yours' })
     expect(at('>tag:essay sort:oldest').act.view).toMatchObject({ sort: 'date', asc: true })
-    expect(at('>clear:type', { view: { tab: 'note', sort: 'yours' } })).toMatchObject({ text: 'Enter removes type:note · Enter shows 5 cards', act: { view: { tab: 'all' } } })
+    // A note is a comment by name (C301 (c)): type:comment, with type:note still read.
+    expect(at('>tag:essay type:comment').act.view).toMatchObject({ tab: 'note' })
+    expect(at('>clear:type', { view: { tab: 'note', sort: 'yours' } })).toMatchObject({ text: 'Enter removes type:comment · Enter shows 5 cards', act: { view: { tab: 'all' } } })
     expect(at('>clear:type').text).toBe('No type: filter is in force')
     expect(at('>clear:sort', { view: { tab: 'all', sort: 'date', asc: true } }).act.view).toMatchObject({ sort: 'yours', asc: false })
     expect(at('>clear:sort').text).toBe('The cards are in your order already')
@@ -873,7 +875,7 @@ describe('filters, export: and pin: on the Collection (C287)', () => {
 
   it('export: alone downloads the cards as shown, the file named for a collection, never its name', () => {
     const p = at('>export:md')
-    expect(p.text).toBe('Enter downloads 3 cards of Q2 as Markdown: parliament-collection-2026-10-21.md · 2 cards shown stay out: only notes, highlights and quotes are exported · It is for reading elsewhere, and cannot be brought back in')
+    expect(p.text).toBe('Enter downloads 3 cards of Q2 as Markdown: parliament-collection-2026-10-21.md · 2 cards shown stay out: only comments, highlights and quotes are exported · It is for reading elsewhere, and cannot be brought back in')
     expect(p.act).toEqual({ kind: 'export', format: 'md', picked: [210, 211, 212], file: 'parliament-collection-2026-10-21.md' })
     // In the order shown, narrowed by its filters.
     const q = at('>export:jsonl', { shownCards: [card(212), card(210)], narrowed: true })
@@ -923,16 +925,24 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
     return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
   }
 
-  it('note: writes a note quoting what it names, or nothing, and never sends it', () => {
+  it('comment: writes a comment quoting what it names, or nothing, and never sends it (C301 (c))', () => {
+    expect(at('>comment:214, 217 "Thread for the essay"')).toMatchObject({
+      text: 'Enter writes a comment in Q2, quoting 214 and 217 beneath it · A comment is for people and is never sent',
+      act: { kind: 'note', text: 'Thread for the essay', quotes: [214, 217], collection: 'q2' },
+    })
+    expect(at('>comment:"Check the dates"').act).toEqual({ kind: 'note', text: 'Check the dates', quotes: [], collection: 'q2' })
+    expect(at('>comment:Check the dates', { addressed: 'almanac' })).toMatchObject({ text: 'Enter writes a comment of its own in Records · A comment is for people and is never sent', act: { collection: null } })
+    expect(at('>comment:214 ""').text).toBe('A comment needs some words, like comment:214 "…"')
+    expect(at('>comment:214').text).toBe('A comment needs some words, like comment:214 "…"')
+    expect(at('>comment:299 "x"').text).toBe('Nothing here has the number 299')
+  })
+
+  it('note:, its older name, still writes one', () => {
     expect(at('>note:214, 217 "Thread for the essay"')).toMatchObject({
-      text: 'Enter writes a note in Q2, quoting 214 and 217 beneath it · A note is for people and is never sent',
+      text: 'Enter writes a comment in Q2, quoting 214 and 217 beneath it · A comment is for people and is never sent',
       act: { kind: 'note', text: 'Thread for the essay', quotes: [214, 217], collection: 'q2' },
     })
     expect(at('>note:"Check the dates"').act).toEqual({ kind: 'note', text: 'Check the dates', quotes: [], collection: 'q2' })
-    expect(at('>note:Check the dates', { addressed: 'almanac' })).toMatchObject({ text: 'Enter writes a note of its own in Records · A note is for people and is never sent', act: { collection: null } })
-    expect(at('>note:214 ""').text).toBe('A note needs some words, like note:214 "…"')
-    expect(at('>note:214').text).toBe('A note needs some words, like note:214 "…"')
-    expect(at('>note:299 "x"').text).toBe('Nothing here has the number 299')
   })
 
   it('summarize: names its one call and its cost first, and any quote that goes', () => {
@@ -941,7 +951,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
       act: { kind: 'summarize', nums: [214, 217], collection: 'q2' },
     })
     expect(at('>summarize:').act.nums).toEqual([214, 217, 219])
-    expect(at('>summarize:202').text).toBe('202 is not a note, highlight or quote, which are what summarize: takes for now')
+    expect(at('>summarize:202').text).toBe('202 is not a comment, highlight or quote, which are what summarize: takes for now')
     expect(at('>summarize:214', { helper: { keyed: false, provider: 'Anthropic' } }).text).toBe('A summary needs a key for Anthropic. api: adds one')
     expect(at('>summarize:214', { addressed: 'almanac' }).text).toBe('summarize: writes a summary note on Collection. Rewriting a summary line here comes later')
   })
@@ -950,7 +960,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
     expect(at('>compare:214 219')).toMatchObject({ text: 'Enter sets 214 and 219 side by side and marks the words that differ · Words, not meaning. Add meaning at the end to ask a model how they differ · Nothing is sent to an AI model', act: { kind: 'compare', nums: [214, 219] } })
     expect(at('>compare:214, 219').act.nums).toEqual([214, 219])
     expect(at('>compare:214').text).toBe('compare: takes two, like compare:218 231 or compare:201a 201b')
-    expect(at('>compare:214 202').text).toBe('compare: takes two notes, highlights or quotes, or two chats or branches, not one of each')
+    expect(at('>compare:214 202').text).toBe('compare: takes two comments, highlights or quotes, or two chats or branches, not one of each')
   })
 
   it('compare: takes two branches, or two chats, by their last replies (C289)', () => {
@@ -969,7 +979,7 @@ describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
     expect(withPlan('>compare:229a 229A').text).toBe('Those are the same thing twice')
     // The plan's number alone names its branches to pick from.
     expect(withPlan('>compare:229 229a').text).toBe('229 is a plan. compare:229a 229c compares the last replies of two of its branches')
-    expect(withPlan('>compare:229a 214').text).toBe('compare: takes two notes, highlights or quotes, or two chats or branches, not one of each')
+    expect(withPlan('>compare:229a 214').text).toBe('compare: takes two comments, highlights or quotes, or two chats or branches, not one of each')
     expect(withPlan('>compare:229b 229a').text).toBe('Nothing here has the number 229b')
 
     // meaning at the end asks the helper how they differ: one call, named and priced first (C290).
@@ -1297,9 +1307,9 @@ describe('markup: the markup menu (C301 (b))', () => {
 
   it('hides and shows every kind drawn in the text, one step for undo:', () => {
     expect(at('>markup:off')).toMatchObject({ text: 'Enter hides every mark in the text. Replies read as they stand, and stay editable',
-      act: { kind: 'setting', key: 'markupShow', value: { ...all, edits: false, highlights: false, prompts: false }, before: all } })
-    const hidden = { markup: { show: { edits: false, highlights: false, prompts: false } } }
-    expect(at('>markup:on', hidden)).toMatchObject({ text: 'Enter shows every mark in the text: edits, highlights and prompts', act: { key: 'markupShow', value: all } })
+      act: { kind: 'setting', key: 'markupShow', value: { edits: false, highlights: false, prompts: false, comments: false }, before: all } })
+    const hidden = { markup: { show: { edits: false, highlights: false, prompts: false, comments: false } } }
+    expect(at('>markup:on', hidden)).toMatchObject({ text: 'Enter shows every mark in the text: edits, highlights, prompts and comments', act: { key: 'markupShow', value: all } })
     expect(at('>markup:on').text).toBe('Every mark shows already')
     expect(at('>markup:off', hidden).text).toBe('Every mark is hidden already')
   })
@@ -1320,13 +1330,17 @@ describe('markup: the markup menu (C301 (b))', () => {
     expect(at('>markup:suggesting', { markup: { mode: 'suggesting' } }).text).toBe('Suggesting already: what you type waits until you accept it')
   })
 
-  it('says the Collection always shows its marks, and that comments come next', () => {
+  it('says the Collection always shows its marks', () => {
     expect(at('>markup:off col')).toMatchObject({ text: 'Marks always show on the collection board now. markup:off hides them in the text', act: null })
-    expect(at('>markup:off comments')).toMatchObject({ text: 'Comments come into the text next. Until then, notes are kept on the collection board', act: null })
+  })
+
+  it('hides and shows comments in the text, now that they are drawn there (C301 (c))', () => {
+    expect(at('>markup:off comments')).toMatchObject({ act: { kind: 'setting', key: 'markupShow', value: { ...all, comments: false }, before: all } })
+    expect(at('>markup:on comments', { markup: { show: { comments: false } } }).act).toMatchObject({ value: all })
   })
 
   it('reads calm: and calm:off as hiding and showing every mark', () => {
-    expect(at('>calm:').act).toMatchObject({ kind: 'setting', key: 'markupShow', value: { ...all, edits: false, highlights: false, prompts: false } })
+    expect(at('>calm:').act).toMatchObject({ kind: 'setting', key: 'markupShow', value: { edits: false, highlights: false, prompts: false, comments: false } })
     expect(at('>calm:off', { markup: { show: { edits: false } } }).act).toMatchObject({ key: 'markupShow', value: all })
     expect(at('>calm:off').text).toBe('Every mark shows already')
   })

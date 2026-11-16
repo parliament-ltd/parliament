@@ -1001,6 +1001,42 @@ msgstr ""
 msgid "chat.close"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "chat.commentBlock"
+msgstr ""
+
+#. The label of the box a comment is written in
+#. js-lingui-explicit-id
+msgid "chat.commentLabel"
+msgstr ""
+
+#. After a long comment shown whole: back to its first line
+#. js-lingui-explicit-id
+msgid "chat.commentLess"
+msgstr ""
+
+#. After the first line of a long comment in the text: shows the rest
+#. js-lingui-explicit-id
+msgid "chat.commentMore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.commentOnMessage"
+msgstr ""
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Alt+M or ⌘⌥M
+#. js-lingui-explicit-id
+msgid "chat.commentPick"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.commentPlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.commentTitle"
+msgstr ""
+
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
 msgid "chat.continueReply"
@@ -2572,6 +2608,10 @@ msgid "enter.colsUnknown"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.commentKept"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.compare"
 msgstr ""
 
@@ -3694,10 +3734,6 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.markupColGone"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "enter.markupCommentsLater"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9756,6 +9792,10 @@ msgid "verb.cols"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.comment"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr ""
 
@@ -9900,6 +9940,7 @@ msgstr ""
 msgid "verb.new"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.note"
 msgstr ""
@@ -10273,7 +10314,7 @@ msgstr ""
 msgid "welcome.step.noteQuotes"
 msgstr ""
 
-#. {command} is note:"…", which stays English
+#. {command} is comment:"…", which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotesHow"
 msgstr ""

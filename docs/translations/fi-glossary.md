@@ -20,6 +20,7 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - answer → vastaus. Finnish has one word; a source's answer is "vastaus lähteestä {source}" or "lähteen vastaus", so context keeps them apart, as in English.
 - marking (notes, keywords, quotes, favourites together) → merkintä (merkinnät).
 - note → muistiinpano.
+- comment → kommentti (C301 (c), 15 November: notes became comments, and every line that said muistiinpano of one now says kommentti; the type: word is comment). Markup menu's Kommentit already had it.
 - keyword (kind.term) → avainsana.
 - quote → lainaus; the Quote button → Lainaa.
 - highlight → korostus. "Lit" for keywords is rendered as "erottuvat omalla värillään" so it does not overlap.

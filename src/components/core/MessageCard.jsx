@@ -21,6 +21,15 @@ import { instructionLike } from '../../lib/injection'
 import { CARD_HEAD } from '../../lib/release'
 import './chat.css'
 
+// The comments' bubble (C301 (c)), as the text draws it after a passage.
+function CommentMark() {
+  return (
+    <svg className="pm-cm-ico" viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M2 2.5h8a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H6l-2.5 2v-2H2a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 const NO_QUOTES = Object.freeze([])
 
 // PR-18e: chip-icon lookup for the attachmentMeta strip rendered under
@@ -89,6 +98,9 @@ export default function MessageCard({
   askInfo, onSettleAsk, askWords,
   // Suggestions (stage 12; C229): each one's number, settling one, and the words.
   sugInfo, onSettleSuggestion, sugWords,
+  // Comments (C301 (c)): { words, whole }, those on words in it and those on
+  // all of it; onComment keeps one written with Ctrl+Alt+M; commentWords.
+  comments = null, onComment, commentWords,
 }) {
   const fixed = hostContent ? { contentEditable: false, suppressContentEditableWarning: true } : {}
   const { i18n } = useLingui()
@@ -227,6 +239,9 @@ export default function MessageCard({
           sugWords={sugWords}
           titles={titles ?? undefined}
           titleWords={titleWords}
+          comments={comments?.words}
+          onComment={onComment}
+          commentWords={commentWords}
         />
       )
     }
@@ -370,7 +385,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, heldEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, heldEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords, comments?.words, onComment, commentWords])
 
   return (
     <motion.div
@@ -451,6 +466,18 @@ export default function MessageCard({
             {/* A source that found nothing says so where its answer would be. */}
             {source?.found === false && <SourceLine source={source} />}
           </div>
+          {/* A comment on the whole message, under it (C301 (c)). Never sent. */}
+          {comments?.whole?.length > 0 && (
+            <div {...fixed} className="p-cm-msgs">
+              {comments.whole.map((c) => (
+                <div key={c.id} className="p-cm-msg" data-comment={c.num ?? undefined}>
+                  <CommentMark />
+                  <span dir="auto">{c.text}</span>
+                  {c.num != null && <span className="p-marg">{i18n._(COPY.chat.commentOnMessage, { num: c.num, part: type === 'user' ? 'prompt' : 'reply' })}</span>}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* PR-18e: attachment chips on user messages — a memory aid
               showing what files were attached on this turn. Base64 data

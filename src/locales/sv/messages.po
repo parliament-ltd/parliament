@@ -956,7 +956,7 @@ msgstr "Skriver {command} i fältet"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "{kind, select, note {anteckning {num}, sparad i Parliament} term {markering {num}, sparad i Parliament} quote {citat {num}, sparat i Parliament} highlight {markering {num}, sparad i Parliament} other {{num}, sparad i Parliament}}"
+msgstr "{kind, select, note {kommentar {num}, sparad i Parliament} term {markering {num}, sparad i Parliament} quote {citat {num}, sparat i Parliament} highlight {markering {num}, sparad i Parliament} other {{num}, sparad i Parliament}}"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1000,6 +1000,42 @@ msgstr "ångra"
 #. js-lingui-explicit-id
 msgid "chat.close"
 msgstr "Stäng"
+
+#. js-lingui-explicit-id
+msgid "chat.commentBlock"
+msgstr "En kommentar hör till ord i ett och samma stycke"
+
+#. The label of the box a comment is written in
+#. js-lingui-explicit-id
+msgid "chat.commentLabel"
+msgstr "KOMMENTAR"
+
+#. After a long comment shown whole: back to its first line
+#. js-lingui-explicit-id
+msgid "chat.commentLess"
+msgstr "mindre"
+
+#. After the first line of a long comment in the text: shows the rest
+#. js-lingui-explicit-id
+msgid "chat.commentMore"
+msgstr "mer"
+
+#. js-lingui-explicit-id
+msgid "chat.commentOnMessage"
+msgstr "kommentar {num}, till {part, select, prompt {den här prompten} other {det här svaret}}"
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Alt+M or ⌘⌥M
+#. js-lingui-explicit-id
+msgid "chat.commentPick"
+msgstr "Markera några ord först, så skriver {keys} en kommentar till dem"
+
+#. js-lingui-explicit-id
+msgid "chat.commentPlaceholder"
+msgstr "För dig och dem du delar den med. Skickas aldrig till en modell"
+
+#. js-lingui-explicit-id
+msgid "chat.commentTitle"
+msgstr "Kommentar {num}. Den skickas aldrig"
 
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
@@ -1288,7 +1324,7 @@ msgstr "ny chatt"
 
 #. js-lingui-explicit-id
 msgid "collection.actNote"
-msgstr "Anteckning"
+msgstr "Kommentar"
 
 #. js-lingui-explicit-id
 msgid "collection.actNoteQuoting"
@@ -1362,7 +1398,7 @@ msgstr "efter"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {anteckning {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {plan {num}} edit {redigering {num}} ask {fråga {num}} suggestion {förslag {num}} other {{num}}}"
+msgstr "{kind, select, note {kommentar {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {plan {num}} edit {redigering {num}} ask {fråga {num}} suggestion {förslag {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1411,7 +1447,7 @@ msgstr "Inget här än. add:207 lägger till något, eller välj en chatt i list
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "Det som finns i den har inga anteckningar, markeringar eller citat än. De visas här när de skapas."
+msgstr "Det som finns i den har inga kommentarer, markeringar eller citat än. De visas här när de skapas."
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1536,7 +1572,7 @@ msgstr "Skriver open:{num} i fältet"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "Ett klick skriver add: eller rm: i fältet. Numren styr ordningen efter källa; add:218 tar med en enda anteckning, en markering eller ett citat."
+msgstr "Ett klick skriver add: eller rm: i fältet. Numren styr ordningen efter källa; add:218 tar med en enda kommentar, en markering eller ett citat."
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1691,7 +1727,7 @@ msgstr "Meddelanden"
 
 #. js-lingui-explicit-id
 msgid "collection.tabNote"
-msgstr "Anteckningar"
+msgstr "Kommentarer"
 
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
@@ -2541,7 +2577,7 @@ msgstr "{sort, select, yours {Enter visar din ordning} source {Enter grupperar k
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {Enter visar markeringarna} quote {Enter visar citaten} note {Enter visar anteckningarna} other {Enter visar markeringarna}}"
+msgstr "{kind, select, term {Enter visar markeringarna} quote {Enter visar citaten} note {Enter visar kommentarerna} other {Enter visar markeringarna}}"
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTabAll"
@@ -2572,13 +2608,17 @@ msgid "enter.colsUnknown"
 msgstr "Ingen kolumn heter {word}. Försök med {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.commentKept"
+msgstr "Sparade kommentar {num}. Den skickas aldrig"
+
+#. js-lingui-explicit-id
 msgid "enter.compare"
 msgstr "Enter ställer {a} och {b} sida vid sida och markerar orden som skiljer sig åt"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} är inte en anteckning, en markering, ett citat, en chatt eller en gren, som är det compare: tar"
+msgstr "{num} är inte en kommentar, en markering, ett citat, en chatt eller en gren, som är det compare: tar"
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
@@ -2623,7 +2663,7 @@ msgstr "Båda skickas till {model} i det här anropet"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareMixed"
-msgstr "compare: tar två anteckningar, markeringar eller citat, eller två chattar eller grenar, inte en av varje"
+msgstr "compare: tar två kommentarer, markeringar eller citat, eller två chattar eller grenar, inte en av varje"
 
 #. {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -2942,12 +2982,12 @@ msgstr "Enter och sedan Enter igen raderar {erasing} för gott"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, one {# anteckning, markering eller citat försvinner också} other {# anteckningar, markeringar och citat försvinner också}}"
+msgstr "{count, plural, one {# kommentar, markering eller citat försvinner också} other {# kommentarer, markeringar och citat försvinner också}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, one {# anteckning, markering eller citat ligger kvar, märkt som från en raderad chatt. Lägg till all efter numret för att radera det också} other {# anteckningar, markeringar och citat ligger kvar, märkta som från en raderad chatt. Lägg till all efter numret för att radera dem också}}"
+msgstr "{count, plural, one {# kommentar, markering eller citat ligger kvar, märkt som från en raderad chatt. Lägg till all efter numret för att radera det också} other {# kommentarer, markeringar och citat ligger kvar, märkta som från en raderad chatt. Lägg till all efter numret för att radera dem också}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2959,7 +2999,7 @@ msgstr "{count, plural, one {Ångra kan inte ta tillbaka den och går inte förb
 
 #. js-lingui-explicit-id
 msgid "enter.exportCardsOut"
-msgstr "{count, plural, one {# kort som visas lämnas utanför: bara anteckningar, markeringar och citat exporteras} other {# kort som visas lämnas utanför: bara anteckningar, markeringar och citat exporteras}}"
+msgstr "{count, plural, one {# kort som visas lämnas utanför: bara kommentarer, markeringar och citat exporteras} other {# kort som visas lämnas utanför: bara kommentarer, markeringar och citat exporteras}}"
 
 #. js-lingui-explicit-id
 msgid "enter.exportCollection"
@@ -3697,10 +3737,6 @@ msgid "enter.markupColGone"
 msgstr "Samlingen visar nu alltid allt som är markerat. markup:off döljer det i texten"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCommentsLater"
-msgstr "Kommentarer kommer in i texten härnäst. Till dess sparas anteckningar i Samlingen"
-
-#. js-lingui-explicit-id
 msgid "enter.markupEditing"
 msgstr "Enter växlar till redigering: det du skriver blir texten och följer med din nästa prompt"
 
@@ -3727,7 +3763,7 @@ msgstr "{mode, select, suggesting {Redan förslag: det du skriver väntar tills 
 
 #. js-lingui-explicit-id
 msgid "enter.markupShowAll"
-msgstr "Enter visar allt som är markerat i texten: redigeringar, markeringar och promptar"
+msgstr "Enter visar allt som är markerat i texten: redigeringar, markeringar, promptar och kommentarer"
 
 #. kind is edits, highlights or prompts
 #. js-lingui-explicit-id
@@ -3911,11 +3947,11 @@ msgstr "Ett kommando börjar med ett verb och ett kolon, som open:201"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAlone"
-msgstr "Enter skriver en fristående anteckning i {board}"
+msgstr "Enter skriver en fristående kommentar i {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAloneQuoting"
-msgstr "Enter skriver en fristående anteckning i {board}, med {nums} citerade under"
+msgstr "Enter skriver en fristående kommentar i {board}, med {nums} citerade under"
 
 #. js-lingui-explicit-id
 msgid "enter.noteDone"
@@ -3923,27 +3959,27 @@ msgstr "Skrev {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteIn"
-msgstr "Enter skriver en anteckning i {name}"
+msgstr "Enter skriver en kommentar i {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteInQuoting"
-msgstr "Enter skriver en anteckning i {name}, med {nums} citerade under"
+msgstr "Enter skriver en kommentar i {name}, med {nums} citerade under"
 
 #. js-lingui-explicit-id
 msgid "enter.noteLong"
-msgstr "En anteckning får vara högst {max} tecken"
+msgstr "En kommentar får vara högst {max} tecken"
 
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
-msgstr "En anteckning är till för människor och skickas aldrig"
+msgstr "En kommentar är till för människor och skickas aldrig"
 
 #. js-lingui-explicit-id
 msgid "enter.noteOnMessage"
-msgstr "Enter skriver en anteckning till {part, select, prompt {prompten som börjar med ”{opening}”, och citerar den} other {svaret som börjar med ”{opening}”, och citerar det}}"
+msgstr "Enter skriver en kommentar till {part, select, prompt {prompten som börjar med ”{opening}”, och citerar den} other {svaret som börjar med ”{opening}”, och citerar det}}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
-msgstr "En anteckning behöver några ord, som {example}"
+msgstr "En kommentar behöver några ord, som {example}"
 
 #. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
 #. js-lingui-explicit-id
@@ -4016,7 +4052,7 @@ msgstr "Att öppna den här kommer senare. inspect:{num} visar den nu"
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr "{num} är en fristående anteckning, utan någon chatt att öppna. Enter visar den under fältet"
+msgstr "{num} är en fristående kommentar, utan någon chatt att öppna. Enter visar den under fältet"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
@@ -5772,7 +5808,7 @@ msgstr "Ingen sammanfattning kom tillbaka, så inget skrevs"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num} är inte en anteckning, en markering eller ett citat, som är det summarize: tar än så länge"
+msgstr "{num} är inte en kommentar, en markering eller ett citat, som är det summarize: tar än så länge"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -6176,7 +6212,7 @@ msgstr "Översätter. Fältet är fritt under tiden"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "I {board} tar type: en av highlight, quote eller note"
+msgstr "I {board} tar type: en av highlight, quote eller comment"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7147,7 +7183,7 @@ msgstr "Meddelande"
 
 #. js-lingui-explicit-id
 msgid "kind.note"
-msgstr "Anteckning"
+msgstr "Kommentar"
 
 #. A passage kept beside the chat, never sent
 #. js-lingui-explicit-id
@@ -7809,7 +7845,7 @@ msgstr "{kind, select, edits {Redigeringar} highlights {Markeringar} prompts {Pr
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {Dina, och ändringar som föreslås dig} highlights {Orden du har markerat} prompts {Frågor i texten, väntande eller besvarade} other {Härnäst: kommentarer skrivna i texten}}"
+msgstr "{kind, select, edits {Dina, och ändringar som föreslås dig} highlights {Orden du har markerat} prompts {Frågor i texten, väntande eller besvarade} other {Dina, på ord och på hela meddelanden, och de skickas aldrig}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -9756,6 +9792,10 @@ msgid "verb.cols"
 msgstr "Dölj eller visa kolumner i tabellen"
 
 #. js-lingui-explicit-id
+msgid "verb.comment"
+msgstr "Skriv en kommentar för människor. Den skickas aldrig"
+
+#. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "Ställ två sida vid sida och markera orden som skiljer sig åt: anteckningar, markeringar, citat eller de senaste svaren i två grenar. Inget skickas till en AI-modell. Lägg till meaning för att fråga en modell hur de skiljer sig i innebörd"
 
@@ -9817,7 +9857,7 @@ msgstr "Visa vad som kom från en chatt, en plan, en gren eller en körning"
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "Visa det som har anteckningar, citat eller markeringar"
+msgstr "Visa det som har kommentarer, citat eller markeringar"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"
@@ -9900,9 +9940,10 @@ msgstr "Namnge det fältet pekar på: ett rum, en samling eller en chatt. Med tv
 msgid "verb.new"
 msgstr "Skapa något nytt: chatt, plan, rum, samling, ramverk, gren, steg, körning eller block"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.note"
-msgstr "Skriv en anteckning för människor. Den skickas aldrig"
+msgstr "Ett äldre namn: note: skriver en kommentar, som comment: gör"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
@@ -10271,9 +10312,9 @@ msgstr "{command}, rummets nummer och sedan dess namn"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotes"
-msgstr "Skriv en anteckning som citerar dem"
+msgstr "Skriv en kommentar som citerar dem"
 
-#. {command} is note:"…", which stays English
+#. {command} is comment:"…", which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotesHow"
 msgstr "välj korten och sedan {command}"

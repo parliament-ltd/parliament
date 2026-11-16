@@ -132,7 +132,7 @@ export function planNoteMessage(step, screens = {}) {
   const part = word?.value ?? 'reply'
   const last = args[args.length - 1]
   const text = String(last?.kind === 'text' ? last.value : '').trim()
-  if (!text) return { says: { message: 'noteWords', values: { example: `note:${part} "…"` } }, act: null }
+  if (!text) return { says: { message: 'noteWords', values: { example: `comment:${part} "…"` } }, act: null }
   if ([...text].length > NOTE_MAX) return { says: { message: 'noteLong', values: { max: NOTE_MAX } }, act: null }
   const r = handOf(part, screens)
   if (r.says) return { says: r.says, act: null }

@@ -71,7 +71,7 @@ const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan'
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
+const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -375,7 +375,7 @@ function planViewStep(view, step, records = {}) {
 }
 
 // A tab's kind as type: names it, for clear:type on the Collection.
-const TAB_WORD = Object.freeze({ term: 'highlight', highlight: 'highlight', quote: 'quote', note: 'note', edit: 'edit', ask: 'ask', suggestion: 'suggestion' })
+const TAB_WORD = Object.freeze({ term: 'highlight', highlight: 'highlight', quote: 'quote', note: 'comment', edit: 'edit', ask: 'ask', suggestion: 'suggestion' })
 
 /**
  * One filter, sort:, type: or clear: on the Collection (C144 (d), (e);
@@ -869,7 +869,6 @@ function planMarkup(a, step, screens = {}) {
   const kind = vals[1]?.value ?? null
   // The Collection's own switch went into the menu; it always shows its marks (C301 (b)).
   if (kind === 'col') return { says: { message: 'markupColGone' }, act: null }
-  if (kind === 'comments') return { says: { message: 'markupCommentsLater' }, act: null }
   return showOrHide(word === 'on', kind, screens)
 }
 
@@ -1151,6 +1150,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       // The four acts, compare: and jump: (piece 7; C145).
       // note:reply "…" quotes one message (C286 (b)).
       note: (a1, s1, sc) => (notesMessage(s1) ? planNoteMessage(s1, sc) : planNote(s1, sc, a1.addressed)),
+      // A note by its new name (C301 (c)): comment: writes what note: wrote.
+      comment: (a1, s1, sc) => (notesMessage(s1) ? planNoteMessage(s1, sc) : planNote(s1, sc, a1.addressed)),
       quote: (a1, s1, sc) => planQuoteMessage(s1, sc),
       summarize: (a1, s1, sc) => planSummarize(s1, sc, a1.addressed),
       compare: (a1, s1, sc) => planCompare(s1, sc),

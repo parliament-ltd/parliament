@@ -82,6 +82,20 @@ describe('a backup with notes of their own and ordered collections (C144 (j), C1
   })
 })
 
+describe('a backup with comments on words (C301 (c))', () => {
+  const note = (extra) => ({ id: 'n1', conversationId: chat.id, messageId: 'm1', text: 'Ask Anna', createdAt: at, ...extra })
+  it('accepts a passage and which time it comes, and a note without them, as before', () => {
+    expect(validateBackup({ conversations: [chat], notes: [note({ passage: 'the hiring plan', nth: 0 })] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [chat], notes: [note({ passage: 'the hiring plan', nth: 3 })] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [chat], notes: [note()] })).toEqual({ valid: true })
+  })
+  it('refuses a passage that is not words, and a place that is not a count', () => {
+    expect(validateBackup({ conversations: [chat], notes: [note({ passage: 7 })] }).valid).toBe(false)
+    expect(validateBackup({ conversations: [chat], notes: [note({ passage: 'x', nth: -1 })] }).valid).toBe(false)
+    expect(validateBackup({ conversations: [chat], notes: [note({ passage: 'x', nth: 1.5 })] }).valid).toBe(false)
+  })
+})
+
 describe('a backup with who answers each chat (stage 7; C150)', () => {
   it('accepts an id from the list, or none, and refuses anything else', () => {
     const c = (extra) => validateBackup({ conversations: [{ ...chat, ...extra }] })

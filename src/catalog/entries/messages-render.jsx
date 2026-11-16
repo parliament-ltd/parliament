@@ -78,6 +78,7 @@ import {
   getDocket as dbGetDocket,
 } from '../../lib/db'
 import { onRecordsChanged } from '../../lib/records'
+import { modKey } from '../../shell/keys'
 import { watchAcross } from '../../editing/across'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
@@ -137,8 +138,8 @@ export default function MessagesRender() {
   const { i18n } = useLingui()
   const { settings } = useSettings()
   const {
-    notes, highlights, showNotes,
-    toggleNotePanel, saveNote, addHighlight,
+    notes, highlights, showNotes, comments,
+    toggleNotePanel, saveNote, addHighlight, addComment,
   } = useAnnotations()
   // The room board this draws in: its chat's frameworks and reply language,
   // for Continue (stage 13, piece 8; C251 (d)).
@@ -439,6 +440,17 @@ export default function MessagesRender() {
     label: i18n._(COPY.chat.askLabel), placeholder: i18n._(COPY.chat.askPlaceholder),
     ask: i18n._(COPY.chat.askMarker), accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
   }), [i18n])
+  // Comments on words (C301 (c)): the COMMENT box, "more" and "less", and what is said when none can be written.
+  const commentWords = useMemo(() => {
+    const keys = modKey() === '⌘' ? '⌘⌥M' : 'Ctrl+Alt+M'
+    return {
+      label: i18n._(COPY.chat.commentLabel), placeholder: i18n._(COPY.chat.commentPlaceholder), keys,
+      more: i18n._(COPY.chat.commentMore), less: i18n._(COPY.chat.commentLess),
+      title: (num) => i18n._(COPY.chat.commentTitle, { num }),
+      pick: i18n._(COPY.chat.commentPick, { keys }), block: i18n._(COPY.chat.commentBlock),
+    }
+  }, [i18n])
+  const keepComment = useCallback((c) => { addComment(c.messageId, c) }, [addComment])
   // After a line of a source's answer that is the title of a page it links to (C287).
   const titleWords = useMemo(() => ({
     ask: i18n._(COPY.chat.titleAsk),
@@ -541,9 +553,14 @@ export default function MessagesRender() {
       sugInfo: sugInfoOf(msg.id),
       onSettleSuggestion: (sugId, how) => settleSugOf(msg.id, sugId, how),
       sugWords,
+      // Its comments, on words and on all of it (C301 (c)).
+      comments: comments.get(msg.id) ?? null,
+      onComment: keepComment,
+      commentWords,
     }
   }, [
     saveEditedReply, suggesting, closedEdits, heldEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
+    comments, keepComment, commentWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     notes, highlights, showNotes,
@@ -608,8 +625,8 @@ export default function MessagesRender() {
 
   const renderPair = useCallback((item, idx) => {
     const { prompt, reply } = item
-    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(prompt.id) ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
-    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(reply.id) ?? NO_QUOTES })
+    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(prompt.id) ?? NO_QUOTES, comments: comments.get(prompt.id)?.words ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
+    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(reply.id) ?? NO_QUOTES, comments: comments.get(reply.id)?.words ?? NO_QUOTES })
     return (
       <EditableMessages
         key={item.key}
@@ -628,9 +645,11 @@ export default function MessagesRender() {
         onSettleSuggestion={settleSugOf}
         sugWords={sugWords}
         titleWords={titleWords}
+        onComment={keepComment}
+        commentWords={commentWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, highlightsByMessage, editedLineOf, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, comments, keepComment, commentWords, editedLineOf, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

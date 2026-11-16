@@ -15,8 +15,9 @@ describe('the selection', () => {
 
 describe('what the acts write into the bar', () => {
   it('carries the numbers, and "" where words are wanted', () => {
-    expect(actCommand.note([214, 217])).toBe('>note:214, 217 ""')
-    expect(actCommand.note([])).toBe('>note:""')
+    // The foot's Comment (C301 (c)).
+    expect(actCommand.note([214, 217])).toBe('>comment:214, 217 ""')
+    expect(actCommand.note([])).toBe('>comment:""')
     expect(actCommand.tag([214])).toBe('>tagadd:"" 214')
     expect(actCommand.summarize([214, 217])).toBe('>summarize:214, 217')
     expect(actCommand.summarize([])).toBe('>summarize:')

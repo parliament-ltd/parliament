@@ -173,7 +173,8 @@ export function planCollectionView(step, view = {}) {
     return { says: { message: 'collectionSort', values: { sort: sort[0], asc: sort[1] ? 'yes' : 'no' } }, act: { kind: 'collectionView', view: { ...view, sort: sort[0], asc: sort[1] } } }
   }
   // A highlight is kept as a term; keyword still reads, for lines kept before (C285).
-  const kinds = { keyword: 'term', quote: 'quote', note: 'note', highlight: 'term' }
+  // comment: a note by its new name (C301 (c)); note still reads.
+  const kinds = { keyword: 'term', quote: 'quote', comment: 'note', note: 'note', highlight: 'term' }
   const items = flat(step.match?.values ?? [])
   if (step.minus || items.length !== 1 || !kinds[items[0].value]) return { says: { message: 'typeCollection', values: { board: 'collection' } }, act: null }
   return { says: { message: 'collectionTab', values: { kind: kinds[items[0].value] } }, act: { kind: 'collectionView', view: { ...view, tab: kinds[items[0].value] } } }

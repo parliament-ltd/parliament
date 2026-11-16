@@ -254,12 +254,16 @@ function backOnPage(a) {
 // being placed), brings it into view and marks it for a moment (C145 (c)).
 // Looks for the first selector for about two seconds, then takes any of
 // the others: a passage's marks can draw a moment after its message.
-function flashWhenDrawn(selectors, tries = 60) {
+// onLater: told when only a later selector was found, as a comment's
+// message is when its words are no longer in it (C301 (c)).
+function flashWhenDrawn(selectors, tries = 60, onLater = null) {
   const list = [].concat(selectors).filter(Boolean)
   let n = 0
   const look = () => {
-    const el = (n < 40 ? list.slice(0, 1) : list).map((q) => document.querySelector(q)).find(Boolean)
+    const first = list.length ? document.querySelector(list[0]) : null
+    const el = first ?? (n < 40 ? null : list.slice(1).map((q) => document.querySelector(q)).find(Boolean))
     if (!el) { if (++n < tries) setTimeout(look, 50); return }
+    if (!first) onLater?.()
     const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     el.scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' })
     el.classList.add('ch-flash')
@@ -775,9 +779,12 @@ export default function Shell() {
     }
     window.addEventListener('parliament-highlighted', onHighlight)
     window.addEventListener('parliament-marked', onHighlight)
+    // A comment on words, too (C301 (c)).
+    window.addEventListener('parliament-commented', onHighlight)
     return () => {
       window.removeEventListener('parliament-highlighted', onHighlight)
       window.removeEventListener('parliament-marked', onHighlight)
+      window.removeEventListener('parliament-commented', onHighlight)
     }
   }, [started, commit])
   const [collectionView, setCollectionView] = useState({ tab: 'all', sort: 'yours', asc: false })
@@ -1200,11 +1207,15 @@ export default function Shell() {
     }
     // An edit's words, or an ask's marker (C220 (f)); else its message.
     const mark = row.change?.mark && /^[\w-]{1,64}$/.test(row.change.mark) ? row.change.mark : null
-    // A suggestion's marker, or its struck words once settled (C229).
-    const spot = !mark ? null : row.kind === 'edit' ? `ins[data-edit="${mark}"], del[data-edit="${mark}"]`
+    // A suggestion's marker, or its struck words once settled (C229). A
+    // comment's words after its passage, or under its message (C301 (c)):
+    // the tint itself is the editor's to draw, and loses a class put on it.
+    const spot = row.kind === 'note' ? `[data-comment-of="${num}"], .p-cm-msg[data-comment="${num}"]` : !mark ? null : row.kind === 'edit' ? `ins[data-edit="${mark}"], del[data-edit="${mark}"]`
       : row.kind === 'suggestion' ? `.pm-sug-marker[data-suggestion="${mark}"], del[data-suggestion="${mark}"]`
         : `.pm-ask-marker[data-ask="${mark}"], .pm-ask-point[data-ask="${mark}"]`
-    flashWhenDrawn([spot ?? `[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null])
+    // A comment on words edited away stays on its message, and says so (C301 (c)).
+    const gone = row.kind === 'note' && row.passage ? () => setBarSaid({ says: { message: 'findGone' } }) : null
+    flashWhenDrawn([spot ?? `[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null], 60, gone)
     return null
   }, [run])
 
@@ -3199,8 +3210,17 @@ export default function Shell() {
       const num = e.detail?.num
       if (Number.isInteger(num)) setBarSaid({ says: { message: 'highlightKept', values: { num } } })
     }
+    // A comment kept on words (C301 (c)), by its number, saying it is never sent.
+    const onComment = (e) => {
+      const num = e.detail?.num
+      if (Number.isInteger(num)) setBarSaid({ says: { message: 'commentKept', values: { num } } })
+    }
     window.addEventListener('parliament-highlighted', onKept)
-    return () => window.removeEventListener('parliament-highlighted', onKept)
+    window.addEventListener('parliament-commented', onComment)
+    return () => {
+      window.removeEventListener('parliament-highlighted', onKept)
+      window.removeEventListener('parliament-commented', onComment)
+    }
   }, [])
   const onPlanDelete = useCallback(async (line) => {
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })

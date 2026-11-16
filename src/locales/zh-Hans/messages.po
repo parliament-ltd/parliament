@@ -956,7 +956,7 @@ msgstr "在输入栏中写入 {command}"
 
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
-msgstr "{kind, select, note {笔记 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} other {{num}}}，保存在 Parliament 中"
+msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} other {{num}}}，保存在 Parliament 中"
 
 #. js-lingui-explicit-id
 msgid "chat.answeredFrom"
@@ -1000,6 +1000,42 @@ msgstr "撤销"
 #. js-lingui-explicit-id
 msgid "chat.close"
 msgstr "关闭"
+
+#. js-lingui-explicit-id
+msgid "chat.commentBlock"
+msgstr "批注只能写在同一段落的文字上"
+
+#. The label of the box a comment is written in
+#. js-lingui-explicit-id
+msgid "chat.commentLabel"
+msgstr "批注"
+
+#. After a long comment shown whole: back to its first line
+#. js-lingui-explicit-id
+msgid "chat.commentLess"
+msgstr "收起"
+
+#. After the first line of a long comment in the text: shows the rest
+#. js-lingui-explicit-id
+msgid "chat.commentMore"
+msgstr "展开"
+
+#. js-lingui-explicit-id
+msgid "chat.commentOnMessage"
+msgstr "批注 {num}，写在这条{part, select, prompt {提示词} other {回复}}上"
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Alt+M or ⌘⌥M
+#. js-lingui-explicit-id
+msgid "chat.commentPick"
+msgstr "先选中一些文字，再按 {keys} 为它们写批注"
+
+#. js-lingui-explicit-id
+msgid "chat.commentPlaceholder"
+msgstr "给你自己和你分享的人看。绝不会发送给模型"
+
+#. js-lingui-explicit-id
+msgid "chat.commentTitle"
+msgstr "批注 {num}。它绝不会被发送"
 
 #. A button under a reply that was cut off; it writes continue: into the bar
 #. js-lingui-explicit-id
@@ -1288,7 +1324,7 @@ msgstr "新对话"
 
 #. js-lingui-explicit-id
 msgid "collection.actNote"
-msgstr "笔记"
+msgstr "批注"
 
 #. js-lingui-explicit-id
 msgid "collection.actNoteQuoting"
@@ -1362,7 +1398,7 @@ msgstr "按"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {笔记 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} edit {编辑 {num}} ask {提问 {num}} suggestion {建议 {num}} other {{num}}}"
+msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} edit {编辑 {num}} ask {提问 {num}} suggestion {建议 {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1411,7 +1447,7 @@ msgstr "这里还没有内容。用 add:207 放入内容，或从上方列表中
 
 #. js-lingui-explicit-id
 msgid "collection.emptyHeld"
-msgstr "其中的内容还没有笔记、高亮或摘录。创建后会显示在这里。"
+msgstr "其中的内容还没有批注、高亮或摘录。创建后会显示在这里。"
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
@@ -1536,7 +1572,7 @@ msgstr "在输入栏中写入 open:{num}"
 #. add: and rm: stay English
 #. js-lingui-explicit-id
 msgid "collection.pickFoot"
-msgstr "点击会在输入栏中写入 add: 或 rm:。按来源排列时，顺序由编号决定；add:218 只收入一条笔记、高亮或摘录。"
+msgstr "点击会在输入栏中写入 add: 或 rm:。按来源排列时，顺序由编号决定；add:218 只收入一条批注、高亮或摘录。"
 
 #. {command} is add: or rm: with a number
 #. js-lingui-explicit-id
@@ -1691,7 +1727,7 @@ msgstr "消息"
 
 #. js-lingui-explicit-id
 msgid "collection.tabNote"
-msgstr "笔记"
+msgstr "批注"
 
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
@@ -2541,7 +2577,7 @@ msgstr "{sort, select, yours {按 Enter 以自定顺序显示} source {按 Enter
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTab"
-msgstr "{kind, select, term {按 Enter 显示高亮} quote {按 Enter 显示摘录} note {按 Enter 显示笔记} other {按 Enter 显示高亮}}"
+msgstr "{kind, select, term {按 Enter 显示高亮} quote {按 Enter 显示摘录} note {按 Enter 显示批注} other {按 Enter 显示高亮}}"
 
 #. js-lingui-explicit-id
 msgid "enter.collectionTabAll"
@@ -2572,13 +2608,17 @@ msgid "enter.colsUnknown"
 msgstr "没有名为 {word} 的列。试试 {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.commentKept"
+msgstr "已保存批注 {num}。它绝不会被发送"
+
+#. js-lingui-explicit-id
 msgid "enter.compare"
 msgstr "按 Enter 将 {a} 和 {b} 并排对照，并标出不同的词"
 
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareKinds"
-msgstr "{num} 不是笔记、高亮、摘录、对话或分支，而 compare: 只支持这几种"
+msgstr "{num} 不是批注、高亮、摘录、对话或分支，而 compare: 只支持这几种"
 
 #. {model} is a model name, from the list
 #. js-lingui-explicit-id
@@ -2623,7 +2663,7 @@ msgstr "这次调用会把两者都发送给 {model}"
 #. compare: stays English
 #. js-lingui-explicit-id
 msgid "enter.compareMixed"
-msgstr "compare: 需要两条笔记、高亮或摘录，或者两个对话或分支，不能各取其一"
+msgstr "compare: 需要两条批注、高亮或摘录，或者两个对话或分支，不能各取其一"
 
 #. {address} is a branch like 201a, or a chat number
 #. js-lingui-explicit-id
@@ -2942,12 +2982,12 @@ msgstr "按 Enter 后再按一次 Enter，即永久删除 {erasing}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
-msgstr "{count, plural, other {其中 # 条笔记、高亮和摘录也会一并删除}}"
+msgstr "{count, plural, other {其中 # 条批注、高亮和摘录也会一并删除}}"
 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, other {其中 # 条笔记、高亮和摘录会保留，并标明出自已删除的对话。加上 all 可一并删除}}"
+msgstr "{count, plural, other {其中 # 条批注、高亮和摘录会保留，并标明出自已删除的对话。加上 all 可一并删除}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2959,7 +2999,7 @@ msgstr "{count, plural, other {撤销无法将其恢复，也不能越过这一�
 
 #. js-lingui-explicit-id
 msgid "enter.exportCardsOut"
-msgstr "{count, plural, other {已显示的卡片中有 # 张不包含在内：只导出笔记、高亮和摘录}}"
+msgstr "{count, plural, other {已显示的卡片中有 # 张不包含在内：只导出批注、高亮和摘录}}"
 
 #. js-lingui-explicit-id
 msgid "enter.exportCollection"
@@ -3697,10 +3737,6 @@ msgid "enter.markupColGone"
 msgstr "合集现在始终显示其中的标注。markup:off 可在正文中隐藏它们"
 
 #. js-lingui-explicit-id
-msgid "enter.markupCommentsLater"
-msgstr "批注接下来会进入正文。在此之前，笔记保存在合集中"
-
-#. js-lingui-explicit-id
 msgid "enter.markupEditing"
 msgstr "按 Enter 切换到编辑模式：你输入的内容直接成为正文，并随你的下一条提示词发送"
 
@@ -3727,7 +3763,7 @@ msgstr "{mode, select, suggesting {已是建议模式：你输入的内容会等
 
 #. js-lingui-explicit-id
 msgid "enter.markupShowAll"
-msgstr "按 Enter 显示正文中的所有标注：编辑、高亮和提示词"
+msgstr "按 Enter 显示正文中的所有标注：编辑、高亮、提示词和批注"
 
 #. kind is edits, highlights or prompts
 #. js-lingui-explicit-id
@@ -3911,11 +3947,11 @@ msgstr "命令以动词加冒号开头，例如 open:201"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAlone"
-msgstr "按 Enter 在{board}中写一条独立笔记"
+msgstr "按 Enter 在{board}中写一条独立批注"
 
 #. js-lingui-explicit-id
 msgid "enter.noteAloneQuoting"
-msgstr "按 Enter 在{board}中写一条独立笔记，并在下方引用 {nums}"
+msgstr "按 Enter 在{board}中写一条独立批注，并在下方引用 {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteDone"
@@ -3923,27 +3959,27 @@ msgstr "已写入 {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteIn"
-msgstr "按 Enter 在“{name}”中写一条笔记"
+msgstr "按 Enter 在“{name}”中写一条批注"
 
 #. js-lingui-explicit-id
 msgid "enter.noteInQuoting"
-msgstr "按 Enter 在“{name}”中写一条笔记，并在下方引用 {nums}"
+msgstr "按 Enter 在“{name}”中写一条批注，并在下方引用 {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.noteLong"
-msgstr "笔记最多 {max} 个字符"
+msgstr "批注最多 {max} 个字符"
 
 #. js-lingui-explicit-id
 msgid "enter.noteNeverSent"
-msgstr "笔记是写给人看的，绝不会被发送"
+msgstr "批注是写给人看的，绝不会被发送"
 
 #. js-lingui-explicit-id
 msgid "enter.noteOnMessage"
-msgstr "按 Enter 为以“{opening}”开头的{part, select, prompt {提示词} other {回复}}写一条笔记，并引用它"
+msgstr "按 Enter 为以“{opening}”开头的{part, select, prompt {提示词} other {回复}}写一条批注，并引用它"
 
 #. js-lingui-explicit-id
 msgid "enter.noteWords"
-msgstr "笔记需要文字，例如 {example}"
+msgstr "批注需要文字，例如 {example}"
 
 #. The Lab and its commands wait for a later release (C279 (a)). {verb} is a command such as lab:
 #. js-lingui-explicit-id
@@ -4016,7 +4052,7 @@ msgstr "暂时还不能打开它。inspect:{num} 现在就可以显示它"
 
 #. js-lingui-explicit-id
 msgid "enter.openOwnNote"
-msgstr "{num} 是一条独立笔记，没有可打开的对话。按 Enter 在输入栏下方显示它"
+msgstr "{num} 是一条独立批注，没有可打开的对话。按 Enter 在输入栏下方显示它"
 
 #. js-lingui-explicit-id
 msgid "enter.openPassage"
@@ -5772,7 +5808,7 @@ msgstr "没有返回摘要，因此未写入任何内容"
 #. summarize: stays English
 #. js-lingui-explicit-id
 msgid "enter.summarizeKinds"
-msgstr "{num} 不是笔记、高亮或摘录，而 summarize: 目前只支持这几种"
+msgstr "{num} 不是批注、高亮或摘录，而 summarize: 目前只支持这几种"
 
 #. summarize: stays English
 #. js-lingui-explicit-id
@@ -6176,7 +6212,7 @@ msgstr "正在翻译。其间输入栏可照常使用"
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
-msgstr "在{board}上，type: 可接 highlight、quote 或 note 之一"
+msgstr "在{board}上，type: 可接 highlight、quote 或 comment 之一"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7147,7 +7183,7 @@ msgstr "消息"
 
 #. js-lingui-explicit-id
 msgid "kind.note"
-msgstr "笔记"
+msgstr "批注"
 
 #. A passage kept beside the chat, never sent
 #. js-lingui-explicit-id
@@ -7809,7 +7845,7 @@ msgstr "{kind, select, edits {编辑} highlights {高亮} prompts {提示词} ot
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {你的编辑，以及向你建议的修改} highlights {你标记的文字} prompts {正文中的提问，待发送或已回答} other {下一步：写在正文中的批注}}"
+msgstr "{kind, select, edits {你的编辑，以及向你建议的修改} highlights {你标记的文字} prompts {正文中的提问，待发送或已回答} other {你写在文字或整条消息上的批注，绝不会被发送}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -9756,6 +9792,10 @@ msgid "verb.cols"
 msgstr "隐藏或显示表格的列"
 
 #. js-lingui-explicit-id
+msgid "verb.comment"
+msgstr "写一条给人看的批注。它绝不会被发送"
+
+#. js-lingui-explicit-id
 msgid "verb.compare"
 msgstr "将两项并排对照，并标出不同的词：笔记、高亮、摘录，或两个分支各自的最后一条回复。不会向 AI 模型发送任何内容。在末尾加上 meaning，则会请模型说明两者含义上的不同"
 
@@ -9817,7 +9857,7 @@ msgstr "显示出自某个对话、计划、分支或运行的内容"
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "显示带有笔记、摘录或高亮的内容"
+msgstr "显示带有批注、摘录或高亮的内容"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"
@@ -9900,9 +9940,10 @@ msgstr "为输入栏指向的对象命名：房间、合集或对话。给出两
 msgid "verb.new"
 msgstr "新建对话、计划、房间、合集、框架、分支、步骤、运行或模块"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.note"
-msgstr "写一条给人看的笔记。它绝不会被发送"
+msgstr "旧名称：note: 和 comment: 一样，写一条批注"
 
 #. js-lingui-explicit-id
 msgid "verb.open"
@@ -10271,9 +10312,9 @@ msgstr "{command}，房间编号在前，名称在后"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotes"
-msgstr "写一条引用它们的笔记"
+msgstr "写一条引用它们的批注"
 
-#. {command} is note:"…", which stays English
+#. {command} is comment:"…", which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.noteQuotesHow"
 msgstr "选中这些卡片，然后输入 {command}"

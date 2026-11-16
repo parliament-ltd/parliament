@@ -173,7 +173,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
     marks: [], models: [], sources: [], cost: null, words: '',
     collections: [...new Set([...(held.get(`mark:${store}:${r.id}`) ?? []), ...(chatId ? chatIn(chatId) : [])])],
   })
-  for (const n of notes.filter(numbered)) rows.push(marking('note', 'notes', n, n.text, n.conversationId))
+  // A comment on words carries them, to show above its own (C301 (c)).
+  for (const n of notes.filter(numbered)) rows.push({ ...marking('note', 'notes', n, n.text, n.conversationId), passage: typeof n.passage === 'string' && n.passage ? n.passage : null })
   for (const h of highlights.filter(numbered)) rows.push(marking(h.kind === 'quote' ? 'quote' : 'term', 'highlights', h, h.text, h.conversationId))
   for (const q of quotes.filter(numbered)) rows.push(marking('quote', 'pins', q, q.content, q.targetConversationId))
   // Edits and asks (C220): what a card and a row show, read as text.

@@ -23,8 +23,8 @@ describe("the markup menu's settings (C301 (b))", () => {
   it('gives the shell a class for each kind hidden in the text', () => {
     expect(hiddenClasses(showOf())).toBe('')
     expect(hiddenClasses(showOf({ edits: false, prompts: false }))).toBe(' hide-edits hide-prompts')
-    // Comments are not in the text yet (C301 (c)).
-    expect(hiddenClasses(showOf({ comments: false }))).toBe('')
+    // Comments are drawn in the text now (C301 (c)), so they hide too.
+    expect(hiddenClasses(showOf({ comments: false }))).toBe(' hide-comments')
   })
 })
 

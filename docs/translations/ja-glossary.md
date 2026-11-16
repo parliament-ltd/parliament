@@ -28,6 +28,7 @@
 - answer → 回答 (verb 答える). What a model or a source gives to a question: 情報源からの回答, 最初の回答. Kept apart from 返答 because the English keeps the two apart.
 - marking → マーキング. The study word for marking passages; マーク alone is too vague, and 倍率 already takes the cost "marks".
 - note → メモ. As Apple's Notes (メモ).
+- comment → コメント (C301 (c), 15 November: notes became comments, and every line that said メモ of one now says コメント; the type: word is comment). A tell: note stays メモ.
 - keyword (term) → キーワード
 - highlight → ハイライト
 - quote → 引用. "Cited" sources become 参照した情報源, to keep 引用 for quotes.
