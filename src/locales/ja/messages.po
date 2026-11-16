@@ -4569,10 +4569,26 @@ msgstr "カードについてのチャットには{provider}のキーが必要�
 msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, other {{nums}は引用で、これまでモデルには送っていません。今回だけ、その言葉を一緒に送ります}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnly"
+msgstr "{count, plural, other {入力なし：Enterで、待っているものだけを{nums}に送ります}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyCheap"
+msgstr "{count, plural, other {入力なし：Enterで、待っているものだけを{nums}に送ります：送信に合計{cost}未満}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyTotal"
+msgstr "{count, plural, other {入力なし：Enterで、待っているものだけを{nums}に送ります：送信に合計{cost}}}"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptBranchRunning"
 msgstr "{address}は実行中です。stop:{address} で止めるか、終わるまで待ってください"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchSourceWaits"
+msgstr "{address}は{source}が答え、そこで待っているものは何も読みません。リストで{address}のチェックを外すか、プロンプトを入力してください"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -4617,6 +4633,10 @@ msgid "enter.promptEditsGo"
 msgstr "一緒に1回だけ伝えるもの：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}・{name}が読みます"
 
 #. js-lingui-explicit-id
+msgid "enter.promptEditsGoIn"
+msgstr "{address}へ1回だけ伝えるもの：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}・{name}が読みます"
+
+#. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
 msgstr "入力なし：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}だけを{name}に伝えます"
 
@@ -4632,6 +4652,10 @@ msgstr "{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
 msgstr "{source}は{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}を読みません。キーがあればモデルが読みます：api:"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWaitIn"
+msgstr "{address}では、{source}は{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}を読みません"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -8802,6 +8826,57 @@ msgstr "幅{width}、このウインドウ"
 #. js-lingui-explicit-id
 msgid "screensMap.window"
 msgstr "別ウインドウ"
+
+#. js-lingui-explicit-id
+msgid "sendList.edit"
+msgstr "編集"
+
+#. js-lingui-explicit-id
+msgid "sendList.fold"
+msgstr "リストを閉じる"
+
+#. What goes to one branch: your typed words, its prompts in the text, its edits
+#. js-lingui-explicit-id
+msgid "sendList.goes"
+msgstr "{words, select, yes {入力した言葉} other {}}{sep, select, yes {、} other {}}{prompts, plural, =0 {} other {プロンプト#件}}{both, select, yes {と} other {}}{edits, plural, =0 {} other {編集#件}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.held"
+msgstr "{count, plural, other {#件を保留}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.here"
+msgstr "表示中"
+
+#. js-lingui-explicit-id
+msgid "sendList.nothing"
+msgstr "待っているものはありません"
+
+#. js-lingui-explicit-id
+msgid "sendList.on"
+msgstr "「{passage}」に"
+
+#. js-lingui-explicit-id
+msgid "sendList.requests"
+msgstr "{count, plural, =0 {まだ送るものはありません} other {リクエスト#件}}"
+
+#. At the end of the line under the bar: opens the list of what Enter sends, by branch
+#. js-lingui-explicit-id
+msgid "sendList.see"
+msgstr "送るものを見る"
+
+#. js-lingui-explicit-id
+msgid "sendList.tickToSend"
+msgstr "チェックすると、入力した言葉をここにも送ります"
+
+#. js-lingui-explicit-id
+msgid "sendList.title"
+msgstr "Enterで送るもの"
+
+#. A prompt or edit held back: it waits for a later Enter
+#. js-lingui-explicit-id
+msgid "sendList.waits"
+msgstr "待機"
 
 #. The name of the app
 #. js-lingui-explicit-id

@@ -1508,6 +1508,26 @@ export function promptPreview(text, target = {}) {
   const r = target.reader
   const reader = r && toModel(r) && !r.needsKey && !r.later && !r.gone && !r.unchecked ? r : null
   const readerTokens = () => Math.ceil(((target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0)) / CHARS_PER_TOKEN)
+  // Several branches, each carrying its own on (C174), with what waits in
+  // each (C301 (d), the list): what goes to each, and who reads it.
+  const branches = Array.isArray(target.toMany) && target.toMany.length > 1 && Array.isArray(target.branchWaits) ? target.branchWaits : null
+  const goingBranches = branches ? branches.filter((b) => b.prompts + b.edits > 0) : []
+  const whoIn = (b) => target.many?.[target.toMany.indexOf(b.address)] ?? null
+  const branchLine = (b) => {
+    const who = whoIn(b)
+    const values = { edits: b.edits, asks: b.prompts, total: b.edits + b.prompts, both: b.edits && b.prompts ? 'yes' : 'no', address: b.address }
+    return toModel(who) ? { message: 'promptEditsGoIn', values: { ...values, name: who?.name ?? b.name } } : { message: 'promptEditsWaitIn', values: { ...values, source: who?.name ?? b.name } }
+  }
+  if (goingBranches.length && !String(text ?? '').trim() && !target.streaming) {
+    // Nothing typed: what waits goes, to each branch with something going.
+    const source = goingBranches.find((b) => !toModel(whoIn(b)))
+    if (source) return { ready: false, says: { message: 'promptBranchSourceWaits', values: { address: source.address, source: whoIn(source)?.name ?? source.name } } }
+    const chars = Math.max(1, ...goingBranches.map((b) => b.chars ?? 1))
+    const p = manyPreview('·'.repeat(chars), { ...target, many: goingBranches.map(whoIn), toMany: goingBranches.map((b) => b.address) })
+    if (!p.ready || !p.says) return p
+    const head = { promptToMany: 'promptBranchesOnly', promptToManyTotal: 'promptBranchesOnlyTotal', promptToManyCheap: 'promptBranchesOnlyCheap' }[p.says.message] ?? 'promptBranchesOnly'
+    return { ...p, editsOnly: true, says: { ...p.says, message: head, also: [...goingBranches.map(branchLine), ...(p.says.also ?? [])] } }
+  }
   if (edits && !String(text ?? '').trim() && !target.streaming && !(Array.isArray(target.many) && target.many.length > 1)) {
     // Enter on an empty field sends just the edits and asks (C216 (e)).
     const who = target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
@@ -1532,7 +1552,9 @@ export function promptPreview(text, target = {}) {
   // one being viewed is not it.
   if (!p.ready || !p.says) return p
   const lines = []
-  if (edits) {
+  // With your words to several branches: what goes to each with them (C301 (d)).
+  if (goingBranches.length) for (const b of goingBranches) lines.push(branchLine(b))
+  else if (edits) {
     const first = Array.isArray(target.many) && target.many.length > 1 ? target.many[0] : target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
     lines.push(toModel(first)
       ? { message: 'promptEditsGo', values: { ...what, name: first.name ?? '' } }

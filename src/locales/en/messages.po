@@ -4569,10 +4569,26 @@ msgstr "A chat about cards needs a key for {provider}. api: adds one"
 msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} is a quote, kept from models until now: its words go along this once} other {{nums} are quotes, kept from models until now: their words go along this once}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnly"
+msgstr "{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyCheap"
+msgstr "{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}: under {cost} in all to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyTotal"
+msgstr "{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}: {cost} in all to send}}"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptBranchRunning"
 msgstr "{address} is running. stop:{address}, or wait"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchSourceWaits"
+msgstr "{source} answers {address} and reads none of what waits there. Untick {address} in the list, or type a prompt"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -4617,6 +4633,10 @@ msgid "enter.promptEditsGo"
 msgstr "With it, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} · {name} reads them"
 
 #. js-lingui-explicit-id
+msgid "enter.promptEditsGoIn"
+msgstr "To {address}, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} · {name} reads them"
+
+#. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
 msgstr "Nothing typed: just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}, told to {name}"
 
@@ -4632,6 +4652,10 @@ msgstr "Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, y
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
 msgstr "{source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}. A model reads them once it has a key: api:"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWaitIn"
+msgstr "In {address}, {source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -8802,6 +8826,57 @@ msgstr "{width} wide, this window"
 #. js-lingui-explicit-id
 msgid "screensMap.window"
 msgstr "its own window"
+
+#. js-lingui-explicit-id
+msgid "sendList.edit"
+msgstr "edit"
+
+#. js-lingui-explicit-id
+msgid "sendList.fold"
+msgstr "fold the list"
+
+#. What goes to one branch: your typed words, its prompts in the text, its edits
+#. js-lingui-explicit-id
+msgid "sendList.goes"
+msgstr "{words, select, yes {your words} other {}}{sep, select, yes {, } other {}}{prompts, plural, =0 {} one {# prompt} other {# prompts}}{both, select, yes { and } other {}}{edits, plural, =0 {} one {an edit} other {# edits}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.held"
+msgstr "{count, plural, one {# held back} other {# held back}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.here"
+msgstr "on screen"
+
+#. js-lingui-explicit-id
+msgid "sendList.nothing"
+msgstr "nothing waits"
+
+#. js-lingui-explicit-id
+msgid "sendList.on"
+msgstr "on “{passage}”"
+
+#. js-lingui-explicit-id
+msgid "sendList.requests"
+msgstr "{count, plural, =0 {nothing to send yet} one {# request} other {# requests}}"
+
+#. At the end of the line under the bar: opens the list of what Enter sends, by branch
+#. js-lingui-explicit-id
+msgid "sendList.see"
+msgstr "see what goes"
+
+#. js-lingui-explicit-id
+msgid "sendList.tickToSend"
+msgstr "tick to send your words here too"
+
+#. js-lingui-explicit-id
+msgid "sendList.title"
+msgstr "What Enter sends"
+
+#. A prompt or edit held back: it waits for a later Enter
+#. js-lingui-explicit-id
+msgid "sendList.waits"
+msgstr "waits"
 
 #. The name of the app
 #. js-lingui-explicit-id

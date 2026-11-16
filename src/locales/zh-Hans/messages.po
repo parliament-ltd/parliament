@@ -4569,10 +4569,26 @@ msgstr "关于卡片的对话需要 {provider} 的密钥。api: 可添加"
 msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, other {{nums} 是摘录，此前一直不发给模型；这一次会附上其文字}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnly"
+msgstr "{count, plural, other {未输入新内容：按 Enter 只把等待中的内容发给 {nums}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyCheap"
+msgstr "{count, plural, other {未输入新内容：按 Enter 只把等待中的内容发给 {nums}：发送费用共计不到 {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyTotal"
+msgstr "{count, plural, other {未输入新内容：按 Enter 只把等待中的内容发给 {nums}：发送费用共 {cost}}}"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptBranchRunning"
 msgstr "{address} 正在运行。请用 stop:{address} 停止它，或稍等"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchSourceWaits"
+msgstr "{address} 由 {source} 回答，它不会读取那里等待中的任何内容。请在列表中取消勾选 {address}，或输入一条提示词"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -4617,6 +4633,10 @@ msgid "enter.promptEditsGo"
 msgstr "随提示词附带，只告知一次：{edits, plural, =0 {} other {# 处编辑}}{both, select, yes {和 } other {}}{asks, plural, =0 {} other {# 条正文中的提示词}} · {name} 会读取它们"
 
 #. js-lingui-explicit-id
+msgid "enter.promptEditsGoIn"
+msgstr "发给 {address}，只告知一次：{edits, plural, =0 {} other {# 处编辑}}{both, select, yes {和 } other {}}{asks, plural, =0 {} other {# 条正文中的提示词}} · {name} 会读取它们"
+
+#. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
 msgstr "未输入新内容：只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}告知 {name}"
 
@@ -4632,6 +4652,10 @@ msgstr "你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
 msgstr "{source} 不会读取你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}。有了密钥后，模型会读取它们：api:"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWaitIn"
+msgstr "在 {address} 中，{source} 不会读取你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -8802,6 +8826,57 @@ msgstr "宽 {width}，此窗口"
 #. js-lingui-explicit-id
 msgid "screensMap.window"
 msgstr "独立窗口"
+
+#. js-lingui-explicit-id
+msgid "sendList.edit"
+msgstr "编辑"
+
+#. js-lingui-explicit-id
+msgid "sendList.fold"
+msgstr "收起列表"
+
+#. What goes to one branch: your typed words, its prompts in the text, its edits
+#. js-lingui-explicit-id
+msgid "sendList.goes"
+msgstr "{words, select, yes {你输入的文字} other {}}{sep, select, yes {、} other {}}{prompts, plural, =0 {} other {# 条提示词}}{both, select, yes {和} other {}}{edits, plural, =0 {} other {# 处编辑}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.held"
+msgstr "{count, plural, other {# 项暂缓}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.here"
+msgstr "正在显示"
+
+#. js-lingui-explicit-id
+msgid "sendList.nothing"
+msgstr "没有待发送的内容"
+
+#. js-lingui-explicit-id
+msgid "sendList.on"
+msgstr "针对“{passage}”"
+
+#. js-lingui-explicit-id
+msgid "sendList.requests"
+msgstr "{count, plural, =0 {还没有要发送的内容} other {# 个请求}}"
+
+#. At the end of the line under the bar: opens the list of what Enter sends, by branch
+#. js-lingui-explicit-id
+msgid "sendList.see"
+msgstr "查看要发送的内容"
+
+#. js-lingui-explicit-id
+msgid "sendList.tickToSend"
+msgstr "勾选后，你输入的文字也会发到这里"
+
+#. js-lingui-explicit-id
+msgid "sendList.title"
+msgstr "按 Enter 发送的内容"
+
+#. A prompt or edit held back: it waits for a later Enter
+#. js-lingui-explicit-id
+msgid "sendList.waits"
+msgstr "等待中"
 
 #. The name of the app
 #. js-lingui-explicit-id

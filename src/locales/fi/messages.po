@@ -4569,10 +4569,26 @@ msgstr "Korteista käytävä keskustelu tarvitsee avaimen palveluun {provider}. 
 msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} on lainaus, joka on tähän asti pidetty malleilta piilossa: sen sanat lähtevät mukaan tämän kerran} other {{nums} ovat lainauksia, jotka on tähän asti pidetty malleilta piilossa: niiden sanat lähtevät mukaan tämän kerran}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnly"
+msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter lähettää vain odottavat haaroihin {nums}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyCheap"
+msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter lähettää vain odottavat haaroihin {nums}: yhteensä alle {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchesOnlyTotal"
+msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter lähettää vain odottavat haaroihin {nums}: yhteensä {cost}}}"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptBranchRunning"
 msgstr "{address} on käynnissä. stop:{address} tai odota"
+
+#. js-lingui-explicit-id
+msgid "enter.promptBranchSourceWaits"
+msgstr "{source} vastaa haarassa {address} eikä lue mitään siellä odottavaa. Poista valinta {address} listasta tai kirjoita kehote"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -4617,6 +4633,10 @@ msgid "enter.promptEditsGo"
 msgstr "Mukana kertaalleen: {edits, plural, =0 {} one {# muokkaus} other {# muokkausta}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehote tekstissä} other {# kehotetta tekstissä}} · {name} lukee ne"
 
 #. js-lingui-explicit-id
+msgid "enter.promptEditsGoIn"
+msgstr "Haaraan {address}, kertaalleen: {edits, plural, =0 {} one {# muokkaus} other {# muokkausta}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehote tekstissä} other {# kehotetta tekstissä}} · {name} lukee ne"
+
+#. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
 msgstr "Ei kirjoitettua tekstiä: vain {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}, kerrotaan mallille {name}"
 
@@ -4632,6 +4652,10 @@ msgstr "Samaan aikaan mallille {name} {total, plural, one {menee} other {menee}}
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
 msgstr "{source} ei lue näitä: {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}. Malli lukee ne, kun sillä on avain: api:"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWaitIn"
+msgstr "Haarassa {address} {source} ei lue näitä: {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -8802,6 +8826,57 @@ msgstr "leveys {width}, tämä ikkuna"
 #. js-lingui-explicit-id
 msgid "screensMap.window"
 msgstr "oma ikkuna"
+
+#. js-lingui-explicit-id
+msgid "sendList.edit"
+msgstr "muokkaus"
+
+#. js-lingui-explicit-id
+msgid "sendList.fold"
+msgstr "taita lista"
+
+#. What goes to one branch: your typed words, its prompts in the text, its edits
+#. js-lingui-explicit-id
+msgid "sendList.goes"
+msgstr "{words, select, yes {sanasi} other {}}{sep, select, yes {, } other {}}{prompts, plural, =0 {} one {# kehote} other {# kehotetta}}{both, select, yes { ja } other {}}{edits, plural, =0 {} one {muokkaus} other {# muokkausta}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.held"
+msgstr "{count, plural, one {# pidätetty} other {# pidätetty}}"
+
+#. js-lingui-explicit-id
+msgid "sendList.here"
+msgstr "näytöllä"
+
+#. js-lingui-explicit-id
+msgid "sendList.nothing"
+msgstr "mikään ei odota"
+
+#. js-lingui-explicit-id
+msgid "sendList.on"
+msgstr "kohdassa ”{passage}”"
+
+#. js-lingui-explicit-id
+msgid "sendList.requests"
+msgstr "{count, plural, =0 {ei vielä lähetettävää} one {# pyyntö} other {# pyyntöä}}"
+
+#. At the end of the line under the bar: opens the list of what Enter sends, by branch
+#. js-lingui-explicit-id
+msgid "sendList.see"
+msgstr "katso, mitä lähtee"
+
+#. js-lingui-explicit-id
+msgid "sendList.tickToSend"
+msgstr "valitse, niin sanasi lähtevät tännekin"
+
+#. js-lingui-explicit-id
+msgid "sendList.title"
+msgstr "Mitä Enter lähettää"
+
+#. A prompt or edit held back: it waits for a later Enter
+#. js-lingui-explicit-id
+msgid "sendList.waits"
+msgstr "odottaa"
 
 #. The name of the app
 #. js-lingui-explicit-id

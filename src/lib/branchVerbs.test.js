@@ -75,6 +75,34 @@ describe('the Enter line among branches', () => {
       '2. Wikipedia, no key and no cost',
     ])
   })
+
+  // What waits in each branch, as the bar's list has it (C301 (d)).
+  const haiku = { id: 'claude-haiku-4-5', group: 'model', name: 'Haiku 4.5', price: { type: 'metered', inputPerMillion: 1, outputPerMillion: 5 } }
+  const waits = [
+    { chatId: 'a', address: '201a', name: 'Sonnet 5.5', prompts: 2, edits: 1, chars: 300 },
+    { chatId: 'b', address: '201b', name: 'Haiku 4.5', prompts: 1, edits: 0, chars: 100 },
+  ]
+  it('says what goes to each branch with your words, and who reads it', () => {
+    expect(words({ many: [sonnet, haiku], toMany: ['201a', '201b'], branchWaits: waits })).toEqual(expect.arrayContaining([
+      'To 201a, told once: 1 edit and 2 prompts in the text · Sonnet 5.5 reads them',
+      'To 201b, told once: 1 prompt in the text · Haiku 4.5 reads them',
+    ]))
+  })
+  it('with nothing typed, sends just what waits, to each branch with something going', () => {
+    const p = promptPreview('', { ...room, many: [sonnet, haiku], toMany: ['201a', '201b'], branchWaits: waits })
+    expect(p).toMatchObject({ ready: true, editsOnly: true })
+    const said = [say(i18n, p.says.message, p.says.values), ...p.says.also.map((x) => say(i18n, x.message, x.values))]
+    expect(said[0]).toBe('Nothing typed: Enter sends just what waits, to 201a and 201b: under $0.01 in all to send')
+    expect(said[1]).toBe('To 201a, told once: 1 edit and 2 prompts in the text · Sonnet 5.5 reads them')
+    // A branch with nothing going is not sent to.
+    const one = promptPreview('', { ...room, many: [sonnet, haiku], toMany: ['201a', '201b'], branchWaits: [waits[0], { ...waits[1], prompts: 0, chars: 0 }] })
+    expect(say(i18n, one.says.message, one.says.values)).toMatch(/^Nothing typed: Enter sends just what waits, to 201a/)
+  })
+  it('says a source reads none of what waits, and sends nothing', () => {
+    const p = promptPreview('', { ...room, many: [sonnet, wiki], toMany: ['201a', '201b'], branchWaits: waits })
+    expect(p.ready).toBe(false)
+    expect(say(i18n, p.says.message, p.says.values)).toBe('Wikipedia answers 201b and reads none of what waits there. Untick 201b in the list, or type a prompt')
+  })
 })
 
 describe('a prompt edited in place, asked again (stage 11, piece 2)', () => {

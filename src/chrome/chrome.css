@@ -1216,6 +1216,32 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell.hide-comments :is(.p-pair-host, .p-edit) .p-text .pm-cm-at { background: none; padding: 0; }
 .ch-shell.hide-comments :is(.p-pair-host, .p-edit) .p-text .pm-cm, .ch-shell.hide-comments .p-cm-msgs { display: none; }
 
+/* What Enter sends, by branch, above the field (C301 (d), the list;
+   parliament-prompts-list-v1.html). Each row is a button that runs to: or
+   hold:, its box ticked as the menus' are. */
+.ch-slist { margin: 0 0 6px; padding: 8px 12px 6px; background: var(--ch-surface); border: .5px solid var(--ch-border); border-radius: 12px; max-height: 40vh; overflow-y: auto; }
+.ch-slist-head { display: flex; align-items: baseline; gap: 8px; padding: 0 0 6px; }
+.ch-slist-head h3 { margin: 0; font: 600 12px var(--ch-sans); color: var(--ch-ink); }
+.ch-shell .ch-slist-head button.ch-slist-fold { margin-inline-start: auto; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
+.ch-slist-br { padding: 5px 0 3px; border-top: .5px solid var(--ch-border-2); }
+.ch-shell .ch-slist button.ch-slist-row, .ch-shell .ch-slist button.ch-slist-it { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 2px 0; text-align: start; font: 400 12.5px/1.45 var(--ch-sans); color: var(--ch-ink); }
+.ch-shell .ch-slist button.ch-slist-it { padding-inline-start: 22px; }
+.ch-slist-row .addr { font: 600 11px var(--ch-mono); }
+.ch-slist-row .who { font-weight: 600; }
+.ch-slist-row .what { color: var(--ch-ink-2); }
+.ch-shell .ch-slist .ch-slist-br.none button.ch-slist-row { color: var(--ch-ink-3); }
+.ch-slist-it .pl { flex: 0 1 auto; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ch-prompt); }
+.ch-slist-it .pl b { margin-inline-end: 3px; font: 600 10.5px var(--ch-mono); letter-spacing: -.02em; }
+.ch-slist-it .on-what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+.ch-slist-it .how { margin-inline-start: auto; flex: none; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+.ch-shell .ch-slist button.ch-slist-it.held, .ch-slist-it.held .pl { color: var(--ch-ink-3); }
+.ch-slist-it .el s { color: var(--ch-ink-3); }
+.ch-slist-it .el ins { color: var(--ch-you); text-decoration: underline; text-underline-offset: 2px; }
+.ch-slist-box { flex: none; position: relative; top: 2px; width: 13px; height: 13px; border: 1px solid var(--ch-soft); border-radius: 3px; background: var(--ch-surface); }
+.ch-slist-box.on { background: var(--ch-ink); border-color: var(--ch-ink); }
+.ch-slist-box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.ch-shell .ch-enter button.ch-enter-see { margin-inline-start: 4px; font: inherit; color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
+
 /* The menu's own (MarkupMenu.jsx): the count at its heading, Accept all and
    Reject all as the Collection's foot draws its buttons (C298), and a line. */
 .ch-markup-menu .ch-markup-count { margin-inline-start: 8px; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-transform: none; letter-spacing: 0; }

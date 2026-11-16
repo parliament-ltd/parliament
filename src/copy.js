@@ -1195,6 +1195,13 @@ export const COPY = {
     toSame: /*i18n*/ { id: 'enter.toSame', message: 'Your prompts go there already' },
     promptToBranch: /*i18n*/ { id: 'enter.promptToBranch', message: 'It carries {address} on, and the room moves to it' },
     promptCarriesOn: /*i18n*/ { id: 'enter.promptCarriesOn', message: 'It carries {line} on, not the reply you are viewing. open:{viewed} carries that one on in a room of its own', comment: 'Commands stay English' },
+    // What waits in several branches, as the bar's list has it (C301 (d)).
+    promptEditsGoIn: /*i18n*/ { id: 'enter.promptEditsGoIn', message: 'To {address}, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} · {name} reads them' },
+    promptEditsWaitIn: /*i18n*/ { id: 'enter.promptEditsWaitIn', message: 'In {address}, {source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}' },
+    promptBranchesOnly: /*i18n*/ { id: 'enter.promptBranchesOnly', message: '{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}}}' },
+    promptBranchesOnlyTotal: /*i18n*/ { id: 'enter.promptBranchesOnlyTotal', message: '{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}: {cost} in all to send}}' },
+    promptBranchesOnlyCheap: /*i18n*/ { id: 'enter.promptBranchesOnlyCheap', message: '{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}: under {cost} in all to send}}' },
+    promptBranchSourceWaits: /*i18n*/ { id: 'enter.promptBranchSourceWaits', message: '{source} answers {address} and reads none of what waits there. Untick {address} in the list, or type a prompt' },
     promptToMany: /*i18n*/ { id: 'enter.promptToMany', message: '{count, plural, other {Enter sends this to {nums}, each carrying its own branch on}}' },
     promptToManyTotal: /*i18n*/ { id: 'enter.promptToManyTotal', message: '{count, plural, other {Enter sends this to {nums}, each carrying its own branch on: {cost} in all to send}}' },
     promptToManyCheap: /*i18n*/ { id: 'enter.promptToManyCheap', message: '{count, plural, other {Enter sends this to {nums}, each carrying its own branch on: under {cost} in all to send}}' },
@@ -1501,6 +1508,22 @@ export const COPY = {
   },
 
   // The markup menu (C301 (b); parliament-markup-v1.html), where calm: was.
+  // What Enter sends, by branch, above the bar's field (C301 (d), the list).
+  sendList: {
+    title: /*i18n*/ { id: 'sendList.title', message: 'What Enter sends' },
+    requests: /*i18n*/ { id: 'sendList.requests', message: '{count, plural, =0 {nothing to send yet} one {# request} other {# requests}}' },
+    fold: /*i18n*/ { id: 'sendList.fold', message: 'fold the list' },
+    see: /*i18n*/ { id: 'sendList.see', message: 'see what goes', comment: 'At the end of the line under the bar: opens the list of what Enter sends, by branch' },
+    goes: /*i18n*/ { id: 'sendList.goes', message: '{words, select, yes {your words} other {}}{sep, select, yes {, } other {}}{prompts, plural, =0 {} one {# prompt} other {# prompts}}{both, select, yes { and } other {}}{edits, plural, =0 {} one {an edit} other {# edits}}', comment: 'What goes to one branch: your typed words, its prompts in the text, its edits' },
+    nothing: /*i18n*/ { id: 'sendList.nothing', message: 'nothing waits' },
+    here: /*i18n*/ { id: 'sendList.here', message: 'on screen' },
+    held: /*i18n*/ { id: 'sendList.held', message: '{count, plural, one {# held back} other {# held back}}' },
+    tickToSend: /*i18n*/ { id: 'sendList.tickToSend', message: 'tick to send your words here too' },
+    on: /*i18n*/ { id: 'sendList.on', message: 'on “{passage}”' },
+    waits: /*i18n*/ { id: 'sendList.waits', message: 'waits', comment: 'A prompt or edit held back: it waits for a later Enter' },
+    edit: /*i18n*/ { id: 'sendList.edit', message: 'edit' },
+  },
+
   markupMenu: {
     title: /*i18n*/ { id: 'markupMenu.title', message: 'Markup' },
     mode: /*i18n*/ { id: 'markupMenu.mode', message: 'Mode' },

@@ -32,7 +32,8 @@ function Parts({ parts }) {
  *   then does the line end with how to leave (C291 (b)): after that, Esc is
  *   a row of ?, said once
  */
-export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false, learning = true }) {
+// see: opens the bar's list of what Enter sends, by branch (C301 (d)), "on a click on the line".
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false, learning = true, see = null }) {
   const { i18n } = useLingui()
   // What Enter will do, in the language a language: line names, once its
   // words are loaded (C184); until then, in the page's.
@@ -104,6 +105,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   return (
     <div className={`ch-enter${hidden ? ' hide' : ''}`} aria-live="polite" aria-hidden={hidden ? 'true' : undefined}>
       <Parts parts={parts} />
+      {see && <button type="button" className="ch-enter-see" onMouseDown={(e) => e.preventDefault()} onClick={see}>{i18n._(COPY.sendList.see)}</button>}
     </div>
   )
 }

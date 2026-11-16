@@ -22,6 +22,7 @@ import AnswerPicker from './AnswerPicker'
 import ReplyPicker from './ReplyPicker'
 import FrameworkPicker from './FrameworkPicker'
 import MarkupMenu from './MarkupMenu'
+import SendList from './SendList'
 import { step as stepBranch } from '../stores/branchView'
 import { useVoiceInput } from '../hooks/useVoiceInput'
 import { formatSize } from '../lib/fileUpload'
@@ -62,7 +63,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, sendList = null, onSeeList = null, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -420,6 +421,10 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   return (
     <div className={className} ref={root}>
       <div className="ch-dock-in">
+        {/* What Enter sends, by branch, above the field (C301 (d), the list). */}
+        {sendList && field.mode === 'prompt' && !folded && (
+          <SendList rows={sendList.rows} words={Boolean(field.text.prompt?.trim())} onBranch={sendList.onBranch} onItem={sendList.onItem} onFold={sendList.onFold} />
+        )}
         <div className="ch-frow">
         <Field
           ref={input}
@@ -469,7 +474,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             ))}
           </div>
         )}
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} see={onSeeList && field.mode === 'prompt' ? onSeeList : null} />
         {/* Extra screen detected (C259 (g)): once, under the field. */}
         {note && !folded && (
           <p className="ch-snote ch-marg">
