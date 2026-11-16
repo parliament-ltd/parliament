@@ -1403,10 +1403,6 @@ msgid "collection.askTakenBack"
 msgstr "取り消し済み"
 
 #. js-lingui-explicit-id
-msgid "collection.by"
-msgstr "並べ替え"
-
-#. js-lingui-explicit-id
 msgid "collection.card"
 msgstr "{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} edit {編集{num}} ask {プロンプト{num}} suggestion {提案{num}} other {{num}}}"
 
@@ -1663,6 +1659,15 @@ msgid "collection.shown"
 msgstr "{count, plural, =0 {表示中のカードなし} other {カード#枚を表示中}}"
 
 #. js-lingui-explicit-id
+msgid "collection.sortBy"
+msgstr "並べ替え"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.sortFoot"
+msgstr "バーの sort:yours、sort:source、sort:newest でも同じことができます"
+
+#. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "出典"
 
@@ -1763,9 +1768,10 @@ msgstr "取り消す"
 msgid "collection.undoEdit"
 msgstr "取り消す"
 
+#. A collection with no name of its own, after the word Collection (C302 (c))
 #. js-lingui-explicit-id
 msgid "collection.untitled"
-msgstr "無題のコレクション"
+msgstr "無題"
 
 #. js-lingui-explicit-id
 msgid "collection.writtenHere"

@@ -1403,10 +1403,6 @@ msgid "collection.askTakenBack"
 msgstr "kumottu"
 
 #. js-lingui-explicit-id
-msgid "collection.by"
-msgstr "lajittelu"
-
-#. js-lingui-explicit-id
 msgid "collection.card"
 msgstr "{kind, select, note {kommentti {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} edit {muokkaus {num}} ask {kehote {num}} suggestion {ehdotus {num}} other {{num}}}"
 
@@ -1663,6 +1659,15 @@ msgid "collection.shown"
 msgstr "{count, plural, =0 {ei kortteja näkyvissä} one {# kortti näkyvissä} other {# korttia näkyvissä}}"
 
 #. js-lingui-explicit-id
+msgid "collection.sortBy"
+msgstr "Järjestys"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.sortFoot"
+msgstr "sort:yours, sort:source ja sort:newest tekevät saman palkista"
+
+#. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "lähde"
 
@@ -1763,9 +1768,10 @@ msgstr "kumoa"
 msgid "collection.undoEdit"
 msgstr "kumoa"
 
+#. A collection with no name of its own, after the word Collection (C302 (c))
 #. js-lingui-explicit-id
 msgid "collection.untitled"
-msgstr "Nimetön kokoelma"
+msgstr "Nimetön"
 
 #. js-lingui-explicit-id
 msgid "collection.writtenHere"

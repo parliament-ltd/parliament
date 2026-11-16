@@ -670,8 +670,8 @@
 /* The Collection (stage 6, piece 6; collection board v3; C144): cards, not a
    table. A keyword, quote, highlight or message reads as a quotation; a
    note as plain text. A card for something erased takes a dashed rule. */
-.ch-col-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 10px 16px 4px; }
-.ch-col-name { font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
+/* The collection shown, in the board's head line, as a room's title is (C302 (c)). */
+.ch-chead .ch-col-name { color: var(--ch-ink-2); }
 .ch-shell .ch-col-from { padding: 0; color: var(--ch-ink-2); text-decoration: underline dotted; text-underline-offset: 3px; font: 400 var(--ch-t-id) var(--ch-mono); font-style: normal; }
 .ch-shell .ch-col-from:hover { color: var(--ch-ink); }
 .ch-col-count { margin-inline-start: 10px; }
@@ -683,15 +683,19 @@
 .ch-pk-item.on .box { background: var(--ch-ink); border-color: var(--ch-ink); color: var(--ch-surface); }
 .ch-pk-item .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ch-pk-foot { margin: 6px 2px 2px; }
-.ch-col-tabs { display: flex; gap: 16px; padding: 6px 16px 0; border-bottom: 1px solid var(--ch-divider); overflow-x: auto; }
+/* The tabs, and the order's drop-down at their right (C302 (b)). */
+.ch-col-tabrow { display: flex; align-items: flex-end; gap: 12px; padding: 0 16px; border-bottom: 1px solid var(--ch-divider); }
+.ch-col-tabs { display: flex; gap: 16px; padding: 6px 0 0; min-width: 0; overflow-x: auto; }
+.ch-col-sort { position: relative; flex: none; margin-inline-start: auto; padding-bottom: 7px; }
+.ch-shell .ch-col-sort button.ch-col-sort-open { padding: 0; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); white-space: nowrap; }
+.ch-shell .ch-col-sort button.ch-col-sort-open b { font-weight: 400; color: var(--ch-ink); }
+.ch-shell .ch-col-sort button.ch-col-sort-open:hover { color: var(--ch-ink); }
+.ch-col-sort-menu { position: absolute; z-index: 40; inset-inline-end: 0; top: calc(100% + 4px); width: 240px; }
+.ch-col-sort-menu .ch-ref { margin: 0; }
 .ch-shell .ch-col-tabs button { padding: 2px 0 7px; border-bottom: 2px solid transparent; color: var(--ch-ink-3); font: 500 12px var(--ch-sans); white-space: nowrap; }
 .ch-shell .ch-col-tabs button:hover, .ch-shell .ch-col-tabs button.on { color: var(--ch-ink); }
 .ch-shell .ch-col-tabs button.on { border-bottom-color: var(--ch-ink); }
 .ch-col-tabs .n { font: 500 10px var(--ch-mono); margin-inline-start: 4px; opacity: .8; }
-.ch-col-tools { display: flex; gap: 8px; justify-content: flex-end; padding: 6px 16px 2px; }
-.ch-shell .ch-col-tools button { padding: 0; }
-.ch-shell .ch-col-tools button:hover { color: var(--ch-ink); }
-.ch-shell .ch-col-tools button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 3px; }
 /* Only the cards scroll; the head, tabs and orders stay in view. */
 .ch-collection > * { flex: none; }
 .ch-collection > .ch-col-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
@@ -743,7 +747,8 @@
 .ch-mk-st { color: var(--ch-ink); }
 .ch-col-markup { margin-inline-start: auto; display: inline-flex; gap: 6px; align-items: baseline; }
 .ch-shell .ch-col-markup button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
-.ch-col-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 4px 0 2px; font-style: italic; }
+/* Under the tabs, centred, clear of the board's edge (C302 (c)). */
+.ch-col-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; padding: 6px 16px 2px; font-style: italic; }
 .ch-col-legend s { color: var(--ch-ink-3); }
 .ch-col-legend ins { text-decoration: none; }
 .ch-col-legend ins.l-you { color: var(--ch-you); text-decoration: underline; text-underline-offset: 2px; }

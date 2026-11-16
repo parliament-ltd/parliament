@@ -5,6 +5,7 @@ import { dayOf } from './when'
 import { WORDED, selectionOf, actCommand, sharedActs } from '../lib/cardActs'
 import { isChangeRow } from '../lib/recordsFilter'
 import { InForce } from './AlmanacBoard'
+import { MenuPanel, MenuGroup, MenuRow } from './Menu'
 
 // The Collection (refactor-plan.md, stage 6, piece 6; collection board v3;
 // the editing spec; C139, C144): cards, not a table. Markings are read, not
@@ -44,6 +45,42 @@ const ORDERS = [['yours', COPY.collections.yours], ['source', COPY.collections.s
 const ADD = (num) => `add:${num}`
 const RM = (num) => `rm:${num}`
 const QUOTED = new Set(['term', 'quote', 'highlight', 'message'])
+
+/**
+ * The order of the cards, in a drop-down at the right of the tabs (C302 (b);
+ * Stefan, 15 November): your order, by source, or by date. A click picks one
+ * and closes it; Escape or a click outside closes it.
+ */
+function SortMenu({ sort, onSort }) {
+  const { i18n } = useLingui()
+  const [open, setOpen] = useState(false)
+  const box = useRef(null)
+  useEffect(() => {
+    if (!open) return undefined
+    const away = (e) => { if (box.current && !box.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('pointerdown', away, true)
+    return () => document.removeEventListener('pointerdown', away, true)
+  }, [open])
+  const now = ORDERS.find(([k]) => k === sort) ?? ORDERS[0]
+  return (
+    <div className="ch-col-sort" ref={box}>
+      <button type="button" className="ch-col-sort-open" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)}>
+        {i18n._(COPY.collections.sortBy)} <b>{i18n._(now[1])}</b> ▾
+      </button>
+      {open && (
+        <div className="ch-col-sort-menu">
+          <MenuPanel title={i18n._(COPY.collections.sortBy)} foot={i18n._(COPY.collections.sortFoot)} onClose={() => setOpen(false)}>
+            <MenuGroup>
+              {ORDERS.map(([k, word]) => (
+                <MenuRow key={k} round on={now[0] === k} label={i18n._(word)} onClick={() => { onSort(k); setOpen(false) }} />
+              ))}
+            </MenuGroup>
+          </MenuPanel>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function Card({ card, under, onWrite, picked, onPick, onFind, rowOf }) {
   const { i18n } = useLingui()
@@ -387,6 +424,20 @@ export default function CollectionBoard({ collection, collections, label, entrie
     return () => clearTimeout(t)
   }, [fresh])
 
+  // The head, on one line as a room's is (C302 (c)): Collection, the one
+  // shown, and where its cards come from, a click away from the list.
+  const head = collection && (
+    <>
+      <span className="ch-marg ch-aside ch-col-name" dir="auto">{label(collection)}</span>
+      <span className="ch-marg ch-aside ch-sep" aria-hidden="true">·</span>
+      <span className="ch-marg ch-aside">
+        {i18n._(COPY.collections.from)}{' '}
+        <button type="button" className="ch-col-from" aria-expanded={picking} title={i18n._(COPY.collections.fromHelp)} onClick={() => setPicking((p) => !p)}>
+          {sources.length ? sources.map((s) => s.num).join(', ') : i18n._(COPY.collections.fromNothing)}
+        </button>
+      </span>
+    </>
+  )
   let body
   if (!collection) body = <p className="ch-marg ch-alm-note">{i18n._(COPY.collections.none)}</p>
   else {
@@ -415,15 +466,6 @@ export default function CollectionBoard({ collection, collections, label, entrie
       : <p className="ch-marg ch-alm-note">{i18n._(filtered?.line.length ? C.noneMatchFiltered : searching ? COPY.collections.noneMatch : collection.items.length ? COPY.collections.emptyHeld : COPY.collections.empty)}</p>
     body = (
       <>
-        <div className="ch-col-head">
-          <span className="ch-col-name" dir="auto">{label(collection)}</span>
-          <span className="ch-marg">
-            {i18n._(COPY.collections.from)}{' '}
-            <button type="button" className="ch-col-from" aria-expanded={picking} title={i18n._(COPY.collections.fromHelp)} onClick={() => setPicking((p) => !p)}>
-              {sources.length ? sources.map((s) => s.num).join(', ') : i18n._(COPY.collections.fromNothing)}
-            </button>
-          </span>
-        </div>
         {picking && <Picker pickable={pickable} sources={sources} onWrite={onWrite} />}
         {notHeld != null && (
           <p className="ch-marg ch-col-nothere">
@@ -431,19 +473,16 @@ export default function CollectionBoard({ collection, collections, label, entrie
             <button type="button" onClick={() => onWrite(`>${ADD(notHeld)}`)}>{ADD(notHeld)}</button>
           </p>
         )}
-        <div className="ch-col-tabs" role="tablist">
-          {tabs.map(([k, word]) => (
-            <button key={k} type="button" role="tab" aria-selected={view.tab === k} className={view.tab === k ? 'on' : undefined} onClick={() => onView({ tab: k })}>
-              {i18n._(word)}<span className={`n${k === 'suggestion' && waiting.length ? ' rust' : ''}`}>{counts[k] ?? 0}</span>
-            </button>
-          ))}
-        </div>
-        <div className="ch-col-tools ch-marg">
-          <span>{i18n._(COPY.collections.by)}</span>
-          {ORDERS.map(([k, word]) => (
-            <button key={k} type="button" className={view.sort === k ? 'on' : undefined} onClick={() => onView({ sort: k, asc: false })}>{i18n._(word)}</button>
-          ))}
-          {/* Its markup · clean switch went into the markup menu (C301 (b)): the Collection always shows its marks. */}
+        {/* The tabs, and at their right the order of the cards, in a drop-down (C302 (b)). */}
+        <div className="ch-col-tabrow">
+          <div className="ch-col-tabs" role="tablist">
+            {tabs.map(([k, word]) => (
+              <button key={k} type="button" role="tab" aria-selected={view.tab === k} className={view.tab === k ? 'on' : undefined} onClick={() => onView({ tab: k })}>
+                {i18n._(word)}<span className={`n${k === 'suggestion' && waiting.length ? ' rust' : ''}`}>{counts[k] ?? 0}</span>
+              </button>
+            ))}
+          </div>
+          <SortMenu sort={view.sort} onSort={(k) => onView({ sort: k, asc: false })} />
         </div>
         {filtered && <InForce search={filtered.search} line={filtered.line} count={shownCount} onClear={onClear} shown={C.shown} />}
         {changed && !clean ? (
@@ -469,6 +508,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
     >
       <header className="ch-chead">
         <h2>{i18n._(COPY.boards.collection)}</h2>
+        {head}
       </header>
       {collections.length > 1 && (
         <div className="ch-alm-saved ch-marg" role="group" aria-label={i18n._(COPY.collections.line)}>

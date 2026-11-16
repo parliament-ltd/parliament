@@ -817,6 +817,20 @@ export function planFocusSet(a, all, chat = null) {
  * focus turns off first, the space as it was, and the caller then brings
  * the board. Null when not focused or the board is on screen.
  */
+/**
+ * A board brought beside what is here, the bar left where it points (C302
+ * (a)): the Collection, when the first mark in a room's chat is made. null
+ * when it is on the page or in a window already, or while focus is on, which
+ * keeps the page to its boards.
+ */
+export function planBeside(a, board) {
+  if (a.focus || isOnPage(a, board) || isPopped(a, board)) return null
+  const next = copy(a)
+  place(next, board)
+  next.addressed = a.addressed
+  return next
+}
+
 export function outOfFocusFor(a, board) {
   if (!a.focus) return null
   if (a.columns.flat().includes(board) || a.popped.some((p) => p.board === board)) return null

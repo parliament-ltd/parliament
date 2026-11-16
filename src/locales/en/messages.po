@@ -1403,10 +1403,6 @@ msgid "collection.askTakenBack"
 msgstr "taken back"
 
 #. js-lingui-explicit-id
-msgid "collection.by"
-msgstr "by"
-
-#. js-lingui-explicit-id
 msgid "collection.card"
 msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {prompt {num}} suggestion {suggestion {num}} other {{num}}}"
 
@@ -1663,6 +1659,15 @@ msgid "collection.shown"
 msgstr "{count, plural, =0 {no cards shown} one {# card shown} other {# cards shown}}"
 
 #. js-lingui-explicit-id
+msgid "collection.sortBy"
+msgstr "Sort by"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.sortFoot"
+msgstr "sort:yours, sort:source and sort:newest do the same from the bar"
+
+#. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "source"
 
@@ -1763,9 +1768,10 @@ msgstr "undo"
 msgid "collection.undoEdit"
 msgstr "undo"
 
+#. A collection with no name of its own, after the word Collection (C302 (c))
 #. js-lingui-explicit-id
 msgid "collection.untitled"
-msgstr "Untitled collection"
+msgstr "Untitled"
 
 #. js-lingui-explicit-id
 msgid "collection.writtenHere"

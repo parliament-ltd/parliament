@@ -11,7 +11,7 @@ import { savedOf } from '../lib/savedArrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
+import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor, planBeside } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, nextAdvanced, showSteps, stepsShown, stepsMade, stepsKept, advancedNumbers, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -254,6 +254,10 @@ function backOnPage(a) {
 // being placed), brings it into view and marks it for a moment (C145 (c)).
 // Looks for the first selector for about two seconds, then takes any of
 // the others: a passage's marks can draw a moment after its message.
+// The marks a person makes in a room's text: the first one brings the
+// Collection beside the room (C302 (a)).
+const FIRST_MARKS = new Set(['term', 'note', 'edit', 'ask'])
+
 // onLater: told when only a later selector was found, as a comment's
 // message is when its words are no longer in it (C301 (c)).
 function flashWhenDrawn(selectors, tries = 60, onLater = null) {
@@ -759,23 +763,36 @@ export default function Shell() {
   // the strip names the new collection, and the Collection shows it. The
   // first edit or ask does too (C300; Stefan, 15 November: "nothing appears
   // in the collection until a highlight is made").
+  //
+  // The first mark in a room's chat, a highlight, edit, comment or prompt,
+  // also brings the Collection beside the room, once, with focus off (C302
+  // (a); Stefan, 15 November: "Yes, on the first mark"). After that it stays
+  // where it is put. The rows are read before the new mark reaches them.
   const rowsNow = useRef(null)
+  const broughtFor = useRef(new Set())
   useEffect(() => {
     if (!started) return undefined
     const onHighlight = async (e) => {
       const chatId = e.detail?.chatId
       if (typeof chatId !== 'string' || !db.current) return
+      const num = Number.isInteger(e.detail?.num) ? e.detail.num : null
+      const first = !broughtFor.current.has(chatId) && Array.isArray(rowsNow.current)
+        && !rowsNow.current.some((r) => r.chatId === chatId && FIRST_MARKS.has(r.kind) && r.num !== num)
+      if (first) broughtFor.current.add(chatId)
       const kept = await readCollections(db.current).catch(() => null)
-      if (!kept || kept.length) return
       const row = (rowsNow.current ?? []).find((r) => r.kind === 'chat' && r.chatId === chatId)
-      if (!row) return
-      const now = new Date().toISOString()
-      const fresh = newCollection({ id: crypto.randomUUID(), now })
-      const after = withRows(fresh, [row], now).next
-      try { await writeCollection(db.current, { id: fresh.id, before: null, after }) } catch { return }
-      setCollections(await readCollections(db.current).catch(() => []))
-      const a = current.current
-      commit({ ...a, context: { ...a.context, collection: fresh.id } })
+      if (kept && !kept.length && row) {
+        const now = new Date().toISOString()
+        const fresh = newCollection({ id: crypto.randomUUID(), now })
+        const after = withRows(fresh, [row], now).next
+        try { await writeCollection(db.current, { id: fresh.id, before: null, after }) } catch { return }
+        setCollections(await readCollections(db.current).catch(() => []))
+        const a = current.current
+        commit({ ...a, context: { ...a.context, collection: fresh.id } })
+      }
+      if (!first) return
+      const beside = planBeside(current.current, 'collection')
+      if (beside) commit(beside)
     }
     window.addEventListener('parliament-highlighted', onHighlight)
     window.addEventListener('parliament-marked', onHighlight)

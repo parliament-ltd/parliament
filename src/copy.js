@@ -2238,6 +2238,9 @@ export const COPY = {
     pickHelp: /*i18n*/ { id: 'collection.pickHelp', message: 'Writes {command} in the bar', comment: '{command} is add: or rm: with a number' },
     pickFoot: /*i18n*/ { id: 'collection.pickFoot', message: 'A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one comment, highlight or quote.', comment: 'add: and rm: stay English' },
     tabAll: /*i18n*/ { id: 'collection.tabAll', message: 'All' },
+    // The order of the cards, in a drop-down at the right of the tabs (C302 (b)).
+    sortBy: /*i18n*/ { id: 'collection.sortBy', message: 'Sort by' },
+    sortFoot: /*i18n*/ { id: 'collection.sortFoot', message: 'sort:yours, sort:source and sort:newest do the same from the bar', comment: 'Commands stay English' },
     tabHighlight: /*i18n*/ { id: 'collection.tabHighlight', message: 'Highlights' },
     tabTerm: /*i18n*/ { id: 'collection.tabTerm', message: 'Highlights' },
     tabQuote: /*i18n*/ { id: 'collection.tabQuote', message: 'Quotes' },
@@ -2301,7 +2304,6 @@ export const COPY = {
     legendRustIs: /*i18n*/ { id: 'collection.legendRustIs', message: 'Ripple’s suggestion' },
     legendSweepIs: /*i18n*/ { id: 'collection.legendSweepIs', message: 'an answer or a sweep' },
     notHeldHere: /*i18n*/ { id: 'collection.notHeldHere', message: 'The chat in the room, {num}, is not in this collection' },
-    by: /*i18n*/ { id: 'collection.by', message: 'by' },
     yours: /*i18n*/ { id: 'collection.yours', message: 'your order' },
     source: /*i18n*/ { id: 'collection.source', message: 'source' },
     date: /*i18n*/ { id: 'collection.date', message: 'date' },
@@ -2323,7 +2325,7 @@ export const COPY = {
     groupAdded: /*i18n*/ { id: 'collection.groupAdded', message: 'Added one by one' },
     count: /*i18n*/ { id: 'collection.count', message: '{count, plural, =0 {nothing} one {# card} other {# cards}}' },
     favorites: /*i18n*/ { id: 'collection.favorites', message: 'Favorites', comment: 'The collection favourites became (C20)' },
-    untitled: /*i18n*/ { id: 'collection.untitled', message: 'Untitled collection' },
+    untitled: /*i18n*/ { id: 'collection.untitled', message: 'Untitled', comment: 'A collection with no name of its own, after the word Collection (C302 (c))' },
     // Selecting cards and the four acts (piece 7; C145 (d)).
     select: /*i18n*/ { id: 'collection.select', message: 'Select {card}' },
     selected: /*i18n*/ { id: 'collection.selected', message: '{count} selected' },

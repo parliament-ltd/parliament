@@ -7,7 +7,7 @@ import { withoutWaiting, START,
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
-  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare,
+  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare, planBeside,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -263,6 +263,22 @@ describe('pop: and pop:back', () => {
     expect(a.bar).toEqual({ at: 'top', side: 'center', popped: true })
     expect(planPopBar(a, true)).toMatchObject({ next: null, says: { message: 'barPoppedAlready' } })
     expect(keep(planPopBar(a, false)).bar.popped).toBe(false)
+  })
+})
+
+describe('the Collection beside a room, on the first mark (C302 (a))', () => {
+  const room = () => keep(planRoom({ ...shipped('room'), id: SPACE }, 'c1'))
+  it('brings it beside, the bar still pointing at the room', () => {
+    const a = room()
+    const next = planBeside(a, 'collection')
+    expect(next.columns.flat()).toContain('collection')
+    expect(next.columns.flat()).toContain('room')
+    expect(next.addressed).toBe(a.addressed)
+  })
+  it('leaves the page as it is when the Collection is there already, or focus is on', () => {
+    const a = room()
+    expect(planBeside(planBeside(a, 'collection'), 'collection')).toBeNull()
+    expect(planBeside(keep(planFocus(a)), 'collection')).toBeNull()
   })
 })
 

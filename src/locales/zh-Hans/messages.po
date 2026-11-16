@@ -1403,10 +1403,6 @@ msgid "collection.askTakenBack"
 msgstr "已撤销"
 
 #. js-lingui-explicit-id
-msgid "collection.by"
-msgstr "按"
-
-#. js-lingui-explicit-id
 msgid "collection.card"
 msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} edit {编辑 {num}} ask {提示词 {num}} suggestion {建议 {num}} other {{num}}}"
 
@@ -1663,6 +1659,15 @@ msgid "collection.shown"
 msgstr "{count, plural, =0 {未显示卡片} other {已显示 # 张卡片}}"
 
 #. js-lingui-explicit-id
+msgid "collection.sortBy"
+msgstr "排序方式"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.sortFoot"
+msgstr "在输入栏中用 sort:yours、sort:source 和 sort:newest 也可以做到"
+
+#. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "来源"
 
@@ -1763,9 +1768,10 @@ msgstr "撤销"
 msgid "collection.undoEdit"
 msgstr "撤销"
 
+#. A collection with no name of its own, after the word Collection (C302 (c))
 #. js-lingui-explicit-id
 msgid "collection.untitled"
-msgstr "未命名合集"
+msgstr "未命名"
 
 #. js-lingui-explicit-id
 msgid "collection.writtenHere"
