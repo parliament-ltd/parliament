@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasks, rethought</title>
+<!--
+  C301 (g), redrawn (16 November) after Stefan tried the first build: a main
+  task with sub-tasks, each titled; who does a sub-task, a model or you; its
+  branches, each with its room or none; the runs and counts under the main
+  task. Tasks need no room. v1 kept as it was. Values from tokens.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --docket: #0E728D; --docket-tint: rgba(13, 148, 136, .10);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  a.l { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .right { margin-inline-start: auto; }
+  .body { padding: 4px 22px 16px; }
+
+  .tasks-list .row { display: grid; grid-template-columns: 40px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 9px 0; border-bottom: .5px solid var(--border-2); }
+  .tasks-list .row:last-child { border-bottom: none; }
+  .num { font: 600 11px var(--mono); color: var(--docket); }
+  .tasks-list .t { font: 600 14px var(--sans); }
+  .tasks-list .open .t { text-decoration: underline; text-underline-offset: 3px; }
+  .tasks-list .facts { grid-column: 2 / 4; }
+  .state { font: 600 10.5px var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+  .state.done { color: var(--ai); }
+  .state.waits { color: var(--prompt); }
+
+  .main-head { padding: 12px 0 10px; border-bottom: .5px solid var(--border-2); }
+  .main-head .line1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+  .main-head h3 { margin: 0; font: 400 20px/1.3 var(--serif); }
+  .sub { display: grid; grid-template-columns: 22px 18px 1fr auto; gap: 2px 8px; align-items: baseline; padding: 10px 0 9px; border-bottom: .5px solid var(--border-2); }
+  .sub .n { font: 400 var(--t-id) var(--mono); color: var(--ink-3); text-align: end; }
+  .sub .title { font: 600 14px var(--sans); }
+  .sub .words { grid-column: 3 / 5; font: 400 14px/1.5 var(--serif); color: var(--ink-2); }
+  .sub .who { grid-column: 3 / 5; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+  .sub.ticked .title, .sub.ticked .words { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--soft); }
+  .lead { font: 600 10.5px var(--mono); color: var(--prompt); }
+  .box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+  .chip { display: inline-flex; align-items: baseline; gap: 5px; padding: 1px 8px; border-radius: 10px; background: var(--docket-tint); font: 400 12px var(--sans); color: var(--ink-2); white-space: nowrap; }
+  .chip b { font: 600 10.5px var(--mono); color: var(--docket); }
+  .chip .st { font: 600 9.5px var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--ink-3); }
+  .chip .st.done { color: var(--ai); }
+  .chip .st.running { color: var(--you); }
+  .answer { grid-column: 3 / 5; margin-top: 4px; padding: 6px 10px; border-inline-start: 2px solid var(--ai); background: var(--subtle); border-radius: 0 8px 8px 0; font: 400 13.5px/1.5 var(--serif); color: var(--ink-2); }
+  .answer .by { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+
+  .details { margin-top: 14px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 700px) { .details { grid-template-columns: 1fr 1fr; } }
+  .details h4 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .details ul { list-style: none; margin: 0; padding: 0; font: 400 13px/1.7 var(--sans); }
+  .details li { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; border-bottom: .5px solid var(--border-2); }
+  .details li:last-child { border-bottom: none; }
+
+  .form { margin-top: 12px; padding: 12px 14px; border: .5px dashed var(--soft); border-radius: 12px; background: var(--subtle); }
+  .form .f { display: grid; grid-template-columns: 70px 1fr; gap: 6px 10px; align-items: baseline; padding: 4px 0; font: 400 13px var(--sans); }
+  .form .k { font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .03em; text-transform: uppercase; }
+  .form .in { border-bottom: .5px solid var(--soft); padding: 1px 0; color: var(--ink); }
+  .form .in.ph { color: var(--ink-3); }
+  .pick { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+  .opt { padding: 1px 8px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 12px var(--sans); }
+  .opt.on { border-color: var(--ink); }
+
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  pre { margin: 0; padding: 12px 14px; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; font: 400 12px/1.6 var(--mono); color: var(--ink-2); overflow-x: auto; white-space: pre-wrap; }
+  pre .add { color: var(--you); }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 780px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair h3 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Tasks, rethought</h1>
+    <p>C301 (g), redrawn after you tried the first build. What was a plan is a <b>main task</b>, numbered as before (207), with <b>sub-tasks</b>. Each has a title. A sub-task says who does it, a model or you, and goes to one or more branches, each with its own model and its own room, or no room at all. The runs and the counts sit under the main task.</p>
+    <p>Tasks need no room: the Tasks board lists every main task, and an answer shows under its sub-task. A room is chosen only where you want one. One small change to what is stored, in section 5.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · Every main task, one open</h2>
+    <p class="lede">The Tasks board lists your main tasks, newest first, each with how far along it is. A click opens one under the list; <code>new:task "Grant application"</code> makes one.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Tasks</h2><span class="marg right">3 main tasks</span></div>
+      <div class="body tasks-list">
+        <div class="row open"><span class="num">207</span><span class="t">Grant application</span><span class="state waits">waits for you</span><span class="facts marg">4 sub-tasks, 1 done · 2 branches · run 2</span></div>
+        <div class="row"><span class="num">203</span><span class="t">Moving house</span><span class="state">ready</span><span class="facts marg">5 sub-tasks, all yours · no room</span></div>
+        <div class="row"><span class="num">201</span><span class="t">Water tower history</span><span class="state done">done</span><span class="facts marg">3 sub-tasks · 3 branches · run 1</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · A main task, open</h2>
+    <p class="lede">Each sub-task: its number, a box if it is yours or <span class="lead">p&gt;</span> if a model does it, its title, its words, and the branches it goes to, each chip naming the branch, who answers there, its room and how it went. An answer shows under its sub-task, its first lines, with a link to the whole chat.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Tasks</h2><span class="marg right">207 · run 2 of 2</span></div>
+      <div class="body">
+        <div class="main-head">
+          <div class="line1"><span class="num">207</span><h3>Grant application</h3><span class="state waits">waits for you at 2</span></div>
+        </div>
+
+        <div class="sub">
+          <span class="n">1</span><span class="lead">p&gt;</span><span class="title">Draft the summary</span><span class="state done">done</span>
+          <span class="words">A one-page summary of the project from my notes, for the board</span>
+          <span class="who"><span class="chip"><b>207a</b>Sonnet 5.5 · Writing studio<span class="st done">done</span></span><span class="chip"><b>207b</b>Mistral Medium 3.5 · no room<span class="st done">done</span></span></span>
+          <div class="answer"><span class="by">207a, Sonnet 5.5:</span> The Fernwood Community Land Trust asks the board for a two-year grant of 48,000 to … <a class="l">open:214</a></div>
+        </div>
+        <div class="sub">
+          <span class="n">2</span><span class="box"></span><span class="title">Check the figures</span><span class="state waits">yours</span>
+          <span class="words">Go through the budget with Anna before anything else goes</span>
+          <span class="who marg">You · no room · the run waits for you here</span>
+        </div>
+        <div class="sub">
+          <span class="n">3</span><span class="lead">p&gt;</span><span class="title">Tighten to a page</span><span class="state">ready</span>
+          <span class="words">Keep the figures as they now stand</span>
+          <span class="who"><span class="chip"><b>207a</b>Sonnet 5.5 · Writing studio<span class="st">ready</span></span></span>
+        </div>
+        <div class="sub ticked">
+          <span class="n">4</span><span class="box on"></span><span class="title">Send it</span><span class="state done">done</span>
+          <span class="words">To the board, by Friday</span>
+          <span class="who marg">You · ticked 10:40</span>
+        </div>
+
+        <div class="details">
+          <div>
+            <h4>Runs</h4>
+            <ul>
+              <li><span>Run 2</span><span class="marg">today 10:12 · waits for you · about 1¢</span></li>
+              <li><span>Run 1</span><span class="marg">15 November · done · about 3¢</span><a class="l">open:run 1</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>About it</h4>
+            <ul>
+              <li><span>2 branches</span><span class="marg">207a Sonnet 5.5 in Writing studio · 207b Mistral Medium 3.5, no room</span></li>
+              <li><span>4 sub-tasks</span><span class="marg">2 by a model, 2 yours · 1 done</span></li>
+              <li><span>2 chats</span><span class="marg">214, 215</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>A sub-task that goes to two branches is one row with two chips: the same words go to both, each answered in its own branch, as a prompt to several does now. One that goes to one branch has one chip.</li>
+      <li>A sub-task of yours has no branch and no room: it is ticked, never sent. A run reaching it waits for you, as built.</li>
+      <li>The runs and the counts are listed under the main task, where the head said "run 1 of 1 · one branch, 2 tasks".</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · Adding a sub-task</h2>
+    <p class="lede">At the foot of a main task: a title, the words, who does it, and for a model, which branches. A branch is made here too: its model and its room, or none. What is chosen is said under the bar and taken back by <code>undo:</code>, as edits on the board are now.</p>
+    <div class="form">
+      <div class="f"><span class="k">Title</span><span class="in">Ask about deadlines</span></div>
+      <div class="f"><span class="k">Words</span><span class="in ph">What the model is asked, or a note for yourself</span></div>
+      <div class="f"><span class="k">Who</span><span class="pick"><span class="opt on">A model</span><span class="opt">You</span></span></div>
+      <div class="f"><span class="k">Branches</span><span class="pick"><span class="opt on">207a · Sonnet 5.5 · Writing studio</span><span class="opt">207b · Mistral Medium 3.5 · no room</span><span class="opt">+ a branch</span></span></div>
+    </div>
+    <div class="form" style="margin-top:10px">
+      <div class="f"><span class="k">Branch</span><span class="in">207c</span></div>
+      <div class="f"><span class="k">Model</span><span class="pick"><span class="opt on">Opus 5.5</span><span class="opt">Sonnet 5.5</span><span class="opt">Mistral Medium 3.5</span><span class="opt">Gemma 4, this computer</span><span class="opt">Wikipedia</span></span></div>
+      <div class="f"><span class="k">Room</span><span class="pick"><span class="opt on">No room</span><span class="opt">Writing studio</span><span class="opt">Quiet room</span></span></div>
+    </div>
+    <ul class="notes">
+      <li>From the bar the same is <code>new:subtask 207 "Ask about deadlines"</code>, <code>new:todo 207 "Check the figures"</code> for one of yours, and <code>new:branch 207 opus</code> with <code>room:207c "Writing studio"</code>.</li>
+      <li>No room: the branch's chat is made when it first runs and shows in Records; its answers show here, and <code>open:</code> on it shows it in an empty room. A room chosen later applies from its next run.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · The words</h2>
+    <p class="lede">Today's build says "list" and "task"; this says <b>task</b> for the numbered whole and <b>sub-task</b> for its rows, as you put it.</p>
+    <div class="two">
+      <pre>Enter opens task 207 on the Tasks board
+Enter adds sub-task 3 to 207, "Tighten to a page"
+207a waits for you at sub-task 2,
+"Check the figures"
+tick:207 2 ticks sub-task 2</pre>
+      <pre>new:task "Grant application"   (new:plan read)
+new:subtask 207 "Draft the summary"
+new:todo 207 "Check the figures"
+new:branch 207 opus
+room:207c "Writing studio"
+tick:207 2   (tick:207a 2 read)</pre>
+    </div>
+    <ul class="notes">
+      <li>A sub-task is numbered within its main task (207, sub-task 2), not within a branch, since one row may go to several branches.</li>
+      <li>In the other four languages, the same words change again, each glossary saying so.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · What is stored: shown before building</h2>
+    <p class="lede">The main task keeps its record and title (a docket). A sub-task stays a step in each branch it goes to, as a prompt to several is now; the steps of one sub-task share an id, and gain a title. Who does it and each branch's room are stored already.</p>
+    <div class="pair">
+      <div>
+        <h3>A step, now</h3>
+<pre>{
+  id: "s-7c1e…",
+  status: "ready",
+  model: "claude-sonnet-5-5",
+  prompt: "Keep the figures…",
+  group: "g-31…",
+  condition: null
+}</pre>
+      </div>
+      <div>
+        <h3>A sub-task's step</h3>
+<pre>{
+  id: "s-7c1e…",
+  status: "ready",
+  model: "claude-sonnet-5-5",
+  prompt: "Keep the figures…",
+<span class="add">  title: "Tighten to a page",</span>
+  group: "g-31…",
+  condition: null
+}</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><code>title</code>: optional, up to 200 characters. A step without one shows its first words, as now.</li>
+      <li><code>group</code> is the field a prompt to several already writes (C202): one sub-task across its branches. A step without one is a sub-task of its own.</li>
+      <li>A branch's room is the field each branch of a run has now (<code>room</code>, or null for none).</li>
+      <li>No migration. A restore checks <code>title</code>; backups carry it; older ones read as now; an older Parliament drops it and shows the words.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>The names:</b> a main task (<code>task 207</code>, <code>new:task</code>) and its sub-tasks (<code>sub-task 2</code>, <code>new:subtask</code>), in place of list and task; older words still read.</li>
+        <li><b>The board lists every main task,</b> one open under the list at a time.</li>
+        <li><b>A sub-task is one row</b> however many branches it goes to, a chip for each branch with its model and its room or none; a sub-task of yours has neither.</li>
+        <li><b>Answers show under their sub-task,</b> so a task needs no room; a room is chosen per branch, when wanted.</li>
+        <li><b>Runs and counts are listed under the main task.</b></li>
+        <li><b>The stored change:</b> <code>title</code> on a sub-task's step.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
