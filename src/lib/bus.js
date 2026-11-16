@@ -21,6 +21,7 @@ const SIGNALS = Object.freeze({
   changed: ['kind', 'op', 'num', 'id'], // a record was written; re-read it
   stop: ['scope', 'num', 'letter'],   // halt runs: scope 'all' | 'docket' | 'branch'
   locked: [],                         // the lock went on or off: reload (Lock Parliament)
+  alarms: [],                         // the alarms changed: read them again (C303 (a))
 })
 
 const FIELD_TYPES = Object.freeze({

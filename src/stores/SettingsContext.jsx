@@ -18,6 +18,10 @@ const DEFAULT_SETTINGS = {
   // How often to remind about backups (set:reminder; C182). Monthly is the
   // rule the reminder always had.
   backupReminder: 'monthly',
+  // Alarms (C303 (a)): kept on this device, never in a backup; the chime
+  // off with alarm:quiet.
+  alarms: [],
+  quietAlarms: false,
   // Warn before a costly run (set:warn; C203): an amount in dollars, or null for off.
   runWarn: null,
   lastBackup: null,

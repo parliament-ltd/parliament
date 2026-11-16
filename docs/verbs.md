@@ -35,6 +35,10 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `jump:242` | Scroll to a number on this board | `jump:242` | everywhere | no |
 | `tour:` | Show the welcome steps, put them away, or show the second list | `tour:`, `tour:off`, `tour:advanced` | everywhere | no |
 | `letter:` | Read the newest letter from the maker of Parliament, one by its number, or the list of them | `letter:`, `letter:1`, `letter:all` | everywhere | no |
+| `alarm:25m` | Set an alarm or a break after so much work, push one later, take one off, or show them | `alarm:`, `alarm:25m`, `alarm:25m tea`, `alarm:15:30 "Call Anna"`, `alarm:every 50m "Take a break"`, `alarm:5m 2`, `alarm:off 2`, `alarm:off`, `alarm:quiet` | everywhere | yes |
+| `dictionary:reluctant` | Look a word up: what it means, and the words that mean the same. Alone, the word selected in your text | `dictionary:reluctant`, `dictionary:` | everywhere | no |
+| `thesaurus:reluctant` | The words that mean the same as a word, beside what it means | `thesaurus:reluctant`, `thesaurus:` | everywhere | no |
+| `calc:48000*2/12` | Work out a sum, on the line under the bar | `calc:48000*2/12`, `calc:(1250+3400)*1.25` | everywhere | no |
 
 ## Start
 

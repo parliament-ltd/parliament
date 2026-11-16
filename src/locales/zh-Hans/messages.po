@@ -8,6 +8,160 @@ msgstr ""
 "Language: zh-Hans\n"
 
 #. js-lingui-explicit-id
+msgid "alarms.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.addPlus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.atHint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.bandAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.bandBreak"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.bandIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.everyHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.factsAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.factsEvery"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.factsIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldEvery"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldKind"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fiveMore"
+msgstr ""
+
+#. Rings at a time of day
+#. js-lingui-explicit-id
+msgid "alarms.kindAt"
+msgstr ""
+
+#. A break after so much work
+#. js-lingui-explicit-id
+msgid "alarms.kindEvery"
+msgstr ""
+
+#. A timer: rings in so long
+#. js-lingui-explicit-id
+msgid "alarms.kindIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.minutesHint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.namePlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.none"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "alarms.noneHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.noticeAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.noticeBreak"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.noticeIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.off"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.onlyOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.rang"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.rangAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.rangMissed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.stop"
+msgstr ""
+
+#. The strip’s label, written as the boards are
+#. js-lingui-explicit-id
+msgid "alarms.strip"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.switch"
+msgstr ""
+
+#. The tab’s title while an alarm rings out of sight
+#. js-lingui-explicit-id
+msgid "alarms.tabTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.takeOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "almanac.backupAtRisk"
 msgstr "此浏览器尚未同意长期保存你在这里创建的内容，可能会将其删除。请保留一份备份。"
 
@@ -711,6 +865,11 @@ msgstr "你的提示词"
 msgid "blocksBoard.toc.truncateAt"
 msgstr "截断于"
 
+#. Timers, times of day and breaks, set from the bar (C303 (a))
+#. js-lingui-explicit-id
+msgid "board.alarms"
+msgstr ""
+
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -735,6 +894,11 @@ msgstr "合集"
 #. js-lingui-explicit-id
 msgid "board.commands"
 msgstr "命令菜单"
+
+#. What a word means, and the words that mean the same (C303 (b))
+#. js-lingui-explicit-id
+msgid "board.dictionary"
+msgstr ""
 
 #. Prompts and to-dos set out in branches, to run and to tick (C131; C301 (g))
 #. js-lingui-explicit-id
@@ -1949,6 +2113,80 @@ msgid "count.steps"
 msgstr "{count, plural, other {# 项子任务}}"
 
 #. js-lingui-explicit-id
+msgid "dictionary.adjective"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.adverb"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.didYouMean"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.fromText"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.lookHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.looking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.meanings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.missing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.none"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "dictionary.noneHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.noSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.notFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.noun"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.opposite"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.putHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.same"
+msgstr ""
+
+#. The word lists’ name and licence, as they give them
+#. js-lingui-explicit-id
+msgid "dictionary.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.verb"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.addAllThere"
 msgstr "这些都已经在房间中了"
 
@@ -2052,6 +2290,84 @@ msgstr "它的回复会加入那条提示词下的标签页，房间的视图保
 #. js-lingui-explicit-id
 msgid "enter.againUnpriced"
 msgstr "按 Enter 以 {next} 再问一次“{prompt}”，与 {address} 并列：{name}，约 {tokens, number} 个 token"
+
+#. js-lingui-explicit-id
+msgid "enter.alarmAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmEvery"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmEveryHow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmNoneAll"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmOffAll"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmOffDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuiet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuietDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuietOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuietOffDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmSetDone"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.aloneErase"
@@ -2436,6 +2752,42 @@ msgstr "在每两个名称之间加上 then，例如 by:wikipedia then sonnet"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} 可能是 {names}。请指明是哪个，例如 {example}"
+
+#. The answer to a sum, rounded
+#. js-lingui-explicit-id
+msgid "enter.calcAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcBracket"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calcChar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcDivide"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calcHow"
+msgstr ""
+
+#. The answer to a sum written in the bar
+#. js-lingui-explicit-id
+msgid "enter.calcIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcPower"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcSyntax"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3790,6 +4142,36 @@ msgstr "{on, select, on {它已经只发送给本机上的模型} other {它本�
 #. js-lingui-explicit-id
 msgid "enter.localWhich"
 msgstr "local: 可接 on 或 off"
+
+#. js-lingui-explicit-id
+msgid "enter.lookUp"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.lookUpHow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.lookUpNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpSameSelection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpSelection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpTooLong"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.manyFailed"
@@ -5215,6 +5597,18 @@ msgid "enter.renamedForm"
 msgstr "{verb} 现在是 {now}。按 Enter 将其写入"
 
 #. js-lingui-explicit-id
+msgid "enter.replacedWord"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replaceGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replaceNotNow"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.replyCut"
 msgstr "回复中途断开。已收到的内容会保留，并标注为已中断"
 
@@ -6014,6 +6408,10 @@ msgstr "summarize: 会在{board}上写一条摘要笔记。在这里改写摘要
 #. js-lingui-explicit-id
 msgid "enter.summarizeWriting"
 msgstr "正在写摘要"
+
+#. js-lingui-explicit-id
+msgid "enter.sumSelected"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.swapBoards"
@@ -10348,6 +10746,10 @@ msgid "verb.again"
 msgstr "用编辑后的提示词再问一次，作为新分支"
 
 #. js-lingui-explicit-id
+msgid "verb.alarm"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "让正文中的提示词在回复本身中回答，或在正文中原文之后回答"
 
@@ -10384,6 +10786,10 @@ msgstr "在页面上移动输入栏"
 #. js-lingui-explicit-id
 msgid "verb.by"
 msgstr "选择此对话由谁回答：模型，或不耗 token 的来源"
+
+#. js-lingui-explicit-id
+msgid "verb.calc"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10437,6 +10843,10 @@ msgstr "按编号删除内容。已发送的内容要再按一次 Enter 才会�
 #. js-lingui-explicit-id
 msgid "verb.device"
 msgstr "说明房间是为哪种设备设计的"
+
+#. js-lingui-explicit-id
+msgid "verb.dictionary"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.diff"
@@ -10708,6 +11118,10 @@ msgstr "写一条笔记，模型会随你的下一条提示词读取它"
 #. js-lingui-explicit-id
 msgid "verb.theme"
 msgstr "选择房间的配色和字体"
+
+#. js-lingui-explicit-id
+msgid "verb.thesaurus"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.thinking"

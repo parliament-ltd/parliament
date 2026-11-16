@@ -76,6 +76,16 @@ export default defineConfig({
 
         runtimeCaching: [
           {
+            // C303 (b): the Dictionary board's word lists, a piece at a
+            // time, from this site only, kept after first use so a word
+            // looked up again, or offline, needs nothing fetched. Never
+            // precached: .json is not in globPatterns. A new edition of the
+            // lists rotates the name.
+            urlPattern: ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/words/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'parliament-words-v1' },
+          },
+          {
             // ─────────────────────────────────────────────────────────────
             // SECURITY: Anthropic API — NetworkOnly, no exceptions.
             //

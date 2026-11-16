@@ -12,6 +12,10 @@ import { strikeSelection, struckIdsIn } from '../../editing/keys'
 // The editor last in focus: ask: and strikethrough: in the bar act there, on
 // the selection it kept when the bar took the focus.
 let lastFocused = null
+// The word last looked up from a selection (C303 (b)): which text it is in,
+// where, and what it said, so a word from the Dictionary board can take its
+// place, as an edit, only while it still says the same.
+let lookedUp = null
 const MAX = 1000
 
 /**
@@ -90,13 +94,47 @@ export function useAskBox(viewRef, onKept, words, canAsk) {
       // The words stay, struck, where they were.
       detail.mark = [...struckIdsIn(v.state.doc, from, to)].find((id) => !before.has(id)) ?? null
     }
+    // dictionary: alone, or Ctrl+Alt+L (C303 (b)): the word selected here.
+    const onLookUp = (e) => {
+      const detail = e.detail
+      if (!detail || detail.taken || lastFocused !== token) return
+      const v = viewRef.current
+      if (!v || !v.dom.isConnected) return
+      const { from, to, empty } = v.state.selection
+      if (empty) { detail.taken = 'lookUpNothing'; return }
+      const word = v.state.doc.textBetween(from, to, ' ').trim()
+      if (!word || word.length > 60) { detail.taken = 'lookUpTooLong'; return }
+      lookedUp = { token, from, to, word }
+      detail.taken = true
+      detail.word = word
+    }
+    // A word clicked on the board takes the selection's place, as an edit,
+    // if the text still says what was looked up.
+    const onReplace = (e) => {
+      const detail = e.detail
+      if (!detail || detail.taken || !lookedUp || lookedUp.token !== token) return
+      const v = viewRef.current
+      if (!v || !v.dom.isConnected) { detail.taken = 'replaceGone'; return }
+      if (!v.editable) { detail.taken = 'replaceNotNow'; return }
+      const { from, to, word } = lookedUp
+      if (to > v.state.doc.content.size || v.state.doc.textBetween(from, to, ' ').trim() !== word) { detail.taken = 'replaceGone'; return }
+      const next = String(detail.word ?? '')
+      v.dispatch(v.state.tr.insertText(next, from, to))
+      lookedUp = { token, from, to: from + next.length, word: next }
+      detail.taken = true
+    }
     document.addEventListener('focusin', onFocus)
     window.addEventListener('parliament-ask', onBarAsk)
     window.addEventListener('parliament-strike', onBarStrike)
+    window.addEventListener('parliament-look-up', onLookUp)
+    window.addEventListener('parliament-replace-word', onReplace)
     return () => {
       document.removeEventListener('focusin', onFocus)
       window.removeEventListener('parliament-ask', onBarAsk)
       window.removeEventListener('parliament-strike', onBarStrike)
+      window.removeEventListener('parliament-look-up', onLookUp)
+      window.removeEventListener('parliament-replace-word', onReplace)
+      if (lookedUp?.token === token) lookedUp = null
       if (lastFocused === token) lastFocused = null
     }
   }, [viewRef, keepAt, open])

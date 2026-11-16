@@ -32,7 +32,7 @@ import BirdsMark from './BirdsMark'
  * markup: { open, onOpen(from) }: whether the markup menu is open, and
  * opening it under the word that was clicked (C301 (b)).
  */
-export default function Strip({ arrangement, onPick, onRun = null, markup = null, phone = null, globe = null }) {
+export default function Strip({ arrangement, onPick, onRun = null, markup = null, phone = null, globe = null, alarm = null }) {
   const { i18n } = useLingui()
   const on = Boolean(arrangement.focus)
   // The birds fold the boards away and bring them back (C301 (f); Stefan,
@@ -87,6 +87,8 @@ export default function Strip({ arrangement, onPick, onRun = null, markup = null
           {shown}
         </button>
       ))}
+      {/* The next alarm, while any is set (C303 (a)). */}
+      {alarm}
       </span>
       {markup && (
         <span className="ch-marg ch-smarkup">

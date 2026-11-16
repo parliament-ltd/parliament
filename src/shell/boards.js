@@ -30,6 +30,10 @@ export const BOARDS = Object.freeze({
   library: { title: 'Library', resting: 'search', can: [], closable: true, strip: 5 },
   docket: { title: 'Tasks', resting: 'prompt', can: ['execute'], closable: true, strip: 6 },
   settings: { title: null, resting: 'search', can: [], closable: true, strip: null },
+  // Alarms and the dictionary (C303, ruled 16 November): off the strip,
+  // brought by alarm: and dictionary:; the strip names the next alarm.
+  alarms: { title: 'Alarms', resting: 'search', can: [], closable: true, strip: null },
+  dictionary: { title: 'Dictionary', resting: 'search', can: [], closable: true, strip: null },
   // The Lab's boards (Lab v7, A2).
   canvas: { title: null, resting: 'search', can: [], closable: true, strip: null },
   blocks: { title: null, resting: 'search', can: [], closable: true, strip: null },

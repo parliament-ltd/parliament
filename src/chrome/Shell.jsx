@@ -87,6 +87,12 @@ import { createRunner, runScope } from '../lib/runner'
 import { FLOWS, isCommand, modelOf, taskLeadOf, titleOf } from '../lib/taskModel'
 import { taskRows, openTaskOf, answersOf } from '../lib/tasksBoard'
 import TasksBoard from './TasksBoard'
+import AlarmsBoard, { AlarmBand, StripAlarm } from './AlarmsBoard'
+import DictionaryBoard from './DictionaryBoard'
+import { useAlarms } from './useAlarms'
+import { makeAlarm, later as alarmLater, isAlarm, lengthOf as alarmLength } from '../lib/alarms'
+import { lookUp as lookUpWord } from '../lib/lookUp'
+import { figuresIn, sumOf, format as sumFormat } from '../lib/sums'
 import { isTodo } from '../lib/docketModel'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
@@ -1433,6 +1439,75 @@ export default function Shell() {
       remember(body)
       return null
     }
+    // Alarms (C303 (a)): kept in the settings on this device; each change
+    // taken back by undo:, as a setting is.
+    if (what.kind === 'alarmOpen' || what.kind === 'lookUp') {
+      const board = what.kind === 'alarmOpen' ? 'alarms' : 'dictionary'
+      let word = what.word ?? null
+      let from = null
+      if (what.kind === 'lookUp' && !word) {
+        // dictionary: alone, or Ctrl+Alt+L (C303 (b)): the word selected in your text.
+        const detail = { taken: false, word: null }
+        window.dispatchEvent(new CustomEvent('parliament-look-up', { detail }))
+        if (detail.taken !== true) return typeof detail.taken === 'string' ? detail.taken : 'lookUpNothing'
+        word = detail.word
+        from = { word }
+      }
+      const a = current.current
+      const here = a.columns.flat().includes(board) || a.popped.some((p) => p.board === board)
+      const refused = await run(here ? address(a, board) : planOpen(a, board).next ?? a, null)
+      if (refused) return refused
+      remember(body)
+      if (what.kind === 'alarmOpen') return null
+      setLook({ word, half: what.half ?? 'meanings', result: null, from })
+      lookUpWord(word).then((res) => setLook((l) => (l && l.word === word ? { ...l, result: res?.ok ? res : { word, found: null, near: [], missing: true } } : l)))
+      return null
+    }
+    if (what.kind === 'alarmSet' || what.kind === 'alarmOff' || what.kind === 'alarmLater' || what.kind === 'alarmSwitch') {
+      const list = (latest.current.settings?.alarms ?? []).filter(isAlarm)
+      const at = new Date()
+      let next = list
+      let says = null
+      if (what.kind === 'alarmSet') {
+        const made = makeAlarm(what.set, { id: `al-${crypto.randomUUID()}`, now: at })
+        next = [...list, made]
+        says = { message: 'alarmSetDone', values: { at: `${String(new Date(made.at).getHours()).padStart(2, '0')}:${String(new Date(made.at).getMinutes()).padStart(2, '0')}`, every: made.kind === 'every' ? 'yes' : 'no' } }
+        // The browser's notice, asked for on the first alarm, never before (§3).
+        if (typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission().catch(() => {})
+      } else if (what.kind === 'alarmOff') {
+        next = list.filter((x) => !what.ids.includes(x.id))
+        for (const id of what.ids) alarmsStop.current(id)
+        says = { message: 'alarmOffDone', values: { count: what.ids.length } }
+      } else if (what.kind === 'alarmLater') {
+        next = list.map((x) => (x.id === what.id ? alarmLater(x, what.ms, at) : x))
+        alarmsStop.current(what.id)
+      } else {
+        next = list.map((x) => {
+          if (x.id !== what.id) return x
+          const ms = (x.minutes ?? 0) * 60_000
+          // A rung one switched on rings again: a timer or a break as long
+          // again, a time of day the next day.
+          if (x.rang) return x.kind === 'at' ? alarmLater(x, Math.max(60_000, Date.parse(x.at) + 86_400_000 - at.getTime()), at) : alarmLater(x, ms, at)
+          if (x.on) return { ...x, on: false }
+          return Date.parse(x.at) <= at.getTime() || x.kind === 'every' ? { ...alarmLater(x, x.kind === 'at' ? Date.parse(x.at) + 86_400_000 - at.getTime() : ms, at), on: true } : { ...x, on: true }
+        })
+      }
+      if (touched.current) touched.current.setting = { key: 'alarms', before: list }
+      await updateSettingNow.current('alarms', next)
+      remember(body)
+      return says ? { done: true, says } : null
+    }
+    if (what.kind === 'alarmQuiet') {
+      if (touched.current) touched.current.setting = { key: 'quietAlarms', before: latest.current.settings?.quietAlarms ?? false }
+      await updateSettingNow.current('quietAlarms', what.quiet)
+      remember(body)
+      return { done: true, says: { message: what.quiet ? 'alarmQuietDone' : 'alarmQuietOffDone' } }
+    }
+    // calc: (C303 (c)): worked out as it was typed; Enter keeps it in the bar's history.
+    if (what.kind === 'calc') {
+      remember(body)
+      return { done: true, says: { message: what.exact ? 'calcIs' : 'calcAbout', values: { result: what.result } } }
+    }
     if (what.kind === 'letter') {
       setInspected(null)
       setCompared(null)
@@ -2396,6 +2471,8 @@ export default function Shell() {
     return out
   }, [act, run, undo])
 
+  const onRunNow = useRef(null)
+  useEffect(() => { onRunNow.current = onRun })
   const onRoomReady = useCallback((chatId) => {
     readyRooms.current.add(chatId)
     const w = waiting.current
@@ -2424,6 +2501,8 @@ export default function Shell() {
   const changeSetting = useCallback(async (key, value) => {
     await updateSetting(key, value)
     if (key === 'storageMode') await keepKeys(value !== 'memory').catch(() => {})
+    // The other tabs read the alarms again: a signal, nothing more (C303 (a)).
+    if (key === 'alarms') tabBus().post({ type: 'alarms' })
   }, [updateSetting])
   useEffect(() => { updateSettingNow.current = changeSetting })
   // Text size (set:text): the chrome's type and the rooms' together.
@@ -2438,6 +2517,54 @@ export default function Shell() {
   const latest = useRef({})
   const replyNow = useRef(null) // what replies are in, for the send (C166)
   useEffect(() => { latest.current = { settings, locale: i18n.locale } })
+
+  // ── Alarms, the dictionary and sums (C303, ruled 16 November) ─
+  const saveAlarms = useCallback(async (list, { quietly = false } = {}) => {
+    if (quietly) await updateSetting('alarms', list)
+    else await updateSettingNow.current('alarms', list)
+  }, [updateSetting])
+  const alarmWords = useMemo(() => ({
+    alarm: i18n._(COPY.alarms.unnamed),
+    title: (name) => i18n._(COPY.alarms.tabTitle, { name }),
+    body: (a) => i18n._(a.kind === 'every' ? COPY.alarms.noticeBreak : a.kind === 'at' ? COPY.alarms.noticeAt : COPY.alarms.noticeIn, { minutes: a.minutes ?? 0, ...alarmLength(a.minutes ?? 0) }),
+  }), [i18n])
+  const alarmsHere = useAlarms({ alarms: settings.alarms, quiet: settings.quietAlarms === true, save: saveAlarms, words: alarmWords })
+  const alarmsStop = useRef(() => {})
+  useEffect(() => { alarmsStop.current = alarmsHere.stop })
+  // The Dictionary board's word, its half, and what was found.
+  const [look, setLook] = useState(null)
+  // Ctrl+Alt+L in a text: the word selected, looked up (C303 (b)).
+  useEffect(() => {
+    const on = () => { onRunNow.current?.(null, 'dictionary:', null, { kind: 'lookUp', half: 'meanings', word: null }).then((out) => { if (out && !out.done) setBarSaid({ says: typeof out === 'string' ? { message: out } : out }) }) }
+    window.addEventListener('parliament-look-up-key', on)
+    return () => window.removeEventListener('parliament-look-up-key', on)
+  }, [])
+  // Figures selected in a reply, added up on the line under the bar, as a
+  // spreadsheet says what its selection adds up to (C303 (c)). Read with the
+  // interface language's decimal mark; nothing is stored.
+  const sumShown = useRef(false)
+  useEffect(() => {
+    let t = 0
+    const point = new Intl.NumberFormat(i18n.locale).formatToParts(1.5).find((x) => x.type === 'decimal')?.value ?? '.'
+    const inCard = (n) => (n?.nodeType === 1 ? n : n?.parentElement)?.closest?.('.p-msg')
+    const on = () => {
+      clearTimeout(t)
+      t = setTimeout(() => {
+        const sel = document.getSelection()
+        const text = sel && !sel.isCollapsed && inCard(sel.anchorNode) ? sel.toString().slice(0, 20000) : ''
+        const sum = text ? sumOf(figuresIn(text, point)) : null
+        if (sum) {
+          sumShown.current = true
+          setBarSaid({ says: { message: 'sumSelected', values: { count: sum.count, sum: sumFormat(sum.sum, i18n.locale).text, average: sumFormat(sum.average, i18n.locale).text } } })
+        } else if (sumShown.current) {
+          sumShown.current = false
+          setBarSaid((was) => (was?.says?.message === 'sumSelected' ? null : was))
+        }
+      }, 150)
+    }
+    document.addEventListener('selectionchange', on)
+    return () => { clearTimeout(t); document.removeEventListener('selectionchange', on) }
+  }, [i18n.locale])
 
   // Your own text, first written in an empty room (C301 (f)): when you pause,
   // its chat is made, numbered and titled from its first words here, with
@@ -3655,7 +3782,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled, elsewhere: installedApp }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: markupScreen, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, tasks: tasksList, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, installedApp, helper, answering, frameworkScreens, settings.thinking, markupScreen, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, tasksList, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled, elsewhere: installedApp }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: markupScreen, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, tasks: tasksList, alarms: alarmsHere.alarms, calcLocale: i18n.locale, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, installedApp, helper, answering, frameworkScreens, settings.thinking, markupScreen, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, tasksList, alarmsHere.alarms, i18n.locale, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -4642,6 +4769,25 @@ export default function Shell() {
         />
       )
     }
+    if (board === 'alarms') {
+      return (
+        <AlarmsBoard key="alarms" alarms={alarmsHere.alarms} addressed={arrangement.addressed === 'alarms'} onAddress={focusBoard} onRun={runClicked}
+          onSwitch={(a) => { onRun(null, 'alarm:', null, { kind: 'alarmSwitch', id: a.id }).catch(() => {}) }} />
+      )
+    }
+    if (board === 'dictionary') {
+      return (
+        <DictionaryBoard key="dictionary" look={look} addressed={arrangement.addressed === 'dictionary'} onAddress={focusBoard}
+          onLook={(w, half) => runClicked(`${half === 'same' ? 'thesaurus' : 'dictionary'}:${w}`)}
+          onHalf={(h) => setLook((l) => (l ? { ...l, half: h } : l))}
+          onReplace={(w) => {
+            const detail = { word: w, taken: false }
+            window.dispatchEvent(new CustomEvent('parliament-replace-word', { detail }))
+            if (detail.taken === true) { setLook((l) => (l ? { ...l, from: { word: w } } : l)); setBarSaid({ says: { message: 'replacedWord', values: { word: w } } }) }
+            else setBarSaid({ says: { message: typeof detail.taken === 'string' ? detail.taken : 'replaceGone' } })
+          }} />
+      )
+    }
     if (board === 'letter') {
       // The letter as a board (C286 (q)): the one letter: asked for, else the newest.
       const which = arrangement.context?.letter ?? newestLetter().n
@@ -4751,7 +4897,9 @@ export default function Shell() {
     <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${hiddenClasses(markupShow)}`}>
       {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
       {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
-      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} markup={{ open: markupPicking, onOpen: openMarkupFrom }} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe} />}
+      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} markup={{ open: markupPicking, onOpen: openMarkupFrom }} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe}
+        alarm={alarmsHere.next ? <StripAlarm alarm={alarmsHere.next} onOpen={() => runClicked('alarm:')} /> : null} />}
+      <AlarmBand ringing={alarmsHere.ringing} at={bar.at === 'top' ? 'top' : 'bottom'} onStop={alarmsHere.stop} onLater={(id) => { alarmsHere.fiveMore(id) }} />
       {welcomeAlone && globe && <div className="ch-headcorner">{globe}</div>}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}

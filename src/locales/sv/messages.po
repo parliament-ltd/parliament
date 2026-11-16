@@ -8,6 +8,160 @@ msgstr ""
 "Language: sv\n"
 
 #. js-lingui-explicit-id
+msgid "alarms.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.addPlus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.atHint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.bandAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.bandBreak"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.bandIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.everyHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.factsAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.factsEvery"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.factsIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldEvery"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldKind"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fieldName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.fiveMore"
+msgstr ""
+
+#. Rings at a time of day
+#. js-lingui-explicit-id
+msgid "alarms.kindAt"
+msgstr ""
+
+#. A break after so much work
+#. js-lingui-explicit-id
+msgid "alarms.kindEvery"
+msgstr ""
+
+#. A timer: rings in so long
+#. js-lingui-explicit-id
+msgid "alarms.kindIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.minutesHint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.namePlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.none"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "alarms.noneHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.noticeAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.noticeBreak"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.noticeIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.off"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.onlyOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.rang"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.rangAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.rangMissed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.stop"
+msgstr ""
+
+#. The strip’s label, written as the boards are
+#. js-lingui-explicit-id
+msgid "alarms.strip"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.switch"
+msgstr ""
+
+#. The tab’s title while an alarm rings out of sight
+#. js-lingui-explicit-id
+msgid "alarms.tabTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.takeOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "alarms.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "almanac.backupAtRisk"
 msgstr "Den här webbläsaren har inte lovat att behålla det du skapar här, och kan radera det. Gör en säkerhetskopia."
 
@@ -711,6 +865,11 @@ msgstr "dina promptar"
 msgid "blocksBoard.toc.truncateAt"
 msgstr "Kortar vid"
 
+#. Timers, times of day and breaks, set from the bar (C303 (a))
+#. js-lingui-explicit-id
+msgid "board.alarms"
+msgstr ""
+
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -735,6 +894,11 @@ msgstr "Samlingen"
 #. js-lingui-explicit-id
 msgid "board.commands"
 msgstr "Kommandomenyn"
+
+#. What a word means, and the words that mean the same (C303 (b))
+#. js-lingui-explicit-id
+msgid "board.dictionary"
+msgstr ""
 
 #. Prompts and to-dos set out in branches, to run and to tick (C131; C301 (g))
 #. js-lingui-explicit-id
@@ -1949,6 +2113,80 @@ msgid "count.steps"
 msgstr "{count, plural, one {# deluppgift} other {# deluppgifter}}"
 
 #. js-lingui-explicit-id
+msgid "dictionary.adjective"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.adverb"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.didYouMean"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.fromText"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.lookHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.looking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.meanings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.missing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.none"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "dictionary.noneHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.noSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.notFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.noun"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.opposite"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.putHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.same"
+msgstr ""
+
+#. The word lists’ name and licence, as they give them
+#. js-lingui-explicit-id
+msgid "dictionary.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "dictionary.verb"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.addAllThere"
 msgstr "Allt det finns redan i rummet"
 
@@ -2052,6 +2290,84 @@ msgstr "Svaret hamnar bland flikarna under den prompten, och rummet stannar där
 #. js-lingui-explicit-id
 msgid "enter.againUnpriced"
 msgstr "Enter frågar ”{prompt}” igen som {next}, bredvid {address}: {name}, cirka {tokens, number} tokens"
+
+#. js-lingui-explicit-id
+msgid "enter.alarmAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmEvery"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmEveryHow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmNoneAll"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmOffAll"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alarmOffDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuiet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuietDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuietOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmQuietOffDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.alarmSetDone"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.aloneErase"
@@ -2436,6 +2752,42 @@ msgstr "Sätt then mellan namnen, som by:wikipedia then sonnet"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} kan vara {names}. Ange vilken, till exempel {example}"
+
+#. The answer to a sum, rounded
+#. js-lingui-explicit-id
+msgid "enter.calcAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcBracket"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calcChar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcDivide"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calcHow"
+msgstr ""
+
+#. The answer to a sum written in the bar
+#. js-lingui-explicit-id
+msgid "enter.calcIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcPower"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calcSyntax"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -3790,6 +4142,36 @@ msgstr "{on, select, on {Det skickar redan bara till modeller på den här dator
 #. js-lingui-explicit-id
 msgid "enter.localWhich"
 msgstr "local: tar on eller off"
+
+#. js-lingui-explicit-id
+msgid "enter.lookUp"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.lookUpHow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.lookUpNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpSameSelection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpSelection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.lookUpTooLong"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.manyFailed"
@@ -5215,6 +5597,18 @@ msgid "enter.renamedForm"
 msgstr "{verb} heter nu {now}. Enter skriver in det"
 
 #. js-lingui-explicit-id
+msgid "enter.replacedWord"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replaceGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replaceNotNow"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.replyCut"
 msgstr "Svaret bröts av halvvägs. Det som hann komma sparas och märks som avbrutet"
 
@@ -6014,6 +6408,10 @@ msgstr "summarize: skriver en sammanfattande anteckning i {board}. Att skriva om
 #. js-lingui-explicit-id
 msgid "enter.summarizeWriting"
 msgstr "Skriver sammanfattningen"
+
+#. js-lingui-explicit-id
+msgid "enter.sumSelected"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.swapBoards"
@@ -10348,6 +10746,10 @@ msgid "verb.again"
 msgstr "Fråga igen utifrån den redigerade prompten, som en ny gren"
 
 #. js-lingui-explicit-id
+msgid "verb.alarm"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "Låt en prompt i texten besvaras i själva svaret, eller i texten efter textavsnittet"
 
@@ -10384,6 +10786,10 @@ msgstr "Flytta fältet på sidan"
 #. js-lingui-explicit-id
 msgid "verb.by"
 msgstr "Välj vem som svarar i den här chatten: en modell, eller en källa utan tokens"
+
+#. js-lingui-explicit-id
+msgid "verb.calc"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10437,6 +10843,10 @@ msgstr "Radera något med dess nummer. Det som har skickats försvinner för got
 #. js-lingui-explicit-id
 msgid "verb.device"
 msgstr "Ange vad rummet är byggt för"
+
+#. js-lingui-explicit-id
+msgid "verb.dictionary"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.diff"
@@ -10708,6 +11118,10 @@ msgstr "Skriv en anteckning som modellen läser med din nästa prompt"
 #. js-lingui-explicit-id
 msgid "verb.theme"
 msgstr "Välj färger och typsnitt för ett rum"
+
+#. js-lingui-explicit-id
+msgid "verb.thesaurus"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.thinking"

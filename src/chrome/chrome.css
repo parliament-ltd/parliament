@@ -1444,3 +1444,58 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell button.ch-tk-cancel { padding: 0; border: 0; background: none; font: 400 12.5px var(--ch-sans); color: var(--ch-ink-3); cursor: pointer; }
 .ch-shell button.ch-tk-keep:focus-visible, .ch-shell button.ch-tk-cancel:focus-visible { outline: var(--ch-focus); outline-offset: 2px; }
 .ch-tk-bad { color: var(--ch-rust); }
+
+/* Alarms (C303 (a); parliament-alarms-v1.html): a row each, the switch in
+   the column the Tasks board's boxes take; the band over the bar. */
+.ch-al-row { display: grid; grid-template-columns: 26px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 10px 0; border-bottom: .5px solid var(--ch-divider); }
+.ch-al-t { font: 600 14px var(--ch-sans); color: var(--ch-ink); overflow-wrap: anywhere; }
+.ch-al-row.off .ch-al-t { color: var(--ch-ink-3); }
+.ch-al-row.rang .ch-al-t { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-soft); }
+.ch-al-end { display: inline-flex; gap: 8px; align-items: baseline; justify-self: end; }
+.ch-al-left { font: 400 15px var(--ch-mono); color: var(--ch-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ch-al-row.off .ch-al-left { color: var(--ch-ink-3); font: italic 400 var(--ch-t-marg) var(--ch-serif); }
+.ch-al-facts { grid-column: 2 / 4; }
+.ch-al-row:hover .ch-tk-del { opacity: 1; }
+.ch-al-foot { margin: 10px 0 0; }
+.ch-al-amount { display: inline-flex; gap: 10px; align-items: baseline; }
+.ch-al-amount .ch-tk-in { width: 7em; }
+.ch-shell button.ch-al-sw { position: relative; top: 2px; width: 22px; height: 13px; padding: 0; border: 0; border-radius: 7px; background: var(--ch-soft); cursor: pointer; }
+.ch-shell button.ch-al-sw span { position: absolute; top: 2px; left: 2px; width: 9px; height: 9px; border-radius: 50%; background: #fff; transition: left var(--ch-dur-fade) ease; }
+.ch-shell button.ch-al-sw.on { background: var(--ch-ink); }
+.ch-shell button.ch-al-sw.on span { left: 11px; }
+.ch-shell button.ch-al-sw:focus-visible { outline: var(--ch-focus); outline-offset: 2px; }
+.ch-al-band { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 6px; }
+.ch-al-band.bottom { bottom: 104px; }
+.ch-al-band.top { top: 104px; }
+.ch-al-ring { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding: 10px 16px; border-radius: 12px; border: .5px solid var(--ch-border); background: var(--ch-surface); box-shadow: var(--ch-lift); }
+.ch-al-ring b { font: 600 14px var(--ch-sans); color: var(--ch-ink); }
+.ch-al-acts { margin-inline-start: auto; display: inline-flex; gap: 12px; }
+.ch-shell button.ch-salarm .ch-ctx { font-family: var(--ch-mono); font-variant-numeric: tabular-nums; }
+
+/* The Dictionary board (C303 (b); parliament-dictionary-v1.html): the two
+   halves side by side when the board is wide, one at a time, by its tabs,
+   when narrow. */
+.ch-dict { container-type: inline-size; }
+.ch-dc-tabs { display: none; gap: 14px; margin-inline-start: 8px; }
+.ch-shell .ch-dc-tabs button { padding: 0; border: 0; background: none; font: 400 12.5px var(--ch-sans); color: var(--ch-ink-3); cursor: pointer; }
+.ch-shell .ch-dc-tabs button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 4px; }
+.ch-shell .ch-dc-tabs button:focus-visible { outline: var(--ch-focus); outline-offset: 2px; }
+.ch-dc-word { margin: 4px 0 2px; font: 400 26px/1.25 var(--ch-serif); color: var(--ch-ink); }
+.ch-dc-from { margin: 0 0 4px; }
+.ch-dc-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-top: 8px; }
+.ch-dc-pos, .ch-dc-h { margin: 10px 0 2px; font: 600 11px var(--ch-sans); color: var(--ch-ink-3); letter-spacing: .04em; text-transform: uppercase; }
+.ch-dc-means ol { margin: 0; padding: 0 0 0 20px; font: 400 14px/1.55 var(--ch-serif); color: var(--ch-ink); }
+.ch-dc-means li + li { margin-top: 4px; }
+.ch-dc-eg { display: block; font: italic 400 13px/1.5 var(--ch-serif); color: var(--ch-ink-3); }
+.ch-dc-ws { display: flex; flex-wrap: wrap; gap: 6px; }
+.ch-shell button.ch-dc-w { padding: 1px 9px; border: .5px solid var(--ch-border); border-radius: 10px; background: var(--ch-surface); font: 400 13px var(--ch-serif); color: var(--ch-ink); cursor: pointer; }
+.ch-shell button.ch-dc-w:hover { border-color: var(--ch-ink); }
+.ch-shell button.ch-dc-w:focus-visible { outline: var(--ch-focus); outline-offset: 2px; }
+.ch-dc-src { margin: 14px 0 0; padding-top: 8px; border-top: .5px solid var(--ch-divider); }
+@container (max-width: 560px) {
+  .ch-dc-tabs { display: inline-flex; }
+  .ch-dc-grid { grid-template-columns: 1fr; }
+  .ch-dict[data-half="meanings"] .ch-dc-same { display: none; }
+  .ch-dict[data-half="same"] .ch-dc-means { display: none; }
+}
+.ch-pl-none .ch-dc-w { margin-inline-start: 6px; }

@@ -291,6 +291,12 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     // A comment on the selected words (C301 (c)), in a prompt or a reply, as
     // Google Docs has it. Never sent.
     'Mod-Alt-m': (state, dispatch, view) => (onComment ? onComment(view) : false),
+    // The word selected, looked up on the Dictionary board (C303 (b)).
+    'Mod-Alt-l': (state) => {
+      if (state.selection.empty || typeof window === 'undefined') return false
+      window.dispatchEvent(new CustomEvent('parliament-look-up-key'))
+      return true
+    },
     // Ctrl+Enter in the text does what Enter in the bar would, the line
     // under the bar having said what (C301 (a), (f)).
     'Mod-Enter': () => (onSend ? (onSend(), true) : false),

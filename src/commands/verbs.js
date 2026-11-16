@@ -137,6 +137,17 @@ export const VERBS = Object.freeze([
   // number, or the list. Nothing announces it; it is found here, in ?.
   v({ verb: 'letter', group: 'go', example: 'letter:', forms: ['letter:', 'letter:1', 'letter:all'], takes: [[], [['all']], ['number']], stage: 15, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.letter', message: 'Read the newest letter from the maker of Parliament, one by its number, or the list of them' } }),
+  // Alarms, the dictionary and sums (C303, ruled 16 November): each keeps
+  // the rest of the line, read by its own rules (alarms.js, words.js, sums.js).
+  v({ verb: 'alarm', group: 'go', example: 'alarm:25m', forms: ['alarm:', 'alarm:25m', 'alarm:25m tea', 'alarm:15:30 "Call Anna"', 'alarm:every 50m "Take a break"', 'alarm:5m 2', 'alarm:off 2', 'alarm:off', 'alarm:quiet'],
+    rest: true, takes: [[], ['text']], stage: 15, undoable: true, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.alarm', message: 'Set an alarm or a break after so much work, push one later, take one off, or show them' } }),
+  v({ verb: 'dictionary', group: 'go', example: 'dictionary:reluctant', forms: ['dictionary:reluctant', 'dictionary:'], rest: true, takes: [[], ['text']], stage: 15, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.dictionary', message: 'Look a word up: what it means, and the words that mean the same. Alone, the word selected in your text' } }),
+  v({ verb: 'thesaurus', group: 'go', example: 'thesaurus:reluctant', forms: ['thesaurus:reluctant', 'thesaurus:'], rest: true, takes: [[], ['text']], stage: 15, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.thesaurus', message: 'The words that mean the same as a word, beside what it means' } }),
+  v({ verb: 'calc', group: 'go', example: 'calc:48000*2/12', forms: ['calc:48000*2/12', 'calc:(1250+3400)*1.25'], rest: true, takes: [['text']], stage: 15, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.calc', message: 'Work out a sum, on the line under the bar' } }),
   v({ verb: 'resources', group: 'go', example: 'resources:', takes: [[]], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.resources', message: 'Open the guides and references, with every command in full' } }),
 
