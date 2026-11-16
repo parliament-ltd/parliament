@@ -1469,7 +1469,6 @@ export const COPY = {
     whoHelp: /*i18n*/ { id: 'plan.whoHelp', message: 'Who answers task {index} of {address}. A click shows who can' },
     // To-dos of yours (C301 (g)).
     yours: /*i18n*/ { id: 'plan.yours', message: 'yours', comment: 'A to-do of the person, never sent' },
-    yoursCount: /*i18n*/ { id: 'plan.yoursCount', message: '{count, plural, one {one to-do of yours} other {# to-dos of yours}}' },
     tick: /*i18n*/ { id: 'plan.tick', message: 'Tick task {index} of {address}' },
     untick: /*i18n*/ { id: 'plan.untick', message: 'Untick task {index} of {address}' },
     tickHelp: /*i18n*/ { id: 'plan.tickHelp', message: 'Runs {command}', comment: 'Commands stay English' },

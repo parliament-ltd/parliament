@@ -280,7 +280,6 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
             <div className="ch-marg ch-pl-marg ch-pl-dmarg">
               <span>{i18n._(COPY.plan.runOf, { run: plan.n, runs: plan.latest })}</span>
               <Sep /><span>{i18n._(COPY.plan.counts, { branches: plan.counts.branches, steps: plan.counts.steps })}</span>
-              {plan.counts.yours > 0 && <><Sep /><span>{i18n._(COPY.plan.yoursCount, { count: plan.counts.yours })}</span></>}
               {plan.counts.held > 0 && <><Sep /><span>{i18n._(COPY.plan.held, { count: plan.counts.held })}</span></>}
               {plan.n !== plan.latest && (
                 <>

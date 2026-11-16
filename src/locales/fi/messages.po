@@ -8567,10 +8567,6 @@ msgid "plan.yours"
 msgstr "sinun"
 
 #. js-lingui-explicit-id
-msgid "plan.yoursCount"
-msgstr "{count, plural, one {yksi oma tehtäväsi} other {# omaa tehtävääsi}}"
-
-#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, one {korttinumero} other {# korttinumeroa}}"
 

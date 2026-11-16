@@ -8567,10 +8567,6 @@ msgid "plan.yours"
 msgstr "你的"
 
 #. js-lingui-explicit-id
-msgid "plan.yoursCount"
-msgstr "{count, plural, other {# 项你的待办}}"
-
-#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, other {# 个银行卡号}}"
 

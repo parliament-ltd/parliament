@@ -8567,10 +8567,6 @@ msgid "plan.yours"
 msgstr "din"
 
 #. js-lingui-explicit-id
-msgid "plan.yoursCount"
-msgstr "{count, plural, one {en punkt att göra för dig} other {# punkter att göra för dig}}"
-
-#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, one {ett kortnummer} other {# kortnummer}}"
 
