@@ -43,8 +43,16 @@
   .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
   .chead h2 { margin: 0; font: 600 13px var(--sans); }
   .body { padding: 4px 22px 16px; }
-  .plus { display: inline-flex; align-items: center; gap: 6px; padding: 8px 0 4px; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
-  .plus .p { display: inline-grid; place-items: center; width: 18px; height: 18px; border: .5px solid var(--soft); border-radius: 50%; font: 400 13px var(--sans); color: var(--ink); font-style: normal; }
+  /* Adding a task or a sub-task: an empty box with a plus in it, in the
+     boxes' own column, and its words where a title goes, as the next row
+     would be (16 November: "a different style for the plus buttons"). */
+  .plus { display: grid; grid-template-columns: 18px auto; gap: 10px; align-items: baseline; padding: 9px 0 6px; font: 400 13.5px var(--sans); color: var(--ink-3); cursor: pointer; }
+  .plus:hover { color: var(--ink); }
+  .plus .p { position: relative; top: 2px; width: 13px; height: 13px; border: 1px dashed var(--soft); border-radius: 3px; }
+  .plus .p::before, .plus .p::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; transform: translate(-50%, -50%); }
+  .plus .p::before { width: 7px; height: 1.2px; }
+  .plus .p::after { width: 1.2px; height: 7px; }
+  .plus:hover .p { border-style: solid; border-color: var(--ink); }
 
   .task { display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 10px 0; border-bottom: .5px solid var(--border-2); }
   .task .t { font: 600 14px var(--sans); }
@@ -127,7 +135,7 @@
     <div class="card addressed">
       <div class="chead"><h2>Tasks</h2></div>
       <div class="body">
-        <div class="plus"><span class="p">+</span>add a task</div>
+        <div class="plus"><span class="p"></span><span>Add a task</span></div>
 
         <div class="main">
           <div class="head">
@@ -155,7 +163,7 @@
             <span class="box"></span><span class="title">Send it</span><span></span>
             <span class="words">To the board, by Friday</span>
           </div>
-          <div class="plus" style="padding-inline-start:28px"><span class="p">+</span>add a sub-task</div>
+          <div class="plus"><span class="p"></span><span>Add a sub-task</span></div>
 
           <div class="runs">
             <h4>Runs</h4>
