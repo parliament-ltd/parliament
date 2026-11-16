@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First screen</title>
+<!--
+  C302 (d), to rule (15 November): the first screen is a room. The first run
+  shows an empty room with the birds and tour:, import: and close:; closing
+  the tour, or reset:, leaves an empty room alone, the bar centred at its
+  foot. C301 (f)'s landing page, brought forward. Values from
+  src/styles/tokens.css and src/chrome/chrome.css; the bar as
+  parliament-markup-v1.html draws it.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --divider: rgba(25, 25, 25, .08);
+    --navy: 22, 38, 70;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 980px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 760px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+
+  /* A screen, drawn small */
+  .screen { position: relative; background: var(--paper); border: .5px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .strip { display: flex; gap: 18px; align-items: baseline; padding: 9px 16px; border-bottom: .5px solid var(--border-2); font: 400 12.5px var(--sans); color: var(--ink-2); }
+  .strip .on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .strip .right { margin-inline-start: auto; display: flex; gap: 14px; }
+  .stage { display: flex; justify-content: center; gap: 16px; padding: 18px 16px 0; min-height: 300px; }
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 8px; padding: 10px 18px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h3 { margin: 0; font: 600 var(--t-small) var(--sans); }
+  .room { flex: 1 1 auto; max-width: 620px; }
+  .room .body { padding: 26px 22px 40px; }
+  .room .empty { margin: 0; }
+  .room .writing { margin: 16px 0 0; font: 400 15.5px/1.7 var(--serif); color: var(--ink-3); }
+  .birds-col { flex: 0 0 210px; padding: 18px 16px; }
+  .birds { display: block; width: 72px; height: auto; margin: 6px 0 12px; }
+  .cmds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font: 400 12.5px/1.45 var(--sans); color: var(--ink-2); }
+  .cmds code { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+  .inside { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 30px 22px 44px; }
+  .inside .cmds { align-items: center; }
+  .barwrap { display: flex; flex-direction: column; align-items: center; padding: 16px 16px 18px; }
+  .field { width: min(560px, 100%); display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 12px; border-radius: 14px; background: rgb(var(--navy)); color: rgba(255,255,255,.7); }
+  .field .chip { padding: 2px 7px; border-radius: 9px; background: rgba(255,255,255,.14); color: #fff; font: 600 9px var(--sans); letter-spacing: .06em; }
+  .field .v { font: 400 13px var(--sans); }
+  .enter { margin: 6px 0 0; }
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 860px) { .two { grid-template-columns: 1fr 1fr; } .two .stage { min-height: 260px; } .two .birds-col { flex-basis: 150px; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+
+  table.t2 { width: 100%; border-collapse: collapse; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; overflow: hidden; font: 400 13px var(--sans); }
+  .t2 th, .t2 td { padding: 7px 12px; text-align: start; border-bottom: .5px solid var(--border-2); vertical-align: top; }
+  .t2 th { font: 600 11px var(--sans); color: var(--ink-3); background: var(--subtle); }
+  .t2 td.k { color: var(--ink-2); white-space: nowrap; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 4px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>First screen</h1>
+    <p>C302 (d), to rule. The first screen is a room. On the first run, an empty room with the birds and three commands; after the tour is closed, or after reset:, an empty room alone, the bar centred at its foot. The welcome steps are a command away, tour:. Nothing new is stored: an empty room exists today, and its first prompt starts its chat. Writing your own text in it before any prompt is C301 (f), and waits for its own stored change.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The first run: two ways to place the birds</h2>
+    <p class="lede">Today the first run shows the welcome page with its steps. Instead, a room, addressed, and the bar under it resting on a prompt. The birds and their three lines either stand beside the room (A) or sit in the empty room itself until its first prompt (B).</p>
+    <div class="two">
+      <div>
+        <span class="tag">A · beside the room</span>
+        <div class="screen">
+          <div class="strip"><span class="on">Room</span><span>Records</span><span class="right marg"><span>markup ▾</span><span>English ▾</span></span></div>
+          <div class="stage">
+            <div class="card room addressed">
+              <div class="chead"><h3>Room</h3><span class="marg">empty</span></div>
+              <div class="body">
+                <p class="empty marg">An empty room. Its first prompt, written in the bar, starts its chat.</p>
+              </div>
+            </div>
+            <div class="birds-col">
+              <img class="birds" src="parliament-birds.svg" alt="">
+              <ul class="cmds">
+                <li><code>tour:</code> the welcome steps, one at a time</li>
+                <li><code>import:</code> a Parliament file</li>
+                <li><code>close:</code> puts this away</li>
+              </ul>
+            </div>
+          </div>
+          <div class="barwrap">
+            <div class="field"><span class="chip">PROMPT</span><span class="v">Ask anything</span></div>
+            <div class="enter marg">p&gt; is a prompt · &gt; a command · ? every command</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="tag">B · inside the empty room</span>
+        <div class="screen">
+          <div class="strip"><span class="on">Room</span><span>Records</span><span class="right marg"><span>markup ▾</span><span>English ▾</span></span></div>
+          <div class="stage">
+            <div class="card room addressed">
+              <div class="chead"><h3>Room</h3><span class="marg">empty</span></div>
+              <div class="inside">
+                <img class="birds" src="parliament-birds.svg" alt="">
+                <p class="empty marg">An empty room. Its first prompt, written in the bar, starts its chat.</p>
+                <ul class="cmds">
+                  <li><code>tour:</code> the welcome steps · <code>import:</code> a Parliament file</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="barwrap">
+            <div class="field"><span class="chip">PROMPT</span><span class="v">Ask anything</span></div>
+            <div class="enter marg">p&gt; is a prompt · &gt; a command · ? every command</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>A: the room keeps its own width and its own words; the birds are a board of their own, so close: puts them away and the room stays. On a phone they sit above the room.</li>
+      <li>B: one card, nothing beside it. The birds and the two commands go once the room has its first prompt; close: is not needed.</li>
+      <li>Either way the bar rests on a prompt, as it does in a room, and its line carries what the start card said: p&gt; for a prompt, &gt; for a command, ? for every command.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · After the tour is closed, and after reset:</h2>
+    <p class="lede">An empty room alone, at a room's width (820 at most, C300 (c)), centred, the bar centred under it. Nothing else on the page.</p>
+    <div class="screen">
+      <div class="strip"><span class="on">Room</span><span>Records</span><span class="right marg"><span>markup ▾</span><span>focus: off</span><span>English ▾</span></span></div>
+      <div class="stage">
+        <div class="card room addressed" style="max-width:640px">
+          <div class="chead"><h3>Room</h3><span class="marg">empty</span></div>
+          <div class="body"><p class="empty marg">An empty room. Its first prompt, written in the bar, starts its chat.</p></div>
+        </div>
+      </div>
+      <div class="barwrap">
+        <div class="field"><span class="chip">PROMPT</span><span class="v">Ask anything</span></div>
+        <div class="enter marg">p&gt; is a prompt · &gt; a command · ? every command</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>reset: still closes every board and window and deletes nothing; it now leaves this room instead of the start card. Its line says so: "Enter clears the screen to an empty room. Nothing is deleted".</li>
+      <li>Closing the welcome page with nothing else open leaves this room too. The bar stays where it is (C300 (a)): at the foot, centred.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · What changes</h2>
+    <table class="t2">
+      <thead><tr><th>When</th><th>Now</th><th>Becomes</th></tr></thead>
+      <tbody>
+        <tr><td class="k">First run</td><td>The welcome page, with its steps</td><td>An empty room, with the birds (A or B); tour: shows the steps</td></tr>
+        <tr><td class="k">Closing the tour, nothing else open</td><td>The start card (C282)</td><td>An empty room alone</td></tr>
+        <tr><td class="k">reset:</td><td>The start card (C293)</td><td>An empty room alone</td></tr>
+        <tr><td class="k">tour:</td><td>The welcome steps</td><td>The same, beside the room</td></tr>
+        <tr><td class="k">The start card</td><td>Its birds and three lines</td><td>Retired: its lines go to the bar's line and the birds (asked, item by item, before anything goes)</td></tr>
+        <tr><td class="k">Someone whose screen was saved on the start card</td><td>The start card</td><td>An empty room, the next time Parliament opens</td></tr>
+        <tr><td class="k">What is stored</td><td colspan="2">Nothing new. A room with no chat is kept as a room with no chat, as today.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>Where the birds go on the first run:</b> beside the room (A), or inside the empty room until its first prompt (B).</li>
+        <li><b>Closing the tour and reset:</b> an empty room alone, the bar centred under it, as section 2 draws.</li>
+        <li><b>The start card retires,</b> its three lines carried by the bar's line; the component kept in src/deprecated/ until you approve its removal.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
