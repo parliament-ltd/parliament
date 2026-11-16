@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasks, v4</title>
+<!--
+  C301 (g), v4 (16 November): v3 with Stefan's two notes on it. A task has a
+  kind, picked as the models are: a prompt, a search, a command, or none, when
+  it is yours; a command can sit between prompts. Rooms are named by their
+  number, as the strip names them, never by the name of the room's layout.
+  v1 to v3 kept. Values from tokens.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --docket: #0E728D; --docket-tint: rgba(13, 148, 136, .10);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  a.l { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .body { padding: 4px 22px 16px; }
+  /* Adding a task or a sub-task: an empty box with a plus in it, in the
+     boxes' own column, and its words where a title goes, as the next row
+     would be (16 November: "a different style for the plus buttons"). */
+  .plus { display: grid; grid-template-columns: 18px auto; gap: 10px; align-items: baseline; padding: 9px 0 6px; font: 400 13.5px var(--sans); color: var(--ink-3); cursor: pointer; }
+  .plus:hover { color: var(--ink); }
+  .plus .p { position: relative; top: 2px; width: 13px; height: 13px; border: 1px dashed var(--soft); border-radius: 3px; }
+  .plus .p::before, .plus .p::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; transform: translate(-50%, -50%); }
+  .plus .p::before { width: 7px; height: 1.2px; }
+  .plus .p::after { width: 1.2px; height: 7px; }
+  .plus:hover .p { border-style: solid; border-color: var(--ink); }
+
+  .task { display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 10px 0; border-bottom: .5px solid var(--border-2); }
+  .task .t { font: 600 14px var(--sans); }
+  .task .facts { grid-column: 2 / 4; }
+  .task.done .t { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--soft); }
+  .task.open > .t { text-decoration: underline; text-underline-offset: 3px; }
+  .state { font: 600 10.5px var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--ai); white-space: nowrap; }
+  .state.running { color: var(--you); }
+  .box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+
+  .main { padding: 10px 0 4px 28px; border-bottom: .5px solid var(--border-2); }
+  .main .head { display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: baseline; margin-inline-start: -28px; }
+  .main h3 { margin: 0; font: 400 20px/1.3 var(--serif); }
+  .main .desc { grid-column: 2 / 4; font: 400 14px/1.5 var(--serif); color: var(--ink-2); }
+  .main .meta { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .sub { display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 9px 0 8px; border-bottom: .5px solid var(--border-2); }
+  .sub:last-of-type { border-bottom: none; }
+  .sub .title { font: 600 14px var(--sans); }
+  .sub .words { grid-column: 2 / 4; font: 400 14px/1.5 var(--serif); color: var(--ink-2); }
+  .sub .who { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+  .sub.ticked .title, .sub.ticked .words { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--soft); }
+  .mk { font: 600 10.5px var(--mono); color: var(--prompt); }
+  .kind { display: inline-flex; align-items: baseline; padding: 1px 8px; border-radius: 10px; border: .5px solid var(--border); background: var(--surface); font: 400 12px var(--sans); color: var(--ink-2); }
+  .cmd { font: 400 13px var(--mono); color: var(--ink); }
+  .chip { display: inline-flex; align-items: baseline; gap: 5px; padding: 1px 8px; border-radius: 10px; background: var(--docket-tint); font: 400 12px var(--sans); color: var(--ink-2); white-space: nowrap; }
+  .chip.faint { background: transparent; border: .5px dashed var(--soft); color: var(--ink-3); }
+  .answer { grid-column: 2 / 4; margin-top: 4px; padding: 6px 10px; border-inline-start: 2px solid var(--ai); background: var(--subtle); border-radius: 0 8px 8px 0; font: 400 13.5px/1.5 var(--serif); color: var(--ink-2); }
+  .answer .by { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .runs { margin: 10px 0 0; }
+  .runs h4 { margin: 0 0 4px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .runs ul { list-style: none; margin: 0; padding: 0; font: 400 13px/1.7 var(--sans); }
+  .runs li { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+
+  .form { padding: 12px 14px; border: .5px solid var(--border); border-radius: 12px; background: var(--subtle); }
+  .f { display: grid; grid-template-columns: 90px 1fr; gap: 6px 10px; align-items: baseline; padding: 5px 0; font: 400 13px var(--sans); }
+  .k { font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .03em; text-transform: uppercase; }
+  .in { border-bottom: .5px solid var(--soft); padding: 1px 0; color: var(--ink); min-height: 1.5em; }
+  .in.ph { color: var(--ink-3); font-style: italic; }
+  .pick { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .opt { padding: 1px 9px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 12px var(--sans); white-space: nowrap; }
+  .opt.on { border-color: var(--ink); color: var(--ink); }
+  .opt .x { margin-inline-start: 4px; color: var(--ink-3); }
+  .drop { display: inline-flex; gap: 6px; align-items: baseline; padding: 1px 9px; border: .5px solid var(--soft); border-radius: 8px; background: var(--surface); font: 400 12.5px var(--sans); }
+  .menu { margin-top: 6px; padding: 6px 0; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); max-width: 320px; font: 400 13px var(--sans); }
+  .menu div { padding: 3px 12px; }
+  .menu .on { background: var(--subtle); }
+  .menu .grp { font: 600 10.5px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; padding-top: 6px; }
+  .seg { display: inline-flex; justify-self: start; border: .5px solid var(--soft); border-radius: 8px; overflow: hidden; font: 400 12.5px var(--sans); }
+  .seg span { padding: 2px 10px; }
+  .seg .on { background: var(--ink); color: #fff; }
+
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  pre { margin: 0; padding: 12px 14px; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; font: 400 12px/1.6 var(--mono); color: var(--ink-2); overflow-x: auto; white-space: pre-wrap; }
+  pre .add { color: var(--you); }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 780px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair h3 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Tasks, v4</h1>
+    <p>v3 with your two notes on it. A task now has a <b>kind</b>, picked from pills as its model is: a <b>prompt</b> to a model, a <b>search</b> of a source, a <b>command</b>, or none, when it is yours. So a command can sit between two prompts: compare the drafts, export them, open a room. A command never runs by itself: a run puts it in the bar, the line under the bar says what it will do, and it waits for your Enter.</p>
+    <p>Rooms are named by their number, as the strip names them ("Room: 204"), and branches by theirs (207a), never by the name of a room's layout. The rest is v3.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The board</h2>
+    <p class="lede">A task's kind shows as a small pill before its model or its command; a task of yours shows none. Where its answer lands is named by number: its branch (207a), or the room it goes into (room 204).</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Tasks</h2></div>
+      <div class="body">
+        <div class="plus"><span class="p"></span><span>Add a task</span></div>
+
+        <div class="main">
+          <div class="head">
+            <span class="box"></span><h3>Grant application</h3><span></span>
+            <span class="desc">The two-year grant for the land trust, to the board by Friday</span>
+            <span class="meta"><span class="kind">prompt</span><span class="chip">Sonnet 5.5</span><span class="chip">room 204</span><span class="marg">one by one · 1 of 5 done</span></span>
+          </div>
+
+          <div class="sub">
+            <span class="box on"></span><span class="title">Draft the summary</span><span class="state">done</span>
+            <span class="words">A one-page summary of the project from my notes, for the board</span>
+            <span class="who"><span class="kind">prompt</span><span class="chip faint">Sonnet 5.5, as the task</span><span class="chip">room 204</span></span>
+            <div class="answer"><span class="by">Sonnet 5.5, room 204:</span> The Fernwood Community Land Trust asks the board for a two-year grant of 48,000 to … <a class="l">open:204</a></div>
+          </div>
+          <div class="sub">
+            <span class="box"></span><span class="title">Find last year's figures</span><span></span>
+            <span class="words">land trust grants 2025</span>
+            <span class="who"><span class="kind">search</span><span class="chip">OpenAlex</span><span class="chip">207b</span></span>
+          </div>
+          <div class="sub">
+            <span class="box"></span><span class="title">Check the figures</span><span></span>
+            <span class="words">Go through the budget with Anna</span>
+          </div>
+          <div class="sub">
+            <span class="box"></span><span class="title">Compare the two drafts</span><span></span>
+            <span class="who"><span class="kind">command</span><span class="cmd">compare:207a 207b</span></span>
+            <span class="words marg">the run puts it in the bar, and waits for your Enter</span>
+          </div>
+          <div class="sub">
+            <span class="box"></span><span class="title">Tighten to a page</span><span></span>
+            <span class="words">Keep the figures as they now stand</span>
+            <span class="who"><span class="kind">prompt</span><span class="chip">Opus 5.5</span><span class="chip">room 204</span></span>
+          </div>
+          <div class="plus"><span class="p"></span><span>Add a sub-task</span></div>
+
+          <div class="runs">
+            <h4>Runs</h4>
+            <ul>
+              <li><span>Run 2</span><span class="marg">today 10:12 · waits at "Check the figures" · about 1¢</span></li>
+              <li><span>Run 1</span><span class="marg">15 November · done · about 3¢</span><a class="l">open:run 1</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="task"><span class="box"></span><span class="t">Moving house</span><span></span><span class="facts marg">5 sub-tasks</span></div>
+        <div class="task done"><span class="box on"></span><span class="t">Water tower history</span><span class="state">done</span><span class="facts"><span class="kind">search</span> <span class="chip">Wikipedia</span> <span class="chip">201a</span></span></div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>A box ticks a task done, as <code>tick:</code> does, said under the bar and taken back by <code>undo:</code>. A prompt or a search is done when its answer comes, a command when it has run; ticking one yourself marks it done without sending or running it.</li>
+      <li>The main task's box ticks itself when every sub-task is done, and ticking it ticks those of its sub-tasks still open that are yours.</li>
+      <li>"room 204": the answer goes into that room's chat, after what is there, as a prompt typed there would. "207b": a branch of this task, its chat made when it first runs. A task of yours goes nowhere.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · Adding a task</h2>
+    <p class="lede">The plus opens this in place. The kind comes first, as pills; what follows it changes with the kind. A sub-task starts with its task's kind, model and rooms, each changeable.</p>
+    <div class="two">
+      <div class="form">
+        <div class="f"><span class="k">Name</span><span class="in">Grant application</span></div>
+        <div class="f"><span class="k">Description</span><span class="in ph">if you like</span></div>
+        <div class="f"><span class="k">Kind</span><span class="pick"><span class="opt">None</span><span class="opt on">Prompt</span><span class="opt">Search</span><span class="opt">Command</span></span></div>
+        <div class="f"><span class="k">Model</span><span class="pick"><span class="drop">Sonnet 5.5 ▾</span></span></div>
+        <div class="f"><span class="k">Rooms</span><span class="pick"><span class="opt on">room 204<span class="x">×</span></span><span class="in ph" style="min-width:120px">search rooms ▾</span></span></div>
+        <div class="f"><span class="k">Flow</span><span class="seg"><span>All at once</span><span class="on">One by one</span></span></div>
+      </div>
+      <div>
+        <span class="tag">Kind, and what it asks for</span>
+        <div class="menu">
+          <div><b>None</b>: yours, ticked by you. Nothing more.</div>
+          <div><b>Prompt</b>: a model, from the models' list.</div>
+          <div><b>Search</b>: a source: Wikipedia, Hacker News, OpenAlex.</div>
+          <div><b>Command</b>: a command line, written as in the bar.</div>
+        </div>
+        <span class="tag" style="margin-top:12px">The rooms' search</span>
+        <div class="menu">
+          <div class="on">204 · First, the budget</div>
+          <div>199 · Grant draft, October</div>
+          <div>211 · barn owl</div>
+          <div class="grp">or</div>
+          <div>A branch of this task</div>
+          <div>No room</div>
+        </div>
+      </div>
+    </div>
+    <div class="form" style="margin-top:12px">
+      <div class="f"><span class="k">Kind</span><span class="pick"><span class="opt">None</span><span class="opt">Prompt</span><span class="opt">Search</span><span class="opt on">Command</span></span></div>
+      <div class="f"><span class="k">Command</span><span class="in cmd">compare:207a 207b</span></div>
+      <div class="f"><span class="k"></span><span class="marg">compare: sets the last replies of 207a and 207b side by side and marks the words that differ. Nothing is sent</span></div>
+    </div>
+    <ul class="notes">
+      <li>A command is checked as it is written, with the line the bar would show under it; one the bar would refuse cannot be kept.</li>
+      <li>Rooms are found by number or by their chat's title, and listed as the strip and Records name them: "204 · First, the budget". "A branch of this task" makes a chat for it when it first runs (207a, 207b, …); "No room" is for a task of yours, or a search kept on the board.</li>
+      <li>From the bar: <code>new:task "Grant application"</code>, <code>new:subtask 207 "Compare the two drafts"</code>; the board's fields set the rest.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · A command between prompts</h2>
+    <p class="lede">One by one, a run that reaches a command puts it in the bar, as if you had typed it, and waits there, as it waits at a task of yours. The line under the bar says what Enter will do and what it costs. Enter runs it and the run goes on; Escape leaves it, and the run waits until you run it or tick it.</p>
+    <div class="form">
+      <div class="f"><span class="k">The bar</span><span class="cmd">compare:207a 207b</span></div>
+      <div class="f"><span class="k">Its line</span><span class="marg">Enter sets the last replies of 207a and 207b side by side, marking the words that differ. Nothing is sent · then 207 goes on to "Tighten to a page"</span></div>
+    </div>
+    <ul class="notes">
+      <li>Never on its own: a command can change or delete what you have, or cost money, so each waits for your Enter, as anything typed in the bar does. One that asks for a second Enter asks for it here too.</li>
+      <li>Only you write a task's command. A model's answer or a source's text never becomes one, as text from outside never runs a command now.</li>
+      <li>All at once, the commands wait until the rest have gone, then come to the bar one at a time.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · Flow</h2>
+    <div class="two">
+      <div class="form">
+        <div class="f"><span class="k">One by one</span><span>Each after the one before, in order, so each model reads what came before it. A task of yours, or a command, holds those after it until you tick it or press Enter.</span></div>
+      </div>
+      <div class="form">
+        <div class="f"><span class="k">All at once</span><span>Prompts and searches sent together, each in its own chat; commands after, one at a time; yours hold nothing up.</span></div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>With a model, the task's own name and description go with each of its prompts, so each knows what it is part of. A task with a kind and no sub-tasks is sent, searched or run as itself.</li>
+      <li>The flow can change until the task first runs.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · What is stored: shown before building</h2>
+    <p class="lede">As v3, with a command's line on a step, and rooms held as the chats they show.</p>
+    <div class="pair">
+      <div>
+        <h3>A task</h3>
+<pre>{
+  id: "d-81…", num: 207,
+  title: "Grant application",
+<span class="add">  description: "The two-year grant…",
+  model: "claude-sonnet-5-5",
+  rooms: ["c-204…"],
+  flow: "oneByOne",
+  doneAt: null,</span>
+  branches: [ … ], order: [ … ]
+}</pre>
+      </div>
+      <div>
+        <h3>A command sub-task</h3>
+<pre>{
+  id: "s-5d02…",
+  status: "ready",
+<span class="add">  title: "Compare the two drafts",
+  command: "compare:207a 207b",</span>
+  prompt: "",
+  model: null,
+  condition: null
+}</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>The kind is read from what a step holds: <code>command</code> a command, <code>todo</code> yours, a source for its model a search, a model a prompt. Nothing stores the kind twice.</li>
+      <li><code>command</code>: one line, up to 2,000 characters, kept only as you wrote it; its <code>prompt</code> stays empty, so an older Parliament sees an empty step and runs nothing.</li>
+      <li><code>rooms</code> are the chats the rooms show (chat ids), so "room 204" is chat 204. A sub-task sent into one goes into that chat, after what is there; the chat stays in its own place in Records.</li>
+      <li>The rest as v3: <code>description</code>, <code>model</code>, <code>flow</code>, <code>doneAt</code> on a task, <code>title</code> on a sub-task. No migration; a restore checks each field.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>v3's six points,</b> as drawn there.</li>
+        <li><b>Kinds:</b> none (yours), prompt, search and command, picked as pills before the model; a sub-task starts with its task's.</li>
+        <li><b>A command never runs by itself:</b> a run puts it in the bar with its line, and waits for your Enter, or a tick.</li>
+        <li><b>Rooms and branches by number:</b> "room 204" sends into chat 204, after what is there; "207a" is a branch of the task; no layout names.</li>
+        <li><b>The stored change:</b> v3's fields, with <code>command</code> on a step and <code>rooms</code> as chat ids.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
