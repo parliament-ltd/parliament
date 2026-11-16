@@ -51,7 +51,7 @@ export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothin
  */
 export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, todo = null, title = '', command = null, now }) {
   const cmd = todo == null && command != null && String(command).trim() ? String(command).trim().slice(0, COMMAND_MOST) : null
-  const name = String(title ?? '').replace(/s+/g, ' ').trim().slice(0, TITLE_MOST)
+  const name = String(title ?? '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
   return {
     id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: todo != null || cmd ? '' : String(prompt ?? ''), model: todo != null || cmd ? null : model,
     ...(name ? { title: name } : {}),

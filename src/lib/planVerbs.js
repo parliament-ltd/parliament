@@ -11,7 +11,7 @@
 // a new branch would have; selected: the branch picked on the board.
 
 import { planOpen, address } from '../shell/arrangement'
-import { STATUS, TODO_MOST } from './docketModel'
+import { STATUS, TODO_MOST, TITLE_MOST } from './docketModel'
 import { runScope, waitsAt } from './runner'
 import { CHARS_PER_TOKEN, inputCost } from '../shell/estimate'
 import { queryLines } from './languageVerbs'
@@ -89,6 +89,45 @@ export function planNewPlan(step) {
 }
 
 /**
+ * new:task, new:task "Grant application" (C301 (g), v4): a task with nothing
+ * in it, one by one and yours until its fields say otherwise, opened on the
+ * Tasks board.
+ */
+export function planNewTask(step) {
+  const title = typed(step.match?.values?.[1]).replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
+  return {
+    says: title ? { message: 'taskNewTitled', values: { title, board: BOARD } } : { message: 'taskNew', values: { board: BOARD } },
+    act: { kind: 'newTask', title },
+  }
+}
+
+/**
+ * new:subtask, new:subtask 207 "Compare with the old draft" (v4): a sub-task
+ * at the end of the task on the board, named, of its task's kind: a prompt
+ * to its model, a search of its source, or, with neither, yours. Its other
+ * fields are set on the board. On a plan of before, new:step.
+ */
+export function planNewSub(step, screens = {}) {
+  const p = screens.plan ?? null
+  if (!p?.task) return planNewStep(step, screens)
+  const [, a2, a3] = step.match?.values ?? []
+  const arg = a2?.kind === 'address' ? a2 : null
+  const title = (a3 ? typed(a3) : isWords(a2) ? typed(a2) : '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
+  const s = shown(screens, arg ? arg.num : null)
+  if (s.bad) return { says: s.bad, act: null }
+  const old = record(p)
+  if (old) return { says: old, act: null }
+  const lane = p.branches.find((b) => b.letter === 'a')
+  if (!lane) return { says: { message: 'planNoBranch', values: { address: `${p.num}a`, run: p.n } }, act: null }
+  const yours = !p.task.model
+  const values = { index: lane.steps.length + 1, num: p.num, title }
+  return {
+    says: { message: title ? (yours ? 'subNewYours' : 'subNew') : 'subNewEmpty', values },
+    act: { kind: 'planStep', docketId: p.docketId, num: p.num, n: p.n, letter: 'a', address: String(p.num), title, prompt: yours ? '' : title, ...(yours ? { todo: true } : {}) },
+  }
+}
+
+/**
  * new:step, new:step 201b, new:step "Who built it?", new:step 201b "…": a
  * step planned at the end of a branch in the last run, to write on the
  * board when no text is given. Nothing is sent.
@@ -127,6 +166,8 @@ export function planTick(step, screens = {}) {
   const vals = step.match?.values ?? []
   const off = vals[0]?.kind === 'word' && vals[0].value === 'off'
   const [arg, num] = off ? vals.slice(1) : vals
+  // A task (v4): tick:207 the task, tick:207 2 its sub-task 2.
+  if (arg?.kind === 'address' && !arg.letter && (num == null || num.kind === 'number')) return taskTick(arg, num, off, screens)
   if (arg?.kind !== 'address' || !arg.letter || num?.kind !== 'number') return { says: { message: 'tickHow' }, act: null }
   const s = shown(screens, arg.num)
   if (s.bad) return { says: s.bad, act: null }
@@ -145,6 +186,47 @@ export function planTick(step, screens = {}) {
   return {
     says: { message: off ? 'tickOffGo' : 'tickGo', values },
     act: { kind: 'tickTodo', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, stepId: one.stepId, index, address: b.branch.address, done: !off },
+  }
+}
+
+// tick: on a task (v4). The task itself, with your sub-tasks still open; or
+// one sub-task: a to-do, a command, or a prompt not yet sent, marked done
+// without sending or running it. One sent is done when its answer comes.
+function taskTick(arg, num, off, screens) {
+  // A task not open on the board, ticked from its row.
+  const row = num == null && screens.plan?.num !== arg.num ? (screens.tasks ?? []).find((t) => t.num === arg.num) : null
+  if (row) {
+    const values = { num: row.num, title: row.title }
+    if (off ? !row.ticked : row.ticked) return { says: { message: off ? 'taskTickOffAlready' : 'taskTickAlready', values }, act: null }
+    return { says: { message: off ? 'taskTickOffGo' : 'taskTickGo', values }, act: { kind: 'tickTask', docketId: row.docketId, num: row.num, done: !off } }
+  }
+  const s = shown(screens, arg.num)
+  if (s.bad) return { says: s.bad, act: null }
+  const p = s.plan
+  if (!p.task) return { says: { message: 'tickHow' }, act: null }
+  const old = record(p)
+  if (old) return { says: old, act: null }
+  const lane = p.branches.find((b) => b.letter === 'a')
+  if (num == null) {
+    const values = { num: p.num, title: p.title }
+    const ticked = Boolean(p.task.doneAt)
+    if (off ? !ticked : ticked) return { says: { message: off ? 'taskTickOffAlready' : 'taskTickAlready', values }, act: null }
+    const yours = (lane?.steps ?? []).filter((x) => x.planned && x.status === STATUS.READY && (x.todo || x.yours)).length
+    return {
+      says: { message: off ? 'taskTickOffGo' : yours ? 'taskTickGoYours' : 'taskTickGo', values: { ...values, count: yours } },
+      act: { kind: 'tickTask', docketId: p.docketId, num: p.num, done: !off },
+    }
+  }
+  const index = Number(num.value)
+  const one = lane?.steps[index - 1]
+  const values = { index, address: String(p.num), run: p.n, words: one ? (one.title || one.text) : '' }
+  if (!one) return { says: { message: 'planNoStep', values }, act: null }
+  if (!one.todo && (!one.planned || one.status === STATUS.RUNNING)) return { says: { message: 'tickSent', values }, act: null }
+  const ticked = one.todo ? Boolean(one.todo.doneAt) : one.status === STATUS.DONE
+  if (off ? !ticked : ticked) return { says: { message: off ? 'tickOffAlready' : 'tickAlready', values }, act: null }
+  return {
+    says: { message: off ? 'tickOffGo' : 'tickGo', values },
+    act: { kind: 'tickTodo', docketId: p.docketId, num: p.num, n: p.n, letter: 'a', stepId: one.stepId, index, address: String(p.num), done: !off },
   }
 }
 
@@ -269,7 +351,9 @@ export function planPromptPreview(text, p) {
   if (p.none) return { ready: false, says: { message: 'planNone', values: { board: BOARD } } }
   const old = record(p)
   if (old) return { ready: false, says: old }
-  const b = branchOf(p, null)
+  // A task (v4): what is typed is its next sub-task, named by the task's number.
+  const lane = p.task ? p.branches.find((x) => x.letter === 'a') : null
+  const b = lane ? { branch: { ...lane, address: String(p.num) } } : branchOf(p, null)
   if (b.bad) return { ready: false, says: b.bad }
   const values = { index: b.branch.steps.length + 1, address: b.branch.address, run: p.n }
   if (!String(text ?? '').trim()) return { ready: false, says: { message: 'planPromptEmpty', values } }
@@ -364,9 +448,23 @@ export function planRun(step, screens = {}) {
   if (old) return { says: old, act: null }
   const f = screens.runFacts
   if (!f) return null
-  if (f.keyed == null) return { says: { message: 'promptChecking' }, act: null }
+  // A task with a kind and no sub-tasks is run as itself (v4).
+  const lane = p.task ? p.branches.find((b) => b.letter === 'a') : null
+  if (p.task && lane && !lane.steps.length && !arg?.letter) {
+    if (!p.task.model) return { says: { message: 'taskRunNothing', values: { num: p.num } }, act: null }
+    if (f.keyed == null) return { says: { message: 'promptChecking' }, act: null }
+    const who = f.whoOf(p.task.model, null)
+    if (who.needsKey) return { says: { message: 'runNeedsKey', values: { index: 1, address: String(p.num), name: who.name, provider: who.providerName, command: `api:${who.provider}` } }, act: null }
+    return {
+      says: { message: 'taskRunSelf', values: { num: p.num, title: p.title, name: who.name }, also: [{ message: 'runUndo' }] },
+      act: { kind: 'run', docketId: p.docketId, num: p.num, n: p.latest, letter: null, letters: ['a'], newRun: false, self: true, together: false },
+    }
+  }
   const scope = runScope(p, { letter: arg?.letter ?? null })
   if (scope.bad) return { says: scope.bad, act: null }
+  // Keys are looked for only when something is sent: a task of yours and
+  // your commands runs without (v4).
+  if (f.keyed == null && scope.branches.some((b) => b.steps.some((st) => !st.command))) return { says: { message: 'promptChecking' }, act: null }
   let count = 0
   let tokens = 0
   let total = 0
@@ -376,9 +474,12 @@ export function planRun(step, screens = {}) {
   let asking = 0
   let askingQuery = null
   const names = []
+  let lines = 0
   for (const b of scope.branches) {
     let chars = b.chatId ? f.charsOf(b.chatId) : 0
     for (const [i, st] of b.steps.entries()) {
+      // A command of yours waits for your Enter, and costs nothing here (v4).
+      if (st.command) { lines += 1; continue }
       const who = f.whoOf(st.model, b.chatId)
       const at = { index: i + 1, address: b.address, name: who.name }
       if (who.later) return { says: { message: 'runLater', values: at }, act: null }
@@ -406,7 +507,7 @@ export function planRun(step, screens = {}) {
     }
   }
   const nums = scope.branches.map((b) => b.address)
-  const also = [{ message: 'runTo', values: { answering: names } }]
+  const also = names.length ? [{ message: 'runTo', values: { answering: names } }] : []
   // With steps that may not run, the cost is what goes if every one does.
   const all = iffy ? 'All' : ''
   if (tokens) also.push(!priced ? { message: `runCost${all}Unpriced`, values: { tokens } } : total < CENT ? { message: `runCost${all}Cheap`, values: { tokens, cost: CENT } } : { message: `runCost${all}`, values: { tokens, cost: total } })
@@ -414,15 +515,20 @@ export function planRun(step, screens = {}) {
   if (askingQuery) also.push(...queryLines(askingQuery, asking, f.nameOf ?? ((t) => t)))
   if (local) also.push({ message: 'runLocal' })
   if (scope.skipped) also.push({ message: 'runSkipped', values: { count: scope.skipped } })
+  if (lines) also.push({ message: 'runLines', values: { count: lines } })
+  if (p.task?.flow === 'together') also.push({ message: 'runTogether' })
   // Where a lane will wait for you, at a to-do not yet ticked (C301 (g)).
   if (!scope.newRun) {
     for (const b of scope.branches) {
       const w = waitsAt(p.branches.find((x) => x.letter === b.letter)?.steps ?? [])
-      if (w) also.push({ message: 'runWaitsYou', values: { address: b.address, index: w.n, words: w.text } })
+      if (w) also.push(p.task ? { message: w.command ? 'taskWaitsLine' : 'taskWaitsYou', values: { num: p.num, index: w.n, words: w.title || w.text } } : { message: 'runWaitsYou', values: { address: b.address, index: w.n, words: w.text } })
     }
   }
   also.push({ message: 'runUndo' })
-  const head = scope.newRun
+  // A task (v4): its sub-tasks, its prompts and searches and your commands.
+  const head = p.task
+    ? { message: p.task.flow === 'together' ? 'taskRunHeadTogether' : 'taskRunHead', values: { num: p.num, count: count + lines, run: scope.run, fresh: scope.newRun ? 'yes' : 'no' } }
+    : scope.newRun
     ? { message: 'runHeadNew', values: { count, run: scope.run, address: nums[0] } }
     : { message: nums.length > 1 ? 'runHeadMany' : 'runHead', values: { count, run: scope.run, nums, num: p.num } }
   // Warn before a costly run (settings spec §9; C203): above the amount set,
@@ -430,7 +536,7 @@ export function planRun(step, screens = {}) {
   const costly = f.warn != null && priced && total >= f.warn
   return {
     says: costly ? { message: 'runCostly', values: { cost: total, warn: f.warn }, also: [head, ...also] } : { ...head, also },
-    act: { kind: 'run', docketId: p.docketId, num: p.num, n: p.latest, letter: arg?.letter ?? null, letters: scope.branches.map((b) => b.letter), newRun: scope.newRun },
+    act: { kind: 'run', docketId: p.docketId, num: p.num, n: p.latest, letter: arg?.letter ?? null, letters: scope.branches.map((b) => b.letter), newRun: scope.newRun, together: p.task?.flow === 'together' },
   }
 }
 

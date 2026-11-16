@@ -396,3 +396,17 @@ Each: id, the English, the draft, and why I was unsure.
 - keys.localStepOrigins, keys.localStepOriginsOther: "and only this site" is "och ingen annan", more natural than the literal "och bara den".
 - keys.localStepOriginsOther: "ställ in OLLAMA_ORIGINS på {origin}", the usual way to set a setting to a value; "där det körs" for "where it runs" (Ollama is "det", per the glossary).
 - keys.localStepNotAll: "som" points at * itself ("Inte *, som skulle låta alla webbplatser använda det"); "vilket" would point at the whole clause.
+
+## Tasks v4, drafted 16 November 2026 (C301 (g))
+
+- All lines: a plan is "uppgift" and a step "deluppgift", so "uppgift" now means the numbered thing, where on 16 November it meant a step. A reader who saw the earlier draft meets the same word one level up.
+- Quotation marks: the English has “…” and the Swedish keeps ”…”, as the rest of the catalogue and the conventions above.
+- tasks.fieldWords: "Words" (the text of a sub-task of your own) is "Text". "Ord" reads oddly as a field label.
+- tasks.keep: "Keep" (the button that keeps a changed task) is "Spara", as room.editsKept has "sparade" for kept. "Behåll" could read as keeping it as it was.
+- tasks.kindNone: "Ingen", agreeing with the field's name "Typ" (en typ).
+- tasks.runStopped: "stoppat", neuter like "klart" and "körs" on the same row of runs and like plan.ended, though a run (körning) is common gender.
+- enter.taskTickGo, enter.taskTickGoYours, verb.tick: "done" is not translated, since "bocka av" already says it, as verb.tick did before.
+- enter.taskTickGoYours: "the sub-task of yours still open" is "din egen deluppgift som fortfarande är öppen", with "egen" so it names the kind None (the person's own) and not any sub-task of the task. "with it" is "samtidigt".
+- enter.runLines: "# commands of yours" is "# av dina kommandon". "for your Enter" is "på att du trycker på Enter" here, in enter.taskWaitsLine and in tasks.commandWaits, as leader.prompt has it.
+- enter.runTogether: "Alla samtidigt: varje prompt går till en egen chatt, sedan kommandona" keeps the English's clipped ending.
+- tasks.noneHow: "the plus" is "pluset", as enter.colsNow ("ett plus"); the example is new:task "bidragsansökan", translated as other free-text examples are, with straight quotes since it is typed.

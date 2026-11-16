@@ -8,6 +8,7 @@ import { withSteps, runFromRun, emptyPlan } from './recordsModel'
 import { STATUS, plannedStep } from './docketModel'
 import { taskOf, kindOf, modelOf, targetOf, taskDone, isTaskish, titleOf, isCommand } from './taskModel'
 import { validateBackup } from './validate'
+import { createRunner } from './runner'
 import { rebuildRecord } from './backupSchema'
 
 // Tasks v4 (C301 (g), ruled 16 November): a task with a description, a
@@ -77,6 +78,10 @@ describe('a command sub-task, as stored', () => {
     const s = plannedStep({ id: 's1', title: 'Compare with the old draft', command: '  compare:204 199 ', prompt: 'x', model: 'claude-sonnet-5-5', now: 'x' })
     expect(s).toMatchObject({ title: 'Compare with the old draft', command: 'compare:204 199', prompt: '', model: null, status: STATUS.READY })
     expect(isCommand(s)).toBe(true)
+  })
+
+  it('keeps a title as written, its spaces made one', () => {
+    expect(plannedStep({ id: 's1', title: '  List  the rooms ', prompt: 'x', now: 'x' }).title).toBe('List the rooms')
   })
 
   it('keeps its place as the chat moves on, and comes forward in the next run', () => {
@@ -164,5 +169,68 @@ describe('a task in the database', () => {
     await R.markStep(db, { docketId, n: 1, letter: 'a', stepId: p.step.id, status: STATUS.RUNNING, now: at() })
     await expect(R.changeTask(db, { docketId, set: { flow: 'oneByOne' }, now: at() })).rejects.toMatchObject({ code: 'ran' })
     await expect(R.changeTask(db, { docketId, set: { description: 'Still fine' }, now: at() })).resolves.toBeTruthy()
+  })
+})
+
+describe('a task run', () => {
+  const step = (id, extra = {}) => ({ id, status: STATUS.READY, prompt: `Prompt ${id}`, model: 'm', condition: null, ...extra })
+  const depsFor = (lane, { sent, offered, chats }) => ({
+    readBranch: async () => structuredClone(lane),
+    ensureChat: async ({ step: s, own }) => { const c = own ? `own-${s.id}` : 'c-a'; chats?.push(c); return c },
+    markStep: async ({ stepId, status }) => { lane.steps.find((s) => s.id === stepId).status = status },
+    sendStep: async ({ step: s, chatId }) => { sent.push(`${s.id}@${chatId}`); return 'done' },
+    offerLine: ({ step: s }) => offered.push(s.command),
+    stopChat: () => {},
+    lock: async (id, fn) => fn(),
+    newRunFor: async () => 1,
+  })
+  const settle = () => new Promise((res) => setTimeout(res, 20))
+
+  it('one by one, puts a command in the bar and waits for it, even last', async () => {
+    const lane = { chatId: null, steps: [step('p1'), step('c2', { prompt: '', model: null, command: 'compare:204 199' }), step('p3'), step('c4', { prompt: '', model: null, command: 'export:204' })] }
+    const sent = []
+    const offered = []
+    const r = createRunner(depsFor(lane, { sent, offered }))
+    const out = await r.start({ docketId: 'd', num: 207, n: 1, letters: ['a'] })
+    await settle()
+    expect(sent).toEqual(['p1@c-a'])
+    expect(offered).toEqual(['compare:204 199'])
+    expect(r.active()[0]).toMatchObject({ yours: 'c2', line: 'compare:204 199' })
+    lane.steps[1].status = STATUS.DONE
+    r.ticked({ docketId: 'd', letter: 'a', stepId: 'c2' })
+    await settle()
+    expect(sent).toEqual(['p1@c-a', 'p3@c-a'])
+    expect(offered).toEqual(['compare:204 199', 'export:204'])
+    lane.steps[3].status = STATUS.DONE
+    r.ticked({ docketId: 'd', letter: 'a', stepId: 'c4' })
+    expect(await out.finished).toEqual({ n: 1, ended: { a: 'done' } })
+  })
+
+  it('one by one, waits at a sub-task that is yours before a prompt', async () => {
+    const lane = { chatId: 'c-a', steps: [step('p1'), step('y2', { model: null, yours: true }), step('p3')] }
+    const sent = []
+    const r = createRunner(depsFor(lane, { sent, offered: [] }))
+    const out = await r.start({ docketId: 'd', num: 207, n: 1, letters: ['a'] })
+    await settle()
+    expect(sent).toEqual(['p1@c-a'])
+    expect(r.active()[0]).toMatchObject({ yours: 'y2', line: null })
+    r.stop({ scope: 'docket', num: 207 })
+    expect(await out.finished).toEqual({ n: 1, ended: { a: 'stopped' } })
+  })
+
+  it('all at once, sends each prompt into its own chat, yours holding nothing, then the commands', async () => {
+    const lane = { chatId: null, steps: [step('p1'), step('t2', { prompt: '', model: null, todo: { text: 'Call Anna', doneAt: null } }), step('c3', { prompt: '', model: null, command: 'compare:207b 207c' }), step('p4')] }
+    const sent = []
+    const offered = []
+    const chats = []
+    const r = createRunner(depsFor(lane, { sent, offered, chats }))
+    const out = await r.start({ docketId: 'd', num: 207, n: 1, letters: ['a'], together: true })
+    await settle()
+    expect(sent.sort()).toEqual(['p1@own-p1', 'p4@own-p4'])
+    expect(offered).toEqual(['compare:207b 207c'])
+    lane.steps[2].status = STATUS.DONE
+    r.ticked({ docketId: 'd', letter: 'a', stepId: 'c3' })
+    expect(await out.finished).toEqual({ n: 1, ended: { a: 'done' } })
+    expect(lane.steps[1].status).toBe(STATUS.READY)
   })
 })

@@ -40,7 +40,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 
 | Command | What it does | Forms | Works on | `undo:` |
 | --- | --- | --- | --- | --- |
-| `new:chat` | Make a chat, list of tasks, room, collection, framework, branch, step, to-do, run or block | `new:chat`, `new:tasks`, `new:tasks "Grant application"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:todo "Check the figures"`, `new:todo 201a "Check the figures"`, `new:run` | everywhere | yes |
+| `new:chat` | Make a chat, task, sub-task, room, collection, framework, branch, to-do, run or block | `new:chat`, `new:task`, `new:task "Grant application"`, `new:subtask 207 "Compare with the old draft"`, `new:room`, `new:room guided`, `new:collection`, `new:framework "Editor" "Make each sentence shorter"`, `new:branch 207`, `new:branch 201a 2`, `new:branch "Shorter"`, `new:step`, `new:step 201b "Who built it?"`, `new:todo "Check the figures"`, `new:todo 201a "Check the figures"`, `new:run` | everywhere | yes |
 | `open:207` | Open a board, or anything by its number or name; several at once, and spread across your screens | `open:207`, `open:201a`, `open:201a summary`, `open:run 1`, `open:"Owl notes"`, `open:collection`, `open:records`, `open:settings keys`, `open:202 203 collection records spread` | everywhere | no |
 | `close:records` | Take a board off the screen, or close the letter. Nothing is lost | `close:records`, `close:204`, `close:room`, `close:welcome` | everywhere | yes |
 
@@ -118,7 +118,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `accept:244` | Accept a suggestion | `accept:244`, `accept:all` | Rooms, Tasks, Reflection, Collection | yes |
 | `reject:244` | Turn down a suggestion | `reject:244`, `reject:all` | Rooms, Tasks, Reflection, Collection | yes |
 | `hold:242` | Keep a branch or an edit from going until you say | `hold:242`, `hold:201c`, `hold:off 242` | Rooms, Tasks, Reflection, Collection | yes |
-| `tick:201a 2` | Tick a to-do of yours on a list of tasks, or untick it | `tick:201a 2`, `tick:off 201a 2` | everywhere | yes |
+| `tick:207 2` | Tick a task or a sub-task done, or untick it | `tick:207 2`, `tick:207`, `tick:off 207 2`, `tick:201a 2` | everywhere | yes |
 | `markup:` | Markup: markup: opens the menu. markup:on and markup:off show or hide every mark in the text, or one kind, as markup:off highlights. markup:suggesting keeps what you type held back until you accept it, and markup:editing makes it the text | `markup:`, `markup:off`, `markup:on prompts`, `markup:suggesting` | everywhere | yes |
 | `by:haiku` | Choose who answers in this chat: a model, or a source with no tokens | `by:`, `by:haiku`, `by:mistral small`, `by:wikipedia` | everywhere | yes |
 | `thinking:off` | Let models that can think do so before answering, shown as they go, or not | `thinking:`, `thinking:on`, `thinking:off` | everywhere | yes |

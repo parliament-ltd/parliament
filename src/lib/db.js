@@ -100,6 +100,16 @@ export async function getPlan({ id = null, num = null } = {}) {
   return { docket, runs }
 }
 
+/** Every plan and its runs (oldest first), for the Tasks board (v4). */
+export async function listPlans() {
+  const db = await initDB()
+  if (!db.objectStoreNames.contains('dockets')) return []
+  const [dockets, runs] = await Promise.all([db.getAll('dockets'), db.getAll('runs')])
+  const byDocket = new Map()
+  for (const r of runs) byDocket.set(r.docketId, [...(byDocket.get(r.docketId) ?? []), r])
+  return dockets.map((docket) => ({ docket, runs: (byDocket.get(docket.id) ?? []).sort((a, b) => a.n - b.n) }))
+}
+
 /** fn(the database as stored, not through the lock), for the lock's rewrites. */
 export async function withRawDB(fn) {
   await initDB()

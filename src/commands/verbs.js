@@ -142,17 +142,19 @@ export const VERBS = Object.freeze([
 
   // Start
   v({ verb: 'new', group: 'start', example: 'new:chat',
-    forms: ['new:chat', 'new:tasks', 'new:tasks "Grant application"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:todo "Check the figures"', 'new:todo 201a "Check the figures"', 'new:run'],
+    forms: ['new:chat', 'new:task', 'new:task "Grant application"', 'new:subtask 207 "Compare with the old draft"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:todo "Check the figures"', 'new:todo 201a "Check the figures"', 'new:run'],
     // new:framework "Name" "What it asks": a framework of your own (C164).
     // new:branch 201a 2: a fork after step 2 of 201a (C178).
     // new:step 201b "…", new:plan "…" and new:branch "…" (C198): an address
     // is read before text, which an address would also fill.
     // new:tasks, a list of tasks, is new:plan by its new name, still read;
-    // new:todo, a to-do of yours (C301 (g)).
-    takes: [[['chat', 'tasks', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'todo', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['branch'], 'address', 'number'], [['branch'], 'text'], [['framework'], 'text', 'text'],
-      [['step'], 'address'], [['step'], 'text'], [['step'], 'address', 'text'], [['todo'], 'address'], [['todo'], 'text'], [['todo'], 'address', 'text'], [['plan'], 'text'], [['tasks'], 'text']],
+    // new:todo, a to-do of yours (C301 (g)); new:task, a task, and
+    // new:subtask, one of its sub-tasks (v4).
+    takes: [[['chat', 'task', 'subtask', 'tasks', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'todo', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['branch'], 'address', 'number'], [['branch'], 'text'], [['framework'], 'text', 'text'],
+      [['step'], 'address'], [['step'], 'text'], [['step'], 'address', 'text'], [['todo'], 'address'], [['todo'], 'text'], [['todo'], 'address', 'text'], [['plan'], 'text'], [['tasks'], 'text'], [['task'], 'text'],
+      [['subtask'], 'address'], [['subtask'], 'text'], [['subtask'], 'address', 'text']],
     stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, list of tasks, room, collection, framework, branch, step, to-do, run or block' } }),
+    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, task, sub-task, room, collection, framework, branch, to-do, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     // Several at once, and spread across the screens (C284).
     forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Owl notes"', 'open:collection', 'open:records', 'open:settings keys', 'open:202 203 collection records spread'],
@@ -306,8 +308,9 @@ export const VERBS = Object.freeze([
   v({ verb: 'hold', group: 'editing', example: 'hold:242', forms: ['hold:242', 'hold:201c', 'hold:off 242'], takes: [['addresses'], [['off'], { opt: 'addresses' }]], on: EDITING, stage: 10, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.hold', message: 'Keep a branch or an edit from going until you say' } }),
   // A to-do of yours ticked or not (C301 (g)); done: is the Lab's.
-  v({ verb: 'tick', group: 'editing', example: 'tick:201a 2', forms: ['tick:201a 2', 'tick:off 201a 2'], takes: [['address', 'number'], [['off'], 'address', 'number']], stage: 15, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.tick', message: 'Tick a to-do of yours on a list of tasks, or untick it' } }),
+  // A task, or one of its sub-tasks, ticked (v4).
+  v({ verb: 'tick', group: 'editing', example: 'tick:207 2', forms: ['tick:207 2', 'tick:207', 'tick:off 207 2', 'tick:201a 2'], takes: [['address', 'number'], ['address'], [['off'], 'address', 'number'], [['off'], 'address']], stage: 15, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.tick', message: 'Tick a task or a sub-task done, or untick it' } }),
   // The markup menu (C301 (b)): from any board, as the strip's "markup ▾"
   // is. col, the Collection's own switch before, is still read (it says the
   // Collection always shows its marks now).

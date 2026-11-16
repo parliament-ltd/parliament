@@ -393,3 +393,14 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 - keys.localStepCheck: "Paina yllä olevaa painiketta ”{check}”." Head noun painiketta carries the partitive, and the word is quoted, as ”Poista kaikki” on painike.
 - keys.localStepInstall, keys.localStepRestart: {provider} stands bare as the object of an imperative (nominative), so no head noun is needed. "Quit" is "Lopeta" (the macOS word), not "Sulje", which could mean closing only its window.
 - keys.localStepOriginsOther: "aseta asetuksen OLLAMA_ORIGINS arvoksi {origin}", the head noun arvoksi carrying the translative; "where it runs" is "siellä, missä se on käynnissä", as keys.localUnreached says käynnissä.
+
+## Tasks v4, drafted 16 November 2026 (C301 (g))
+
+- **oma tehtävä beside tehtävä**: a to-do of yours keeps the glossary's "oma tehtävä", but a task is now "tehtävä" too. verb.new lists both ("tehtävä, alitehtävä, … oma tehtävä"), and enter.planTodoAdd reads "lisää oman tehtäväsi haaran {address} alitehtäväksi {index}". "oma alitehtävä" would keep them apart where the to-do is a sub-task.
+- **haaran {address}**: the sub-task lines keep "haaran {address}" from before. enter.tickHow's example is tick:207 2, so {address} may now be a task's number; if so, "haaran 207" is wrong there and "tehtävän {address}" is needed (enter.tickSent already says task).
+- **step still in the English**: picker.forStep, enter.runLocal, enter.runNothing (new:step), enter.planHoldEmpty, library.aboutDocket, block.steps and guide.o.steps were not reworded, so their Finnish keeps "vaihe" and the screen shows vaihe and alitehtävä for the same thing.
+- Settled the same day: a to-do of yours is now "oma alitehtävä"; the sub-task lines say "kohteen {address}", which reads for a task (207) or a branch (201a); the six step lines were reworded and now say alitehtävä. Only enter.planHoldEmpty still says "Haarassa {address} … vaiheita"; its English ("{address} has nothing planned to hold") names neither.
+- **tasks.runStopped**: "pysäytetty", as the English says stopped, but the board shows it for any paused run; "keskeytynyt" (plan.statusPaused) would also cover failures.
+- **tasks.fieldWords, tasks.fieldSearch, tasks.keep**: "Teksti" (not "Sanat", which reads like lyrics), "Hakusanat", and "Tallenna" for Keep (it saves the changed fields).
+- **tasks.add, tasks.addPlus**: both "Lisää tehtävä" (and both sub-task ones "Lisää alitehtävä"); Finnish has no article to tell the button from the plus.
+- **tasks.noneHow**: the example name is translated, new:task "apurahahakemus", as arrange:save examples are.

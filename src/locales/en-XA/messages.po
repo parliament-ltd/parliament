@@ -5476,6 +5476,10 @@ msgid "enter.runLater"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runLines"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.runLocal"
 msgstr ""
 
@@ -5519,6 +5523,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runTogether"
 msgstr ""
 
 #. Commands stay English
@@ -5936,6 +5944,22 @@ msgid "enter.strikeNumbered"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.subDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.subNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.subNewEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.subNewYours"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr ""
 
@@ -6141,6 +6165,76 @@ msgstr ""
 msgid "enter.targetTrying"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.taskChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskFlowRan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskLineWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewTitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHeadTogether"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskRunNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunSelf"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskTickAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGoYours"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsLine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsYou"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
@@ -6238,6 +6332,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tickSent"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9893,6 +9991,239 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "storage.notKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.addPlus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.addSub"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.addSubPlus"
+msgstr ""
+
+#. Who answered and where, before the first words of the answer
+#. js-lingui-explicit-id
+msgid "tasks.answerBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.asTask"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.asTaskChip"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.cancel"
+msgstr ""
+
+#. A link that opens the task’s fields to change them
+#. js-lingui-explicit-id
+msgid "tasks.change"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.commandExample"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.commandNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.commandWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.deleteSub"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.doneOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldDescription"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldFlow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldKind"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldWords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.findRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOneLow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogether"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogetherLow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.ifYouLike"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.keep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.kindCommand"
+msgstr ""
+
+#. The kind of a task that is the person’s own
+#. js-lingui-explicit-id
+msgid "tasks.kindNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.kindPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.kindSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.needsKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.none"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.noneHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.noRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.ownBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.ownRoom"
+msgstr ""
+
+#. A small label: the sub-task is a command
+#. js-lingui-explicit-id
+msgid "tasks.pillCommand"
+msgstr ""
+
+#. A small label: the sub-task is a prompt to a model
+#. js-lingui-explicit-id
+msgid "tasks.pillPrompt"
+msgstr ""
+
+#. A small label: the sub-task is a search of a source
+#. js-lingui-explicit-id
+msgid "tasks.pillSearch"
+msgstr ""
+
+#. A room, by its number, as the strip names it
+#. js-lingui-explicit-id
+msgid "tasks.room"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.roomOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.runN"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.runs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.runWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.subCount"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.subRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.tickSub"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.tickTask"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.untitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "tasks.yoursNow"
 msgstr ""
 
 #. js-lingui-explicit-id

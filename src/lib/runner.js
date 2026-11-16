@@ -13,6 +13,13 @@
 // each step, and every change is written through the functions it is given.
 // Only one tab runs a plan at a time (a Web Lock per plan, bus.js); stop:
 // reaches the tab that runs it over the bus, as ids and signals only.
+//
+// A task (C301 (g), v4) runs its branch a. One by one, in order: a to-do of
+// yours, or a sub-task with no model (`yours`, as read for the run), holds
+// those after it until you tick it; a command of yours is put in the bar and
+// holds the rest until you run it there or tick it. All at once, its prompts
+// and searches go together, each into a chat of its own, then its commands
+// one at a time; yours hold nothing up.
 
 import { STATUS, isPlanned, isTodo } from './docketModel'
 
@@ -45,36 +52,50 @@ export function outcomeOf(step) {
   return null
 }
 
-const hasWords = (s) => !isTodo(s) && String(s?.text ?? s?.prompt ?? '').trim().length > 0
+// A command of yours (v4): never sent, put in the bar for your Enter.
+const isLine = (s) => typeof s?.command === 'string' && s.command.trim().length > 0
+// Yours: a to-do, or a sub-task of a task with no model to ask (v4).
+const isYours = (s) => isTodo(s) || s?.yours === true
+const hasWords = (s) => !isYours(s) && !isLine(s) && String(s?.text ?? s?.prompt ?? '').trim().length > 0
 const isReady = (s) => s.status === STATUS.READY && (s.planned ?? isPlanned(s))
 // A to-do of yours not yet ticked (C301 (g)): the lane waits there for you.
-const openTodo = (s) => isTodo(s) && isReady(s)
+const openTodo = (s) => isYours(s) && isReady(s)
+const openLine = (s) => isLine(s) && isReady(s)
 // Whether a prompt is still to run after index i, for a to-do to wait for.
 const promptAfter = (steps, i) => steps.slice(i + 1).some((s) => isReady(s) && hasWords(s))
 
 /**
  * The next step a branch runs after index `after`: ready, planned and with
- * words, or a to-do of yours not yet ticked with a prompt after it, where
- * the lane waits. Empty ones are skipped.
+ * words; a to-do of yours not yet ticked with a prompt after it, where the
+ * lane waits; or a command of yours, which waits for your Enter (v4). Empty
+ * ones are skipped.
  */
 export function nextStep(steps, after = -1) {
   for (let i = after + 1; i < steps.length; i++) {
     const s = steps[i]
     if (s.status === STATUS.RUNNING) return null
     if (isReady(s) && hasWords(s)) return { index: i, step: s }
-    if (openTodo(s) && promptAfter(steps, i)) return { index: i, step: s, yours: true }
+    if (openLine(s)) return { index: i, step: s, yours: true, command: true }
+    if (openTodo(s) && (promptAfter(steps, i) || steps.slice(i + 1).some(openLine))) return { index: i, step: s, yours: true }
   }
   return null
 }
 
-/** Where a lane would wait for you: its first to-do not ticked with a prompt after it, numbered from 1, or null (C301 (g)). */
+/**
+ * Where a lane would wait for you: its first to-do not ticked with a prompt
+ * after it, or its first command (v4), numbered from 1, or null (C301 (g)).
+ */
 export function waitsAt(steps) {
-  const i = (steps ?? []).findIndex((s, k) => openTodo(s) && promptAfter(steps, k))
-  return i < 0 ? null : { n: i + 1, text: String(steps[i].todo?.text ?? '') }
+  const list = steps ?? []
+  const i = list.findIndex((s, k) => openLine(s) || (openTodo(s) && (promptAfter(list, k) || list.slice(k + 1).some(openLine))))
+  if (i < 0) return null
+  const s = list[i]
+  const named = s.title ? { title: s.title } : {}
+  return isLine(s) ? { n: i + 1, text: s.command, command: true, ...named } : { n: i + 1, text: String(s.todo?.text || s.title || s.prompt || ''), ...named }
 }
 
-const readyOf = (b) => b.steps.filter((s) => isReady(s) && hasWords(s))
-const emptyOf = (b) => b.steps.filter((s) => isReady(s) && !hasWords(s) && !isTodo(s)).length
+const readyOf = (b) => b.steps.filter((s) => isReady(s) && (hasWords(s) || isLine(s)))
+const emptyOf = (b) => b.steps.filter((s) => isReady(s) && !hasWords(s) && !isYours(s) && !isLine(s)).length
 // Held by hold:, not waiting because a condition was not met (C201).
 const heldOf = (b) => {
   const open = b.steps.filter((s) => s.planned && s.ended !== 'unmet')
@@ -132,29 +153,34 @@ export const runsActive = () => going
  *   stopChat(chatId)  stops the reply arriving there
  *   lock(docketId, fn) -> fn's result, or null when another tab holds the plan
  *   newRunFor({ docketId, letters }) -> the new run's number, the other branches waiting
+ *   offerLine({ docketId, num, n, letter, step }) a command of yours, put in the bar (v4)
  *   onChange(active)  what runs here now changed
  *   onEnd({ docketId, num, n, ended })  a run finished: ended maps each letter to how
  */
-export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopChat, lock, newRunFor, onChange = () => {}, onEnd = () => {} }) {
+export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopChat, lock, newRunFor, offerLine = () => {}, onChange = () => {}, onEnd = () => {} }) {
   const jobs = new Map() // docketId -> { num, n, letters, stopping, current }
 
   const active = () => [...jobs.entries()].flatMap(([docketId, job]) => [...job.letters].map((letter) => ({
     docketId, num: job.num, n: job.n, letter, chatId: job.current.get(letter) ?? null, stopping: job.stopping.has(letter),
     // Waiting for you at a to-do (C301 (g)): its step's id.
     yours: job.waits?.get(letter)?.stepId ?? null,
+    // Waiting for your Enter at a command of yours (v4).
+    line: job.waits?.get(letter)?.line ?? null,
   })))
   const changed = () => onChange(active())
 
   // One step: its chat made if the branch has none, marked running, sent,
   // and marked done or paused. Returns how it ended.
-  async function runStep(docketId, job, letter, chatId, step, group = null, included = null) {
+  async function runStep(docketId, job, letter, chatId, step, group = null, included = null, own = false) {
     try {
-      chatId = chatId ?? await ensureChat({ docketId, n: job.n, letter, step })
+      chatId = chatId ?? await ensureChat({ docketId, n: job.n, letter, step, own })
       await markStep({ docketId, n: job.n, letter, stepId: step.id, status: STATUS.RUNNING })
     } catch {
       return 'failed'
     }
-    job.current.set(letter, chatId)
+    // All at once, each in its own chat (v4): each kept to stop it.
+    if (own) job.chats.add(chatId)
+    else job.current.set(letter, chatId)
     changed()
     let outcome
     try {
@@ -162,7 +188,8 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
     } catch (err) {
       outcome = err?.name === 'Stalled' ? 'stalled' : err?.name === 'AbortError' ? 'stopped' : 'failed'
     }
-    job.current.delete(letter)
+    if (own) job.chats.delete(chatId)
+    else job.current.delete(letter)
     const answered = outcome === 'done' || outcome === 'nothing'
     if (!answered && job.stopping.has(letter)) outcome = 'stopped'
     await markStep({ docketId, n: job.n, letter, stepId: step.id, status: answered ? STATUS.DONE : STATUS.PAUSED, ended: answered ? null : outcome }).catch(() => {})
@@ -172,7 +199,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
 
   // A lane waiting for you at a to-do (C301 (g)): until it is ticked, here
   // (ticked()) or in another tab (read again every two seconds), or stopped.
-  function untilTicked(docketId, job, letter, step) {
+  function untilTicked(docketId, job, letter, step, line = null) {
     if (job.stopping.has(letter)) return Promise.resolve('stopped')
     return new Promise((resolve) => {
       let timer = 0
@@ -182,8 +209,10 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         changed()
         resolve(how)
       }
-      job.waits.set(letter, { stepId: step.id, done })
+      job.waits.set(letter, { stepId: step.id, done, line })
       changed()
+      // A command of yours goes into the bar as the lane waits for it (v4).
+      if (line) Promise.resolve().then(() => offerLine({ docketId, num: job.num, n: job.n, letter, step })).catch(() => {})
       const look = async () => {
         if (!job.waits.has(letter)) return
         const branch = await readBranch({ docketId, n: job.n, letter }).catch(() => null)
@@ -229,7 +258,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
       // Your to-do: the lane waits until you tick it, then goes on as after
       // a step that finished (C301 (g)). stop: ends the wait.
       if (next.yours) {
-        if (await untilTicked(docketId, job, letter, step) === 'stopped') return 'stopped'
+        if (await untilTicked(docketId, job, letter, step, next.command ? step.command : null) === 'stopped') return 'stopped'
         before = 'done'
         continue
       }
@@ -238,6 +267,24 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
       before = outcome
       ran = outcome === 'nothing' ? 'done' : outcome
     }
+  }
+
+  // A task all at once (v4): its prompts and searches together, each into a
+  // chat of its own; then its commands, one at a time, each waiting for your
+  // Enter or a tick; yours hold nothing up.
+  async function runTogether(docketId, job, letter) {
+    const branch = await readBranch({ docketId, n: job.n, letter })
+    if (!branch) return 'gone'
+    const prompts = branch.steps.filter((s) => isReady(s) && hasWords(s))
+    const outcomes = await Promise.all(prompts.map((step) => (job.stopping.has(letter) ? 'stopped' : runStep(docketId, job, letter, null, step, null, null, true))))
+    if (job.stopping.has(letter)) return 'stopped'
+    for (const step of branch.steps.filter(openLine)) {
+      const now = (await readBranch({ docketId, n: job.n, letter }))?.steps.find((s) => s.id === step.id)
+      if (!now || !openLine(now)) continue
+      if (await untilTicked(docketId, job, letter, now, now.command) === 'stopped') return 'stopped'
+    }
+    const bad = outcomes.find((o) => o !== 'done' && o !== 'nothing')
+    return bad ?? 'done'
   }
 
   // One prompt to several, one after another (branch slider v9; C201):
@@ -270,12 +317,12 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
    * begun, or could not: { started, n, reason, finished } where finished
    * resolves when every branch has ended.
    */
-  async function start({ docketId, num, n, letters, newRun = false, chain = null, group = null, included = null }) {
+  async function start({ docketId, num, n, letters, newRun = false, chain = null, group = null, included = null, together = false }) {
     if (jobs.has(docketId)) return { started: false, reason: 'running' }
     let begun
     const head = new Promise((resolve) => { begun = resolve })
     const finished = Promise.resolve(lock(docketId, async () => {
-      const job = { num, n, letters: new Set(letters), stopping: new Set(), current: new Map(), waits: new Map() }
+      const job = { num, n, letters: new Set(letters), stopping: new Set(), current: new Map(), waits: new Map(), chats: new Set() }
       jobs.set(docketId, job)
       going += 1
       const ended = {}
@@ -285,7 +332,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         changed()
         if (chain) Object.assign(ended, await runChain(docketId, job, chain, group, included))
         else {
-          const outcomes = await Promise.all(letters.map((l) => runBranch(docketId, job, l)))
+          const outcomes = await Promise.all(letters.map((l) => (together ? runTogether(docketId, job, l) : runBranch(docketId, job, l))))
           letters.forEach((l, i) => { ended[l] = outcomes[i] })
         }
         return { n: job.n, ended }
@@ -324,6 +371,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         hit += 1
         const chat = job.current.get(l)
         if (chat) stopChat(chat)
+        for (const c of job.chats) stopChat(c)
         // A lane waiting for you stops waiting (C301 (g)).
         job.waits.get(l)?.done('stopped')
       }
@@ -332,7 +380,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
     return hit
   }
 
-  /** A to-do ticked in this tab: the lane waiting at it goes on at once (C301 (g)). */
+  /** A to-do ticked, or a command run, in this tab: the lane waiting at it goes on at once (C301 (g); v4). */
   function ticked({ docketId, letter, stepId }) {
     const w = jobs.get(docketId)?.waits.get(letter)
     if (w && w.stepId === stepId) w.done('ticked')

@@ -126,11 +126,11 @@ msgstr "メモ、ハイライト、引用、お気に入り、コレクション
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
-msgstr "チャットとリスト"
+msgstr "チャットとタスク"
 
 #. js-lingui-explicit-id
 msgid "backup.catChatsAbout"
-msgstr "すべてのチャットとそのメッセージやファイル、チャットが属するリスト"
+msgstr "すべてのチャットとそのメッセージやファイル、チャットが属するタスク"
 
 #. js-lingui-explicit-id
 msgid "backup.catLayouts"
@@ -384,7 +384,7 @@ msgstr "波及分析"
 
 #. js-lingui-explicit-id
 msgid "block.steps"
-msgstr "ステップ一覧"
+msgstr "サブタスク"
 
 #. js-lingui-explicit-id
 msgid "block.summary-dashboard"
@@ -452,7 +452,7 @@ msgstr "下書きを送信すると、ある部分がほかの部分と食い違
 
 #. js-lingui-explicit-id
 msgid "blockAbout.steps"
-msgstr "このルームの会話に合わせて表示する、リストのタスク。リスト全体には専用のボードがあります。"
+msgstr "このルームの会話に合わせて表示する、タスクのサブタスク。タスク全体には専用のボードがあります。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
@@ -468,7 +468,7 @@ msgstr "会話の見出し。好きな位置へ移動できます。"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsEmpty"
-msgstr "まだ書かれていないタスク"
+msgstr "まだ書かれていないサブタスク"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsFollowing"
@@ -476,15 +476,15 @@ msgstr "このチャット（{address}）に連動"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoChat"
-msgstr "このルームにはまだチャットがないため、タスクもありません"
+msgstr "このルームにはまだチャットがないため、サブタスクもありません"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoPlan"
-msgstr "番号{num}のリストはここにはありません"
+msgstr "番号{num}のタスクはここにはありません"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsPinned"
-msgstr "リスト{num}（ピン留め）"
+msgstr "タスク{num}（ピン留め）"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsSent"
@@ -492,7 +492,7 @@ msgstr "送信済み（そのチャットにあります）"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsWhole"
-msgstr "でリスト全体を表示します"
+msgstr "でタスク全体を表示します"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.add"
@@ -1427,7 +1427,7 @@ msgstr "取り消し済み"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {リスト{num}} edit {編集{num}} ask {プロンプト{num}} suggestion {提案{num}} other {{num}}}"
+msgstr "{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {タスク{num}} edit {編集{num}} ask {プロンプト{num}} suggestion {提案{num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1480,7 +1480,7 @@ msgstr "含まれているものには、まだコメントもハイライトも
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {チャット{num}（削除済み）} plan {リスト{num}（削除済み）} message {メッセージ（削除済み）} other {{num}（削除済み）}}"
+msgstr "{what, select, chat {チャット{num}（削除済み）} plan {タスク{num}（削除済み）} message {メッセージ（削除済み）} other {{num}（削除済み）}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
@@ -1505,7 +1505,7 @@ msgstr "出典"
 
 #. js-lingui-explicit-id
 msgid "collection.fromHelp"
-msgstr "含まれるチャットとリスト。クリックで一覧を表示します"
+msgstr "含まれるチャットとタスク。クリックで一覧を表示します"
 
 #. js-lingui-explicit-id
 msgid "collection.fromNothing"
@@ -1525,7 +1525,7 @@ msgstr "チャット{num}"
 
 #. js-lingui-explicit-id
 msgid "collection.groupPlan"
-msgstr "リスト{num}"
+msgstr "タスク{num}"
 
 #. js-lingui-explicit-id
 msgid "collection.holdBack"
@@ -1615,7 +1615,7 @@ msgstr "ピン留め済み"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
-msgstr "リスト"
+msgstr "タスク"
 
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
@@ -1942,11 +1942,11 @@ msgstr "{count, plural, other {チャット#件}}"
 
 #. js-lingui-explicit-id
 msgid "count.dockets"
-msgstr "{count, plural, other {リスト#件}}"
+msgstr "{count, plural, other {タスク#件}}"
 
 #. js-lingui-explicit-id
 msgid "count.steps"
-msgstr "{count, plural, other {#タスク}}"
+msgstr "{count, plural, other {サブタスク#件}}"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
@@ -2742,7 +2742,7 @@ msgstr "AIモデルには何も送信されません"
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
 msgid "enter.comparePlan"
-msgstr "{num}はリストです。{example} で、その中の2つのブランチの最後の返答を比較します"
+msgstr "{num}はタスクです。{example} で、その中の2つのブランチの最後の返答を比較します"
 
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
@@ -2851,7 +2851,7 @@ msgstr "プロンプト{num}はモデルに送られたため、残ります。�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteBranch"
-msgstr "Enterで、一度も実行していない{address}を、リスト{num}のすべての実行から削除します。undo: で元に戻せます"
+msgstr "Enterで、一度も実行していない{address}を、タスク{num}のすべての実行から削除します。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2865,12 +2865,12 @@ msgstr "削除しました。20秒間は、チャットで元に戻せます"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
-msgstr "リスト{num}を削除しました。undo: で元に戻せます"
+msgstr "タスク{num}を削除しました。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
-msgstr "{address}のタスク{index}を削除しました。undo: で元に戻せます"
+msgstr "{address}のサブタスク{index}を削除しました。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2896,20 +2896,20 @@ msgstr "20秒間は、チャットで元に戻せます"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletePlan"
-msgstr "Enterで、まだチャットのないリスト{num}を削除します。undo: で元に戻せます"
+msgstr "Enterで、まだチャットのないタスク{num}を削除します。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.deletePlanToo"
-msgstr "リストの最後のブランチなので、リスト{num}も消えます"
+msgstr "タスクの最後のブランチなので、タスク{num}も消えます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteStep"
-msgstr "Enterで、{address}のタスク{index}を実行{run}から削除します。undo: で元に戻せます"
+msgstr "Enterで、{address}のサブタスク{index}を実行{run}から削除します。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
-msgstr "{address}のタスク{index}は開始済みのため、チャットと一緒に残ります"
+msgstr "{address}のサブタスク{index}は開始済みのため、チャットと一緒に残ります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2953,7 +2953,7 @@ msgstr "Enterで、実行{run}の横に実行{other}を並べ、違うところ�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffOneRun"
-msgstr "リスト{num}の実行は1つだけです。new:run で比較用の実行をもう1つ作れます"
+msgstr "タスク{num}の実行は1つだけです。new:run で比較用の実行をもう1つ作れます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3056,7 +3056,7 @@ msgstr "{count, plural, other {コメント、ハイライト、引用#件は、
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
-msgstr "{count, plural, other {リスト{nums}も、最後のチャットと一緒に消えます}}"
+msgstr "{count, plural, other {タスク{nums}も、最後のチャットと一緒に消えます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseUndo"
@@ -3317,7 +3317,7 @@ msgstr "{word} は{names}のいずれかを指します。{example} のように
 
 #. js-lingui-explicit-id
 msgid "enter.fromWhat"
-msgstr "{num}から来たものはありません。from: にはチャット、リスト、ブランチ、実行のいずれかを指定します"
+msgstr "{num}から来たものはありません。from: にはチャット、タスク、ブランチ、実行のいずれかを指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.goNewRoom"
@@ -3966,7 +3966,7 @@ msgstr "Enterで、{address}の履歴全体をコピーした{next}を、専用�
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchAt"
-msgstr "Enterで、{address}のタスク{step}までをコピーした{next}を、専用のルームで始めます。モデルは呼び出しません"
+msgstr "Enterで、{address}のサブタスク{step}までをコピーした{next}を、専用のルームで始めます。モデルは呼び出しません"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchDone"
@@ -3991,7 +3991,7 @@ msgstr "Enterで、{address}の隣に空のブランチ{next}を、専用のル�
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
-msgstr "{count, plural, =0 {{address}にはまだタスクがありません} other {{address}には#タスクあります}}"
+msgstr "{count, plural, =0 {{address}にはまだサブタスクがありません} other {{address}にはサブタスクが#件あります}}"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGo"
@@ -4085,7 +4085,7 @@ msgstr "Enterで、ここのルームに{address}を履歴ごと表示します�
 
 #. js-lingui-explicit-id
 msgid "enter.openBranchUnrun"
-msgstr "{address}はまだ実行していません。Enterで、そのタスクを{board}ボードに表示します"
+msgstr "{address}はまだ実行していません。Enterで、そのサブタスクを{board}ボードに表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.openChat"
@@ -4133,11 +4133,11 @@ msgstr "Enterで、{num}のあるチャットを、その箇所で開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
-msgstr "Enterで、リスト{num}を{board}ボードで開きます"
+msgstr "Enterで、タスク{num}を{board}ボードで開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlanHere"
-msgstr "リスト{num}は{board}ボードにあります。Enterでバーの対象にします"
+msgstr "タスク{num}は{board}ボードにあります。Enterでバーの対象にします"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -4319,20 +4319,20 @@ msgstr "{address}を追加しました。実行するまでチャットはあり
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchNew"
-msgstr "Enterで、リスト{num}に{address}を追加します。実行するまでチャットはありません。何も送信されません"
+msgstr "Enterで、タスク{num}に{address}を追加します。実行するまでチャットはありません。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planChanged"
-msgstr "その間にリストが変わりました。もう一度確認してから、Enterを押してください"
+msgstr "その間にタスクが変わりました。もう一度確認してから、Enterを押してください"
 
 #. js-lingui-explicit-id
 msgid "enter.planFailed"
-msgstr "リストを変更できませんでした"
+msgstr "タスクを変更できませんでした"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planFixed"
-msgstr "そのタスクは開始済みのため、もう変更できません。new:run で計画し直せます"
+msgstr "そのサブタスクは開始済みのため、もう変更できません。new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldAlready"
@@ -4353,7 +4353,7 @@ msgstr "Enterで、実行{run}の{nums}の保留を解除します"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldOn"
-msgstr "Enterで、実行{run}の{nums}を保留にします。hold:off まで、そのタスクは待機します"
+msgstr "Enterで、実行{run}の{nums}を保留にします。hold:off まで、そのサブタスクは待機します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4375,19 +4375,19 @@ msgstr "{address}はすでに{other}の{where, select, after {後ろ} other {前
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planMoveWhich"
-msgstr "move:201c after 201a のように、同じリストのブランチを2つ指定してください"
+msgstr "move:201c after 201a のように、同じタスクのブランチを2つ指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.planNew"
-msgstr "Enterで、空のリストを作って{board}ボードで開きます。何も送信されません"
+msgstr "Enterで、空のタスクを作って{board}ボードで開きます。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewDone"
-msgstr "リスト{num}を作りました。中身はまだありません"
+msgstr "タスク{num}を作りました。中身はまだありません"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewTitled"
-msgstr "Enterで、空のリスト「{title}」を作って{board}ボードで開きます。何も送信されません"
+msgstr "Enterで、空のタスク「{title}」を作って{board}ボードで開きます。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoBranch"
@@ -4396,33 +4396,33 @@ msgstr "{address}は実行{run}にありません"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
-msgstr "{board}ボードにリストはありません。open: とリストの番号で表示するか、new:tasks で作れます"
+msgstr "{board}ボードにタスクはありません。open: とタスクの番号で表示するか、new:task で作れます"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoStep"
-msgstr "実行{run}の{address}には、タスク{index}がありません"
+msgstr "実行{run}の{address}には、サブタスク{index}がありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNotShown"
-msgstr "リスト{num}は{board}ボードにありません。open:{num} で表示できます"
+msgstr "タスク{num}は{board}ボードにありません。open:{num} で表示できます"
 
 #. js-lingui-explicit-id
 msgid "enter.planOnePlan"
-msgstr "一度に指定できるのは、1つのリストのブランチだけです"
+msgstr "一度に指定できるのは、1つのタスクのブランチだけです"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptEmpty"
-msgstr "タスクを書いてください。Enterで、{address}のタスク{index}として追加します。何も送信されません"
+msgstr "サブタスクを書いてください。Enterで、{address}のサブタスク{index}として追加します。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptStep"
-msgstr "Enterで、これを実行{run}の{address}のタスク{index}として追加します。何も送信されません"
+msgstr "Enterで、これを実行{run}の{address}のサブタスク{index}として追加します。何も送信されません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planRecord"
-msgstr "実行{run}は以前の実行で、当時のまま残しています。リストを変更するには open:run {latest} を使います"
+msgstr "実行{run}は以前の実行で、当時のまま残しています。タスクを変更するには open:run {latest} を使います"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunDone"
@@ -4434,45 +4434,45 @@ msgstr "実行{run}はすでに{board}ボードにあります"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNew"
-msgstr "Enterで、リスト{num}の実行{from}から実行{next}を作ります：すべてのタスクを計画し直し、何も開始しません。何も送信されません"
+msgstr "Enterで、タスク{num}の実行{from}から実行{next}を作ります：すべてのサブタスクを計画し直し、何も開始しません。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNone"
-msgstr "{runs, plural, other {リスト{num}の実行は#件です}}"
+msgstr "{runs, plural, other {タスク{num}の実行は#件です}}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunOpen"
-msgstr "Enterで、リスト{num}の実行{run}を表示します"
+msgstr "Enterで、タスク{num}の実行{run}を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepAdd"
-msgstr "Enterで、実行{run}の{address}にタスク{index}を追加します。何も送信されません"
+msgstr "Enterで、実行{run}の{address}にサブタスク{index}を追加します。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepDone"
-msgstr "{address}にタスク{index}を計画しました。何も送信していません"
+msgstr "{address}にサブタスク{index}を計画しました。何も送信していません"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepEmpty"
-msgstr "Enterで、実行{run}の{address}に空のタスク{index}を追加します。内容はボードで書けます。何も送信されません"
+msgstr "Enterで、実行{run}の{address}に空のサブタスク{index}を追加します。内容はボードで書けます。何も送信されません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planStepHeld"
-msgstr "{address}は保留中なので、このタスクも待機します。hold:off {address} で保留を解除できます"
+msgstr "{address}は保留中なので、このサブタスクも待機します。hold:off {address} で保留を解除できます"
 
 #. js-lingui-explicit-id
 msgid "enter.planTodoAdd"
-msgstr "Enterで、自分のやることを{address}のタスク{index}として追加します。送信されることはなく、終わったらチェックを付けます"
+msgstr "Enterで、自分のやることを{address}のサブタスク{index}として追加します。送信されることはなく、終わったらチェックを付けます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planTodoDone"
-msgstr "{address}のタスク{index}は自分のやることです。tick:{address} {index} でチェックを付けます"
+msgstr "{address}のサブタスク{index}は自分のやることです。tick:{address} {index} でチェックを付けます"
 
 #. js-lingui-explicit-id
 msgid "enter.planTodoEmpty"
-msgstr "Enterで、空のやることを{address}のタスク{index}として追加します。内容はボードで書けます。送信されることはありません"
+msgstr "Enterで、空のやることを{address}のサブタスク{index}として追加します。内容はボードで書けます。送信されることはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
@@ -5334,29 +5334,29 @@ msgstr "Rippleはルームのチャットに使えます。先にルームを開
 
 #. js-lingui-explicit-id
 msgid "enter.rippleNothing"
-msgstr "Rippleは編集をリストのほかのブランチに広げますが、このチャットにはまだほかのブランチがありません"
+msgstr "Rippleは編集をタスクのほかのブランチに広げますが、このチャットにはまだほかのブランチがありません"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOff"
-msgstr "Enterで、リスト{num}のRippleをオフにします：編集はそのブランチだけに残ります"
+msgstr "Enterで、タスク{num}のRippleをオフにします：編集はそのブランチだけに残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOffAlready"
-msgstr "リスト{num}のRippleはすでにオフです"
+msgstr "タスク{num}のRippleはすでにオフです"
 
 #. {nums} are the other branches, as 201b and 201c
 #. js-lingui-explicit-id
 msgid "enter.rippleOn"
-msgstr "Enterで、リスト{num}のRippleをオンにします：編集をプロンプトと一緒に送るとき、{name}が{nums}に同じ変更がないか確認します。ブランチごとに1回呼び出します"
+msgstr "Enterで、タスク{num}のRippleをオンにします：編集をプロンプトと一緒に送るとき、{name}が{nums}に同じ変更がないか確認します。ブランチごとに1回呼び出します"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOnAlready"
-msgstr "リスト{num}のRippleはすでにオンです"
+msgstr "タスク{num}のRippleはすでにオンです"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleOnNoKey"
-msgstr "Enterで、リスト{num}のRippleをオンにします。{nums}を確認するには、キーのあるモデルが必要です：api:"
+msgstr "Enterで、タスク{num}のRippleをオンにします。{nums}を確認するには、キーのあるモデルが必要です：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -5404,27 +5404,27 @@ msgstr "今のところ、{verb} を同じ行に並べられるのは同じ種�
 
 #. js-lingui-explicit-id
 msgid "enter.runChanged"
-msgstr "その間にリストが変わりました。もう一度確認してから、Enterを押してください"
+msgstr "その間にタスクが変わりました。もう一度確認してから、Enterを押してください"
 
 #. js-lingui-explicit-id
 msgid "enter.runCost"
-msgstr "送信は少なくとも{tokens, number}トークン、{cost}です。各タスクは、それまでの返答もあわせて送ります"
+msgstr "送信は少なくとも{tokens, number}トークン、{cost}です。各サブタスクは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAll"
-msgstr "すべてのタスクが実行されると、送信は少なくとも{tokens, number}トークン、{cost}です。各タスクは、それまでの返答もあわせて送ります"
+msgstr "すべてのサブタスクが実行されると、送信は少なくとも{tokens, number}トークン、{cost}です。各サブタスクは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllCheap"
-msgstr "すべてのタスクが実行されると、送信は少なくとも{tokens, number}トークン、{cost}未満です。各タスクは、それまでの返答もあわせて送ります"
+msgstr "すべてのサブタスクが実行されると、送信は少なくとも{tokens, number}トークン、{cost}未満です。各サブタスクは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllUnpriced"
-msgstr "すべてのタスクが実行されると、送信は少なくとも{tokens, number}トークンです。各タスクは、それまでの返答もあわせて送ります"
+msgstr "すべてのサブタスクが実行されると、送信は少なくとも{tokens, number}トークンです。各サブタスクは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostCheap"
-msgstr "送信は少なくとも{tokens, number}トークン、{cost}未満です。各タスクは、それまでの返答もあわせて送ります"
+msgstr "送信は少なくとも{tokens, number}トークン、{cost}未満です。各サブタスクは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostly"
@@ -5432,15 +5432,15 @@ msgstr "送信に少なくとも{cost}かかります。警告するよう指定
 
 #. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
-msgstr "送信は少なくとも{tokens, number}トークンです。各タスクは、それまでの返答もあわせて送ります"
+msgstr "送信は少なくとも{tokens, number}トークンです。各サブタスクは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runDone"
-msgstr "リスト{num}の実行{run}が完了しました"
+msgstr "タスク{num}の実行{run}が完了しました"
 
 #. js-lingui-explicit-id
 msgid "enter.runElsewhere"
-msgstr "リスト{num}は別のタブで実行中です"
+msgstr "タスク{num}は別のタブで実行中です"
 
 #. js-lingui-explicit-id
 msgid "enter.runFailed"
@@ -5448,19 +5448,19 @@ msgstr "実行を開始できませんでした"
 
 #. js-lingui-explicit-id
 msgid "enter.runGone"
-msgstr "{address}のタスク{index}の送り先{name}は、もう提供されていません"
+msgstr "{address}のサブタスク{index}の送り先{name}は、もう提供されていません"
 
 #. js-lingui-explicit-id
 msgid "enter.runHead"
-msgstr "{count, plural, =1 {Enterで、{nums}のタスクを1つ実行します（実行{run}）} other {Enterで、{nums}の#タスクを順番に実行します（実行{run}）}}"
+msgstr "{count, plural, =1 {Enterで、{nums}のサブタスクを1つ実行します（実行{run}）} other {Enterで、{nums}のサブタスク#件を順番に実行します（実行{run}）}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadMany"
-msgstr "Enterで、{nums}の{count, number}タスクを実行します（実行{run}）：ブランチどうしは並行して進み、各ブランチの中では1タスクずつ順番に実行します"
+msgstr "Enterで、{nums}のサブタスク{count, number}件を実行します（実行{run}）：ブランチどうしは並行して進み、各ブランチの中では1つずつ順番に実行します"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadNew"
-msgstr "{count, plural, =1 {Enterで実行{run}を作り、そこで{address}のタスクを1つ実行します。ほかのブランチは待機します} other {Enterで実行{run}を作り、そこで{address}の#タスクを順番に実行します。ほかのブランチは待機します}}"
+msgstr "{count, plural, =1 {Enterで実行{run}を作り、そこで{address}のサブタスクを1つ実行します。ほかのブランチは待機します} other {Enterで実行{run}を作り、そこで{address}のサブタスク#件を順番に実行します。ほかのブランチは待機します}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5469,34 +5469,38 @@ msgstr "{address}は保留中です。hold:off {address} で保留を解除で�
 
 #. js-lingui-explicit-id
 msgid "enter.runIf"
-msgstr "{count, plural, other {#タスクは、前のタスクが失敗するか何も見つからなかった場合にだけ実行します}}"
+msgstr "{count, plural, other {サブタスク#件は、前のサブタスクが失敗するか何も見つからなかった場合にだけ実行します}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
-msgstr "{address}のタスク{index}の送り先{name}は、まだ準備中です"
+msgstr "{address}のサブタスク{index}の送り先{name}は、まだ準備中です"
+
+#. js-lingui-explicit-id
+msgid "enter.runLines"
+msgstr "{count, plural, =1 {自分のコマンドが1つ、バーでEnterを待ちます} other {自分のコマンド#件が、1つずつバーでEnterを待ちます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLocal"
-msgstr "このコンピュータで答えるステップは、外に何も送りません"
+msgstr "このコンピュータで答えるサブタスクは、外に何も送りません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNeedsKey"
-msgstr "{address}のタスク{index}の送り先{name}には、{provider}のキーが必要です。{command} で追加できます"
+msgstr "{address}のサブタスク{index}の送り先{name}には、{provider}のキーが必要です。{command} で追加できます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNoSteps"
-msgstr "{address}には実行するタスクがありません。new:step {address} で計画できます"
+msgstr "{address}には実行するサブタスクがありません。new:subtask {address} で追加できます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNothing"
-msgstr "実行{run}には、実行できるステップがありません。new:step で計画できます"
+msgstr "実行{run}には、実行できるサブタスクがありません。new:subtask で追加できます"
 
 #. js-lingui-explicit-id
 msgid "enter.runPaused"
-msgstr "リスト{num}の実行{run}が終わりました。{nums}は中断しています。理由は{board}ボードに表示されます"
+msgstr "タスク{num}の実行{run}が終わりました。{nums}は中断しています。理由は{board}ボードに表示されます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5510,21 +5514,25 @@ msgstr "{address}は実行中です。stop:{address} で止められます"
 
 #. js-lingui-explicit-id
 msgid "enter.runSkipped"
-msgstr "{count, plural, other {空の#タスクは飛ばします}}"
+msgstr "{count, plural, other {空のサブタスク#件は飛ばします}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runStarted"
-msgstr "リスト{num}の実行{run}を開始しました。stop: で止められます"
+msgstr "タスク{num}の実行{run}を開始しました。stop: で止められます"
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
 msgstr "送り先は{answering}です"
 
+#. js-lingui-explicit-id
+msgid "enter.runTogether"
+msgstr "すべて同時に：各プロンプトはそれぞれ専用のチャットに入り、そのあとにコマンドが続きます"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runUnchecked"
-msgstr "{address}のタスク{index}の送り先は、このコンピュータ上の{name}ですが、このページを開いてから{provider}の一覧で確認されていません。{command} で確認できます"
+msgstr "{address}のサブタスク{index}の送り先は、このコンピュータ上の{name}ですが、このページを開いてから{provider}の一覧で確認されていません。{command} で確認できます"
 
 #. js-lingui-explicit-id
 msgid "enter.runUndo"
@@ -5532,7 +5540,7 @@ msgstr "取り消しは実行のところで止まります。実行で書かれ
 
 #. js-lingui-explicit-id
 msgid "enter.runWaitsYou"
-msgstr "{address}はタスク{index}「{words}」であなたを待ち、チェックを付けると先に進みます"
+msgstr "{address}はサブタスク{index}「{words}」であなたを待ち、チェックを付けると先に進みます"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -5886,7 +5894,7 @@ msgstr "Enterで、すべてのウインドウのすべての実行と返答を�
 
 #. js-lingui-explicit-id
 msgid "enter.stopBranch"
-msgstr "Enterで{address}を止めます。済んだものはそのまま残り、その分の料金はかかります。実行中のタスクは、その場で止まります"
+msgstr "Enterで{address}を止めます。済んだものはそのまま残り、その分の料金はかかります。実行中のサブタスクは、その場で止まります"
 
 #. js-lingui-explicit-id
 msgid "enter.stopDone"
@@ -5902,7 +5910,7 @@ msgstr "{what}で実行中のものはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.stopPlan"
-msgstr "Enterでリスト{num}を止めます。済んだものはそのまま残り、その分の料金はかかります。実行中のタスクは、その場で止まります"
+msgstr "Enterでタスク{num}を止めます。済んだものはそのまま残り、その分の料金はかかります。実行中のサブタスクは、その場で止まります"
 
 #. js-lingui-explicit-id
 msgid "enter.stopReply"
@@ -5934,6 +5942,22 @@ msgstr "その返答は、書かれている途中は編集できません"
 #. js-lingui-explicit-id
 msgid "enter.strikeNumbered"
 msgstr "編集{num}として取り消し線を引きました。undo:{num} で取り消せます"
+
+#. js-lingui-explicit-id
+msgid "enter.subDone"
+msgstr "タスク{num}にサブタスク{index}を追加しました。何も送信していません"
+
+#. js-lingui-explicit-id
+msgid "enter.subNew"
+msgstr "Enterで、タスク{num}にサブタスク{index}「{title}」を、そのモデルへのプロンプトとして追加します。何も送信されません"
+
+#. js-lingui-explicit-id
+msgid "enter.subNewEmpty"
+msgstr "Enterで、タスク{num}に空のサブタスク{index}を追加します。内容はボードで書けます。何も送信されません"
+
+#. js-lingui-explicit-id
+msgid "enter.subNewYours"
+msgstr "Enterで、タスク{num}にサブタスク{index}「{title}」を追加します。チェックは自分で付けます。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6062,7 +6086,7 @@ msgstr "{address}は情報源が答えたもので、情報源の言葉は照合
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepWhichBranch"
-msgstr "リスト{num}にはブランチがあります。sweep:{num}a のように1つ指定してください"
+msgstr "タスク{num}にはブランチがあります。sweep:{num}a のように1つ指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"
@@ -6141,6 +6165,76 @@ msgstr "→ 新しいルーム"
 msgid "enter.targetTrying"
 msgstr "→ 新しいチャット（{room}、triedタグ付き）"
 
+#. js-lingui-explicit-id
+msgid "enter.taskChanged"
+msgstr "タスク{num}を変更しました"
+
+#. js-lingui-explicit-id
+msgid "enter.taskFlowRan"
+msgstr "タスク{num}は実行済みのため、進め方は実行したときのままです"
+
+#. js-lingui-explicit-id
+msgid "enter.taskLineWaits"
+msgstr "タスク{num}はこのコマンド「{title}」を待っています：Enterで実行すると、タスクが先に進みます。ボードでチェックを付けることもできます"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNew"
+msgstr "Enterで、空のタスクを作って{board}ボードで開きます。何も送信されません"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewDone"
+msgstr "タスク{num}を作りました。中身はまだありません"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewTitled"
+msgstr "Enterで、空のタスク「{title}」を作って{board}ボードで開きます。何も送信されません"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHead"
+msgstr "{fresh, select, yes {Enterで、タスク{num}の実行{run}を作り、サブタスクを1つずつ実行します} other {Enterで、タスク{num}のサブタスクを1つずつ実行します（実行{run}）}}"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHeadTogether"
+msgstr "{fresh, select, yes {Enterで、タスク{num}の実行{run}を作り、サブタスクをすべて同時に実行します} other {Enterで、タスク{num}のサブタスクをすべて同時に実行します（実行{run}）}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskRunNothing"
+msgstr "タスク{num}には、サブタスクも、尋ねるモデルもありません。new:subtask {num} で追加できます"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunSelf"
+msgstr "Enterで、サブタスクのないタスク{num}「{title}」を、そのまま{name}に送ります"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskTickAlready"
+msgstr "タスク{num}にはすでにチェックが付いています。tick:off {num} で外せます"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGo"
+msgstr "Enterで、タスク{num}「{title}」にチェックを付けて完了にします"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGoYours"
+msgstr "Enterで、タスク{num}「{title}」にチェックを付けて完了にし、{count, plural, other {未完了の自分のサブタスク#件}}にも一緒にチェックを付けます"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffAlready"
+msgstr "タスク{num}にはチェックが付いていません"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffGo"
+msgstr "Enterで、タスク{num}「{title}」のチェックを外します。サブタスクはそのままです"
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsLine"
+msgstr "タスク{num}はサブタスク{index}「{words}」で待っています：そのコマンドがバーに入り、Enterを待ちます"
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsYou"
+msgstr "タスク{num}はサブタスク{index}「{words}」であなたを待ち、チェックを付けると先に進みます"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
@@ -6217,28 +6311,32 @@ msgstr "{on, select, on {思考はすでにオンです} other {思考はすで�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tickAlready"
-msgstr "{address}のタスク{index}にはすでにチェックが付いています。tick:off {address} {index} で外せます"
+msgstr "{address}のサブタスク{index}にはすでにチェックが付いています。tick:off {address} {index} で外せます"
 
 #. js-lingui-explicit-id
 msgid "enter.tickGo"
-msgstr "Enterで、{address}のタスク{index}「{words}」にチェックを付けます。そこで待っているブランチは先に進みます"
+msgstr "Enterで、{address}のサブタスク{index}「{words}」にチェックを付けます。そこで待っているブランチは先に進みます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tickHow"
-msgstr "tick: にはブランチとタスクを指定します：tick:201a 2"
+msgstr "tick: にはタスクとサブタスクを指定します：tick:207 2"
 
 #. js-lingui-explicit-id
 msgid "enter.tickNotTodo"
-msgstr "{address}のタスク{index}はプロンプトです。返答が届いた時点で完了になります"
+msgstr "{address}のサブタスク{index}はプロンプトです。返答が届いた時点で完了になります"
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffAlready"
-msgstr "{address}のタスク{index}にはチェックが付いていません"
+msgstr "{address}のサブタスク{index}にはチェックが付いていません"
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffGo"
-msgstr "Enterで、{address}のタスク{index}「{words}」のチェックを外します"
+msgstr "Enterで、{address}のサブタスク{index}「{words}」のチェックを外します"
+
+#. js-lingui-explicit-id
+msgid "enter.tickSent"
+msgstr "タスク{address}のサブタスク{index}は送信済みです：返答が届いた時点で完了になります"
 
 #. js-lingui-explicit-id
 msgid "enter.toAll"
@@ -6403,7 +6501,7 @@ msgstr "送信待ちのプロンプトは delete:{num} で取り下げます"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAtRun"
-msgstr "リスト{num}の実行{run}は開始済みで、取り消しはそこで止まります。リストはまだ自由に変更できます：new:run で計画し直せます"
+msgstr "タスク{num}の実行{run}は開始済みで、取り消しはそこで止まります。タスクはまだ自由に変更できます：new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -6562,7 +6660,7 @@ msgstr "ブラウザは、Parliamentにウインドウの配置を許可しな�
 
 #. js-lingui-explicit-id
 msgid "erase.about"
-msgstr "すべてのチャット、リスト、マーキング、組み立てたルーム、キー、設定をこのブラウザから削除します。取り消しでは戻せず、ほかの場所にも何も残りません。"
+msgstr "すべてのチャット、タスク、マーキング、組み立てたルーム、キー、設定をこのブラウザから削除します。取り消しでは戻せず、ほかの場所にも何も残りません。"
 
 #. js-lingui-explicit-id
 msgid "erase.backupFirst"
@@ -6594,7 +6692,7 @@ msgstr "すべて削除する"
 
 #. js-lingui-explicit-id
 msgid "erase.goesChats"
-msgstr "{chats, plural, other {チャット#件}}と{plans, plural, other {リスト#件}}、それぞれのメッセージとファイル"
+msgstr "{chats, plural, other {チャット#件}}と{plans, plural, other {タスク#件}}、それぞれのメッセージとファイル"
 
 #. js-lingui-explicit-id
 msgid "erase.goesKeys"
@@ -6962,7 +7060,7 @@ msgstr "ちょっとした質問"
 
 #. js-lingui-explicit-id
 msgid "guide.o.steps"
-msgstr "ステップ一覧"
+msgstr "サブタスク"
 
 #. js-lingui-explicit-id
 msgid "guide.o.talking"
@@ -7342,7 +7440,7 @@ msgstr "チャット"
 #. A list of tasks, as a kind of record (C301 (g))
 #. js-lingui-explicit-id
 msgid "kind.docket"
-msgstr "リスト"
+msgstr "タスク"
 
 #. js-lingui-explicit-id
 msgid "kind.edit"
@@ -7495,7 +7593,7 @@ msgstr "比べる、尋ねる、適用するために並べたもの。"
 
 #. js-lingui-explicit-id
 msgid "library.aboutDocket"
-msgstr "ブランチとステップに分けて並べ、まとめて実行するプロンプト。"
+msgstr "タスクのサブタスクをブランチに分けて並べ、まとめて実行します。"
 
 #. js-lingui-explicit-id
 msgid "library.aboutLibrary"
@@ -8232,7 +8330,7 @@ msgstr "英語のみ"
 
 #. js-lingui-explicit-id
 msgid "picker.forStep"
-msgstr "{address}のステップ{index}に答えるもの"
+msgstr "{address}のサブタスク{index}に答えるもの"
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -8385,7 +8483,7 @@ msgstr "ブランチを追加"
 
 #. js-lingui-explicit-id
 msgid "plan.addStep"
-msgstr "{address}にタスクを追加"
+msgstr "{address}にサブタスクを追加"
 
 #. js-lingui-explicit-id
 msgid "plan.addTodo"
@@ -8417,15 +8515,15 @@ msgstr "open:{num} で開きます"
 #. When a step runs (C201)
 #. js-lingui-explicit-id
 msgid "plan.condition"
-msgstr "{condition, select, failed {前のタスクが失敗したら実行} nothing {何も見つからなければ実行} always {結果にかかわらず実行} other {前のタスクが終わったら実行}}"
+msgstr "{condition, select, failed {前のサブタスクが失敗したら実行} nothing {何も見つからなければ実行} always {結果にかかわらず実行} other {前のサブタスクが終わったら実行}}"
 
 #. js-lingui-explicit-id
 msgid "plan.conditionHelp"
-msgstr "このタスクの実行条件。クリックで変更します"
+msgstr "このサブタスクの実行条件。クリックで変更します"
 
 #. js-lingui-explicit-id
 msgid "plan.counts"
-msgstr "{branches, plural, other {ブランチ#件}}、{steps, plural, =0 {タスクなし} other {#タスク}}"
+msgstr "{branches, plural, other {ブランチ#件}}、{steps, plural, =0 {サブタスクなし} other {サブタスク#件}}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteBranch"
@@ -8433,7 +8531,7 @@ msgstr "{address}を削除"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
-msgstr "{address}のタスク{index}を削除"
+msgstr "{address}のサブタスク{index}を削除"
 
 #. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
@@ -8443,7 +8541,7 @@ msgstr "{why, select, stopped {停止} failed {失敗} stalled {ネットワー�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
-msgstr "このタスクは実行{run}で開始済みのため、プロンプトは変更できません。new:run で計画し直せます"
+msgstr "このサブタスクは実行{run}で開始済みのため、プロンプトは変更できません。new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "plan.held"
@@ -8452,12 +8550,12 @@ msgstr "{count, plural, other {保留中#件}}"
 #. The plan’s number, at the top of the Plan board
 #. js-lingui-explicit-id
 msgid "plan.label"
-msgstr "リスト{num}"
+msgstr "タスク{num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.latest"
-msgstr "open:run {run} でリストを変更"
+msgstr "open:run {run} でタスクを変更"
 
 #. js-lingui-explicit-id
 msgid "plan.newInRun"
@@ -8469,12 +8567,12 @@ msgstr "実行するまでチャットなし"
 
 #. js-lingui-explicit-id
 msgid "plan.none"
-msgstr "ここにはまだリストがありません"
+msgstr "ここにはまだタスクがありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.noneHow"
-msgstr "open: とリストの番号で、ここに表示できます。new:tasks で作れます"
+msgstr "open: とタスクの番号で、ここに表示できます。new:task で作れます"
 
 #. js-lingui-explicit-id
 msgid "plan.onlyIn"
@@ -8482,7 +8580,7 @@ msgstr "実行{run}にはない"
 
 #. js-lingui-explicit-id
 msgid "plan.pip"
-msgstr "{reached, select, yes {実行{run}} other {実行{run}（このタスクまで進まなかった）}}"
+msgstr "{reached, select, yes {実行{run}} other {実行{run}（このサブタスクまで進まなかった）}}"
 
 #. js-lingui-explicit-id
 msgid "plan.pipHelp"
@@ -8518,15 +8616,15 @@ msgstr "待機中"
 
 #. js-lingui-explicit-id
 msgid "plan.step"
-msgstr "{address}のタスク{index}"
+msgstr "{address}のサブタスク{index}"
 
 #. js-lingui-explicit-id
 msgid "plan.steps"
-msgstr "{count, plural, =0 {まだタスクなし} other {#タスク}}"
+msgstr "{count, plural, =0 {まだサブタスクなし} other {サブタスク#件}}"
 
 #. js-lingui-explicit-id
 msgid "plan.tick"
-msgstr "{address}のタスク{index}にチェックを付ける"
+msgstr "{address}のサブタスク{index}にチェックを付ける"
 
 #. js-lingui-explicit-id
 msgid "plan.ticked"
@@ -8539,11 +8637,11 @@ msgstr "{command} を実行します"
 
 #. js-lingui-explicit-id
 msgid "plan.untick"
-msgstr "{address}のタスク{index}のチェックを外す"
+msgstr "{address}のサブタスク{index}のチェックを外す"
 
 #. js-lingui-explicit-id
 msgid "plan.untitled"
-msgstr "無題のリスト"
+msgstr "無題のタスク"
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
@@ -8555,11 +8653,11 @@ msgstr "実行はここであなたを待っています"
 
 #. js-lingui-explicit-id
 msgid "plan.whoHelp"
-msgstr "{address}のタスク{index}に答えるもの。クリックで、答えられるものを表示します"
+msgstr "{address}のサブタスク{index}に答えるもの。クリックで、答えられるものを表示します"
 
 #. js-lingui-explicit-id
 msgid "plan.write"
-msgstr "タスクを書く"
+msgstr "サブタスクを書く"
 
 #. A to-do of the person, never sent
 #. js-lingui-explicit-id
@@ -9086,7 +9184,7 @@ msgstr "外観"
 
 #. js-lingui-explicit-id
 msgid "settings.backupHelp"
-msgstr "チャット、リスト、ルーム、ライブラリ、すべてのマーキングを、1つの.parliamentファイルにまとめます。バックアップの形式はバージョン{version}です。古いバックアップはすべて復元できます。新しいParliamentで作ったものは、先にアップデートを求めます。"
+msgstr "チャット、タスク、ルーム、ライブラリ、すべてのマーキングを、1つの.parliamentファイルにまとめます。バックアップの形式はバージョン{version}です。古いバックアップはすべて復元できます。新しいParliamentで作ったものは、先にアップデートを求めます。"
 
 #. js-lingui-explicit-id
 msgid "settings.backupLabel"
@@ -9419,7 +9517,7 @@ msgstr "{count, plural, =0 {{month}の利用はまだありません。} other {
 
 #. js-lingui-explicit-id
 msgid "settings.monthSpentRuns"
-msgstr "{month}の利用額は{cost}です。内訳は{runs, plural, other {リストの実行#件}}{count, plural, =0 {で、単独のチャットはありません} other {と単独のチャット#件です}}。トークン数からの概算で、正式な額はプロバイダの請求書で確認できます。"
+msgstr "{month}の利用額は{cost}です。内訳は{runs, plural, other {タスクの実行#件}}{count, plural, =0 {で、単独のチャットはありません} other {と単独のチャット#件です}}。トークン数からの概算で、正式な額はプロバイダの請求書で確認できます。"
 
 #. js-lingui-explicit-id
 msgid "settings.monthUnknown"
@@ -9559,7 +9657,7 @@ msgstr "返答の言語"
 
 #. js-lingui-explicit-id
 msgid "settings.roomHelp"
-msgstr "新しいチャットとそのリストが始まるルーム。"
+msgstr "新しいチャットとそのタスクが始まるルーム。"
 
 #. js-lingui-explicit-id
 msgid "settings.roomLabel"
@@ -9571,7 +9669,7 @@ msgstr "実行{run}"
 
 #. js-lingui-explicit-id
 msgid "settings.runRowHelp"
-msgstr "リスト{num}の実行{run}を{board}ボードに表示します"
+msgstr "タスク{num}の実行{run}を{board}ボードに表示します"
 
 #. js-lingui-explicit-id
 msgid "settings.sources"
@@ -9591,7 +9689,7 @@ msgstr "利用額"
 
 #. js-lingui-explicit-id
 msgid "settings.storageCounts"
-msgstr "{chats, plural, other {チャット#件}}、{plans, plural, other {リスト#件}}、{markings, plural, other {マーキング#件}}。"
+msgstr "{chats, plural, other {チャット#件}}、{plans, plural, other {タスク#件}}、{markings, plural, other {マーキング#件}}。"
 
 #. js-lingui-explicit-id
 msgid "settings.storageLabel"
@@ -9894,6 +9992,239 @@ msgstr "このブラウザは、削除するまでParliamentのデータを保�
 #. js-lingui-explicit-id
 msgid "storage.notKept"
 msgstr "このブラウザは、Parliamentのデータの保持に同意していません。ブラウザによっては、閉じたときや容量が足りなくなったときに、サイトのデータを削除します。残すには、ブラウザのプライバシー設定で、このサイトにCookieとサイトデータの保存を許可し、バックアップも取っておいてください。"
+
+#. js-lingui-explicit-id
+msgid "tasks.add"
+msgstr "タスクを追加"
+
+#. js-lingui-explicit-id
+msgid "tasks.addPlus"
+msgstr "タスクを追加"
+
+#. js-lingui-explicit-id
+msgid "tasks.addSub"
+msgstr "サブタスクを追加"
+
+#. js-lingui-explicit-id
+msgid "tasks.addSubPlus"
+msgstr "サブタスクを追加"
+
+#. Who answered and where, before the first words of the answer
+#. js-lingui-explicit-id
+msgid "tasks.answerBy"
+msgstr "{name}、ルーム{num}："
+
+#. js-lingui-explicit-id
+msgid "tasks.asTask"
+msgstr "タスクと同じ：{name}"
+
+#. js-lingui-explicit-id
+msgid "tasks.asTaskChip"
+msgstr "{name}（タスクと同じ）"
+
+#. js-lingui-explicit-id
+msgid "tasks.cancel"
+msgstr "キャンセル"
+
+#. A link that opens the task’s fields to change them
+#. js-lingui-explicit-id
+msgid "tasks.change"
+msgstr "変更"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.commandExample"
+msgstr "compare:204 199"
+
+#. js-lingui-explicit-id
+msgid "tasks.commandNow"
+msgstr "今バーにあります：Enterで実行すると、タスクが先に進みます"
+
+#. js-lingui-explicit-id
+msgid "tasks.commandWaits"
+msgstr "実行するとバーに入り、Enterを待ちます"
+
+#. js-lingui-explicit-id
+msgid "tasks.deleteSub"
+msgstr "タスク{num}のサブタスク{n}を削除"
+
+#. js-lingui-explicit-id
+msgid "tasks.doneOf"
+msgstr "{done}/{count}完了"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldCommand"
+msgstr "コマンド"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldDescription"
+msgstr "説明"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldFlow"
+msgstr "進め方"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldKind"
+msgstr "種類"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldModel"
+msgstr "モデル"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldName"
+msgstr "名前"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldPrompt"
+msgstr "プロンプト"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRooms"
+msgstr "ルーム"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSearch"
+msgstr "検索語"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSource"
+msgstr "情報源"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldWords"
+msgstr "内容"
+
+#. js-lingui-explicit-id
+msgid "tasks.findRooms"
+msgstr "番号か名前でルームを探す"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOne"
+msgstr "1つずつ"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOneLow"
+msgstr "1つずつ"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogether"
+msgstr "すべて同時に"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogetherLow"
+msgstr "すべて同時に"
+
+#. js-lingui-explicit-id
+msgid "tasks.ifYouLike"
+msgstr "任意"
+
+#. js-lingui-explicit-id
+msgid "tasks.keep"
+msgstr "保存"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindCommand"
+msgstr "コマンド"
+
+#. The kind of a task that is the person’s own
+#. js-lingui-explicit-id
+msgid "tasks.kindNone"
+msgstr "なし"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindPrompt"
+msgstr "プロンプト"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindSearch"
+msgstr "検索"
+
+#. js-lingui-explicit-id
+msgid "tasks.needsKey"
+msgstr "キーが必要"
+
+#. js-lingui-explicit-id
+msgid "tasks.none"
+msgstr "タスクはまだありません"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.noneHow"
+msgstr "＋で追加するか、バーに new:task \"助成金の申請\" と入力します"
+
+#. js-lingui-explicit-id
+msgid "tasks.noRoom"
+msgstr "ルームなし"
+
+#. js-lingui-explicit-id
+msgid "tasks.ownBranch"
+msgstr "このタスクのブランチ"
+
+#. js-lingui-explicit-id
+msgid "tasks.ownRoom"
+msgstr "このタスクのブランチ。チャットは初めて実行したときに作られます"
+
+#. A small label: the sub-task is a command
+#. js-lingui-explicit-id
+msgid "tasks.pillCommand"
+msgstr "コマンド"
+
+#. A small label: the sub-task is a prompt to a model
+#. js-lingui-explicit-id
+msgid "tasks.pillPrompt"
+msgstr "プロンプト"
+
+#. A small label: the sub-task is a search of a source
+#. js-lingui-explicit-id
+msgid "tasks.pillSearch"
+msgstr "検索"
+
+#. A room, by its number, as the strip names it
+#. js-lingui-explicit-id
+msgid "tasks.room"
+msgstr "ルーム{num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.roomOff"
+msgstr "ルーム{num}を外す"
+
+#. js-lingui-explicit-id
+msgid "tasks.runN"
+msgstr "実行{n}"
+
+#. js-lingui-explicit-id
+msgid "tasks.runs"
+msgstr "実行"
+
+#. js-lingui-explicit-id
+msgid "tasks.runWaits"
+msgstr "「{title}」で待機中"
+
+#. js-lingui-explicit-id
+msgid "tasks.subCount"
+msgstr "{count, plural, other {サブタスク#件}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subRooms"
+msgstr "回答は、タスクの回答と同じ場所に届きます"
+
+#. js-lingui-explicit-id
+msgid "tasks.tickSub"
+msgstr "タスク{num}のサブタスク{n}「{title}」にチェックを付ける"
+
+#. js-lingui-explicit-id
+msgid "tasks.tickTask"
+msgstr "タスク{num}「{title}」にチェックを付ける"
+
+#. js-lingui-explicit-id
+msgid "tasks.untitled"
+msgstr "まだ名前のないタスク"
+
+#. js-lingui-explicit-id
+msgid "tasks.yoursNow"
+msgstr "実行は、あなたがチェックを付けるのを待っています"
 
 #. js-lingui-explicit-id
 msgid "template.dataWorkspace"
@@ -10221,7 +10552,7 @@ msgstr "バーの対象に名前を付ける：ルーム、コレクション、
 
 #. js-lingui-explicit-id
 msgid "verb.new"
-msgstr "チャット、タスクのリスト、ルーム、コレクション、方針、ブランチ、ステップ、やること、実行、ブロックを作る"
+msgstr "チャット、タスク、サブタスク、ルーム、コレクション、方針、ブランチ、やること、実行、ブロックを作る"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10379,7 +10710,7 @@ msgstr "思考できるモデルに、答える前に考えさせ、その過程
 
 #. js-lingui-explicit-id
 msgid "verb.tick"
-msgstr "タスクのリストにある自分のやることにチェックを付ける、または外す"
+msgstr "タスクやサブタスクにチェックを付けて完了にする、またはチェックを外す"
 
 #. js-lingui-explicit-id
 msgid "verb.to"

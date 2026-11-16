@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat, getPins, addPin, deleteMessage as dbDeleteMessage, addMessage } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, listPlans, getEditsOfChat, getPins, addPin, deleteMessage as dbDeleteMessage, addMessage } from '../lib/db'
 import { focusWhenDrawn } from '../editing/writeFocus'
 import { isDraft as writingIsDraft, writingOf } from '../lib/writing'
 import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
@@ -82,8 +82,12 @@ import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCar
 import CollectionBoard from './CollectionBoard'
 import { showOf, modeOf, hiddenClasses } from '../lib/markupShow'
 import { settleable } from '../lib/editVerbs'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, tickTodo, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, changeTask, tickTask, planStep, changeStep, tickTodo, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
+import { FLOWS, isCommand, modelOf, taskLeadOf, titleOf } from '../lib/taskModel'
+import { taskRows, openTaskOf, answersOf } from '../lib/tasksBoard'
+import TasksBoard from './TasksBoard'
+import { isTodo } from '../lib/docketModel'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
 import { planBoardOf, latestPlan, compareRuns } from '../lib/planBoard'
@@ -165,7 +169,7 @@ const BAR = 'command' // the popped bar's key among the windows
 const FEATURES = detectFeatures()
 const NONE = Object.freeze([])
 // What the plan commands do, carried out by planAct (stage 10, piece 2; C198).
-const PLAN_ACTS = new Set(['newPlan', 'planStep', 'tickTodo', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete', 'run', 'stop', 'stopReply'])
+const PLAN_ACTS = new Set(['newPlan', 'newTask', 'changeTask', 'tickTask', 'planStep', 'tickTodo', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete', 'run', 'stop', 'stopReply'])
 
 // The interface language a source answers in. The test languages (en-XA,
 // ar-XB) stand for English.
@@ -2340,6 +2344,14 @@ export default function Shell() {
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
+    // A task's command, run from the bar as offered (v4): its sub-task done.
+    const offered = offeredLine.current
+    if (offered && typeof body === 'string' && body.trim().replace(/^>/, '').trim() === offered.line && (!out || out.done)) {
+      offeredLine.current = null
+      tickTodo(db.current, { docketId: offered.docketId, n: offered.n, letter: offered.letter, stepId: offered.stepId, done: true })
+        .then(() => runnerRef.current?.ticked({ docketId: offered.docketId, letter: offered.letter, stepId: offered.stepId }))
+        .catch(() => {})
+    }
     if (out && !out.done) return out
     // erase: is never taken back, and what came before may point at what
     // it removed, so undo: stops here (C134, C137).
@@ -3011,22 +3023,46 @@ export default function Shell() {
   // The to-dos a lane waits at in a run here, by step id (C301 (g)).
   const waitingForYou = useMemo(() => new Set(runningHere.map((r) => r.yours).filter(Boolean)), [runningHere])
   const runDeps = useRef({})
+  // The command a task's run waits for in the bar (v4): run there, it is done.
+  const offeredLine = useRef(null)
   useEffect(() => {
     runDeps.current = {
       readBranch: async ({ docketId, n, letter }) => {
         const plan = await getPlan({ id: docketId })
         const b = plan?.runs.find((r) => r.n === n)?.branches?.[letter]
-        return b ? { chatId: b.chatId ?? null, steps: b.steps ?? [] } : null
+        if (!b) return null
+        const d = plan.docket
+        if (!FLOWS.includes(d.flow) || letter !== 'a') return { chatId: b.chatId ?? null, steps: b.steps ?? [] }
+        // A task (v4): each sub-task asks its own model, else the task's;
+        // with neither, it is yours. One by one, into the task's room if it
+        // still has its chat, else the task's own chat.
+        const steps = (b.steps ?? []).map((st) => {
+          if (isTodo(st) || isCommand(st)) return st
+          const model = modelOf(st, d)
+          return model ? { ...st, model } : { ...st, yours: true }
+        })
+        let chatId = b.chatId ?? null
+        if (d.flow !== 'together' && d.rooms?.length) {
+          const room = await getConversation(d.rooms[0]).catch(() => null)
+          if (room) chatId = room.id
+        }
+        return { chatId, steps }
       },
       // A branch with no chat gets one as it first runs, named for it.
-      ensureChat: async ({ docketId, n, letter, step }) => {
+      ensureChat: async ({ docketId, n, letter, step, own = false }) => {
+        // All at once (v4): a branch of the task for this sub-task, its chat
+        // named for it (207b, 207c, …).
+        if (own) {
+          const made = await newPlanBranch(db.current, { docketId, n, name: titleOf(step), now: new Date().toISOString() })
+          letter = made.letter
+        }
         const plan = await getPlan({ id: docketId })
         const named = plan?.docket.branches?.find((b) => b.letter === letter)
         const room = plan?.runs.find((r) => r.n === n)?.branches?.[letter]?.room ?? null
         const now = new Date().toISOString()
         const { settings: s } = latest.current
         const conversation = {
-          id: crypto.randomUUID(), title: named?.name || plan?.docket.title || titleFromPrompt(step.prompt), model: s.defaultModel,
+          id: crypto.randomUUID(), title: named?.name || plan?.docket.title || titleFromPrompt(step.prompt || step.title || ''), model: s.defaultModel,
           parentId: null, branchPoint: null, createdInMode: null, room, ...(step.model ? { answerer: step.model } : {}),
           pinned: false, storageBytes: 0, createdAt: now, updatedAt: now,
         }
@@ -3040,8 +3076,9 @@ export default function Shell() {
       // frameworks and reply language, through the privacy filter. No title
       // request follows: the chat is named for its branch. How it ended is
       // read from what was kept.
-      sendStep: async ({ chatId, step, group = null, included = null }) => {
+      sendStep: async ({ docketId = null, chatId, step, group = null, included = null }) => {
         if (replyArriving(chatId)) return 'failed'
+        const task = docketId ? (await getPlan({ id: docketId }).catch(() => null))?.docket : null
         const conv = await getConversation(chatId).catch(() => null)
         const fresh = await keyedProviders().catch(() => ({}))
         const who = answererOf({ chosen: step.model ?? conv?.answerer ?? null, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
@@ -3061,7 +3098,8 @@ export default function Shell() {
           await askSourceAs(chatId, step.prompt, who, { step: step.id, ...together, ...(searched ? { asked: searched } : {}) })
         } else {
           // Answers held by include: go to each model that runs, as data (C176; C202).
-          await sendMessage(chatId, step.prompt, who.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false, step: step.id, ...together, ...(included?.length ? { included } : {}) })
+          const lead = taskLeadOf(task)
+          await sendMessage(chatId, step.prompt, who.id, withReplyLanguage([lead, instructionsOf(fw, fwListNow.current)].filter(Boolean).join('\n\n'), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false, step: step.id, ...together, ...(included?.length ? { included } : {}) })
         }
         loadConversations().catch(() => {})
         const msgs = await getMessages(chatId).catch(() => [])
@@ -3070,6 +3108,13 @@ export default function Shell() {
         // A source that answered and found nothing: an answer, not a stop (C196 (e)).
         if (reply && !reply.incomplete && reply.source?.found === false) return 'nothing'
         return reply?.content && !reply.incomplete ? 'done' : 'stopped'
+      },
+      // A command of yours (v4): put in the bar as typed, for your Enter;
+      // the run waits until it has run, or it is ticked.
+      offerLine: ({ docketId, num, n, letter, step }) => {
+        offeredLine.current = { docketId, num, n, letter, stepId: step.id, line: step.command }
+        writeField(`>${step.command}`)
+        setBarSaid({ says: { message: 'taskLineWaits', values: { num, title: titleOf(step) } } })
       },
       // The next run for one branch: the others wait in it.
       newRunFor: async ({ docketId, letters }) => {
@@ -3088,6 +3133,7 @@ export default function Shell() {
       markStep: (a) => runDeps.current.markStep(a),
       sendStep: (a) => runDeps.current.sendStep(a),
       newRunFor: (a) => runDeps.current.newRunFor(a),
+      offerLine: (a) => runDeps.current.offerLine(a),
       stopChat: (chatId) => stopStream(chatId, 'stopped'),
       lock: withDocketLock,
       onChange: (active) => setRunningHere(active),
@@ -3138,7 +3184,17 @@ export default function Shell() {
       for (const id of chats) {
         for (const m of await getMessages(id).catch(() => [])) if (m.role === 'user') texts.set(m.id, typeof m.content === 'string' ? m.content : '')
       }
-      if (live) setPlanRead({ num: planNum, run: planRun, against: planAgainst, plan, texts })
+      // A task (v4): each sub-task's answer, wherever it went: the task's own
+      // chats, a chat of its own, or its room's.
+      let answers = new Map()
+      if (plan && FLOWS.includes(plan.docket.flow)) {
+        const where = new Set([...(plan.docket.rooms ?? [])])
+        for (const r of plan.runs) for (const b of Object.values(r.branches ?? {})) if (b?.chatId) where.add(b.chatId)
+        const read = []
+        for (const id of where) read.push({ chatId: id, messages: await getMessages(id).catch(() => []) })
+        answers = answersOf(read)
+      }
+      if (live) setPlanRead({ num: planNum, run: planRun, against: planAgainst, plan, texts, answers })
     }
     read()
     const off = onRecordsChanged(() => { read() })
@@ -3160,6 +3216,38 @@ export default function Shell() {
   }, [planOnScreen, planRead, planNum, planRun, planAgainst, chatRowsById, recordsNames, i18n, planPick])
   const planBoardNow = useRef(null)
   useEffect(() => { planBoardNow.current = planBoard }, [planBoard])
+  // The Tasks board (C301 (g), v4): every task, newest first, and the one
+  // open. Read while the board is on the screen, and again whenever
+  // something is stored.
+  const [taskPlans, setTaskPlans] = useState(null)
+  useEffect(() => {
+    if (!started || !planOnScreen) return undefined
+    let live = true
+    const read = async () => {
+      const all = await listPlans().catch(() => [])
+      if (live) setTaskPlans(all)
+    }
+    read()
+    const off = onRecordsChanged(() => { read() })
+    return () => { live = false; off() }
+  }, [started, planOnScreen])
+  const taskChatOf = useCallback((id) => {
+    const r = chatRowsById.get(id)
+    return r ? { num: r.num, title: r.title ?? '', branch: r.branch ?? null, docketNum: r.docketNum ?? null } : null
+  }, [chatRowsById])
+  const isSourceId = useCallback((id) => destination(id)?.kind === 'source', [])
+  const tasksList = useMemo(() => (taskPlans ? taskRows(taskPlans, { isSource: isSourceId, chatOf: taskChatOf }) : null), [taskPlans, isSourceId, taskChatOf])
+  const taskOpen = useMemo(() => {
+    if (!planOnScreen || !planRead?.plan || planRead.num !== planNum || planRun != null || planAgainst != null) return null
+    const id = planRead.plan.docket.id
+    const here = runningHere.filter((r) => r.docketId === id)
+    // Open: one listed as a task, or one asked for by number.
+    if (!planAsked && !tasksList?.some((t) => t.num === planNum)) return null
+    return openTaskOf(planRead.plan, { answers: planRead.answers ?? new Map(), isSource: isSourceId, chatOf: taskChatOf, waitsAt: here.find((r) => r.yours)?.yours ?? null, running: here.length > 0 })
+  }, [planOnScreen, planRead, planNum, planRun, planAgainst, runningHere, isSourceId, taskChatOf, planAsked, tasksList])
+  // The rooms a task can go into: every chat, by number and title.
+  const taskRooms = useMemo(() => [...chatRowsById.values()].map((r) => ({ chatId: r.chatId, num: r.num, title: r.title ?? '' })).sort((a, b) => b.num - a.num), [chatRowsById])
+
   // What the plan commands do (C198): all on this device, nothing sent;
   // each kept with what it changed, so undo: takes it back.
   const planAct = useCallback(async (what, body) => {
@@ -3175,12 +3263,45 @@ export default function Shell() {
         said()
         return { done: true, says: { message: 'planNewDone', values: { num: made.docket.num } } }
       }
+      // A task (C301 (g), v4): new:task, or the board's form, with its
+      // fields; a task of the kind command holds its command as its first
+      // sub-task, named as the task.
+      if (what.kind === 'newTask') {
+        const t = what.task ?? {}
+        const made = await newPlan(db.current, { title: what.title ?? '', task: { description: t.description ?? '', model: t.model ?? null, rooms: t.rooms ?? [], flow: t.flow ?? 'oneByOne' }, newId, now })
+        keep(made.back)
+        if (t.command) {
+          const out = await planStep(db.current, { docketId: made.docket.id, letter: 'a', prompt: '', title: what.title ?? '', command: t.command, newId, now })
+          keep(out.back)
+        }
+        await run(showPlan(current.current, made.docket.num), null)
+        said()
+        return { done: true, says: { message: 'taskNewDone', values: { num: made.docket.num } } }
+      }
+      if (what.kind === 'changeTask') {
+        const out = await changeTask(db.current, { docketId: what.docketId, set: what.set, now })
+        keep(out.back)
+        said()
+        return { done: true, says: { message: 'taskChanged', values: { num: what.num } } }
+      }
+      if (what.kind === 'tickTask') {
+        const out = await tickTask(db.current, { docketId: what.docketId, done: what.done, now })
+        keep(out.back)
+        said()
+        return null
+      }
       if (what.kind === 'planStep') {
-        // A to-do of yours, or a prompt (C301 (g)).
-        const out = await planStep(db.current, { docketId: what.docketId, n: what.n, letter: what.letter, prompt: what.todo ? '' : what.prompt ?? '', todo: what.todo ? what.prompt ?? '' : null, newId, now })
+        // A to-do of yours, or a prompt (C301 (g)); a sub-task's title, its
+        // model, or a command of yours (v4).
+        const out = await planStep(db.current, {
+          docketId: what.docketId, n: what.n, letter: what.letter,
+          prompt: what.todo || what.command ? '' : what.prompt ?? '', todo: what.todo ? what.words ?? what.prompt ?? '' : null,
+          title: what.title ?? '', command: what.command ?? null, model: what.model ?? null, newId, now,
+        })
         keep(out.back)
         setPlanPick({ num: what.num, letter: what.letter })
         said()
+        if (what.title !== undefined) return { done: true, says: { message: 'subDone', values: { index: out.index, num: what.num } } }
         return { done: true, says: { message: what.todo ? 'planTodoDone' : 'planStepDone', values: { index: out.index, address: what.address } } }
       }
       // tick: and tick:off (C301 (g)): a lane waiting at the to-do goes on at once.
@@ -3219,9 +3340,17 @@ export default function Shell() {
       if (what.kind === 'run') {
         // run: (almanac spec §5): what it runs, read again; if that changed, say so first.
         const p = planBoardNow.current
-        const scope = p && p.docketId === what.docketId ? runScope(p, { letter: what.letter ?? null }) : null
-        if (!scope || scope.bad || scope.newRun !== what.newRun || scope.branches.map((b) => b.letter).join() !== what.letters.join()) return 'runChanged'
-        const out = await runnerRef.current.start({ docketId: what.docketId, num: what.num, n: what.n, letters: what.letters, newRun: what.newRun })
+        if (what.self) {
+          // A task run as itself (v4): its name and description, as its one sub-task.
+          const lane = p?.docketId === what.docketId ? p.branches.find((b) => b.letter === 'a') : null
+          if (!lane || lane.steps.length || !p.task?.model) return 'runChanged'
+          const out = await planStep(db.current, { docketId: what.docketId, letter: 'a', prompt: p.task.description || p.title, title: p.title, newId, now })
+          keep(out.back)
+        } else {
+          const scope = p && p.docketId === what.docketId ? runScope(p, { letter: what.letter ?? null }) : null
+          if (!scope || scope.bad || scope.newRun !== what.newRun || scope.branches.map((b) => b.letter).join() !== what.letters.join()) return 'runChanged'
+        }
+        const out = await runnerRef.current.start({ docketId: what.docketId, num: what.num, n: what.n, letters: what.letters, newRun: what.newRun, together: Boolean(what.together) })
         if (!out.started) return out.reason === 'elsewhere' ? { message: 'runElsewhere', values: { num: what.num } } : 'runFailed'
         if (touched.current) touched.current.ran = { num: what.num, run: out.n }
         said()
@@ -3267,6 +3396,7 @@ export default function Shell() {
       }
     } catch (err) {
       if (err?.code === 'fixed') return 'planFixed'
+      if (err?.code === 'ran') return { message: 'taskFlowRan', values: { num: what.num } }
       if (err?.code === 'running') return { message: 'planHoldRunning', values: { address: `${what.num}${what.letters?.[0] ?? ''}` } }
       return err?.name === 'PlanError' ? 'planChanged' : 'planFailed'
     }
@@ -3519,7 +3649,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled, elsewhere: installedApp }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: markupScreen, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, installedApp, helper, answering, frameworkScreens, settings.thinking, markupScreen, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, stepsAdvanced: welcome.advanced, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, hand: handOf, install: { can: canInstall, installed: appInstalled, elsewhere: installedApp }, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: markupScreen, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, arrangements: arrangementsScreen, displays, size, again, continuing, setting: settingScreen, plan: planBoard, tasks: tasksList, runFacts }), [lastRoom, roomNameHere, welcome.off, welcome.advanced, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, handOf, canInstall, appInstalled, installedApp, helper, answering, frameworkScreens, settings.thinking, markupScreen, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, arrangementsScreen, displays, size, again, continuing, settingScreen, planBoard, tasksList, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -4182,6 +4312,31 @@ export default function Shell() {
     if (!p.act && !p.next) { setBarSaid({ says: p.says ?? null }); return }
     sayRan(line, await onRun(p.next ?? null, line, null, p.act ?? null))
   }, [onRun, sayRan])
+  // The board's own changes (v4), each as the act a command would run, so
+  // each is said under the bar and taken back by undo:.
+  const taskDo = useCallback(async (what, line) => {
+    const out = await onRun(null, line, null, what)
+    sayRan(line, out)
+    return out
+  }, [onRun, sayRan])
+  // A task's fields, written on the board, kept as written, as a sub-task's are.
+  const taskChange = useCallback((num, docketId, set) => {
+    if (!db.current) return
+    changeTask(db.current, { docketId, set }).catch((err) => { if (err?.code === 'ran') setBarSaid({ says: { message: 'taskFlowRan', values: { num } } }) })
+  }, [])
+  const taskAdd = useCallback((fields) => taskDo({ kind: 'newTask', title: fields.title, task: fields }, `new:task "${fields.title}"`), [taskDo])
+  const subAdd = useCallback((num, docketId, n, fields) => taskDo({
+    kind: 'planStep', docketId, num, n, letter: 'a', address: String(num), title: fields.title,
+    prompt: fields.kind === 'prompt' || fields.kind === 'search' ? (fields.words || fields.title) : '',
+    ...(fields.kind === 'yours' ? { todo: true, words: fields.words ?? '' } : {}),
+    ...(fields.kind === 'command' ? { command: fields.command } : {}),
+    model: fields.kind === 'prompt' || fields.kind === 'search' ? fields.model ?? null : null,
+  }, `new:subtask ${num} "${fields.title}"`), [taskDo])
+  const subChange = useCallback((docketId, stepId, set) => {
+    const p = planBoardNow.current
+    if (!p || p.docketId !== docketId || !db.current) return
+    changeStep(db.current, { docketId, n: p.latest, letter: 'a', stepId, set }).catch(() => {})
+  }, [])
   // An address that asks for a board (/settings, the old page's; R37; C186)
   // opens it once the space is loaded, and the address goes back to /.
   const location = useLocation()
@@ -4542,6 +4697,16 @@ export default function Shell() {
           onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}
           clean={false} onRun={onPlanDelete} onFindChange={(num) => { findPassage(num) }}
           nameOf={planModelName} notHeld={roomNotHeld}
+        />
+      )
+    }
+    if (board === 'docket' && !(planBoard && (planBoard.beside || planBoard.n !== planBoard.latest || taskOpen?.older))) {
+      return (
+        <TasksBoard
+          key="docket" tasks={tasksList} open={taskOpen} addressed={arrangement.addressed === 'docket'} onAddress={focusBoard}
+          nameOf={planModelName} defaultModel={settings.defaultModel ?? null} models={answerRows} rooms={taskRooms} validate={(line) => preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })}
+          onOpen={(num) => run(showPlan(current.current, num), null)} onRun={runClicked} onWrite={writeField}
+          onAdd={taskAdd} onChange={taskChange} onAddSub={subAdd} onChangeSub={subChange} onDelete={onPlanDelete}
         />
       )
     }

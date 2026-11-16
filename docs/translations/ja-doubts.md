@@ -417,3 +417,12 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - keys.localStepNotAll: "* は指定しないでください。" * gets a half-width space, treated as typed text by the spacing rule; 「*」 was the alternative.
 - keys.localStepCheck: 上の「{check}」を押してください。 The button word is quoted, as 「すべて削除」 is, though the English does not quote it.
 - keys.localStepInstall, keys.localStepRestart: "open it" is 起動, the word for starting an app. The restart line is split in two (これで設定が読み込まれます。) to keep the order quit, reopen, reads.
+
+## Tasks v4, drafted 16 November 2026
+
+- **Counting sub-tasks:** サブタスク#件 (count.steps, tasks.subCount, plan.counts, plan.steps, enter.runHead and the rest), not the literal swap of the old #タスク to #サブタスク. 3サブタスク reads awkwardly, and plan.counts now reads ブランチ2件、サブタスク3件, both counted the same way.
+- **tasks.fieldFlow:** 進め方, not 順序 as picker.order has it, because one of the two choices (すべて同時に) has no order. If the two labels should match, 順序 works too.
+- **tasks.subRooms vs enter.tickSent:** "answer" is 回答 in tasks.subRooms (the glossary's word for what a model or source gives back). enter.tickSent copies enter.tickNotTodo, which says 返答 for the same phrase "when its answer comes", so the two lines match.
+- **tasks.noneHow:** the example title is in Japanese (new:task "助成金の申請"), following the 23 October ruling. "The plus" is written as ＋ (＋で追加するか).
+- **tasks.ifYouLike:** 任意 (optional), the usual placeholder for a field you can leave empty. 必要なら would be closer to "if you like".
+- **Not in this batch:** enter.promptBranchSourceWaits still says リストで{address}のチェックを外す. "The list" there looks like the picker list, not a plan, so I left it alone.

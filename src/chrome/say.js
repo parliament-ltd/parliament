@@ -91,7 +91,8 @@ export function say(i18n, message, values = {}) {
     else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')
     // What the privacy filter found, by kind (C167): "an email address and 2 phone numbers".
     else if (key === 'found') words[key] = joined(i18n, Object.entries(value).filter(([k, n]) => n > 0 && COPY.privacyFound[k]).map(([k, n]) => i18n._(COPY.privacyFound[k], { count: n })), 'conjunction')
-    else if (key === 'words' || key === 'names') words[key] = joined(i18n, value, 'disjunction')
+    // A list of words, or one quoted (a to-do's, a sub-task's: C301 (g)).
+    else if ((key === 'words' || key === 'names') && Array.isArray(value)) words[key] = joined(i18n, value, 'disjunction')
     else if ((key === 'cost' || key === 'warn') && typeof value === 'number') words[key] = money(i18n, value)
     else if (PERCENTS.has(key) && typeof value === 'number') words[key] = percent(i18n, value)
     else if (key === 'day') words[key] = longDay(i18n, value)

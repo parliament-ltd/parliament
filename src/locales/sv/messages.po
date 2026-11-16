@@ -126,11 +126,11 @@ msgstr "Anteckningar, markeringar, citat, favoriter och samlingar"
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
-msgstr "Chattar och listor"
+msgstr "Chattar och uppgifter"
 
 #. js-lingui-explicit-id
 msgid "backup.catChatsAbout"
-msgstr "Varje chatt med sina meddelanden och filer, och listorna de hör till"
+msgstr "Varje chatt med sina meddelanden och filer, och uppgifterna de hör till"
 
 #. js-lingui-explicit-id
 msgid "backup.catLayouts"
@@ -384,7 +384,7 @@ msgstr "Ringverkningsanalys"
 
 #. js-lingui-explicit-id
 msgid "block.steps"
-msgstr "Steglista"
+msgstr "Deluppgifter"
 
 #. js-lingui-explicit-id
 msgid "block.summary-dashboard"
@@ -452,7 +452,7 @@ msgstr "Hittar var en del av ett utkast inte längre stämmer med en annan, här
 
 #. js-lingui-explicit-id
 msgid "blockAbout.steps"
-msgstr "Listans uppgifter, som följer samtalet i det här rummet. Hela listan är en egen tavla."
+msgstr "Uppgiftens deluppgifter, som följer samtalet i det här rummet. Hela uppgiften är en egen tavla."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
@@ -468,7 +468,7 @@ msgstr "Konversationens rubriker, för att hoppa till valfri punkt i den."
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsEmpty"
-msgstr "en uppgift som inte är skriven än"
+msgstr "en deluppgift som inte är skriven än"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsFollowing"
@@ -476,15 +476,15 @@ msgstr "följer den här chatten, {address}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoChat"
-msgstr "Ingen chatt i det här rummet än, så inga uppgifter"
+msgstr "Ingen chatt i det här rummet än, så inga deluppgifter"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoPlan"
-msgstr "Ingen lista här har nummer {num}"
+msgstr "Ingen uppgift här har nummer {num}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsPinned"
-msgstr "lista {num}, fäst"
+msgstr "uppgift {num}, fäst"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsSent"
@@ -492,7 +492,7 @@ msgstr "skickat, i sin chatt"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsWhole"
-msgstr "visar hela listan"
+msgstr "visar hela uppgiften"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.add"
@@ -1427,7 +1427,7 @@ msgstr "ångrad"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {kommentar {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {lista {num}} edit {redigering {num}} ask {prompt {num}} suggestion {förslag {num}} other {{num}}}"
+msgstr "{kind, select, note {kommentar {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {uppgift {num}} edit {redigering {num}} ask {prompt {num}} suggestion {förslag {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1480,7 +1480,7 @@ msgstr "Det som finns i den har inga kommentarer, markeringar eller citat än. D
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {chatt {num}, raderad} plan {lista {num}, raderad} message {ett meddelande, raderat} other {{num}, raderad}}"
+msgstr "{what, select, chat {chatt {num}, raderad} plan {uppgift {num}, raderad} message {ett meddelande, raderat} other {{num}, raderad}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
@@ -1505,7 +1505,7 @@ msgstr "från"
 
 #. js-lingui-explicit-id
 msgid "collection.fromHelp"
-msgstr "Chattarna och listorna den innehåller. Klicka för att lista dem"
+msgstr "Chattarna och uppgifterna den innehåller. Klicka för att lista dem"
 
 #. js-lingui-explicit-id
 msgid "collection.fromNothing"
@@ -1525,7 +1525,7 @@ msgstr "Chatt {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.groupPlan"
-msgstr "Lista {num}"
+msgstr "Uppgift {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.holdBack"
@@ -1615,7 +1615,7 @@ msgstr "fäst"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
-msgstr "Listor"
+msgstr "Uppgifter"
 
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
@@ -1942,11 +1942,11 @@ msgstr "{count, plural, one {# chatt} other {# chattar}}"
 
 #. js-lingui-explicit-id
 msgid "count.dockets"
-msgstr "{count, plural, one {# lista} other {# listor}}"
+msgstr "{count, plural, one {# uppgift} other {# uppgifter}}"
 
 #. js-lingui-explicit-id
 msgid "count.steps"
-msgstr "{count, plural, one {# uppgift} other {# uppgifter}}"
+msgstr "{count, plural, one {# deluppgift} other {# deluppgifter}}"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
@@ -2742,7 +2742,7 @@ msgstr "Inget skickas till en AI-modell"
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
 msgid "enter.comparePlan"
-msgstr "{num} är en lista. {example} jämför de senaste svaren i två av dess grenar"
+msgstr "{num} är en uppgift. {example} jämför de senaste svaren i två av dess grenar"
 
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
@@ -2851,7 +2851,7 @@ msgstr "Prompt {num} har gått till en modell, så den ligger kvar. accept: elle
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteBranch"
-msgstr "Enter raderar {address}, som aldrig har körts, ur alla körningar av lista {num}. undo: tar tillbaka den"
+msgstr "Enter raderar {address}, som aldrig har körts, ur alla körningar av uppgift {num}. undo: tar tillbaka den"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2865,12 +2865,12 @@ msgstr "Raderat. I 20 sekunder erbjuder sig chatten att ta tillbaka det"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
-msgstr "Lista {num} har raderats. undo: tar tillbaka den"
+msgstr "Uppgift {num} har raderats. undo: tar tillbaka den"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
-msgstr "Uppgift {index} i {address} har raderats. undo: tar tillbaka den"
+msgstr "Deluppgift {index} i {address} har raderats. undo: tar tillbaka den"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2896,20 +2896,20 @@ msgstr "I 20 sekunder erbjuder sig chatten att ta tillbaka det"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletePlan"
-msgstr "Enter raderar lista {num}, som ännu inte har någon chatt. undo: tar tillbaka den"
+msgstr "Enter raderar uppgift {num}, som ännu inte har någon chatt. undo: tar tillbaka den"
 
 #. js-lingui-explicit-id
 msgid "enter.deletePlanToo"
-msgstr "Det är listans sista gren, så lista {num} försvinner också"
+msgstr "Det är uppgiftens sista gren, så uppgift {num} försvinner också"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteStep"
-msgstr "Enter raderar uppgift {index} i {address} i körning {run}. undo: tar tillbaka den"
+msgstr "Enter raderar deluppgift {index} i {address} i körning {run}. undo: tar tillbaka den"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
-msgstr "Uppgift {index} i {address} har startat, så den ligger kvar i sin chatt"
+msgstr "Deluppgift {index} i {address} har startat, så den ligger kvar i sin chatt"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2953,7 +2953,7 @@ msgstr "Enter ställer körning {other} bredvid körning {run} och markerar skil
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffOneRun"
-msgstr "Lista {num} har en körning. new:run skapar en till att jämföra med"
+msgstr "Uppgift {num} har en körning. new:run skapar en till att jämföra med"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3056,7 +3056,7 @@ msgstr "{count, plural, one {# kommentar, markering eller citat ligger kvar, mä
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
-msgstr "{count, plural, one {Lista {nums} försvinner med sin sista chatt} other {Listorna {nums} försvinner med sina sista chattar}}"
+msgstr "{count, plural, one {Uppgift {nums} försvinner med sin sista chatt} other {Uppgifterna {nums} försvinner med sina sista chattar}}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseUndo"
@@ -3317,7 +3317,7 @@ msgstr "{word} kan vara {names}. Ange vilket, till exempel {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.fromWhat"
-msgstr "Inget kommer från {num}. from: tar en chatt, en lista, en gren eller en körning"
+msgstr "Inget kommer från {num}. from: tar en chatt, en uppgift, en gren eller en körning"
 
 #. js-lingui-explicit-id
 msgid "enter.goNewRoom"
@@ -3966,7 +3966,7 @@ msgstr "Enter startar {next} från {address}, en kopia av hela dess historik, i 
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchAt"
-msgstr "Enter startar {next} från {address} efter uppgift {step}, en kopia fram dit, i ett eget rum. Inget anrop"
+msgstr "Enter startar {next} från {address} efter deluppgift {step}, en kopia fram dit, i ett eget rum. Inget anrop"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchDone"
@@ -3991,7 +3991,7 @@ msgstr "Enter startar {next}, en tom gren bredvid {address}, i ett eget rum. Ing
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
-msgstr "{count, plural, =0 {{address} har inga uppgifter än} one {{address} har en uppgift} other {{address} har # uppgifter}}"
+msgstr "{count, plural, =0 {{address} har inga deluppgifter än} one {{address} har en deluppgift} other {{address} har # deluppgifter}}"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGo"
@@ -4085,7 +4085,7 @@ msgstr "Enter visar {address} i rummet här, med hela sin historik. Inget anrop,
 
 #. js-lingui-explicit-id
 msgid "enter.openBranchUnrun"
-msgstr "{address} har inte körts än. Enter visar dess uppgifter på tavlan {board}"
+msgstr "{address} har inte körts än. Enter visar dess deluppgifter på tavlan {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openChat"
@@ -4133,11 +4133,11 @@ msgstr "Enter öppnar chatten som {num} finns i, på rätt ställe"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
-msgstr "Enter öppnar lista {num} på tavlan {board}"
+msgstr "Enter öppnar uppgift {num} på tavlan {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlanHere"
-msgstr "Lista {num} visas på tavlan {board}. Enter riktar fältet mot den"
+msgstr "Uppgift {num} visas på tavlan {board}. Enter riktar fältet mot den"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -4319,20 +4319,20 @@ msgstr "{address} har lagts till, utan chatt tills den körs"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchNew"
-msgstr "Enter lägger till {address} i lista {num}, utan chatt tills den körs. Inget skickas"
+msgstr "Enter lägger till {address} i uppgift {num}, utan chatt tills den körs. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.planChanged"
-msgstr "Listan ändrades under tiden. Titta igen, och tryck sedan Enter"
+msgstr "Uppgiften ändrades under tiden. Titta igen, och tryck sedan Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.planFailed"
-msgstr "Listan kunde inte ändras"
+msgstr "Uppgiften kunde inte ändras"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planFixed"
-msgstr "Den uppgiften har startat, så nu ligger den fast. new:run planerar den på nytt"
+msgstr "Den deluppgiften har startat, så nu ligger den fast. new:run planerar den på nytt"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldAlready"
@@ -4353,7 +4353,7 @@ msgstr "Enter släpper {nums} igen i körning {run}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldOn"
-msgstr "Enter håller kvar {nums} i körning {run}. Deras uppgifter väntar tills hold:off"
+msgstr "Enter håller kvar {nums} i körning {run}. Deras deluppgifter väntar tills hold:off"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4375,19 +4375,19 @@ msgstr "{address} ligger redan {where, select, after {efter} other {före}} {oth
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planMoveWhich"
-msgstr "Ange två grenar i samma lista, som move:201c after 201a"
+msgstr "Ange två grenar i samma uppgift, som move:201c after 201a"
 
 #. js-lingui-explicit-id
 msgid "enter.planNew"
-msgstr "Enter skapar en lista utan innehåll och öppnar den på tavlan {board}. Inget skickas"
+msgstr "Enter skapar en uppgift utan innehåll och öppnar den på tavlan {board}. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewDone"
-msgstr "Lista {num} är skapad, ännu utan innehåll"
+msgstr "Uppgift {num} är skapad, ännu utan innehåll"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewTitled"
-msgstr "Enter skapar listan ”{title}”, utan innehåll, och öppnar den på tavlan {board}. Inget skickas"
+msgstr "Enter skapar uppgiften ”{title}”, utan innehåll, och öppnar den på tavlan {board}. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoBranch"
@@ -4396,33 +4396,33 @@ msgstr "{address} finns inte i körning {run}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
-msgstr "Ingen lista visas på tavlan {board}. open: följt av en listas nummer visar den, eller så skapar new:tasks en ny"
+msgstr "Ingen uppgift visas på tavlan {board}. open: följt av en uppgifts nummer visar den, eller så skapar new:task en ny"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoStep"
-msgstr "{address} har ingen uppgift {index} i körning {run}"
+msgstr "{address} har ingen deluppgift {index} i körning {run}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNotShown"
-msgstr "Lista {num} visas inte på tavlan {board}. open:{num} visar den"
+msgstr "Uppgift {num} visas inte på tavlan {board}. open:{num} visar den"
 
 #. js-lingui-explicit-id
 msgid "enter.planOnePlan"
-msgstr "Ange grenar från en lista i taget"
+msgstr "Ange grenar från en uppgift i taget"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptEmpty"
-msgstr "Skriv uppgiften. Enter lägger till den som uppgift {index} i {address}. Inget skickas"
+msgstr "Skriv deluppgiften. Enter lägger till den som deluppgift {index} i {address}. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptStep"
-msgstr "Enter lägger till det här som uppgift {index} i {address} i körning {run}. Inget skickas"
+msgstr "Enter lägger till det här som deluppgift {index} i {address} i körning {run}. Inget skickas"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planRecord"
-msgstr "Körning {run} är en tidigare körning, bevarad som den var. open:run {latest} för att ändra listan"
+msgstr "Körning {run} är en tidigare körning, bevarad som den var. open:run {latest} för att ändra uppgiften"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunDone"
@@ -4434,45 +4434,45 @@ msgstr "Körning {run} visas redan på tavlan {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNew"
-msgstr "Enter skapar körning {next} av lista {num} från körning {from}: varje uppgift planerad på nytt, inget startat. Inget skickas"
+msgstr "Enter skapar körning {next} av uppgift {num} från körning {from}: varje deluppgift planerad på nytt, inget startat. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNone"
-msgstr "{runs, plural, one {Lista {num} har en körning} other {Lista {num} har # körningar}}"
+msgstr "{runs, plural, one {Uppgift {num} har en körning} other {Uppgift {num} har # körningar}}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunOpen"
-msgstr "Enter visar körning {run} av lista {num}"
+msgstr "Enter visar körning {run} av uppgift {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepAdd"
-msgstr "Enter lägger till uppgift {index} i {address} i körning {run}. Inget skickas"
+msgstr "Enter lägger till deluppgift {index} i {address} i körning {run}. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepDone"
-msgstr "Uppgift {index} är planerad i {address}. Inget skickades"
+msgstr "Deluppgift {index} är planerad i {address}. Inget skickades"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepEmpty"
-msgstr "Enter lägger till en tom uppgift {index} i {address} i körning {run}, att skriva på tavlan. Inget skickas"
+msgstr "Enter lägger till en tom deluppgift {index} i {address} i körning {run}, att skriva på tavlan. Inget skickas"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planStepHeld"
-msgstr "{address} hålls kvar, så uppgiften väntar också. hold:off {address} släpper dem"
+msgstr "{address} hålls kvar, så deluppgiften väntar också. hold:off {address} släpper dem"
 
 #. js-lingui-explicit-id
 msgid "enter.planTodoAdd"
-msgstr "Enter lägger till en punkt att göra för dig som uppgift {index} i {address}. Den skickas aldrig: du bockar av den"
+msgstr "Enter lägger till en punkt att göra för dig som deluppgift {index} i {address}. Den skickas aldrig: du bockar av den"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planTodoDone"
-msgstr "Uppgift {index} i {address} är en punkt att göra för dig. tick:{address} {index} bockar av den"
+msgstr "Deluppgift {index} i {address} är en punkt att göra för dig. tick:{address} {index} bockar av den"
 
 #. js-lingui-explicit-id
 msgid "enter.planTodoEmpty"
-msgstr "Enter lägger till en tom punkt att göra som uppgift {index} i {address}, att skriva på tavlan. Den skickas aldrig"
+msgstr "Enter lägger till en tom punkt att göra som deluppgift {index} i {address}, att skriva på tavlan. Den skickas aldrig"
 
 #. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
@@ -5334,29 +5334,29 @@ msgstr "Ripple fungerar på chatten i ett rum. Öppna ett först: room:"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleNothing"
-msgstr "Ripple för redigeringar vidare till de andra grenarna i en lista, och den här chatten har inga än"
+msgstr "Ripple för redigeringar vidare till de andra grenarna i en uppgift, och den här chatten har inga än"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOff"
-msgstr "Enter stänger av Ripple för lista {num}: redigeringar stannar i sin gren"
+msgstr "Enter stänger av Ripple för uppgift {num}: redigeringar stannar i sin gren"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOffAlready"
-msgstr "Ripple är redan av för lista {num}"
+msgstr "Ripple är redan av för uppgift {num}"
 
 #. {nums} are the other branches, as 201b and 201c
 #. js-lingui-explicit-id
 msgid "enter.rippleOn"
-msgstr "Enter slår på Ripple för lista {num}: när redigeringar följer med en prompt letar {name} efter samma ändring i {nums}, ett anrop per gren"
+msgstr "Enter slår på Ripple för uppgift {num}: när redigeringar följer med en prompt letar {name} efter samma ändring i {nums}, ett anrop per gren"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOnAlready"
-msgstr "Ripple är redan på för lista {num}"
+msgstr "Ripple är redan på för uppgift {num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleOnNoKey"
-msgstr "Enter slår på Ripple för lista {num}. En kontroll av {nums} behöver en modell med nyckel: api:"
+msgstr "Enter slår på Ripple för uppgift {num}. En kontroll av {nums} behöver en modell med nyckel: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -5404,27 +5404,27 @@ msgstr "{verb} delar bara rad med kommandon av samma slag, än så länge"
 
 #. js-lingui-explicit-id
 msgid "enter.runChanged"
-msgstr "Listan ändrades under tiden. Titta igen, och tryck sedan Enter"
+msgstr "Uppgiften ändrades under tiden. Titta igen, och tryck sedan Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.runCost"
-msgstr "Minst {tokens, number} tokens att skicka, {cost}. Varje uppgift skickar också med de tidigare svaren"
+msgstr "Minst {tokens, number} tokens att skicka, {cost}. Varje deluppgift skickar också med de tidigare svaren"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAll"
-msgstr "Om alla uppgifter körs, minst {tokens, number} tokens att skicka, {cost}. Varje uppgift skickar också med de tidigare svaren"
+msgstr "Om alla deluppgifter körs, minst {tokens, number} tokens att skicka, {cost}. Varje deluppgift skickar också med de tidigare svaren"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllCheap"
-msgstr "Om alla uppgifter körs, minst {tokens, number} tokens att skicka, under {cost}. Varje uppgift skickar också med de tidigare svaren"
+msgstr "Om alla deluppgifter körs, minst {tokens, number} tokens att skicka, under {cost}. Varje deluppgift skickar också med de tidigare svaren"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllUnpriced"
-msgstr "Om alla uppgifter körs, minst {tokens, number} tokens att skicka. Varje uppgift skickar också med de tidigare svaren"
+msgstr "Om alla deluppgifter körs, minst {tokens, number} tokens att skicka. Varje deluppgift skickar också med de tidigare svaren"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostCheap"
-msgstr "Minst {tokens, number} tokens att skicka, under {cost}. Varje uppgift skickar också med de tidigare svaren"
+msgstr "Minst {tokens, number} tokens att skicka, under {cost}. Varje deluppgift skickar också med de tidigare svaren"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostly"
@@ -5432,15 +5432,15 @@ msgstr "Minst {cost} att skicka: mer än gränsen på {warn} som du ville bli va
 
 #. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
-msgstr "Minst {tokens, number} tokens att skicka. Varje uppgift skickar också med de tidigare svaren"
+msgstr "Minst {tokens, number} tokens att skicka. Varje deluppgift skickar också med de tidigare svaren"
 
 #. js-lingui-explicit-id
 msgid "enter.runDone"
-msgstr "Körning {run} av lista {num} är klar"
+msgstr "Körning {run} av uppgift {num} är klar"
 
 #. js-lingui-explicit-id
 msgid "enter.runElsewhere"
-msgstr "Lista {num} körs i en annan flik"
+msgstr "Uppgift {num} körs i en annan flik"
 
 #. js-lingui-explicit-id
 msgid "enter.runFailed"
@@ -5448,19 +5448,19 @@ msgstr "Körningen kunde inte starta"
 
 #. js-lingui-explicit-id
 msgid "enter.runGone"
-msgstr "Uppgift {index} i {address} går till {name}, som inte längre erbjuds"
+msgstr "Deluppgift {index} i {address} går till {name}, som inte längre erbjuds"
 
 #. js-lingui-explicit-id
 msgid "enter.runHead"
-msgstr "{count, plural, one {Enter kör en uppgift i {nums}, i körning {run}} other {Enter kör # uppgifter i {nums}, i körning {run}, en i taget}}"
+msgstr "{count, plural, one {Enter kör en deluppgift i {nums}, i körning {run}} other {Enter kör # deluppgifter i {nums}, i körning {run}, en i taget}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadMany"
-msgstr "Enter kör {count, number} uppgifter i {nums}, i körning {run}: grenarna sida vid sida, och i varje gren en uppgift i taget"
+msgstr "Enter kör {count, number} deluppgifter i {nums}, i körning {run}: grenarna sida vid sida, och i varje gren en deluppgift i taget"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadNew"
-msgstr "{count, plural, one {Enter skapar körning {run} och kör där en uppgift i {address}. De andra grenarna väntar} other {Enter skapar körning {run} och kör där # uppgifter i {address}, en i taget. De andra grenarna väntar}}"
+msgstr "{count, plural, one {Enter skapar körning {run} och kör där en deluppgift i {address}. De andra grenarna väntar} other {Enter skapar körning {run} och kör där # deluppgifter i {address}, en i taget. De andra grenarna väntar}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5469,34 +5469,38 @@ msgstr "{address} hålls kvar. hold:off {address} släpper den"
 
 #. js-lingui-explicit-id
 msgid "enter.runIf"
-msgstr "{count, plural, one {En uppgift körs bara om den föregående misslyckas eller inte hittar något} other {# uppgifter körs bara om den föregående misslyckas eller inte hittar något}}"
+msgstr "{count, plural, one {En deluppgift körs bara om den föregående misslyckas eller inte hittar något} other {# deluppgifter körs bara om den föregående misslyckas eller inte hittar något}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
-msgstr "Uppgift {index} i {address} går till {name}, som inte finns än"
+msgstr "Deluppgift {index} i {address} går till {name}, som inte finns än"
+
+#. js-lingui-explicit-id
+msgid "enter.runLines"
+msgstr "{count, plural, one {Ett av dina kommandon väntar i fältet på att du trycker på Enter} other {# av dina kommandon väntar i fältet, ett i taget, på att du trycker på Enter}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLocal"
-msgstr "Steg som besvaras på den här datorn skickar inte ut något"
+msgstr "Deluppgifter som besvaras på den här datorn skickar inte ut något"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNeedsKey"
-msgstr "Uppgift {index} i {address} går till {name}, som behöver en nyckel för {provider}. {command} lägger till en"
+msgstr "Deluppgift {index} i {address} går till {name}, som behöver en nyckel för {provider}. {command} lägger till en"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNoSteps"
-msgstr "{address} har inga uppgifter att köra. new:step {address} planerar en"
+msgstr "{address} har inga deluppgifter att köra. new:subtask {address} lägger till en"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNothing"
-msgstr "Inget i körning {run} är redo att köras. new:step planerar en"
+msgstr "Inget i körning {run} är redo att köras. new:subtask lägger till en"
 
 #. js-lingui-explicit-id
 msgid "enter.runPaused"
-msgstr "Körning {run} av lista {num} avslutades. {nums} pausade; tavlan {board} visar varför"
+msgstr "Körning {run} av uppgift {num} avslutades. {nums} pausade; tavlan {board} visar varför"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5510,21 +5514,25 @@ msgstr "{address} körs. stop:{address} stoppar den"
 
 #. js-lingui-explicit-id
 msgid "enter.runSkipped"
-msgstr "{count, plural, one {En tom uppgift hoppas över} other {# tomma uppgifter hoppas över}}"
+msgstr "{count, plural, one {En tom deluppgift hoppas över} other {# tomma deluppgifter hoppas över}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runStarted"
-msgstr "Körning {run} av lista {num} har startat. stop: stoppar den"
+msgstr "Körning {run} av uppgift {num} har startat. stop: stoppar den"
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
 msgstr "De går till {answering}"
 
+#. js-lingui-explicit-id
+msgid "enter.runTogether"
+msgstr "Alla samtidigt: varje prompt går till en egen chatt, sedan kommandona"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runUnchecked"
-msgstr "Uppgift {index} i {address} går till {name} på den här datorn, men {provider} har inte listat den sedan sidan öppnades. {command} kontrollerar"
+msgstr "Deluppgift {index} i {address} går till {name} på den här datorn, men {provider} har inte listat den sedan sidan öppnades. {command} kontrollerar"
 
 #. js-lingui-explicit-id
 msgid "enter.runUndo"
@@ -5532,7 +5540,7 @@ msgstr "Ångra stannar vid en körning: det körningen skriver ligger kvar"
 
 #. js-lingui-explicit-id
 msgid "enter.runWaitsYou"
-msgstr "{address} väntar på dig vid uppgift {index}, ”{words}”, och går vidare när du bockar av den"
+msgstr "{address} väntar på dig vid deluppgift {index}, ”{words}”, och går vidare när du bockar av den"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -5886,7 +5894,7 @@ msgstr "Enter stoppar alla körningar och svar, i alla fönster. Det som är gjo
 
 #. js-lingui-explicit-id
 msgid "enter.stopBranch"
-msgstr "Enter stoppar {address}. Det som är gjort förblir gjort och betalt; uppgiften som körs nu stannar där den är"
+msgstr "Enter stoppar {address}. Det som är gjort förblir gjort och betalt; deluppgiften som körs nu stannar där den är"
 
 #. js-lingui-explicit-id
 msgid "enter.stopDone"
@@ -5902,7 +5910,7 @@ msgstr "Inget körs i {what}"
 
 #. js-lingui-explicit-id
 msgid "enter.stopPlan"
-msgstr "Enter stoppar lista {num}. Det som är gjort förblir gjort och betalt; uppgifterna som körs nu stannar där de är"
+msgstr "Enter stoppar uppgift {num}. Det som är gjort förblir gjort och betalt; deluppgifterna som körs nu stannar där de är"
 
 #. js-lingui-explicit-id
 msgid "enter.stopReply"
@@ -5934,6 +5942,22 @@ msgstr "Det svaret kan inte redigeras medan det skrivs"
 #. js-lingui-explicit-id
 msgid "enter.strikeNumbered"
 msgstr "Genomstruket som redigering {num}. undo:{num} ångrar den"
+
+#. js-lingui-explicit-id
+msgid "enter.subDone"
+msgstr "Deluppgift {index} är tillagd i uppgift {num}. Inget skickades"
+
+#. js-lingui-explicit-id
+msgid "enter.subNew"
+msgstr "Enter lägger till deluppgift {index}, ”{title}”, i uppgift {num}, en prompt till dess modell. Inget skickas"
+
+#. js-lingui-explicit-id
+msgid "enter.subNewEmpty"
+msgstr "Enter lägger till en tom deluppgift {index} i uppgift {num}, att skriva på tavlan. Inget skickas"
+
+#. js-lingui-explicit-id
+msgid "enter.subNewYours"
+msgstr "Enter lägger till deluppgift {index}, ”{title}”, i uppgift {num}, som du bockar av. Inget skickas"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6062,7 +6086,7 @@ msgstr "{address} besvarades av en källa, och en källas ord granskas inte"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepWhichBranch"
-msgstr "Lista {num} har grenar: ange en, som sweep:{num}a"
+msgstr "Uppgift {num} har grenar: ange en, som sweep:{num}a"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"
@@ -6141,6 +6165,76 @@ msgstr "→ ett nytt rum"
 msgid "enter.targetTrying"
 msgstr "→ en ny chatt i {room}, taggad tried"
 
+#. js-lingui-explicit-id
+msgid "enter.taskChanged"
+msgstr "Uppgift {num} är ändrad"
+
+#. js-lingui-explicit-id
+msgid "enter.taskFlowRan"
+msgstr "Uppgift {num} har körts, så dess flöde förblir som när den kördes"
+
+#. js-lingui-explicit-id
+msgid "enter.taskLineWaits"
+msgstr "Uppgift {num} väntar på det här kommandot, ”{title}”: Enter kör det och uppgiften går vidare. Eller bocka av det på tavlan"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNew"
+msgstr "Enter skapar en uppgift utan innehåll och öppnar den på tavlan {board}. Inget skickas"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewDone"
+msgstr "Uppgift {num} är skapad, ännu utan innehåll"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewTitled"
+msgstr "Enter skapar uppgiften ”{title}”, utan innehåll, och öppnar den på tavlan {board}. Inget skickas"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHead"
+msgstr "{fresh, select, yes {Enter skapar körning {run} av uppgift {num} och kör dess deluppgifter en i taget} other {Enter kör uppgift {num} i körning {run}, dess deluppgifter en i taget}}"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHeadTogether"
+msgstr "{fresh, select, yes {Enter skapar körning {run} av uppgift {num} och kör alla dess deluppgifter samtidigt} other {Enter kör uppgift {num} i körning {run}, alla dess deluppgifter samtidigt}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskRunNothing"
+msgstr "Uppgift {num} har inga deluppgifter och ingen modell att fråga. new:subtask {num} lägger till en"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunSelf"
+msgstr "Enter skickar uppgift {num}, ”{title}”, till {name} som den är, eftersom den inte har några deluppgifter"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskTickAlready"
+msgstr "Uppgift {num} är redan avbockad. tick:off {num} tar bort bocken"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGo"
+msgstr "Enter bockar av uppgift {num}, ”{title}”"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGoYours"
+msgstr "Enter bockar av uppgift {num}, ”{title}”, och samtidigt {count, plural, one {din egen deluppgift som fortfarande är öppen} other {dina # egna deluppgifter som fortfarande är öppna}}"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffAlready"
+msgstr "Uppgift {num} är inte avbockad"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffGo"
+msgstr "Enter tar bort bocken från uppgift {num}, ”{title}”. Dess deluppgifter förblir som de är"
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsLine"
+msgstr "Uppgift {num} väntar vid deluppgift {index}, ”{words}”: dess kommando läggs i fältet och väntar på att du trycker på Enter"
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsYou"
+msgstr "Uppgift {num} väntar på dig vid deluppgift {index}, ”{words}”, och går vidare när du bockar av den"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
@@ -6217,28 +6311,32 @@ msgstr "{on, select, on {Tänkandet är redan på} other {Tänkandet är redan a
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tickAlready"
-msgstr "Uppgift {index} i {address} är redan avbockad. tick:off {address} {index} tar bort bocken"
+msgstr "Deluppgift {index} i {address} är redan avbockad. tick:off {address} {index} tar bort bocken"
 
 #. js-lingui-explicit-id
 msgid "enter.tickGo"
-msgstr "Enter bockar av uppgift {index} i {address}, ”{words}”. En gren som väntar där går vidare"
+msgstr "Enter bockar av deluppgift {index} i {address}, ”{words}”. En gren som väntar där går vidare"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tickHow"
-msgstr "tick: tar en gren och en uppgift: tick:201a 2"
+msgstr "tick: tar en uppgift och en deluppgift: tick:207 2"
 
 #. js-lingui-explicit-id
 msgid "enter.tickNotTodo"
-msgstr "Uppgift {index} i {address} är en prompt: den är klar när svaret kommer"
+msgstr "Deluppgift {index} i {address} är en prompt: den är klar när svaret kommer"
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffAlready"
-msgstr "Uppgift {index} i {address} är inte avbockad"
+msgstr "Deluppgift {index} i {address} är inte avbockad"
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffGo"
-msgstr "Enter tar bort bocken från uppgift {index} i {address}, ”{words}”"
+msgstr "Enter tar bort bocken från deluppgift {index} i {address}, ”{words}”"
+
+#. js-lingui-explicit-id
+msgid "enter.tickSent"
+msgstr "Deluppgift {index} i uppgift {address} har skickats: den är klar när svaret kommer"
 
 #. js-lingui-explicit-id
 msgid "enter.toAll"
@@ -6403,7 +6501,7 @@ msgstr "En prompt som väntar på att skickas tas bort med delete:{num}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAtRun"
-msgstr "Körning {run} av lista {num} har startat, och ångringen stannar där. Listan är fortfarande din att ändra: new:run planerar den på nytt"
+msgstr "Körning {run} av uppgift {num} har startat, och ångringen stannar där. Uppgiften är fortfarande din att ändra: new:run planerar den på nytt"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -6562,7 +6660,7 @@ msgstr "Webbläsaren är inställd på att inte låta Parliament placera fönste
 
 #. js-lingui-explicit-id
 msgid "erase.about"
-msgstr "Tar bort varje chatt, lista, markering, rum du har byggt, nyckel och inställning från den här webbläsaren. Det går inte att ångra, och inget sparas någon annanstans."
+msgstr "Tar bort varje chatt, uppgift, markering, rum du har byggt, nyckel och inställning från den här webbläsaren. Det går inte att ångra, och inget sparas någon annanstans."
 
 #. js-lingui-explicit-id
 msgid "erase.backupFirst"
@@ -6594,7 +6692,7 @@ msgstr "Radera alltihop"
 
 #. js-lingui-explicit-id
 msgid "erase.goesChats"
-msgstr "{chats, plural, one {# chatt} other {# chattar}} och {listas, plural, one {# lista} other {# listor}}, med sina meddelanden och filer"
+msgstr "{chats, plural, one {# chatt} other {# chattar}} och {plans, plural, one {# uppgift} other {# uppgifter}}, med sina meddelanden och filer"
 
 #. js-lingui-explicit-id
 msgid "erase.goesKeys"
@@ -6962,7 +7060,7 @@ msgstr "Snabba frågor"
 
 #. js-lingui-explicit-id
 msgid "guide.o.steps"
-msgstr "Steglistan"
+msgstr "Deluppgifterna"
 
 #. js-lingui-explicit-id
 msgid "guide.o.talking"
@@ -7342,7 +7440,7 @@ msgstr "Chatt"
 #. A list of tasks, as a kind of record (C301 (g))
 #. js-lingui-explicit-id
 msgid "kind.docket"
-msgstr "Lista"
+msgstr "Uppgift"
 
 #. js-lingui-explicit-id
 msgid "kind.edit"
@@ -7495,7 +7593,7 @@ msgstr "Saker lagda sida vid sida för att jämföra, fråga om eller använda."
 
 #. js-lingui-explicit-id
 msgid "library.aboutDocket"
-msgstr "Promptar ordnade i grenar och steg, att köra tillsammans."
+msgstr "En uppgifts deluppgifter, ordnade i grenar, att köra tillsammans."
 
 #. js-lingui-explicit-id
 msgid "library.aboutLibrary"
@@ -8232,7 +8330,7 @@ msgstr "bara engelska"
 
 #. js-lingui-explicit-id
 msgid "picker.forStep"
-msgstr "Vem som svarar på steg {index} i {address}"
+msgstr "Vem som svarar på deluppgift {index} i {address}"
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -8385,7 +8483,7 @@ msgstr "lägg till en gren"
 
 #. js-lingui-explicit-id
 msgid "plan.addStep"
-msgstr "lägg till en uppgift i {address}"
+msgstr "lägg till en deluppgift i {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.addTodo"
@@ -8417,15 +8515,15 @@ msgstr "open:{num} öppnar den"
 #. When a step runs (C201)
 #. js-lingui-explicit-id
 msgid "plan.condition"
-msgstr "{condition, select, failed {körs om föregående uppgift misslyckas} nothing {körs om inget hittas} always {körs vad som än händer} other {körs när föregående uppgift är klar}}"
+msgstr "{condition, select, failed {körs om föregående deluppgift misslyckas} nothing {körs om inget hittas} always {körs vad som än händer} other {körs när föregående deluppgift är klar}}"
 
 #. js-lingui-explicit-id
 msgid "plan.conditionHelp"
-msgstr "När den här uppgiften körs. Klicka för att ändra"
+msgstr "När den här deluppgiften körs. Klicka för att ändra"
 
 #. js-lingui-explicit-id
 msgid "plan.counts"
-msgstr "{branches, plural, one {en gren} other {# grenar}}, {steps, plural, =0 {inga uppgifter} one {en uppgift} other {# uppgifter}}"
+msgstr "{branches, plural, one {en gren} other {# grenar}}, {steps, plural, =0 {inga deluppgifter} one {en deluppgift} other {# deluppgifter}}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteBranch"
@@ -8433,7 +8531,7 @@ msgstr "Radera {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
-msgstr "Radera uppgift {index} i {address}"
+msgstr "Radera deluppgift {index} i {address}"
 
 #. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
@@ -8443,7 +8541,7 @@ msgstr "{why, select, stopped {stoppat} failed {det misslyckades} stalled {nätv
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
-msgstr "Den här uppgiften startade i körning {run}, så dess prompt ligger fast. new:run planerar den på nytt"
+msgstr "Den här deluppgiften startade i körning {run}, så dess prompt ligger fast. new:run planerar den på nytt"
 
 #. js-lingui-explicit-id
 msgid "plan.held"
@@ -8452,12 +8550,12 @@ msgstr "{count, plural, one {en hålls kvar} other {# hålls kvar}}"
 #. The plan’s number, at the top of the Plan board
 #. js-lingui-explicit-id
 msgid "plan.label"
-msgstr "Lista {num}"
+msgstr "Uppgift {num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.latest"
-msgstr "open:run {run} för att ändra listan"
+msgstr "open:run {run} för att ändra uppgiften"
 
 #. js-lingui-explicit-id
 msgid "plan.newInRun"
@@ -8469,12 +8567,12 @@ msgstr "ingen chatt tills den körs"
 
 #. js-lingui-explicit-id
 msgid "plan.none"
-msgstr "Ingen lista här än"
+msgstr "Ingen uppgift här än"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.noneHow"
-msgstr "open: följt av en listas nummer visar den här. new:tasks skapar en ny"
+msgstr "open: följt av en uppgifts nummer visar den här. new:task skapar en ny"
 
 #. js-lingui-explicit-id
 msgid "plan.onlyIn"
@@ -8482,7 +8580,7 @@ msgstr "inte i körning {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.pip"
-msgstr "{reached, select, yes {körning {run}} other {körning {run}, som inte nådde den här uppgiften}}"
+msgstr "{reached, select, yes {körning {run}} other {körning {run}, som inte nådde den här deluppgiften}}"
 
 #. js-lingui-explicit-id
 msgid "plan.pipHelp"
@@ -8518,15 +8616,15 @@ msgstr "väntar"
 
 #. js-lingui-explicit-id
 msgid "plan.step"
-msgstr "Uppgift {index} i {address}"
+msgstr "Deluppgift {index} i {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.steps"
-msgstr "{count, plural, =0 {inga uppgifter än} one {en uppgift} other {# uppgifter}}"
+msgstr "{count, plural, =0 {inga deluppgifter än} one {en deluppgift} other {# deluppgifter}}"
 
 #. js-lingui-explicit-id
 msgid "plan.tick"
-msgstr "Bocka av uppgift {index} i {address}"
+msgstr "Bocka av deluppgift {index} i {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.ticked"
@@ -8539,11 +8637,11 @@ msgstr "Kör {command}"
 
 #. js-lingui-explicit-id
 msgid "plan.untick"
-msgstr "Ta bort bocken från uppgift {index} i {address}"
+msgstr "Ta bort bocken från deluppgift {index} i {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.untitled"
-msgstr "Namnlös lista"
+msgstr "Namnlös uppgift"
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
@@ -8555,11 +8653,11 @@ msgstr "körningen väntar på dig här"
 
 #. js-lingui-explicit-id
 msgid "plan.whoHelp"
-msgstr "Vem som svarar på uppgift {index} i {address}. Klicka för att se vilka som kan"
+msgstr "Vem som svarar på deluppgift {index} i {address}. Klicka för att se vilka som kan"
 
 #. js-lingui-explicit-id
 msgid "plan.write"
-msgstr "Skriv uppgiften"
+msgstr "Skriv deluppgiften"
 
 #. A to-do of the person, never sent
 #. js-lingui-explicit-id
@@ -9086,7 +9184,7 @@ msgstr "Utseende"
 
 #. js-lingui-explicit-id
 msgid "settings.backupHelp"
-msgstr "Chattar, listor, rum, biblioteket och alla markeringar, i en enda .parliament-fil. Säkerhetskopior har format {version}. Alla äldre säkerhetskopior kan återställas; en från en nyare version av Parliament ber dig uppdatera först."
+msgstr "Chattar, uppgifter, rum, biblioteket och alla markeringar, i en enda .parliament-fil. Säkerhetskopior har format {version}. Alla äldre säkerhetskopior kan återställas; en från en nyare version av Parliament ber dig uppdatera först."
 
 #. js-lingui-explicit-id
 msgid "settings.backupLabel"
@@ -9419,7 +9517,7 @@ msgstr "{count, plural, =0 {Inga kostnader i {month} än.} one {{cost} har gått
 
 #. js-lingui-explicit-id
 msgid "settings.monthSpentRuns"
-msgstr "{cost} har gått åt i {month}: {runs, plural, one {# körning av en lista} other {# körningar av listor}} och {count, plural, =0 {ingen fristående chatt} one {# fristående chatt} other {# fristående chattar}}. Uppskattat från antal tokens; leverantörens faktura är det som gäller."
+msgstr "{cost} har gått åt i {month}: {runs, plural, one {# körning av en uppgift} other {# körningar av uppgifter}} och {count, plural, =0 {ingen fristående chatt} one {# fristående chatt} other {# fristående chattar}}. Uppskattat från antal tokens; leverantörens faktura är det som gäller."
 
 #. js-lingui-explicit-id
 msgid "settings.monthUnknown"
@@ -9559,7 +9657,7 @@ msgstr "Svarsspråk"
 
 #. js-lingui-explicit-id
 msgid "settings.roomHelp"
-msgstr "Rummet som en ny chatt, och dess lista, startar i."
+msgstr "Rummet som en ny chatt, och dess uppgift, startar i."
 
 #. js-lingui-explicit-id
 msgid "settings.roomLabel"
@@ -9571,7 +9669,7 @@ msgstr "körning {run}"
 
 #. js-lingui-explicit-id
 msgid "settings.runRowHelp"
-msgstr "Visar körning {run} av lista {num} på tavlan {board}"
+msgstr "Visar körning {run} av uppgift {num} på tavlan {board}"
 
 #. js-lingui-explicit-id
 msgid "settings.sources"
@@ -9591,7 +9689,7 @@ msgstr "Kostnader"
 
 #. js-lingui-explicit-id
 msgid "settings.storageCounts"
-msgstr "{chats, plural, one {# chatt} other {# chattar}}, {listas, plural, one {# lista} other {# listor}}, {markings, plural, one {# markering} other {# markeringar}}."
+msgstr "{chats, plural, one {# chatt} other {# chattar}}, {plans, plural, one {# uppgift} other {# uppgifter}}, {markings, plural, one {# markering} other {# markeringar}}."
 
 #. js-lingui-explicit-id
 msgid "settings.storageLabel"
@@ -9894,6 +9992,239 @@ msgstr "Den här webbläsaren behåller Parliaments data tills du raderar den."
 #. js-lingui-explicit-id
 msgid "storage.notKept"
 msgstr "Den här webbläsaren har inte lovat att behålla Parliaments data. Vissa webbläsare raderar en webbplats data när de stängs eller får ont om utrymme. För att behålla den, tillåt webbplatsen att spara cookies och webbplatsdata i webbläsarens integritetsinställningar, och gör en säkerhetskopia."
+
+#. js-lingui-explicit-id
+msgid "tasks.add"
+msgstr "Lägg till uppgiften"
+
+#. js-lingui-explicit-id
+msgid "tasks.addPlus"
+msgstr "Lägg till en uppgift"
+
+#. js-lingui-explicit-id
+msgid "tasks.addSub"
+msgstr "Lägg till deluppgiften"
+
+#. js-lingui-explicit-id
+msgid "tasks.addSubPlus"
+msgstr "Lägg till en deluppgift"
+
+#. Who answered and where, before the first words of the answer
+#. js-lingui-explicit-id
+msgid "tasks.answerBy"
+msgstr "{name}, rum {num}:"
+
+#. js-lingui-explicit-id
+msgid "tasks.asTask"
+msgstr "Samma som uppgiften: {name}"
+
+#. js-lingui-explicit-id
+msgid "tasks.asTaskChip"
+msgstr "{name}, samma som uppgiften"
+
+#. js-lingui-explicit-id
+msgid "tasks.cancel"
+msgstr "Avbryt"
+
+#. A link that opens the task’s fields to change them
+#. js-lingui-explicit-id
+msgid "tasks.change"
+msgstr "ändra"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.commandExample"
+msgstr "compare:204 199"
+
+#. js-lingui-explicit-id
+msgid "tasks.commandNow"
+msgstr "i fältet nu: Enter kör det, och uppgiften går vidare"
+
+#. js-lingui-explicit-id
+msgid "tasks.commandWaits"
+msgstr "en körning lägger det i fältet och väntar på att du trycker på Enter"
+
+#. js-lingui-explicit-id
+msgid "tasks.deleteSub"
+msgstr "Radera deluppgift {n} i uppgift {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.doneOf"
+msgstr "{done} av {count} klara"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldCommand"
+msgstr "Kommando"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldDescription"
+msgstr "Beskrivning"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldFlow"
+msgstr "Flöde"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldKind"
+msgstr "Typ"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldModel"
+msgstr "Modell"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldName"
+msgstr "Namn"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldPrompt"
+msgstr "Prompt"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRooms"
+msgstr "Rum"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSearch"
+msgstr "Sök efter"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSource"
+msgstr "Källa"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldWords"
+msgstr "Text"
+
+#. js-lingui-explicit-id
+msgid "tasks.findRooms"
+msgstr "hitta ett rum efter nummer eller namn"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOne"
+msgstr "En i taget"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOneLow"
+msgstr "en i taget"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogether"
+msgstr "Alla samtidigt"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogetherLow"
+msgstr "alla samtidigt"
+
+#. js-lingui-explicit-id
+msgid "tasks.ifYouLike"
+msgstr "om du vill"
+
+#. js-lingui-explicit-id
+msgid "tasks.keep"
+msgstr "Spara"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindCommand"
+msgstr "Kommando"
+
+#. The kind of a task that is the person’s own
+#. js-lingui-explicit-id
+msgid "tasks.kindNone"
+msgstr "Ingen"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindPrompt"
+msgstr "Prompt"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindSearch"
+msgstr "Sökning"
+
+#. js-lingui-explicit-id
+msgid "tasks.needsKey"
+msgstr "behöver en nyckel"
+
+#. js-lingui-explicit-id
+msgid "tasks.none"
+msgstr "Inga uppgifter än"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.noneHow"
+msgstr "Lägg till en med pluset, eller med new:task \"bidragsansökan\" i fältet"
+
+#. js-lingui-explicit-id
+msgid "tasks.noRoom"
+msgstr "inget rum"
+
+#. js-lingui-explicit-id
+msgid "tasks.ownBranch"
+msgstr "en gren i den här uppgiften"
+
+#. js-lingui-explicit-id
+msgid "tasks.ownRoom"
+msgstr "en gren i den här uppgiften, vars chatt skapas första gången den körs"
+
+#. A small label: the sub-task is a command
+#. js-lingui-explicit-id
+msgid "tasks.pillCommand"
+msgstr "kommando"
+
+#. A small label: the sub-task is a prompt to a model
+#. js-lingui-explicit-id
+msgid "tasks.pillPrompt"
+msgstr "prompt"
+
+#. A small label: the sub-task is a search of a source
+#. js-lingui-explicit-id
+msgid "tasks.pillSearch"
+msgstr "sökning"
+
+#. A room, by its number, as the strip names it
+#. js-lingui-explicit-id
+msgid "tasks.room"
+msgstr "rum {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.roomOff"
+msgstr "Ta bort rum {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.runN"
+msgstr "Körning {n}"
+
+#. js-lingui-explicit-id
+msgid "tasks.runs"
+msgstr "Körningar"
+
+#. js-lingui-explicit-id
+msgid "tasks.runWaits"
+msgstr "väntar vid ”{title}”"
+
+#. js-lingui-explicit-id
+msgid "tasks.subCount"
+msgstr "{count, plural, one {en deluppgift} other {# deluppgifter}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subRooms"
+msgstr "Svaret hamnar där uppgiftens svar hamnar"
+
+#. js-lingui-explicit-id
+msgid "tasks.tickSub"
+msgstr "Bocka av deluppgift {n} i uppgift {num}, ”{title}”"
+
+#. js-lingui-explicit-id
+msgid "tasks.tickTask"
+msgstr "Bocka av uppgift {num}, ”{title}”"
+
+#. js-lingui-explicit-id
+msgid "tasks.untitled"
+msgstr "En uppgift utan namn än"
+
+#. js-lingui-explicit-id
+msgid "tasks.yoursNow"
+msgstr "körningen väntar på att du bockar av den"
 
 #. js-lingui-explicit-id
 msgid "template.dataWorkspace"
@@ -10221,7 +10552,7 @@ msgstr "Namnge det fältet pekar på: ett rum, en samling eller en chatt. Med tv
 
 #. js-lingui-explicit-id
 msgid "verb.new"
-msgstr "Skapa något nytt: chatt, lista med uppgifter, rum, samling, ramverk, gren, steg, punkt att göra, körning eller block"
+msgstr "Skapa något nytt: chatt, uppgift, deluppgift, rum, samling, ramverk, gren, punkt att göra, körning eller block"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10379,7 +10710,7 @@ msgstr "Låt modeller som kan tänka göra det innan de svarar, synligt medan de
 
 #. js-lingui-explicit-id
 msgid "verb.tick"
-msgstr "Bocka av en punkt att göra i en lista med uppgifter, eller ta bort bocken"
+msgstr "Bocka av en uppgift eller en deluppgift, eller ta bort bocken"
 
 #. js-lingui-explicit-id
 msgid "verb.to"

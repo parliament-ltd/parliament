@@ -47,7 +47,7 @@ describe('sweep: before Enter (C233 (b), (e))', () => {
   })
   it('refuses a source\'s answer, a plan without a branch, a word that names nothing, and no key', () => {
     expect(at('>sweep:201b pushback').text).toBe('201b was answered by a source, whose words are not swept')
-    expect(at('>sweep:201 pushback').text).toBe('List 201 has branches: name one, as sweep:201a')
+    expect(at('>sweep:201 pushback').text).toBe('Task 201 has branches: name one, as sweep:201a')
     expect(at('>sweep:201a nonsense').act).toBeNull()
     expect(at('>sweep:201a pushback', { rippling: { helper: { ...helper, needsKey: true } } }).text).toBe('Sweeping 201a as Push back on me needs a model with a key: api:')
   })

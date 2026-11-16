@@ -447,3 +447,12 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - keys.localStepCheck: 点击上方的“{check}”。 The button word is quoted, as “保存” is in keys.checkThenHold; 点击, since 按 is kept for keys (按 Enter).
 - keys.localStepOrigins, keys.localStepOriginsOther: "and only this site" is 只响应本网站，不响应其他网站, which says the "only" twice as the English does.
 - keys.localStepModel, keys.localStepOrigins: end with the full-width colon ：, as the context line (上下文已用 {percent}%：) does.
+
+## Tasks v4, drafted 16 November 2026
+
+- tasks.fieldFlow, enter.taskFlowRan: Flow is 流程, two characters like the other field names (名称, 类型, 模型). 流程 can suggest a whole workflow; 进行方式 would match its two choices (同时进行, 依次进行) more plainly.
+- tasks.kindNone: None (a sub-task of your own, with no model) is 无, as bare as the English. 待办 would say what it is.
+- tasks.ifYouLike: the placeholder "if you like" is 选填 ("optional"), the usual word in a form field.
+- tasks.fieldWords: Words (the text of a sub-task of your own) is 内容; 文字 was the alternative.
+- tasks.doneOf: "{done} of {count} done" is 已完成 {done} 项，共 {count} 项, as run 1 of 2 is 第 1 次运行，共 2 次. 已完成 {done}/{count} would be shorter in the margin.
+- tasks.noneHow: the example task name inside the ASCII quotes is 基金申请 ("grant application"), translated as the person's own words.

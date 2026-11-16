@@ -41,7 +41,7 @@ import { planReflect, reflectTalkPreview } from '../lib/reflection'
 import { LAB, boardOffered } from '../lib/release'
 import { LETTERS, letterOf, newestLetter } from './letters'
 import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate, planLocal } from '../lib/lab'
-import { planNewPlan, planNewStep, planTick, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
+import { planNewPlan, planNewTask, planNewSub, planNewStep, planTick, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
@@ -308,6 +308,9 @@ const newStep = (a, step, screens) => {
     return planNewBranch(step, screens)
   }
   // A plan, a step and a run, on this device; nothing is sent (C198).
+  // new:task and new:subtask (C301 (g), v4); new:tasks and new:plan, older names, still read.
+  if (what === 'task') return planNewTask(step)
+  if (what === 'subtask') return planNewSub(step, screens)
   if (what === 'plan' || what === 'tasks') return planNewPlan(step)
   if (what === 'todo') return planNewStep(step, screens, { todo: true })
   if (what === 'step') return planNewStep(step, screens)

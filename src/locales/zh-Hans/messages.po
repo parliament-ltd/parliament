@@ -126,11 +126,11 @@ msgstr "笔记、高亮、摘录、收藏和合集"
 
 #. js-lingui-explicit-id
 msgid "backup.catChats"
-msgstr "对话与列表"
+msgstr "对话与任务"
 
 #. js-lingui-explicit-id
 msgid "backup.catChatsAbout"
-msgstr "每个对话及其消息和文件，以及它们所属的列表"
+msgstr "每个对话及其消息和文件，以及它们所属的任务"
 
 #. js-lingui-explicit-id
 msgid "backup.catLayouts"
@@ -384,7 +384,7 @@ msgstr "涟漪分析"
 
 #. js-lingui-explicit-id
 msgid "block.steps"
-msgstr "步骤列表"
+msgstr "子任务"
 
 #. js-lingui-explicit-id
 msgid "block.summary-dashboard"
@@ -452,7 +452,7 @@ msgstr "提交草稿时，找出其中前后不再一致的地方，范围包括
 
 #. js-lingui-explicit-id
 msgid "blockAbout.steps"
-msgstr "跟随此房间中的对话，显示列表的任务。整个列表另有单独的面板。"
+msgstr "跟随此房间中的对话，显示任务的子任务。整个任务另有单独的面板。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
@@ -468,7 +468,7 @@ msgstr "对话中的各个标题，可跳转到任意位置。"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsEmpty"
-msgstr "尚未填写的任务"
+msgstr "尚未填写的子任务"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsFollowing"
@@ -476,15 +476,15 @@ msgstr "跟随此对话，{address}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoChat"
-msgstr "此房间中还没有对话，因此没有任务"
+msgstr "此房间中还没有对话，因此没有子任务"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoPlan"
-msgstr "这里没有编号为 {num} 的列表"
+msgstr "这里没有编号为 {num} 的任务"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsPinned"
-msgstr "列表 {num}，固定显示"
+msgstr "任务 {num}，固定显示"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsSent"
@@ -492,7 +492,7 @@ msgstr "已发送，内容在其对话中"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsWhole"
-msgstr "可显示整个列表"
+msgstr "可显示整个任务"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.add"
@@ -1427,7 +1427,7 @@ msgstr "已撤销"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {列表 {num}} edit {编辑 {num}} ask {提示词 {num}} suggestion {建议 {num}} other {{num}}}"
+msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {任务 {num}} edit {编辑 {num}} ask {提示词 {num}} suggestion {建议 {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1480,7 +1480,7 @@ msgstr "其中的内容还没有批注、高亮或摘录。创建后会显示在
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {对话 {num}，已删除} plan {列表 {num}，已删除} message {一条消息，已删除} other {{num}，已删除}}"
+msgstr "{what, select, chat {对话 {num}，已删除} plan {任务 {num}，已删除} message {一条消息，已删除} other {{num}，已删除}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
@@ -1505,7 +1505,7 @@ msgstr "出自"
 
 #. js-lingui-explicit-id
 msgid "collection.fromHelp"
-msgstr "其中收入的对话和列表。点击可列出"
+msgstr "其中收入的对话和任务。点击可列出"
 
 #. js-lingui-explicit-id
 msgid "collection.fromNothing"
@@ -1525,7 +1525,7 @@ msgstr "对话 {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.groupPlan"
-msgstr "列表 {num}"
+msgstr "任务 {num}"
 
 #. js-lingui-explicit-id
 msgid "collection.holdBack"
@@ -1615,7 +1615,7 @@ msgstr "已置顶"
 
 #. js-lingui-explicit-id
 msgid "collection.plans"
-msgstr "列表"
+msgstr "任务"
 
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
@@ -1942,11 +1942,11 @@ msgstr "{count, plural, other {# 个对话}}"
 
 #. js-lingui-explicit-id
 msgid "count.dockets"
-msgstr "{count, plural, other {# 个列表}}"
+msgstr "{count, plural, other {# 个任务}}"
 
 #. js-lingui-explicit-id
 msgid "count.steps"
-msgstr "{count, plural, other {# 项任务}}"
+msgstr "{count, plural, other {# 项子任务}}"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
@@ -2742,7 +2742,7 @@ msgstr "不会向 AI 模型发送任何内容"
 #. {example} is a command like compare:201a 201b, which stays English
 #. js-lingui-explicit-id
 msgid "enter.comparePlan"
-msgstr "{num} 是一个列表。{example} 可对照其中两个分支的最后一条回复"
+msgstr "{num} 是一个任务。{example} 可对照其中两个分支的最后一条回复"
 
 #. {a} and {b} are branches like 201a, or chat numbers
 #. js-lingui-explicit-id
@@ -2851,7 +2851,7 @@ msgstr "提示词 {num} 已发给模型，因此会保留。accept: 或 reject: 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteBranch"
-msgstr "按 Enter 从列表 {num} 的所有运行中删除 {address}（它从未运行过）。undo: 可恢复"
+msgstr "按 Enter 从任务 {num} 的所有运行中删除 {address}（它从未运行过）。undo: 可恢复"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2865,12 +2865,12 @@ msgstr "已删除。20 秒内可在对话中恢复它"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
-msgstr "列表 {num} 已删除。undo: 可恢复"
+msgstr "任务 {num} 已删除。undo: 可恢复"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
-msgstr "{address} 的第 {index} 项任务已删除。undo: 可恢复"
+msgstr "{address} 的第 {index} 项子任务已删除。undo: 可恢复"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2896,20 +2896,20 @@ msgstr "删除后 20 秒内可在对话中恢复它"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletePlan"
-msgstr "按 Enter 删除列表 {num}（它还没有对话）。undo: 可恢复"
+msgstr "按 Enter 删除任务 {num}（它还没有对话）。undo: 可恢复"
 
 #. js-lingui-explicit-id
 msgid "enter.deletePlanToo"
-msgstr "它是列表的最后一个分支，因此列表 {num} 也会一并删除"
+msgstr "它是任务的最后一个分支，因此任务 {num} 也会一并删除"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteStep"
-msgstr "按 Enter 删除第 {run} 次运行中 {address} 的第 {index} 项任务。undo: 可恢复"
+msgstr "按 Enter 删除第 {run} 次运行中 {address} 的第 {index} 项子任务。undo: 可恢复"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
-msgstr "{address} 的第 {index} 项任务已开始，因此会随其对话保留"
+msgstr "{address} 的第 {index} 项子任务已开始，因此会随其对话保留"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -2953,7 +2953,7 @@ msgstr "按 Enter 将第 {other} 次运行放到第 {run} 次运行旁边，并�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffOneRun"
-msgstr "列表 {num} 只有一次运行。new:run 可再创建一次，用来对照"
+msgstr "任务 {num} 只有一次运行。new:run 可再创建一次，用来对照"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3056,7 +3056,7 @@ msgstr "{count, plural, other {其中 # 条批注、高亮和摘录会保留，�
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
-msgstr "{count, plural, other {列表 {nums} 会随其最后一个对话一起删除}}"
+msgstr "{count, plural, other {任务 {nums} 会随其最后一个对话一起删除}}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseUndo"
@@ -3317,7 +3317,7 @@ msgstr "{word} 可能是 {names}。请指明是哪个，例如 {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.fromWhat"
-msgstr "没有出自 {num} 的内容。from: 可接对话、列表、分支或运行"
+msgstr "没有出自 {num} 的内容。from: 可接对话、任务、分支或运行"
 
 #. js-lingui-explicit-id
 msgid "enter.goNewRoom"
@@ -3966,7 +3966,7 @@ msgstr "按 Enter 从 {address} 开始 {next}，复制其全部历史，放在�
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchAt"
-msgstr "按 Enter 从 {address} 的第 {step} 项任务之后开始 {next}，复制到该步为止的内容，放在单独的房间中。不调用模型"
+msgstr "按 Enter 从 {address} 的第 {step} 项子任务之后开始 {next}，复制到该子任务为止的内容，放在单独的房间中。不调用模型"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchDone"
@@ -3991,7 +3991,7 @@ msgstr "按 Enter 开始 {next}，即与 {address} 并列的空分支，放在�
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
-msgstr "{count, plural, =0 {{address} 还没有任务} other {{address} 有 # 项任务}}"
+msgstr "{count, plural, =0 {{address} 还没有子任务} other {{address} 有 # 项子任务}}"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomGo"
@@ -4085,7 +4085,7 @@ msgstr "按 Enter 在这里的房间中显示 {address}，带有其全部历史�
 
 #. js-lingui-explicit-id
 msgid "enter.openBranchUnrun"
-msgstr "{address} 还没有运行过。按 Enter 在{board}面板上显示它的任务"
+msgstr "{address} 还没有运行过。按 Enter 在{board}面板上显示它的子任务"
 
 #. js-lingui-explicit-id
 msgid "enter.openChat"
@@ -4133,11 +4133,11 @@ msgstr "按 Enter 打开 {num} 所属的对话，并转到它所在的位置"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
-msgstr "按 Enter 在{board}面板上打开列表 {num}"
+msgstr "按 Enter 在{board}面板上打开任务 {num}"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlanHere"
-msgstr "列表 {num} 已在{board}面板上。按 Enter 让输入栏指向它"
+msgstr "任务 {num} 已在{board}面板上。按 Enter 让输入栏指向它"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -4319,20 +4319,20 @@ msgstr "{address} 已添加，在运行之前没有对话"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchNew"
-msgstr "按 Enter 将 {address} 添加到列表 {num}，在运行之前没有对话。不会发送任何内容"
+msgstr "按 Enter 将 {address} 添加到任务 {num}，在运行之前没有对话。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planChanged"
-msgstr "列表在此期间有了变化。请再看一遍，然后按 Enter"
+msgstr "任务在此期间有了变化。请再看一遍，然后按 Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.planFailed"
-msgstr "无法更改列表"
+msgstr "无法更改任务"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planFixed"
-msgstr "该任务已开始，现在不能再改。new:run 可在新的一次运行中重新安排"
+msgstr "该子任务已开始，现在不能再改。new:run 可在新的一次运行中重新安排"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldAlready"
@@ -4353,7 +4353,7 @@ msgstr "按 Enter 在第 {run} 次运行中取消搁置 {nums}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldOn"
-msgstr "按 Enter 在第 {run} 次运行中搁置 {nums}。它们的任务会一直等待，直到用 hold:off 取消"
+msgstr "按 Enter 在第 {run} 次运行中搁置 {nums}。它们的子任务会一直等待，直到用 hold:off 取消"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4375,19 +4375,19 @@ msgstr "{address} 已经在 {other} {where, select, after {之后} other {之前
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planMoveWhich"
-msgstr "请指明同一列表中的两个分支，例如 move:201c after 201a"
+msgstr "请指明同一任务中的两个分支，例如 move:201c after 201a"
 
 #. js-lingui-explicit-id
 msgid "enter.planNew"
-msgstr "按 Enter 新建一个空列表，并在{board}面板上打开。不会发送任何内容"
+msgstr "按 Enter 新建一个空任务，并在{board}面板上打开。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewDone"
-msgstr "列表 {num} 已创建，目前还是空的"
+msgstr "任务 {num} 已创建，目前还是空的"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewTitled"
-msgstr "按 Enter 新建空列表“{title}”，并在{board}面板上打开。不会发送任何内容"
+msgstr "按 Enter 新建空任务“{title}”，并在{board}面板上打开。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoBranch"
@@ -4396,33 +4396,33 @@ msgstr "第 {run} 次运行中没有 {address}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
-msgstr "{board}面板上没有列表。open: 加上列表编号可显示一个列表，new:tasks 可新建一个"
+msgstr "{board}面板上没有任务。open: 加上任务编号可显示一个任务，new:task 可新建一个"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoStep"
-msgstr "第 {run} 次运行中，{address} 没有第 {index} 项任务"
+msgstr "第 {run} 次运行中，{address} 没有第 {index} 项子任务"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNotShown"
-msgstr "列表 {num} 不在{board}面板上。open:{num} 可显示它"
+msgstr "任务 {num} 不在{board}面板上。open:{num} 可显示它"
 
 #. js-lingui-explicit-id
 msgid "enter.planOnePlan"
-msgstr "一次只能指明同一个列表中的分支"
+msgstr "一次只能指明同一个任务中的分支"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptEmpty"
-msgstr "写下这一步。按 Enter 将其添加为 {address} 的第 {index} 项任务。不会发送任何内容"
+msgstr "写下这项子任务。按 Enter 将其添加为 {address} 的第 {index} 项子任务。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptStep"
-msgstr "按 Enter 将其添加为第 {run} 次运行中 {address} 的第 {index} 项任务。不会发送任何内容"
+msgstr "按 Enter 将其添加为第 {run} 次运行中 {address} 的第 {index} 项子任务。不会发送任何内容"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planRecord"
-msgstr "第 {run} 次运行是较早的一次运行，保持原样。要更改列表，请用 open:run {latest}"
+msgstr "第 {run} 次运行是较早的一次运行，保持原样。要更改任务，请用 open:run {latest}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunDone"
@@ -4434,45 +4434,45 @@ msgstr "第 {run} 次运行已经在{board}面板上"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNew"
-msgstr "按 Enter 以第 {from} 次运行为基础，创建列表 {num} 的第 {next} 次运行：每一步都重新安排，均未开始。不会发送任何内容"
+msgstr "按 Enter 以第 {from} 次运行为基础，创建任务 {num} 的第 {next} 次运行：每项子任务都重新安排，均未开始。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNone"
-msgstr "{runs, plural, other {列表 {num} 共有 # 次运行}}"
+msgstr "{runs, plural, other {任务 {num} 共有 # 次运行}}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunOpen"
-msgstr "按 Enter 显示列表 {num} 的第 {run} 次运行"
+msgstr "按 Enter 显示任务 {num} 的第 {run} 次运行"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepAdd"
-msgstr "按 Enter 在第 {run} 次运行中为 {address} 添加第 {index} 项任务。不会发送任何内容"
+msgstr "按 Enter 在第 {run} 次运行中为 {address} 添加第 {index} 项子任务。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepDone"
-msgstr "已在 {address} 中安排第 {index} 项任务。未发送任何内容"
+msgstr "已在 {address} 中安排第 {index} 项子任务。未发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepEmpty"
-msgstr "按 Enter 在第 {run} 次运行中为 {address} 添加空白的第 {index} 项任务，留待在面板上填写。不会发送任何内容"
+msgstr "按 Enter 在第 {run} 次运行中为 {address} 添加空白的第 {index} 项子任务，留待在面板上填写。不会发送任何内容"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planStepHeld"
-msgstr "{address} 已搁置，因此这一步也会等待。hold:off {address} 可取消搁置"
+msgstr "{address} 已搁置，因此这项子任务也会等待。hold:off {address} 可取消搁置"
 
 #. js-lingui-explicit-id
 msgid "enter.planTodoAdd"
-msgstr "按 Enter 把你自己的待办添加为 {address} 的第 {index} 项任务。它不会被发送：完成后由你勾选"
+msgstr "按 Enter 把你自己的待办添加为 {address} 的第 {index} 项子任务。它不会被发送：完成后由你勾选"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planTodoDone"
-msgstr "{address} 的第 {index} 项任务是你自己的待办。tick:{address} {index} 可勾选它"
+msgstr "{address} 的第 {index} 项子任务是你自己的待办。tick:{address} {index} 可勾选它"
 
 #. js-lingui-explicit-id
 msgid "enter.planTodoEmpty"
-msgstr "按 Enter 把一个空白待办添加为 {address} 的第 {index} 项任务，留待在面板上填写。它不会被发送"
+msgstr "按 Enter 把一个空白待办添加为 {address} 的第 {index} 项子任务，留待在面板上填写。它不会被发送"
 
 #. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
@@ -5334,29 +5334,29 @@ msgstr "涟漪作用于房间中的对话。请先打开一个房间：room:"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleNothing"
-msgstr "涟漪会把编辑带到列表的其他分支，但此对话还没有分支"
+msgstr "涟漪会把编辑带到任务的其他分支，但此对话还没有分支"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOff"
-msgstr "按 Enter 为列表 {num} 关闭涟漪：编辑只留在各自的分支中"
+msgstr "按 Enter 为任务 {num} 关闭涟漪：编辑只留在各自的分支中"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOffAlready"
-msgstr "列表 {num} 的涟漪已经关闭"
+msgstr "任务 {num} 的涟漪已经关闭"
 
 #. {nums} are the other branches, as 201b and 201c
 #. js-lingui-explicit-id
 msgid "enter.rippleOn"
-msgstr "按 Enter 为列表 {num} 开启涟漪：编辑随提示词发送时，{name} 会检查 {nums} 中是否有相同的改动，每个分支调用一次"
+msgstr "按 Enter 为任务 {num} 开启涟漪：编辑随提示词发送时，{name} 会检查 {nums} 中是否有相同的改动，每个分支调用一次"
 
 #. js-lingui-explicit-id
 msgid "enter.rippleOnAlready"
-msgstr "列表 {num} 的涟漪已经开启"
+msgstr "任务 {num} 的涟漪已经开启"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.rippleOnNoKey"
-msgstr "按 Enter 为列表 {num} 开启涟漪。检查 {nums} 需要一个有密钥的模型：api:"
+msgstr "按 Enter 为任务 {num} 开启涟漪。检查 {nums} 需要一个有密钥的模型：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -5404,27 +5404,27 @@ msgstr "{verb} 目前只能与同类命令写在同一行"
 
 #. js-lingui-explicit-id
 msgid "enter.runChanged"
-msgstr "列表在此期间有了变化。请再看一遍，然后按 Enter"
+msgstr "任务在此期间有了变化。请再看一遍，然后按 Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.runCost"
-msgstr "至少发送 {tokens, number} 个 token，{cost}。每一步还会把之前的回复一并发送"
+msgstr "至少发送 {tokens, number} 个 token，{cost}。每项子任务还会把之前的回复一并发送"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAll"
-msgstr "如果每一步都运行，至少发送 {tokens, number} 个 token，{cost}。每一步还会把之前的回复一并发送"
+msgstr "如果每项子任务都运行，至少发送 {tokens, number} 个 token，{cost}。每项子任务还会把之前的回复一并发送"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllCheap"
-msgstr "如果每一步都运行，至少发送 {tokens, number} 个 token，不到 {cost}。每一步还会把之前的回复一并发送"
+msgstr "如果每项子任务都运行，至少发送 {tokens, number} 个 token，不到 {cost}。每项子任务还会把之前的回复一并发送"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllUnpriced"
-msgstr "如果每一步都运行，至少发送 {tokens, number} 个 token。每一步还会把之前的回复一并发送"
+msgstr "如果每项子任务都运行，至少发送 {tokens, number} 个 token。每项子任务还会把之前的回复一并发送"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostCheap"
-msgstr "至少发送 {tokens, number} 个 token，不到 {cost}。每一步还会把之前的回复一并发送"
+msgstr "至少发送 {tokens, number} 个 token，不到 {cost}。每项子任务还会把之前的回复一并发送"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostly"
@@ -5432,15 +5432,15 @@ msgstr "发送费用至少 {cost}：超过了你设定的提醒金额 {warn}。�
 
 #. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
-msgstr "至少发送 {tokens, number} 个 token。每一步还会把之前的回复一并发送"
+msgstr "至少发送 {tokens, number} 个 token。每项子任务还会把之前的回复一并发送"
 
 #. js-lingui-explicit-id
 msgid "enter.runDone"
-msgstr "列表 {num} 的第 {run} 次运行已完成"
+msgstr "任务 {num} 的第 {run} 次运行已完成"
 
 #. js-lingui-explicit-id
 msgid "enter.runElsewhere"
-msgstr "列表 {num} 正在另一个标签页中运行"
+msgstr "任务 {num} 正在另一个标签页中运行"
 
 #. js-lingui-explicit-id
 msgid "enter.runFailed"
@@ -5448,19 +5448,19 @@ msgstr "无法开始运行"
 
 #. js-lingui-explicit-id
 msgid "enter.runGone"
-msgstr "{address} 的第 {index} 项任务要发给 {name}，但它已不再提供"
+msgstr "{address} 的第 {index} 项子任务要发给 {name}，但它已不再提供"
 
 #. js-lingui-explicit-id
 msgid "enter.runHead"
-msgstr "{count, plural, =1 {按 Enter 在第 {run} 次运行中执行 {nums} 的一项任务} other {按 Enter 在第 {run} 次运行中依次执行 {nums} 的 # 项任务}}"
+msgstr "{count, plural, =1 {按 Enter 在第 {run} 次运行中执行 {nums} 的一项子任务} other {按 Enter 在第 {run} 次运行中依次执行 {nums} 的 # 项子任务}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadMany"
-msgstr "按 Enter 在第 {run} 次运行中执行 {nums} 的 {count, number} 项任务：各分支同时进行，每个分支内的任务依次执行"
+msgstr "按 Enter 在第 {run} 次运行中执行 {nums} 的 {count, number} 项子任务：各分支同时进行，每个分支内的子任务依次执行"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadNew"
-msgstr "{count, plural, =1 {按 Enter 创建第 {run} 次运行，并在其中执行 {address} 的一项任务。其他分支会等待} other {按 Enter 创建第 {run} 次运行，并在其中依次执行 {address} 的 # 项任务。其他分支会等待}}"
+msgstr "{count, plural, =1 {按 Enter 创建第 {run} 次运行，并在其中执行 {address} 的一项子任务。其他分支会等待} other {按 Enter 创建第 {run} 次运行，并在其中依次执行 {address} 的 # 项子任务。其他分支会等待}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5469,34 +5469,38 @@ msgstr "{address} 已搁置。hold:off {address} 可取消搁置"
 
 #. js-lingui-explicit-id
 msgid "enter.runIf"
-msgstr "{count, plural, other {有 # 项任务只在前一项任务失败或没有找到内容时运行}}"
+msgstr "{count, plural, other {有 # 项子任务只在前一项子任务失败或没有找到内容时运行}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
-msgstr "{address} 的第 {index} 项任务要发给 {name}，但它尚未实现"
+msgstr "{address} 的第 {index} 项子任务要发给 {name}，但它尚未实现"
+
+#. js-lingui-explicit-id
+msgid "enter.runLines"
+msgstr "{count, plural, =1 {你的一条命令会在输入栏中等你按 Enter} other {你的 # 条命令会逐条在输入栏中等你按 Enter}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLocal"
-msgstr "由本机回答的步骤不会向外发送任何内容"
+msgstr "由本机回答的子任务不会向外发送任何内容"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNeedsKey"
-msgstr "{address} 的第 {index} 项任务要发给 {name}，它需要 {provider} 的密钥。{command} 可添加"
+msgstr "{address} 的第 {index} 项子任务要发给 {name}，它需要 {provider} 的密钥。{command} 可添加"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNoSteps"
-msgstr "{address} 没有可运行的任务。new:step {address} 可安排一个"
+msgstr "{address} 没有可运行的子任务。new:subtask {address} 可添加一项"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNothing"
-msgstr "第 {run} 次运行中没有可以运行的步骤。new:step 可安排一个"
+msgstr "第 {run} 次运行中没有可以运行的子任务。new:subtask 可添加一项"
 
 #. js-lingui-explicit-id
 msgid "enter.runPaused"
-msgstr "列表 {num} 的第 {run} 次运行已结束。{nums} 已暂停；原因见{board}面板"
+msgstr "任务 {num} 的第 {run} 次运行已结束。{nums} 已暂停；原因见{board}面板"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5510,21 +5514,25 @@ msgstr "{address} 正在运行。stop:{address} 可将其停止"
 
 #. js-lingui-explicit-id
 msgid "enter.runSkipped"
-msgstr "{count, plural, other {会跳过 # 项空白任务}}"
+msgstr "{count, plural, other {会跳过 # 项空白子任务}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runStarted"
-msgstr "列表 {num} 的第 {run} 次运行已开始。stop: 可将其停止"
+msgstr "任务 {num} 的第 {run} 次运行已开始。stop: 可将其停止"
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
 msgstr "它们会发给 {answering}"
 
+#. js-lingui-explicit-id
+msgid "enter.runTogether"
+msgstr "同时进行：每条提示词各自进入一个单独的对话，之后再轮到命令"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runUnchecked"
-msgstr "{address} 的第 {index} 项任务要发给本机上的 {name}，但打开此页面后 {provider} 还没有列出它。{command} 可检测"
+msgstr "{address} 的第 {index} 项子任务要发给本机上的 {name}，但打开此页面后 {provider} 还没有列出它。{command} 可检测"
 
 #. js-lingui-explicit-id
 msgid "enter.runUndo"
@@ -5532,7 +5540,7 @@ msgstr "撤销遇到运行即停止：运行写下的内容会保留"
 
 #. js-lingui-explicit-id
 msgid "enter.runWaitsYou"
-msgstr "{address} 会在第 {index} 项任务“{words}”处等你，你勾选后继续"
+msgstr "{address} 会在第 {index} 项子任务“{words}”处等你，你勾选后继续"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -5886,7 +5894,7 @@ msgstr "按 Enter 停止所有窗口中的所有运行和回复。已完成的�
 
 #. js-lingui-explicit-id
 msgid "enter.stopBranch"
-msgstr "按 Enter 停止 {address}。已完成的部分会保留，并照常计费；正在运行的任务会就地停下"
+msgstr "按 Enter 停止 {address}。已完成的部分会保留，并照常计费；正在运行的子任务会就地停下"
 
 #. js-lingui-explicit-id
 msgid "enter.stopDone"
@@ -5902,7 +5910,7 @@ msgstr "{what} 中没有正在运行的内容"
 
 #. js-lingui-explicit-id
 msgid "enter.stopPlan"
-msgstr "按 Enter 停止列表 {num}。已完成的部分会保留，并照常计费；正在运行的任务会就地停下"
+msgstr "按 Enter 停止任务 {num}。已完成的部分会保留，并照常计费；正在运行的子任务会就地停下"
 
 #. js-lingui-explicit-id
 msgid "enter.stopReply"
@@ -5934,6 +5942,22 @@ msgstr "这条回复正在撰写中，暂时无法编辑"
 #. js-lingui-explicit-id
 msgid "enter.strikeNumbered"
 msgstr "已作为编辑 {num} 加上删除线。undo:{num} 可撤销"
+
+#. js-lingui-explicit-id
+msgid "enter.subDone"
+msgstr "第 {index} 项子任务已添加到任务 {num}。未发送任何内容"
+
+#. js-lingui-explicit-id
+msgid "enter.subNew"
+msgstr "按 Enter 将第 {index} 项子任务“{title}”添加到任务 {num}，作为发给其模型的提示词。不会发送任何内容"
+
+#. js-lingui-explicit-id
+msgid "enter.subNewEmpty"
+msgstr "按 Enter 为任务 {num} 添加空白的第 {index} 项子任务，留待在面板上填写。不会发送任何内容"
+
+#. js-lingui-explicit-id
+msgid "enter.subNewYours"
+msgstr "按 Enter 将第 {index} 项子任务“{title}”添加到任务 {num}，完成后由你勾选。不会发送任何内容"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6062,7 +6086,7 @@ msgstr "{address} 由来源回答，来源的文字不会被扫查"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.sweepWhichBranch"
-msgstr "列表 {num} 有多个分支：请指明一个，例如 sweep:{num}a"
+msgstr "任务 {num} 有多个分支：请指明一个，例如 sweep:{num}a"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"
@@ -6141,6 +6165,76 @@ msgstr "→ 新房间"
 msgid "enter.targetTrying"
 msgstr "→ “{room}”中的新对话，带有标签 tried"
 
+#. js-lingui-explicit-id
+msgid "enter.taskChanged"
+msgstr "任务 {num} 已更改"
+
+#. js-lingui-explicit-id
+msgid "enter.taskFlowRan"
+msgstr "任务 {num} 已运行过，因此其流程保持当时运行的方式"
+
+#. js-lingui-explicit-id
+msgid "enter.taskLineWaits"
+msgstr "任务 {num} 在等这条命令“{title}”：按 Enter 执行它，任务随即继续。也可以在面板上勾选它"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNew"
+msgstr "按 Enter 新建一个空任务，并在{board}面板上打开。不会发送任何内容"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewDone"
+msgstr "任务 {num} 已创建，目前还是空的"
+
+#. js-lingui-explicit-id
+msgid "enter.taskNewTitled"
+msgstr "按 Enter 新建空任务“{title}”，并在{board}面板上打开。不会发送任何内容"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHead"
+msgstr "{fresh, select, yes {按 Enter 创建任务 {num} 的第 {run} 次运行，并依次执行其子任务} other {按 Enter 在第 {run} 次运行中依次执行任务 {num} 的子任务}}"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunHeadTogether"
+msgstr "{fresh, select, yes {按 Enter 创建任务 {num} 的第 {run} 次运行，并同时执行其所有子任务} other {按 Enter 在第 {run} 次运行中同时执行任务 {num} 的所有子任务}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskRunNothing"
+msgstr "任务 {num} 没有子任务，也没有可询问的模型。new:subtask {num} 可添加一项"
+
+#. js-lingui-explicit-id
+msgid "enter.taskRunSelf"
+msgstr "按 Enter 将任务 {num}“{title}”原样发给 {name}，因为它没有子任务"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskTickAlready"
+msgstr "任务 {num} 已勾选。tick:off {num} 可取消勾选"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGo"
+msgstr "按 Enter 将任务 {num}“{title}”勾选为已完成"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickGoYours"
+msgstr "按 Enter 将任务 {num}“{title}”勾选为已完成，并一并勾选{count, plural, other {你自己尚未完成的 # 项子任务}}"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffAlready"
+msgstr "任务 {num} 尚未勾选"
+
+#. js-lingui-explicit-id
+msgid "enter.taskTickOffGo"
+msgstr "按 Enter 取消勾选任务 {num}“{title}”。其子任务保持原样"
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsLine"
+msgstr "任务 {num} 在第 {index} 项子任务“{words}”处等待：其命令会放进输入栏，等你按 Enter"
+
+#. js-lingui-explicit-id
+msgid "enter.taskWaitsYou"
+msgstr "任务 {num} 会在第 {index} 项子任务“{words}”处等你，你勾选后继续"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
@@ -6217,28 +6311,32 @@ msgstr "{on, select, on {思考已经是开启的} other {思考已经是关闭�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tickAlready"
-msgstr "{address} 的第 {index} 项任务已勾选。tick:off {address} {index} 可取消勾选"
+msgstr "{address} 的第 {index} 项子任务已勾选。tick:off {address} {index} 可取消勾选"
 
 #. js-lingui-explicit-id
 msgid "enter.tickGo"
-msgstr "按 Enter 勾选 {address} 的第 {index} 项任务“{words}”。在此等待的分支会继续"
+msgstr "按 Enter 勾选 {address} 的第 {index} 项子任务“{words}”。在此等待的分支会继续"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tickHow"
-msgstr "tick: 需要一个分支和一项任务：tick:201a 2"
+msgstr "tick: 需要一个任务和一项子任务：tick:207 2"
 
 #. js-lingui-explicit-id
 msgid "enter.tickNotTodo"
-msgstr "{address} 的第 {index} 项任务是一条提示词：收到回答时即完成"
+msgstr "{address} 的第 {index} 项子任务是一条提示词：收到回答时即完成"
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffAlready"
-msgstr "{address} 的第 {index} 项任务尚未勾选"
+msgstr "{address} 的第 {index} 项子任务尚未勾选"
 
 #. js-lingui-explicit-id
 msgid "enter.tickOffGo"
-msgstr "按 Enter 取消勾选 {address} 的第 {index} 项任务“{words}”"
+msgstr "按 Enter 取消勾选 {address} 的第 {index} 项子任务“{words}”"
+
+#. js-lingui-explicit-id
+msgid "enter.tickSent"
+msgstr "任务 {address} 的第 {index} 项子任务已发送：收到回答时即完成"
 
 #. js-lingui-explicit-id
 msgid "enter.toAll"
@@ -6403,7 +6501,7 @@ msgstr "等待发送的提示词要用 delete:{num} 去掉"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAtRun"
-msgstr "列表 {num} 的第 {run} 次运行已开始，撤销到此为止。列表仍可由你更改：new:run 可在新的一次运行中重新安排"
+msgstr "任务 {num} 的第 {run} 次运行已开始，撤销到此为止。任务仍可由你更改：new:run 可在新的一次运行中重新安排"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -6562,7 +6660,7 @@ msgstr "浏览器已设置为不允许 Parliament 放置窗口，因此会在这
 
 #. js-lingui-explicit-id
 msgid "erase.about"
-msgstr "从此浏览器中删除所有对话、列表、标记、你搭建的房间、密钥和设置。撤销无法恢复，任何地方都不会留下副本。"
+msgstr "从此浏览器中删除所有对话、任务、标记、你搭建的房间、密钥和设置。撤销无法恢复，任何地方都不会留下副本。"
 
 #. js-lingui-explicit-id
 msgid "erase.backupFirst"
@@ -6594,7 +6692,7 @@ msgstr "全部删除"
 
 #. js-lingui-explicit-id
 msgid "erase.goesChats"
-msgstr "{chats, plural, other {# 个对话}}和 {plans, plural, other {# 个列表}}，以及其中的消息和文件"
+msgstr "{chats, plural, other {# 个对话}}和 {plans, plural, other {# 个任务}}，以及其中的消息和文件"
 
 #. js-lingui-explicit-id
 msgid "erase.goesKeys"
@@ -6962,7 +7060,7 @@ msgstr "快问快答"
 
 #. js-lingui-explicit-id
 msgid "guide.o.steps"
-msgstr "步骤列表"
+msgstr "子任务"
 
 #. js-lingui-explicit-id
 msgid "guide.o.talking"
@@ -7342,7 +7440,7 @@ msgstr "对话"
 #. A list of tasks, as a kind of record (C301 (g))
 #. js-lingui-explicit-id
 msgid "kind.docket"
-msgstr "列表"
+msgstr "任务"
 
 #. js-lingui-explicit-id
 msgid "kind.edit"
@@ -7495,7 +7593,7 @@ msgstr "把内容并排放在一起，用来比较、提问或运用。"
 
 #. js-lingui-explicit-id
 msgid "library.aboutDocket"
-msgstr "按分支和步骤排好的提示词，可一起运行。"
+msgstr "任务的子任务，按分支排好，可一起运行。"
 
 #. js-lingui-explicit-id
 msgid "library.aboutLibrary"
@@ -8232,7 +8330,7 @@ msgstr "仅英文"
 
 #. js-lingui-explicit-id
 msgid "picker.forStep"
-msgstr "由谁回答 {address} 的第 {index} 步"
+msgstr "由谁回答 {address} 的第 {index} 项子任务"
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -8385,7 +8483,7 @@ msgstr "添加分支"
 
 #. js-lingui-explicit-id
 msgid "plan.addStep"
-msgstr "为 {address} 添加任务"
+msgstr "为 {address} 添加子任务"
 
 #. js-lingui-explicit-id
 msgid "plan.addTodo"
@@ -8417,15 +8515,15 @@ msgstr "open:{num} 可打开它"
 #. When a step runs (C201)
 #. js-lingui-explicit-id
 msgid "plan.condition"
-msgstr "{condition, select, failed {前一项任务失败时运行} nothing {前面没有找到内容时运行} always {无论结果如何都运行} other {前一项任务完成后运行}}"
+msgstr "{condition, select, failed {前一项子任务失败时运行} nothing {前面没有找到内容时运行} always {无论结果如何都运行} other {前一项子任务完成后运行}}"
 
 #. js-lingui-explicit-id
 msgid "plan.conditionHelp"
-msgstr "这一步何时运行。点击可更改"
+msgstr "这项子任务何时运行。点击可更改"
 
 #. js-lingui-explicit-id
 msgid "plan.counts"
-msgstr "{branches, plural, other {# 个分支}}、{steps, plural, =0 {没有任务} other {# 项任务}}"
+msgstr "{branches, plural, other {# 个分支}}、{steps, plural, =0 {没有子任务} other {# 项子任务}}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteBranch"
@@ -8433,7 +8531,7 @@ msgstr "删除 {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
-msgstr "删除 {address} 的第 {index} 项任务"
+msgstr "删除 {address} 的第 {index} 项子任务"
 
 #. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
@@ -8443,7 +8541,7 @@ msgstr "{why, select, stopped {已停止} failed {运行失败} stalled {网络�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
-msgstr "这一步已在第 {run} 次运行中开始，因此其提示词不能再改。new:run 可在新的一次运行中重新安排"
+msgstr "这项子任务已在第 {run} 次运行中开始，因此其提示词不能再改。new:run 可在新的一次运行中重新安排"
 
 #. js-lingui-explicit-id
 msgid "plan.held"
@@ -8452,12 +8550,12 @@ msgstr "{count, plural, other {# 个分支已搁置}}"
 #. The plan’s number, at the top of the Plan board
 #. js-lingui-explicit-id
 msgid "plan.label"
-msgstr "列表 {num}"
+msgstr "任务 {num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.latest"
-msgstr "要更改列表，请用 open:run {run}"
+msgstr "要更改任务，请用 open:run {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.newInRun"
@@ -8469,12 +8567,12 @@ msgstr "运行前没有对话"
 
 #. js-lingui-explicit-id
 msgid "plan.none"
-msgstr "这里还没有列表"
+msgstr "这里还没有任务"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.noneHow"
-msgstr "open: 加上列表编号可在这里显示一个列表。new:tasks 可新建一个"
+msgstr "open: 加上任务编号可在这里显示一个任务。new:task 可新建一个"
 
 #. js-lingui-explicit-id
 msgid "plan.onlyIn"
@@ -8482,7 +8580,7 @@ msgstr "第 {run} 次运行中没有"
 
 #. js-lingui-explicit-id
 msgid "plan.pip"
-msgstr "{reached, select, yes {第 {run} 次运行} other {第 {run} 次运行，未进行到这一步}}"
+msgstr "{reached, select, yes {第 {run} 次运行} other {第 {run} 次运行，未进行到这项子任务}}"
 
 #. js-lingui-explicit-id
 msgid "plan.pipHelp"
@@ -8518,15 +8616,15 @@ msgstr "等待中"
 
 #. js-lingui-explicit-id
 msgid "plan.step"
-msgstr "{address} 的第 {index} 项任务"
+msgstr "{address} 的第 {index} 项子任务"
 
 #. js-lingui-explicit-id
 msgid "plan.steps"
-msgstr "{count, plural, =0 {还没有任务} other {# 项任务}}"
+msgstr "{count, plural, =0 {还没有子任务} other {# 项子任务}}"
 
 #. js-lingui-explicit-id
 msgid "plan.tick"
-msgstr "勾选 {address} 的第 {index} 项任务"
+msgstr "勾选 {address} 的第 {index} 项子任务"
 
 #. js-lingui-explicit-id
 msgid "plan.ticked"
@@ -8539,11 +8637,11 @@ msgstr "运行 {command}"
 
 #. js-lingui-explicit-id
 msgid "plan.untick"
-msgstr "取消勾选 {address} 的第 {index} 项任务"
+msgstr "取消勾选 {address} 的第 {index} 项子任务"
 
 #. js-lingui-explicit-id
 msgid "plan.untitled"
-msgstr "未命名列表"
+msgstr "未命名任务"
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
@@ -8555,11 +8653,11 @@ msgstr "运行在这里等你"
 
 #. js-lingui-explicit-id
 msgid "plan.whoHelp"
-msgstr "由谁回答 {address} 的第 {index} 项任务。点击可查看谁能回答"
+msgstr "由谁回答 {address} 的第 {index} 项子任务。点击可查看谁能回答"
 
 #. js-lingui-explicit-id
 msgid "plan.write"
-msgstr "写下这一步"
+msgstr "写下这项子任务"
 
 #. A to-do of the person, never sent
 #. js-lingui-explicit-id
@@ -9086,7 +9184,7 @@ msgstr "外观"
 
 #. js-lingui-explicit-id
 msgid "settings.backupHelp"
-msgstr "对话、列表、房间、资源库和所有标记，都存入一个 .parliament 文件。备份格式为第 {version} 版。任何较早的备份都能恢复；来自更新版 Parliament 的备份会提示你先更新。"
+msgstr "对话、任务、房间、资源库和所有标记，都存入一个 .parliament 文件。备份格式为第 {version} 版。任何较早的备份都能恢复；来自更新版 Parliament 的备份会提示你先更新。"
 
 #. js-lingui-explicit-id
 msgid "settings.backupLabel"
@@ -9419,7 +9517,7 @@ msgstr "{count, plural, =0 {{month}还没有花费。} other {{month}共花费 {
 
 #. js-lingui-explicit-id
 msgid "settings.monthSpentRuns"
-msgstr "{month}共花费 {cost}：{runs, plural, other {# 次列表运行}}，{count, plural, =0 {没有单独的对话} other {另有 # 个单独的对话}}。按 token 数估算，以服务商账单为准。"
+msgstr "{month}共花费 {cost}：{runs, plural, other {# 次任务运行}}，{count, plural, =0 {没有单独的对话} other {另有 # 个单独的对话}}。按 token 数估算，以服务商账单为准。"
 
 #. js-lingui-explicit-id
 msgid "settings.monthUnknown"
@@ -9559,7 +9657,7 @@ msgstr "回复语言"
 
 #. js-lingui-explicit-id
 msgid "settings.roomHelp"
-msgstr "新对话及其列表开始时所在的房间。"
+msgstr "新对话及其任务开始时所在的房间。"
 
 #. js-lingui-explicit-id
 msgid "settings.roomLabel"
@@ -9571,7 +9669,7 @@ msgstr "第 {run} 次运行"
 
 #. js-lingui-explicit-id
 msgid "settings.runRowHelp"
-msgstr "在{board}面板上显示列表 {num} 的第 {run} 次运行"
+msgstr "在{board}面板上显示任务 {num} 的第 {run} 次运行"
 
 #. js-lingui-explicit-id
 msgid "settings.sources"
@@ -9591,7 +9689,7 @@ msgstr "花费"
 
 #. js-lingui-explicit-id
 msgid "settings.storageCounts"
-msgstr "{chats, plural, other {# 个对话}}、{plans, plural, other {# 个列表}}、{markings, plural, other {# 个标记}}。"
+msgstr "{chats, plural, other {# 个对话}}、{plans, plural, other {# 个任务}}、{markings, plural, other {# 个标记}}。"
 
 #. js-lingui-explicit-id
 msgid "settings.storageLabel"
@@ -9894,6 +9992,239 @@ msgstr "此浏览器会一直保存 Parliament 的数据，直到你将其删除
 #. js-lingui-explicit-id
 msgid "storage.notKept"
 msgstr "此浏览器尚未同意长期保存 Parliament 的数据。有些浏览器会在关闭或空间不足时删除网站数据。要保留这些数据，请在浏览器的隐私设置中允许本网站保存 Cookie 和网站数据，并保留一份备份。"
+
+#. js-lingui-explicit-id
+msgid "tasks.add"
+msgstr "添加任务"
+
+#. js-lingui-explicit-id
+msgid "tasks.addPlus"
+msgstr "添加任务"
+
+#. js-lingui-explicit-id
+msgid "tasks.addSub"
+msgstr "添加子任务"
+
+#. js-lingui-explicit-id
+msgid "tasks.addSubPlus"
+msgstr "添加子任务"
+
+#. Who answered and where, before the first words of the answer
+#. js-lingui-explicit-id
+msgid "tasks.answerBy"
+msgstr "{name}，房间 {num}："
+
+#. js-lingui-explicit-id
+msgid "tasks.asTask"
+msgstr "跟随任务：{name}"
+
+#. js-lingui-explicit-id
+msgid "tasks.asTaskChip"
+msgstr "{name}，跟随任务"
+
+#. js-lingui-explicit-id
+msgid "tasks.cancel"
+msgstr "取消"
+
+#. A link that opens the task’s fields to change them
+#. js-lingui-explicit-id
+msgid "tasks.change"
+msgstr "更改"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.commandExample"
+msgstr "compare:204 199"
+
+#. js-lingui-explicit-id
+msgid "tasks.commandNow"
+msgstr "已在输入栏中：按 Enter 执行它，任务随即继续"
+
+#. js-lingui-explicit-id
+msgid "tasks.commandWaits"
+msgstr "运行时会把它放进输入栏，等你按 Enter"
+
+#. js-lingui-explicit-id
+msgid "tasks.deleteSub"
+msgstr "删除任务 {num} 的第 {n} 项子任务"
+
+#. js-lingui-explicit-id
+msgid "tasks.doneOf"
+msgstr "已完成 {done} 项，共 {count} 项"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldCommand"
+msgstr "命令"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldDescription"
+msgstr "描述"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldFlow"
+msgstr "流程"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldKind"
+msgstr "类型"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldModel"
+msgstr "模型"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldName"
+msgstr "名称"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldPrompt"
+msgstr "提示词"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldRooms"
+msgstr "房间"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSearch"
+msgstr "搜索内容"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldSource"
+msgstr "来源"
+
+#. js-lingui-explicit-id
+msgid "tasks.fieldWords"
+msgstr "内容"
+
+#. js-lingui-explicit-id
+msgid "tasks.findRooms"
+msgstr "按编号或名称查找房间"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOne"
+msgstr "依次进行"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowOneByOneLow"
+msgstr "依次进行"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogether"
+msgstr "同时进行"
+
+#. js-lingui-explicit-id
+msgid "tasks.flowTogetherLow"
+msgstr "同时进行"
+
+#. js-lingui-explicit-id
+msgid "tasks.ifYouLike"
+msgstr "选填"
+
+#. js-lingui-explicit-id
+msgid "tasks.keep"
+msgstr "保存"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindCommand"
+msgstr "命令"
+
+#. The kind of a task that is the person’s own
+#. js-lingui-explicit-id
+msgid "tasks.kindNone"
+msgstr "无"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindPrompt"
+msgstr "提示词"
+
+#. js-lingui-explicit-id
+msgid "tasks.kindSearch"
+msgstr "搜索"
+
+#. js-lingui-explicit-id
+msgid "tasks.needsKey"
+msgstr "需要密钥"
+
+#. js-lingui-explicit-id
+msgid "tasks.none"
+msgstr "还没有任务"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "tasks.noneHow"
+msgstr "点加号添加一个，或在输入栏中输入 new:task \"基金申请\""
+
+#. js-lingui-explicit-id
+msgid "tasks.noRoom"
+msgstr "没有房间"
+
+#. js-lingui-explicit-id
+msgid "tasks.ownBranch"
+msgstr "此任务的一个分支"
+
+#. js-lingui-explicit-id
+msgid "tasks.ownRoom"
+msgstr "此任务的一个分支，首次运行时创建其对话"
+
+#. A small label: the sub-task is a command
+#. js-lingui-explicit-id
+msgid "tasks.pillCommand"
+msgstr "命令"
+
+#. A small label: the sub-task is a prompt to a model
+#. js-lingui-explicit-id
+msgid "tasks.pillPrompt"
+msgstr "提示词"
+
+#. A small label: the sub-task is a search of a source
+#. js-lingui-explicit-id
+msgid "tasks.pillSearch"
+msgstr "搜索"
+
+#. A room, by its number, as the strip names it
+#. js-lingui-explicit-id
+msgid "tasks.room"
+msgstr "房间 {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.roomOff"
+msgstr "移除房间 {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.runN"
+msgstr "第 {n} 次运行"
+
+#. js-lingui-explicit-id
+msgid "tasks.runs"
+msgstr "运行"
+
+#. js-lingui-explicit-id
+msgid "tasks.runWaits"
+msgstr "在“{title}”处等待"
+
+#. js-lingui-explicit-id
+msgid "tasks.subCount"
+msgstr "{count, plural, other {# 项子任务}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subRooms"
+msgstr "其回答会放在与任务的回答相同的地方"
+
+#. js-lingui-explicit-id
+msgid "tasks.tickSub"
+msgstr "勾选任务 {num} 的第 {n} 项子任务“{title}”"
+
+#. js-lingui-explicit-id
+msgid "tasks.tickTask"
+msgstr "勾选任务 {num}“{title}”"
+
+#. js-lingui-explicit-id
+msgid "tasks.untitled"
+msgstr "尚未命名的任务"
+
+#. js-lingui-explicit-id
+msgid "tasks.yoursNow"
+msgstr "运行在等你勾选它"
 
 #. js-lingui-explicit-id
 msgid "template.dataWorkspace"
@@ -10221,7 +10552,7 @@ msgstr "为输入栏指向的对象命名：房间、合集或对话。给出两
 
 #. js-lingui-explicit-id
 msgid "verb.new"
-msgstr "新建对话、任务列表、房间、合集、框架、分支、步骤、待办、运行或模块"
+msgstr "新建对话、任务、子任务、房间、合集、框架、分支、待办、运行或模块"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10379,7 +10710,7 @@ msgstr "让能思考的模型先思考再回答并实时显示过程，或关闭
 
 #. js-lingui-explicit-id
 msgid "verb.tick"
-msgstr "勾选任务列表中你自己的待办，或取消勾选"
+msgstr "将任务或子任务勾选为已完成，或取消勾选"
 
 #. js-lingui-explicit-id
 msgid "verb.to"

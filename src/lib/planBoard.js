@@ -4,6 +4,7 @@
 
 import { STATUS, isPlanned, isTodo } from './docketModel'
 import { letterAt } from './addresses'
+import { FLOWS, isCommand, modelOf, taskOf } from './taskModel'
 
 /**
  * @param {{ docket: object, runs: object[] }} plan  as db.getPlan reads it
@@ -16,6 +17,8 @@ import { letterAt } from './addresses'
  */
 export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf = () => null, roomName = () => null, selected = null } = {}) {
   const { docket } = plan
+  // A task (C301 (g), v4): its own fields; its sub-tasks are branch a's steps.
+  const task = FLOWS.includes(docket.flow) ? taskOf(docket) : null
   const runs = [...plan.runs].sort((a, b) => a.n - b.n)
   const latest = runs.at(-1)?.n ?? 1
   const shown = runs.find((r) => r.n === run) ?? runs.at(-1) ?? null
@@ -32,16 +35,22 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
     const b = shown.branches[letter]
     const chat = b.chatId ? chatOf(b.chatId) : null
     const firstRun = runs.find((r) => r.branches?.[letter])?.n ?? n
+    const sub = task && letter === 'a'
     const steps = (b.steps ?? []).map((s, i) => ({
       id: s.id ?? s.messageId ?? `${letter}${i}`,
       stepId: s.id ?? null,
       index: i + 1,
       status: s.status,
       planned: isPlanned(s),
-      text: isTodo(s) ? String(s.todo.text ?? '') : isPlanned(s) ? String(s.prompt ?? '') : String(textOf(s.messageId) ?? s.prompt ?? ''),
+      text: isTodo(s) ? String(s.todo.text ?? '') : isCommand(s) ? s.command : isPlanned(s) ? String(s.prompt ?? '') : String(textOf(s.messageId) ?? s.prompt ?? ''),
+      // A sub-task's title, and a command of yours (v4).
+      title: typeof s.title === 'string' ? s.title : '',
+      command: isCommand(s) ? s.command : null,
+      // A task's sub-task asks its own model, else the task's; with neither, it is yours.
+      ...(sub ? { ownModel: s.model ?? null, yours: !isTodo(s) && !isCommand(s) && !modelOf(s, docket) } : {}),
       // A to-do of yours (C301 (g)): its words and when it was ticked.
       todo: isTodo(s) ? { text: String(s.todo.text ?? ''), doneAt: s.todo.doneAt ?? null } : null,
-      model: s.model ?? null,
+      model: sub ? modelOf(s, docket) : s.model ?? null,
       room: s.room ?? null,
       condition: s.condition ?? null,
       ended: s.ended ?? null,
@@ -66,6 +75,7 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
     num: docket.num,
     docketId: docket.id,
     title: docket.title ?? '',
+    task,
     n,
     latest,
     runNums: runs.map((r) => r.n),
