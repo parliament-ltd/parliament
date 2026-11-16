@@ -266,20 +266,14 @@ describe('pop: and pop:back', () => {
   })
 })
 
-describe('the first screen: an empty room and the birds beside it (C302 (d))', () => {
-  it('keeps the birds beside the empty room, and lets them go once it has its first prompt', () => {
-    const a = firstScreen()
-    expect(settle(a).columns).toEqual([['room'], [START]])
-    const prompted = settle({ ...a, context: { ...a.context, room: 'c1' } })
-    expect(prompted).toMatchObject({ columns: [['room']], addressed: 'room' })
-  })
-  it('lets them go when a board or the tour opens, or when they are closed', () => {
-    expect(keep(planOpen(firstScreen(), 'almanac')).columns).toEqual([['room'], ['almanac']])
+describe('the first screen: an empty room alone, centred (C302 (e))', () => {
+  it('is an empty room, the bar at its foot, centred', () => {
+    expect(settle(firstScreen())).toMatchObject({ columns: [['room']], addressed: 'room', bar: { at: 'bottom', side: 'center' }, context: { room: null } })
     expect(keep(planOpen(firstScreen(), 'welcome')).columns).toEqual([['welcome'], ['room']])
-    expect(keep(planClose(address(firstScreen(), START)))).toMatchObject({ columns: [['room']], addressed: 'room' })
   })
-  it('gives way to an empty room when they would stand alone, as a start card kept before', () => {
+  it('lets a start card kept on a screen go, and alone gives way to an empty room', () => {
     expect(settle({ ...shipped(SPACE), columns: [[START]], addressed: START, context: { room: 'c1' } })).toMatchObject({ columns: [['room']], addressed: 'room', context: { room: null } })
+    expect(settle({ ...shipped(SPACE), columns: [['room'], [START]], addressed: START, context: {} })).toMatchObject({ columns: [['room']], addressed: 'room' })
   })
   it('clears reset: to an empty room, and says so only when it already is one', () => {
     const shown = keep(planRoom({ ...shipped('room'), id: SPACE }, 'c1'))

@@ -37,8 +37,8 @@ export { isRoom }
 // C302 (d)). The arrangements here say which boards each brings, until
 // their owner edits them (the Lab, stage 13).
 export const SPACE = 'space'
-// The birds' board (C282; C302 (d)): beside an empty room on the first
-// screen, with tour:, import: and close:, until the room has its first prompt.
+// The start card's board (C282). Kept only so a screen kept with it opens:
+// it gives way to an empty room (C302 (e)); the birds are in the strip now.
 export const START = 'start'
 
 /**
@@ -126,11 +126,9 @@ export function freeRoom(a) {
  * it pointed at last, and a room no longer here is forgotten.
  */
 export function settle(a) {
-  // The birds stand only beside an empty room: once it has its first prompt,
-  // they go (C302 (d); Stefan, 15 November: "if the user adds in a prompt
-  // let's have the birds hide"). Alone, as the start card was, they give way
-  // to an empty room.
-  if (a.columns.some((c) => c.includes(START)) && !a.columns.flat().some((b) => isRoom(b) && !chatIn(a, b))) {
+  // The start card is no longer shown (C302 (e)): kept on a screen, it goes,
+  // and alone it gives way to an empty room.
+  if (a.columns.some((c) => c.includes(START))) {
     const columns = a.columns.map((c) => c.filter((b) => b !== START)).filter((c) => c.length)
     if (!columns.length) return settle(emptyRoom(a))
     return settle({ ...a, columns, addressed: a.addressed === START ? columns[0][0] : a.addressed })
@@ -185,14 +183,14 @@ export function emptyRoom(a) {
 }
 
 /**
- * The first screen (C302 (d), ruled "A, beside"): an empty room, and the
- * birds beside it with tour:, import: and close:, until the room has its
- * first prompt. For someone who has made nothing yet, and for a screen kept
- * on the welcome page or the start card alone.
+ * The first screen (C302 (e); Stefan, 15 November: "then we don't need to
+ * second board. the room board can be center"): an empty room alone,
+ * centred, the bar at its foot; the birds, import: and tour: are in the
+ * strip. For someone who has made nothing yet, and for a screen kept on the
+ * welcome page or the start card alone.
  */
 export function firstScreen(context = {}) {
-  const room = emptyRoom(shipped(SPACE, context))
-  return { ...room, columns: [['room'], [START]], resting: null }
+  return { ...emptyRoom(shipped(SPACE, context)), resting: null }
 }
 
 /** The field's resting mode here: the arrangement's own, else the addressed board's (C44). */

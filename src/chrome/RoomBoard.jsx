@@ -166,7 +166,8 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   if (!chatId) {
     return (
       <Card board={board} addressed={addressed} onAddress={onAddress} title={i18n._(COPY.room.newTitle)}>
-        <div className="ch-cbody"><p className="ch-marg">{i18n._(COPY.room.empty)}</p></div>
+        {/* As tall as a room with a chat (C302 (e)). */}
+        <div className="ch-cbody ch-room-empty"><p className="ch-marg">{i18n._(COPY.room.empty)}</p></div>
       </Card>
     )
   }

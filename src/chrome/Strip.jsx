@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { strip, wordFor, isRoom } from '../shell/boards'
+import BirdsMark from './BirdsMark'
 
 // The board strip: every board in its fixed order, open ones underlined, and
 // what each shows after its title (editing spec, "Focus"). A click opens the
@@ -12,6 +13,11 @@ import { strip, wordFor, isRoom } from '../shell/boards'
 // or off at once, as focus: and focus:off do, and says what ran under the
 // bar. focus opens no menu (C292; Stefan, 5 November: "let's not have focus
 // open a menu"): a set of boards is typed, focus:room collection.
+//
+// It starts with the birds, small, and after the boards come import: and
+// tour:, each run by a click as focus is, and said under the bar (C302 (e);
+// Stefan, 15 November: "let's add import: to the top row next to plan:,
+// let's also add tour: and we can add the small bird logo to the top left").
 //
 // On a phone (piece 5; C261 (c)) it is how you move between boards, one
 // shown at a time: each open room has its own entry, by its chat's number,
@@ -30,6 +36,7 @@ export default function Strip({ arrangement, onPick, onRun = null, markup = null
   const on = Boolean(arrangement.focus)
   return (
     <nav className="ch-strip" aria-label={i18n._(COPY.shell.strip)}>
+      <BirdsMark className="ch-sbirds" />
       {strip(arrangement).flatMap((b) => (phone && b.board === 'room' && phone.rooms.length
         ? phone.rooms.map((r) => ({ board: r.board, title: b.title, context: r.num, here: true, exact: true, addressed: arrangement.addressed === r.board }))
         : [b])).map((b) => (
@@ -45,6 +52,11 @@ export default function Strip({ arrangement, onPick, onRun = null, markup = null
         >
           <span dir="ltr">{b.title}</span>
           {b.context != null && <span className="ch-ctx">{String(b.context)}</span>}
+        </button>
+      ))}
+      {onRun && ['import:', 'tour:'].map((command) => (
+        <button key={command} type="button" className="ch-btitle ch-scmd" dir="ltr" title={i18n._(COPY.shell.focusRuns, { command })} onClick={() => onRun(command)}>
+          {command}
         </button>
       ))}
       {markup && (

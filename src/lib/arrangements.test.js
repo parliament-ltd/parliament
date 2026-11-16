@@ -134,10 +134,10 @@ describe('the space to start on', () => {
   beforeEach(async () => { db = await open(6) })
   afterEach(() => db.close())
 
-  it('is the first screen on the very first start, with nothing kept yet: an empty room, the birds beside it (C302 (d))', async () => {
+  it('is the first screen on the very first start, with nothing kept yet: an empty room alone (C302 (e))', async () => {
     const first = await openSpace(db, { fresh: true })
     expect(first).toEqual({ space: firstScreen(), kept: false, canKeep: true })
-    expect(first.space).toMatchObject({ columns: [['room'], ['start']], addressed: 'room', bar: { at: 'bottom', side: 'center' } })
+    expect(first.space).toMatchObject({ columns: [['room']], addressed: 'room', bar: { at: 'bottom', side: 'center' } })
     expect(await loadSpace(db, { fresh: true })).toEqual(first.space)
     expect((await openSpace(db, { fresh: false })).space).toEqual(shipped(SPACE))
   })
@@ -147,14 +147,14 @@ describe('the space to start on', () => {
     await saveArrangement(db, space)
     const next = await openSpace(db, { fresh: true })
     expect(next.kept).toBe(true)
-    expect(next.space.columns).toEqual([['room'], ['start']])
+    expect(next.space.columns).toEqual([['room']])
   })
 
   it('opens a screen kept on the welcome page or the start card alone on the first screen, keeping what boards show', async () => {
     for (const board of ['welcome', 'start']) {
       await saveArrangement(db, { ...shipped('welcome'), id: SPACE, columns: [[board]], addressed: board, context: { collection: 'q2' } })
       const { space } = await openSpace(db, { fresh: false })
-      expect(space).toMatchObject({ columns: [['room'], ['start']], addressed: 'room', context: { collection: 'q2' } })
+      expect(space).toMatchObject({ columns: [['room']], addressed: 'room', context: { collection: 'q2' } })
     }
     // Anything else open beside it is kept as it was.
     await saveArrangement(db, { ...shipped('welcome'), id: SPACE, columns: [['welcome'], ['almanac']], addressed: 'almanac' })
