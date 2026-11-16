@@ -1103,13 +1103,13 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(saved.act).toMatchObject({ kind: 'arrangeSave', record: { name: 'Desk' } })
   })
 
-  it('closes the welcome page alone to the start card, and close:room the room here (C282)', () => {
+  it('closes the welcome page alone to an empty room, and close:room the room here (C282; C302 (d))', () => {
     for (const v of ['>close:welcome']) {
       const p = at(v, shipped('welcome'))
       expect(p.text).toBe('Enter closes the welcome page. tour: brings it back')
-      expect(p.next.columns).toEqual([['start']])
-      // tour: from the start card brings the welcome page back in its place.
-      expect(at('>tour:', p.next).next.columns).toEqual([['welcome']])
+      expect(p.next.columns).toEqual([['room']])
+      // tour: brings the welcome page back beside the room.
+      expect(at('>tour:', p.next).next.columns).toEqual([['welcome'], ['room']])
       // A prompt from it opens a room, and the start card gives way.
     }
     expect(at('>close:room', shipped(SPACE)).text).toBe('No room is open')

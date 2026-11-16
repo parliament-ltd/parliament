@@ -7,7 +7,7 @@ import { withoutWaiting, START,
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
-  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare, planBeside,
+  planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare, planBeside, firstScreen, settle,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -182,12 +182,12 @@ describe('close:', () => {
   it('keeps the last board open, and boards an arrangement cannot do without', () => {
     const one = keep(planClose(almanac(), 'collection'))
     expect(planClose(one)).toMatchObject({ next: null, says: { message: 'closeLast' } })
-    // The welcome card can be closed in the space (C125); alone, the start
-    // card takes its place, and gives way to the next board opened (C282).
-    const start = keep(planClose(shipped('welcome')))
-    expect(start).toMatchObject({ columns: [['start']], addressed: 'start' })
-    expect(planClose(start)).toMatchObject({ next: null, says: { message: 'closeLast' } })
-    expect(keep(planOpen(start, 'almanac'))).toMatchObject({ columns: [['almanac']], addressed: 'almanac' })
+    // The welcome card can be closed in the space (C125); alone, an empty
+    // room takes its place, the bar at its foot (C302 (d)).
+    const empty = keep(planClose({ ...shipped('welcome'), context: { room: 'c1' } }))
+    expect(empty).toMatchObject({ columns: [['room']], addressed: 'room', bar: { at: 'bottom', side: 'center' } })
+    expect(empty.context.room).toBeNull()
+    expect(planClose(empty)).toMatchObject({ next: null, says: { message: 'closeLast' } })
     expect(keep(planClose({ ...shipped('welcome'), columns: [['welcome'], ['almanac']] }, 'welcome')).columns).toEqual([['almanac']])
     expect(planClose(almanac(), 'library')).toMatchObject({ next: null, says: { message: 'closeNotHere' } })
   })
@@ -263,6 +263,28 @@ describe('pop: and pop:back', () => {
     expect(a.bar).toEqual({ at: 'top', side: 'center', popped: true })
     expect(planPopBar(a, true)).toMatchObject({ next: null, says: { message: 'barPoppedAlready' } })
     expect(keep(planPopBar(a, false)).bar.popped).toBe(false)
+  })
+})
+
+describe('the first screen: an empty room and the birds beside it (C302 (d))', () => {
+  it('keeps the birds beside the empty room, and lets them go once it has its first prompt', () => {
+    const a = firstScreen()
+    expect(settle(a).columns).toEqual([['room'], [START]])
+    const prompted = settle({ ...a, context: { ...a.context, room: 'c1' } })
+    expect(prompted).toMatchObject({ columns: [['room']], addressed: 'room' })
+  })
+  it('lets them go when a board or the tour opens, or when they are closed', () => {
+    expect(keep(planOpen(firstScreen(), 'almanac')).columns).toEqual([['room'], ['almanac']])
+    expect(keep(planOpen(firstScreen(), 'welcome')).columns).toEqual([['welcome'], ['room']])
+    expect(keep(planClose(address(firstScreen(), START)))).toMatchObject({ columns: [['room']], addressed: 'room' })
+  })
+  it('gives way to an empty room when they would stand alone, as a start card kept before', () => {
+    expect(settle({ ...shipped(SPACE), columns: [[START]], addressed: START, context: { room: 'c1' } })).toMatchObject({ columns: [['room']], addressed: 'room', context: { room: null } })
+  })
+  it('clears reset: to an empty room, and says so only when it already is one', () => {
+    const shown = keep(planRoom({ ...shipped('room'), id: SPACE }, 'c1'))
+    expect(planReset(shown).next).toMatchObject({ columns: [['room']], context: { room: null } })
+    expect(planReset(keep(planReset(shown))).says.message).toBe('resetAlready')
   })
 })
 
@@ -449,7 +471,8 @@ describe('bar: and reset:', () => {
     a = keep(planBar(a, 'bottom'))
     const p = planReset(a)
     expect(p.says).toEqual({ message: 'resetArrangement', values: { count: 1 } })
-    expect(p.next).toMatchObject({ columns: [['start']], addressed: 'start', popped: [], bar: { at: 'bottom', side: 'center', popped: false }, context: { collection: 'Q2 evidence' } })
+    // An empty room now, as Stefan asked (C302 (d)).
+    expect(p.next).toMatchObject({ columns: [['room']], addressed: 'room', popped: [], bar: { at: 'bottom', side: 'center', popped: false }, context: { collection: 'Q2 evidence', room: null } })
     expect(planReset(almanac()).says.message).toBe('resetArrangement')
     expect(planReset(p.next)).toMatchObject({ next: null, says: { message: 'resetAlready' } })
   })
@@ -656,8 +679,8 @@ describe('a screen without the boards that wait (C295)', () => {
     expect(b.focus).toMatchObject({ columns: [['collection']], addressed: 'collection' })
     expect(a.columns).toEqual([['almanac'], ['library']])
   })
-  it('leaves the start card when the Library was all there was, and changes nothing without it', () => {
-    expect(withoutWaiting({ ...shipped(SPACE), columns: [['library']], popped: [], addressed: 'library' }, lib)).toMatchObject({ columns: [[START]], addressed: START })
+  it('leaves an empty room when the Library was all there was, and changes nothing without it', () => {
+    expect(withoutWaiting({ ...shipped(SPACE), columns: [['library']], popped: [], addressed: 'library' }, lib)).toMatchObject({ columns: [['room']], addressed: 'room' })
     const plain = shipped(SPACE)
     expect(withoutWaiting(plain, lib)).toBe(plain)
     const open = planOpen(shipped(SPACE), 'library').next

@@ -775,7 +775,7 @@ msgstr ""
 msgid "board.settings"
 msgstr ""
 
-#. The card with the bar, shown before anything is open
+#. The small card beside an empty room on the first screen, with tour:, import: and close: (C302 (d)); in a sentence: Enter closes the birds
 #. js-lingui-explicit-id
 msgid "board.start"
 msgstr ""
@@ -10255,6 +10255,11 @@ msgstr ""
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.start.prompt"
+msgstr ""
+
+#. {command} is tour:, import: or close:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.start.writes"
 msgstr ""
 
 #. js-lingui-explicit-id

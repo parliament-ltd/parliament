@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
 import { upgradeSchema } from './schema'
 import { cleanArrangement, loadArrangement, saveArrangement, loadSpace, openSpace } from './arrangements'
-import { shipped, planOpen, planPop, planBar, planCols, SPACE } from '../shell/arrangement'
+import { shipped, planOpen, planPop, planBar, planCols, SPACE, firstScreen } from '../shell/arrangement'
 import { FIELDS } from './backupSchema'
 
 const open = (version) => openDB('arrangements-test', version, { upgrade: upgradeSchema })
@@ -134,9 +134,10 @@ describe('the space to start on', () => {
   beforeEach(async () => { db = await open(6) })
   afterEach(() => db.close())
 
-  it('is the welcome page on the very first start, with nothing kept yet', async () => {
+  it('is the first screen on the very first start, with nothing kept yet: an empty room, the birds beside it (C302 (d))', async () => {
     const first = await openSpace(db, { fresh: true })
-    expect(first).toEqual({ space: { ...shipped('welcome'), id: SPACE }, kept: false, canKeep: true })
+    expect(first).toEqual({ space: firstScreen(), kept: false, canKeep: true })
+    expect(first.space).toMatchObject({ columns: [['room'], ['start']], addressed: 'room', bar: { at: 'bottom', side: 'center' } })
     expect(await loadSpace(db, { fresh: true })).toEqual(first.space)
     expect((await openSpace(db, { fresh: false })).space).toEqual(shipped(SPACE))
   })
@@ -146,14 +147,25 @@ describe('the space to start on', () => {
     await saveArrangement(db, space)
     const next = await openSpace(db, { fresh: true })
     expect(next.kept).toBe(true)
-    expect(next.space.columns).toEqual([['welcome']])
+    expect(next.space.columns).toEqual([['room'], ['start']])
+  })
+
+  it('opens a screen kept on the welcome page or the start card alone on the first screen, keeping what boards show', async () => {
+    for (const board of ['welcome', 'start']) {
+      await saveArrangement(db, { ...shipped('welcome'), id: SPACE, columns: [[board]], addressed: board, context: { collection: 'q2' } })
+      const { space } = await openSpace(db, { fresh: false })
+      expect(space).toMatchObject({ columns: [['room'], ['start']], addressed: 'room', context: { collection: 'q2' } })
+    }
+    // Anything else open beside it is kept as it was.
+    await saveArrangement(db, { ...shipped('welcome'), id: SPACE, columns: [['welcome'], ['almanac']], addressed: 'almanac' })
+    expect((await openSpace(db, { fresh: false })).space.columns).toEqual([['welcome'], ['almanac']])
   })
 
   it('counts a damaged space as kept, though it starts from the default', async () => {
     await db.put('arrangements', { id: SPACE, columns: 'broken' })
     const next = await openSpace(db, { fresh: true })
     expect(next.kept).toBe(true)
-    expect(next.space).toEqual({ ...shipped('welcome'), id: SPACE })
+    expect(next.space).toEqual(firstScreen())
   })
 
   it('changes nothing stored', async () => {

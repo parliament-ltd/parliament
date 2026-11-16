@@ -114,18 +114,6 @@ function withCommand(i18n, descriptor, command, onWrite) {
   )
 }
 
-// A line with several commands in it, each a link that writes it in the bar.
-function withCommands(i18n, descriptor, commands, onWrite) {
-  const names = Object.keys(commands)
-  const marks = Object.fromEntries(names.map((n, i) => [n, `${MARK}${i}${MARK}`]))
-  const parts = i18n._(descriptor, marks).split(new RegExp(`${MARK}([0-9]+)${MARK}`))
-  return parts.map((part, i) => {
-    if (i % 2 === 0) return part
-    const command = commands[names[Number(part)]]
-    return <button key={i} type="button" className="c" dir="ltr" onClick={() => onWrite(command.startsWith('>') ? command : `>${command}`)}>{command}</button>
-  })
-}
-
 /**
  * @param {{ welcome: import('../shell/welcome').Welcome, addressed: boolean, onAddress: (board: string) => void,
  *   onWrite: (text: string) => void, barSlot: (el: HTMLElement|null) => void,
@@ -224,37 +212,36 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
   )
 }
 
+// The birds' three commands (C302 (d); Stefan, 15 November: "let's just
+// have tour: import: and close:"). Commands stay English.
+const BIRDS_COMMANDS = Object.freeze(['tour:', 'import:', 'close:'])
+
 /**
- * The start card (30 October; C282): when the welcome page closes with
- * nothing else open, the birds in the middle of the screen and how to open a
- * room, with the bar docked at the foot, outside the card (C293). Each command is a link that writes it
- * in the bar; nothing is opened for the person. It gives way to the first
- * board opened.
- * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void,
- *   barSlot: (el: HTMLElement|null) => void, languages?: { now: string }|null, onLanguage?: () => void }} props
+ * The birds (C282; C302 (d), ruled 15 November: "let's do beside with A",
+ * "the birds can be a bit smaller"): beside an empty room on the first
+ * screen, until the room has its first prompt, when they go (settle in
+ * shell/arrangement.js). Each command is a link that writes it in the bar,
+ * and nothing is done for the person; a click here points the bar at the
+ * birds, so close: closes them.
+ * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void }} props
  */
-export function StartBoard({ addressed, onAddress, onWrite, barSlot, languages = null, onLanguage }) {
+export function StartBoard({ addressed, onAddress, onWrite }) {
   const { i18n } = useLingui()
   return (
     <article
-      className={`ch-card ch-welcome ch-start${addressed ? ' addressed' : ''}`}
+      className={`ch-card ch-start${addressed ? ' addressed' : ''}`}
       aria-current={addressed ? 'true' : undefined}
       aria-label={i18n._(COPY.boards.start)}
       onMouseDown={() => onAddress('start')}
     >
-      {languages && <div className="ch-wlang"><Globe now={languages.now} onOpen={onLanguage} /></div>}
-      <div className="ch-wscroll">
-        <div className="ch-sgrid">
-          <BirdsMark className="ch-slogo" />
-          <div className="ch-wbar" ref={barSlot} />
-          <ul className="ch-shint">
-            {/* Stefan's words, 2 November (C286 (e)): one line each. */}
-            <li>{withCommand(i18n, COPY.welcome.startPrompt, 'p>', onWrite)}</li>
-            <li>{withCommands(i18n, COPY.welcome.startCommands, { first: '>', second: '?' }, onWrite)}</li>
-            <li>{withCommand(i18n, COPY.welcome.startHistory, 'open:records', onWrite)}</li>
-          </ul>
-        </div>
-      </div>
+      <BirdsMark className="ch-slogo" />
+      <ul className="ch-scmds">
+        {BIRDS_COMMANDS.map((command) => (
+          <li key={command}>
+            <button type="button" className="c" dir="ltr" title={i18n._(COPY.welcome.startWrites, { command })} onClick={() => onWrite(`>${command}`)}>{command}</button>
+          </li>
+        ))}
+      </ul>
     </article>
   )
 }

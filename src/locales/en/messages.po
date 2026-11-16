@@ -775,10 +775,10 @@ msgstr "Rooms"
 msgid "board.settings"
 msgstr "Settings"
 
-#. The card with the bar, shown before anything is open
+#. The small card beside an empty room on the first screen, with tour:, import: and close: (C302 (d)); in a sentence: Enter closes the birds
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr "Start"
+msgstr "the birds"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -5142,7 +5142,7 @@ msgstr "The screen is clear already"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enter clears the screen: every board closes. Nothing is deleted} one {Enter clears the screen: every board closes, and # window. Nothing is deleted} other {Enter clears the screen: every board closes, and # windows. Nothing is deleted}}"
+msgstr "{count, plural, =0 {Enter clears the screen to an empty room: every board closes. Nothing is deleted} one {Enter clears the screen to an empty room: every board closes, and # window. Nothing is deleted} other {Enter clears the screen to an empty room: every board closes, and # windows. Nothing is deleted}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -10012,7 +10012,7 @@ msgstr "Choose the language replies come in, by its code or its name"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "Clear the screen: close every board and window. Nothing is deleted"
+msgstr "Clear the screen to an empty room: close every board and window. Nothing is deleted"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"
@@ -10256,6 +10256,11 @@ msgstr "To see your history, type {command} in the command bar."
 #. js-lingui-explicit-id
 msgid "welcome.start.prompt"
 msgstr "Type {command} to start a prompt."
+
+#. {command} is tour:, import: or close:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.start.writes"
+msgstr "Writes {command} in the bar"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

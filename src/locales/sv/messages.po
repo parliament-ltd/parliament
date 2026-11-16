@@ -775,10 +775,10 @@ msgstr "Rummen"
 msgid "board.settings"
 msgstr "Inställningar"
 
-#. The card with the bar, shown before anything is open
+#. The small card beside an empty room on the first screen, with tour:, import: and close: (C302 (d)); in a sentence: Enter closes the birds
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr "Start"
+msgstr "fåglarna"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -5142,7 +5142,7 @@ msgstr "Skärmen är redan rensad"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enter rensar skärmen: alla tavlor stängs. Inget raderas} one {Enter rensar skärmen: alla tavlor och # fönster stängs. Inget raderas} other {Enter rensar skärmen: alla tavlor och # fönster stängs. Inget raderas}}"
+msgstr "{count, plural, =0 {Enter rensar skärmen till ett tomt rum: alla tavlor stängs. Inget raderas} one {Enter rensar skärmen till ett tomt rum: alla tavlor och # fönster stängs. Inget raderas} other {Enter rensar skärmen till ett tomt rum: alla tavlor och # fönster stängs. Inget raderas}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -10012,7 +10012,7 @@ msgstr "Välj vilket språk svaren kommer på, med kod eller namn"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "Rensa skärmen: stäng alla tavlor och fönster. Inget raderas"
+msgstr "Rensa skärmen till ett tomt rum: stäng alla tavlor och fönster. Inget raderas"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"
@@ -10256,6 +10256,11 @@ msgstr "Skriv {command} i kommandofältet för att se din historik."
 #. js-lingui-explicit-id
 msgid "welcome.start.prompt"
 msgstr "Skriv {command} för att börja på en prompt."
+
+#. {command} is tour:, import: or close:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.start.writes"
+msgstr "Skriver {command} i fältet"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

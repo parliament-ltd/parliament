@@ -37,7 +37,7 @@ export const COPY = {
     room: /*i18n*/ { id: 'board.room', message: 'Rooms', comment: 'Every room, in a list of where a command works' },
     // One room named in a sentence, as the strip names it (30 October).
     // The start card, before anything is open (C282); read by screen readers.
-    start: /*i18n*/ { id: 'board.start', message: 'Start', comment: 'The card with the bar, shown before anything is open' },
+    start: /*i18n*/ { id: 'board.start', message: 'the birds', comment: 'The small card beside an empty room on the first screen, with tour:, import: and close: (C302 (d)); in a sentence: Enter closes the birds' },
     oneRoom: /*i18n*/ { id: 'board.oneRoom', message: 'Room', comment: 'One room, as a board in a sentence: Enter moves Room to the left' },
     welcome: /*i18n*/ { id: 'board.welcome', message: 'Welcome page' },
     letter: /*i18n*/ { id: 'board.letter', message: 'Letter', comment: 'The board a letter from the maker of Parliament opens on (letter:)' },
@@ -212,7 +212,7 @@ export const COPY = {
     resetAlready: /*i18n*/ { id: 'enter.resetAlready', message: 'The screen is clear already' },
     resetArrangement: /*i18n*/ {
       id: 'enter.resetArrangement',
-      message: '{count, plural, =0 {Enter clears the screen: every board closes. Nothing is deleted} one {Enter clears the screen: every board closes, and # window. Nothing is deleted} other {Enter clears the screen: every board closes, and # windows. Nothing is deleted}}',
+      message: '{count, plural, =0 {Enter clears the screen to an empty room: every board closes. Nothing is deleted} one {Enter clears the screen to an empty room: every board closes, and # window. Nothing is deleted} other {Enter clears the screen to an empty room: every board closes, and # windows. Nothing is deleted}}',
     },
     installGo: /*i18n*/ { id: 'enter.installGo', message: 'Enter asks the browser to install Parliament as an app on this computer' },
     installSame: /*i18n*/ { id: 'enter.installSame', message: 'The app and this page share everything: your chats, keys and backups' },
@@ -1930,6 +1930,8 @@ export const COPY = {
     signature: /*i18n*/ { id: 'welcome.signature', message: 'Stef', comment: 'The name the letter is signed with, under the closing line' },
     // The ending (W §7): the letter gives way to one line. {command} is focus:, drawn as a link that writes it in the bar.
     // The start card, when the welcome page closes with nothing else open (30 October; C282).
+    // The birds' commands, each a link that writes it in the bar (C302 (d)).
+    startWrites: /*i18n*/ { id: 'welcome.start.writes', message: 'Writes {command} in the bar', comment: '{command} is tour:, import: or close:, which stay English' },
     startPrompt: /*i18n*/ { id: 'welcome.start.prompt', message: 'Type {command} to start a prompt.', comment: '{command} is p>, which stays English' },
     startCommands: /*i18n*/ { id: 'welcome.start.commands', message: 'Use the command bar for actions. Type {first} and then {second} to see what’s live.', comment: '{first} is > and {second} is ?, which stay as they are' },
     startHistory: /*i18n*/ { id: 'welcome.start.history', message: 'To see your history, type {command} in the command bar.', comment: '{command} is open:records, which stays English' },

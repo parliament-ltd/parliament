@@ -33,10 +33,12 @@ export { isRoom }
 // is one space, edited by commands (C125, ruled 21 October): an
 // arrangement's verb (alm:, sym:, tour:, lab:) brings its boards into the
 // space beside what is there, and nothing switches to another screen. The
-// space is kept on this device; reset: clears it to the start card (C293). The arrangements here say which boards each brings, until
+// space is kept on this device; reset: clears it to an empty room (C293;
+// C302 (d)). The arrangements here say which boards each brings, until
 // their owner edits them (the Lab, stage 13).
 export const SPACE = 'space'
-// The start card's board (C282).
+// The birds' board (C282; C302 (d)): beside an empty room on the first
+// screen, with tour:, import: and close:, until the room has its first prompt.
 export const START = 'start'
 
 /**
@@ -51,7 +53,8 @@ export function withoutWaiting(a, offeredBoard = boardOffered) {
   const popped = Array.isArray(a.popped) ? a.popped : []
   if (!a.columns.flat().some(waits) && !popped.some((p) => waits(p.board))) return a
   let columns = a.columns.map((c) => c.filter((b) => !waits(b))).filter((c) => c.length)
-  if (!columns.length) columns = [[START]]
+  // Nothing left: an empty room (C302 (d)).
+  if (!columns.length) return withoutWaiting(emptyRoom({ ...a, popped: popped.filter((p) => !waits(p.board)) }), offeredBoard)
   const rest = popped.filter((p) => !waits(p.board))
   const here = [...columns.flat(), ...rest.map((p) => p.board)]
   const next = { ...a, columns, popped: rest, addressed: here.includes(a.addressed) ? a.addressed : columns[0][0] }
@@ -123,9 +126,13 @@ export function freeRoom(a) {
  * it pointed at last, and a room no longer here is forgotten.
  */
 export function settle(a) {
-  // The start card is there only while nothing else is open (C282).
-  if (a.columns.some((c) => c.includes(START)) && a.columns.flat().length > 1) {
+  // The birds stand only beside an empty room: once it has its first prompt,
+  // they go (C302 (d); Stefan, 15 November: "if the user adds in a prompt
+  // let's have the birds hide"). Alone, as the start card was, they give way
+  // to an empty room.
+  if (a.columns.some((c) => c.includes(START)) && !a.columns.flat().some((b) => isRoom(b) && !chatIn(a, b))) {
     const columns = a.columns.map((c) => c.filter((b) => b !== START)).filter((c) => c.length)
+    if (!columns.length) return settle(emptyRoom(a))
     return settle({ ...a, columns, addressed: a.addressed === START ? columns[0][0] : a.addressed })
   }
   const rooms = roomsIn(a)
@@ -164,6 +171,28 @@ export function shipped(id, context = {}) {
     context: { ...context },
     widths: {},
   }
+}
+
+/**
+ * An empty room alone, the bar at its foot, centred (C302 (d); Stefan, 15
+ * November: "if the tour is closed, and if the user selects reset, we should
+ * go to a blank room board, the command bar below centered"). The room
+ * shows no chat; its first prompt starts one. Windows and what other boards
+ * show are kept as they were.
+ */
+export function emptyRoom(a) {
+  return { ...a, columns: [['room']], addressed: 'room', bar: { at: 'bottom', side: 'center', popped: false }, context: { ...(a.context ?? {}), room: null } }
+}
+
+/**
+ * The first screen (C302 (d), ruled "A, beside"): an empty room, and the
+ * birds beside it with tour:, import: and close:, until the room has its
+ * first prompt. For someone who has made nothing yet, and for a screen kept
+ * on the welcome page or the start card alone.
+ */
+export function firstScreen(context = {}) {
+  const room = emptyRoom(shipped(SPACE, context))
+  return { ...room, columns: [['room'], [START]], resting: null }
 }
 
 /** The field's resting mode here: the arrangement's own, else the addressed board's (C44). */
@@ -237,7 +266,7 @@ function readdress(a, gone, oldColumn) {
 // welcome card they stack in one column, on the right of the card and the
 // chat (welcome spec §5).
 function place(next, board) {
-  // The start card gives way to the first board opened (C282).
+  // The birds give way to the first board opened (C282; C302 (d)).
   next.columns = next.columns.filter((c) => !c.includes(START))
   if (board === 'welcome') { next.columns.unshift([board]); return }
   const withWelcome = next.columns.some((c) => c.includes('welcome'))
@@ -266,7 +295,7 @@ export function planOpen(a, board) {
   place(next, board)
   next.addressed = board
   // From the start card the board takes the screen, not the right (C282).
-  return go(next, onPage(a).includes(START) ? 'openBoardAlone' : 'openBoard', { board })
+  return go(next, onPage(a).length === 1 && onPage(a)[0] === START ? 'openBoardAlone' : 'openBoard', { board })
 }
 
 /**
@@ -370,10 +399,9 @@ export function planClose(a, board = a.addressed) {
   if (!isOnPage(a, board) && !isPopped(a, board)) return refuse(isRoom(board) ? 'closeNoRoom' : 'closeNotHere', { board })
   if (entry && !entry.closable) return refuse('closeFixed', { board })
   if (isOnPage(a, board) && onPage(a).length === 1) {
-    // The welcome page alone, as on a first start: the start card takes its
-    // place, the birds and the bar with how to open a room, and nothing is
-    // opened for the person (30 October; C282).
-    if (board === 'welcome') return go2({ ...copy(a), columns: [[START]], addressed: START }, 'closeWelcome', { board })
+    // The welcome page alone: an empty room takes its place, the bar at its
+    // foot (C302 (d), in place of C282's start card).
+    if (board === 'welcome') return go2(emptyRoom(copy(a)), 'closeWelcome', { board })
     return refuse('closeLast', { board })
   }
   const oldColumn = columnOf(a, board)
@@ -949,14 +977,14 @@ export function planCols(a, words = []) {
 
 /**
  * reset: (C293; Stefan, 5 November: "i think it'd be best to clear
- * everything"): the screen cleared to the start card, every board and window
- * closed, the bar at the foot, centred, outside the card. Focus,
- * widths and Records' columns go back as shipped. Nothing stored is touched,
- * and what each board shows is kept for when it opens again.
+ * everything"): the screen cleared to an empty room (C302 (d)), every board
+ * and window closed, the bar at its foot, centred. Focus, widths and
+ * Records' columns go back as shipped. Nothing stored is touched; what the
+ * other boards show is kept for when they open again.
  */
 export function planReset(a) {
-  const next = { ...shipped(a.id, a.context), columns: [[START]], addressed: START, bar: { at: 'bottom', side: 'center', popped: false } }
-  if (sameLayout(next, a)) return refuse('resetAlready')
+  const next = emptyRoom(shipped(a.id, a.context))
+  if (sameLayout(next, a) && !chatIn(a, 'room')) return refuse('resetAlready')
   return go(next, 'resetArrangement', { count: a.popped.length })
 }
 

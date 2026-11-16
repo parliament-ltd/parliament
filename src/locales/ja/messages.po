@@ -775,10 +775,10 @@ msgstr "ルーム"
 msgid "board.settings"
 msgstr "設定"
 
-#. The card with the bar, shown before anything is open
+#. The small card beside an empty room on the first screen, with tour:, import: and close: (C302 (d)); in a sentence: Enter closes the birds
 #. js-lingui-explicit-id
 msgid "board.start"
-msgstr "スタート"
+msgstr "鳥"
 
 #. js-lingui-explicit-id
 msgid "board.welcome"
@@ -5142,7 +5142,7 @@ msgstr "画面はすでにクリアされています"
 
 #. js-lingui-explicit-id
 msgid "enter.resetArrangement"
-msgstr "{count, plural, =0 {Enterで画面をクリアし、すべてのボードを閉じます。何も削除されません} other {Enterで画面をクリアし、すべてのボードと#個のウインドウを閉じます。何も削除されません}}"
+msgstr "{count, plural, =0 {Enterで画面をクリアして空のルームだけにし、すべてのボードを閉じます。何も削除されません} other {Enterで画面をクリアして空のルームだけにし、すべてのボードと#個のウインドウを閉じます。何も削除されません}}"
 
 #. The Enter line in search mode, before anything is typed
 #. js-lingui-explicit-id
@@ -10012,7 +10012,7 @@ msgstr "コードか名前で、返答の言語を選ぶ"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
-msgstr "画面をクリアし、すべてのボードとウインドウを閉じる。何も削除されません"
+msgstr "画面をクリアして空のルームだけにし、すべてのボードとウインドウを閉じる。何も削除されません"
 
 #. js-lingui-explicit-id
 msgid "verb.resources"
@@ -10256,6 +10256,11 @@ msgstr "履歴を見るには、コマンドバーに {command} と入力しま�
 #. js-lingui-explicit-id
 msgid "welcome.start.prompt"
 msgstr "プロンプトを書き始めるには、{command} と入力します。"
+
+#. {command} is tour:, import: or close:, which stay English
+#. js-lingui-explicit-id
+msgid "welcome.start.writes"
+msgstr "バーに {command} と入力します"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

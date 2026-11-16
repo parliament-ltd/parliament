@@ -4242,8 +4242,8 @@ export default function Shell() {
       if (h?.win && !h.win.closed) h.win.document.title = windowTitleOf(w.boards)
     }
   }, [arrangement, windows, windowTitleOf])
-  // The welcome page, or the start card that takes its place (C282): either
-  // lays the screen out as the welcome page does, the bar in the card.
+  // The welcome page, or the first screen with the birds (C282; C302 (d)):
+  // either lays the screen out as the welcome page does, its foot under it.
   const welcomeOpen = arrangement.columns.some((c) => c.includes('welcome'))
   const onWelcome = welcomeOpen || arrangement.columns.some((c) => c.includes(START))
   // The strip shows whenever a board is open beside the welcome page, so
@@ -4383,7 +4383,7 @@ export default function Shell() {
       )
     }
     if (board === START) {
-      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
+      return <StartBoard key="start" addressed={arrangement.addressed === START} onAddress={focusBoard} onWrite={writeField} />
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" roomNum={(roomId ? conversations.find((c) => c.id === roomId)?.num : null) ?? lastRoom?.num ?? null} keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} advancedNums={advancedNums} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />

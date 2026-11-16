@@ -16,7 +16,7 @@
 // gives way to the shipped default.
 
 import { boardEntry, isRoom } from '../shell/boards'
-import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS, withoutWaiting } from '../shell/arrangement'
+import { shipped, shippedFor, SHIPPED, SPACE, START, RECORDS_COLUMNS, withoutWaiting, firstScreen } from '../shell/arrangement'
 import { LAB } from './release'
 
 const STORE = 'arrangements'
@@ -157,8 +157,13 @@ export async function openSpace(db, { fresh }) {
   // A space left in the Lab opens on Records while the Lab waits for a later
   // release (C279 (a)); the stored space is not changed. A board that waits,
   // the Library, is left out as if closed (C295).
+  // A screen kept on the welcome page or the start card alone opens on the
+  // first screen, an empty room with the birds beside it (C302 (d)): the
+  // welcome steps are behind tour:.
+  const alone = stored && stored.columns.flat().length === 1 && !stored.popped.length && ['welcome', START].includes(stored.columns[0][0])
+  if (alone) return { space: firstScreen(stored.context), kept, canKeep }
   if (stored) return { space: stored.lab && !LAB ? shipped(SPACE) : withoutWaiting(stored), kept, canKeep }
-  return { space: fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE), kept, canKeep }
+  return { space: fresh ? firstScreen() : shipped(SPACE), kept, canKeep }
 }
 
 /** Your saved arrangements on this device, by name (C257). */

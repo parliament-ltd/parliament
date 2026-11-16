@@ -622,20 +622,18 @@
 .ch-letter .sig { margin-top: 12px; }
 
 
-/* The start card (30 October; C282): the birds in the middle, the bar under
-   them, and three lines on what to type, in the welcome card's serif. */
-.ch-sgrid { width: 100%; max-width: 520px; margin: auto; display: flex; flex-direction: column; align-items: stretch; }
-.ch-slogo { align-self: center; width: 56px; height: 48px; color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
-.ch-start .ch-wscroll { padding-inline-start: 28px; }
-/* The start card fits around what it holds, in the middle of the screen
-   (C293; Stefan, 5 November: "a bit smaller to fit around the content, and
-   perhaps centered"), where the welcome page fills it. */
-.ch-card.ch-welcome.ch-start { flex: 0 0 auto; width: min(600px, 100%); margin: auto; }
-.ch-stage:has(> .ch-col > .ch-card.ch-start) { align-content: center; }
-.ch-start .ch-wbar:empty { display: none; }
-.ch-shint { list-style: none; margin: 18px 0 0; padding: 0 2px; font: 400 13px/1.7 var(--ch-serif); color: var(--ch-ink-2); }
-.ch-shell .ch-shint .c { font: inherit; color: var(--ch-ink); text-decoration: underline; text-decoration-color: var(--ch-soft); text-underline-offset: 3px; }
-.ch-shell .ch-shint .c:hover { text-decoration-color: var(--ch-ink); }
+/* The first screen (C302 (d), ruled "A, beside"): an empty room at a room's
+   width, centred, and the birds beside it, a narrow card fitted to what it
+   holds: the birds, smaller than the start card's, and tour:, import: and
+   close:, one to a line. */
+.ch-shell .ch-stage.space:has(> .ch-col > .ch-card.ch-start) { justify-content: center; flex-wrap: nowrap; align-items: flex-start; }
+.ch-shell .ch-stage.space:has(> .ch-col > .ch-card.ch-start) > .ch-col:has(> .ch-card.room) { flex: 0 1 820px; max-width: 820px; min-width: 300px; align-self: stretch; }
+.ch-shell .ch-stage.space > .ch-col:has(> .ch-card.ch-start) { flex: 0 0 150px; min-width: 130px; }
+.ch-card.ch-start { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 18px 20px; }
+.ch-slogo { width: 40px; height: 34px; color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
+.ch-scmds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ch-shell .ch-scmds .c { padding: 0; font: 400 12.5px var(--ch-mono); color: var(--ch-ink); text-decoration: underline; text-decoration-color: var(--ch-soft); text-underline-offset: 3px; }
+.ch-shell .ch-scmds .c:hover { text-decoration-color: var(--ch-ink); }
 
 /* The field resting in the welcome card: no box, only a faint rule under it
    (welcome spec §2). It takes its fills in command and prompt mode. */
