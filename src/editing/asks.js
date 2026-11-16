@@ -83,18 +83,19 @@ export function dropAsk(state, id) {
   return tr
 }
 
-const WORDS = { accept: 'accept', undo: 'reject', suggests: (name) => `${name} suggests`, someone: 'The model', title: (num) => String(num) }
+const WORDS = { accept: 'accept', undo: 'reject', suggests: (name) => `${name} suggests`, someone: 'The model', title: (num) => String(num), asReply: 'as a reply' }
 
 /**
  * What the marker after a prompt in the text says (C301 (d), (e);
  * parliament-markup-v1.html): while it waits, p> and its words, as the bar
  * writes a prompt; once answered, who suggests the answer, to accept or
  * reject. Words are the person's own and the model's name: set as text.
- * @returns {{ lead: string|null, said: string, settle: boolean }}
+ * A prompt to be answered in the reply says so after its words (C301 (e)).
+ * @returns {{ lead: string|null, said: string, settle: boolean, as: string|null }}
  */
 export function markerOf(info, answered, words = WORDS) {
-  if (answered) return { lead: null, said: words.suggests(info?.by || words.someone), settle: true }
-  return { lead: 'p>', said: String(info?.question ?? ''), settle: false }
+  if (answered) return { lead: null, said: words.suggests(info?.by || words.someone), settle: true, as: null }
+  return { lead: 'p>', said: String(info?.question ?? ''), settle: false, as: info?.reply ? words.asReply ?? WORDS.asReply : null }
 }
 
 /**
@@ -120,7 +121,7 @@ export function asksPlugin({ onSettle, words: given } = {}) {
     box.setAttribute('dir', 'auto')
     // Its number, for calm's numbered dot (C255 (a)).
     if (info?.num) box.setAttribute('data-num', String(info.num))
-    const { lead, said } = markerOf(info, answered, words)
+    const { lead, said, as } = markerOf(info, answered, words)
     // A click finds its card on the Collection (C220 (f)).
     const find = document.createElement(info?.num ? 'button' : 'span')
     find.className = 'pm-ask-find'
@@ -137,6 +138,12 @@ export function asksPlugin({ onSettle, words: given } = {}) {
       find.addEventListener('click', () => window.dispatchEvent(new CustomEvent('parliament-find-card', { detail: { num: info.num } })))
     }
     box.append(find)
+    if (as) {
+      const how = document.createElement('span')
+      how.className = 'pm-ask-as'
+      how.textContent = ` · ${as}`
+      box.append(how)
+    }
     if (answered) {
       const button = (label, how) => {
         const b = document.createElement('button')
@@ -184,7 +191,7 @@ export function asksPlugin({ onSettle, words: given } = {}) {
         decos.push(Decoration.widget(p.from, bracket('open'), { side: -1, key: `ask-open:${id}`, ignoreSelection: true }))
         decos.push(Decoration.widget(p.to, bracket('close'), { side: 1, key: `ask-close:${id}`, ignoreSelection: true }))
       }
-      decos.push(Decoration.widget(e.at, marker(id, i, e.answered), { side: 2, key: `ask:${id}:${i?.num ?? ''}:${e.answered}:${i?.question ?? ''}:${i?.by ?? ''}`, stopEvent: () => true, ignoreSelection: true }))
+      decos.push(Decoration.widget(e.at, marker(id, i, e.answered), { side: 2, key: `ask:${id}:${i?.num ?? ''}:${e.answered}:${i?.question ?? ''}:${i?.by ?? ''}:${i?.reply ? 1 : 0}`, stopEvent: () => true, ignoreSelection: true }))
     }
     return DecorationSet.create(doc, decos)
   }

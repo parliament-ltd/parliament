@@ -35,7 +35,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planContinue, planNewBranch } from '../lib/branchVerbs'
-import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
+import { planAnswers, planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
 import { planReflect, reflectTalkPreview } from '../lib/reflection'
 import { LAB, boardOffered } from '../lib/release'
@@ -71,7 +71,7 @@ const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan'
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
+const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'answers', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -1168,6 +1168,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       ask: (a1, s1) => planAsk(s1),
       // An ask by its new name (C301 (d)).
       prompt: (a1, s1) => planAsk(s1),
+      // How a prompt in the text is answered (C301 (e)).
+      answers: (a1, s1, sc) => planAnswers(s1, sc),
       // strikethrough: and tell: (piece 7; C225 (c), (d)).
       strikethrough: planStrike,
       tell: (a1, s1, sc) => planTell(s1, sc),

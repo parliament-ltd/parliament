@@ -1234,6 +1234,12 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-slist-it .pl b { margin-inline-end: 3px; font: 600 10.5px var(--ch-mono); letter-spacing: -.02em; }
 .ch-slist-it .on-what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
 .ch-slist-it .how { margin-inline-start: auto; flex: none; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+/* A prompt's row, with how it is answered at its end (C301 (e)). */
+.ch-slist-pr { display: flex; align-items: baseline; gap: 8px; }
+.ch-shell .ch-slist .ch-slist-pr button.ch-slist-it { flex: 1 1 auto; min-width: 0; width: auto; }
+.ch-slist-pr > .how { flex: none; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); white-space: nowrap; }
+.ch-shell .ch-slist-pr > .how button { padding: 0; font: inherit; color: var(--ch-marg); }
+.ch-shell .ch-slist-pr > .how button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-shell .ch-slist button.ch-slist-it.held, .ch-slist-it.held .pl { color: var(--ch-ink-3); }
 .ch-slist-it .el s { color: var(--ch-ink-3); }
 .ch-slist-it .el ins { color: var(--ch-you); text-decoration: underline; text-underline-offset: 2px; }

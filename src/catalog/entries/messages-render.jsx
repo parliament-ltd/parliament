@@ -411,7 +411,7 @@ export default function MessagesRender() {
       if (!byMessage.has(r.messageId)) byMessage.set(r.messageId, new Map())
       // Its words, shown after it while it waits, and who answered (C301 (d), (e)).
       const by = r.answer?.by ? modelFacts(r.answer.by)?.name ?? destination(r.answer.by)?.name ?? null : null
-      byMessage.get(r.messageId).set(r.edit, { num: r.num, state: r.state, question: typeof r.question === 'string' ? r.question : '', by })
+      byMessage.get(r.messageId).set(r.edit, { num: r.num, state: r.state, question: typeof r.question === 'string' ? r.question : '', by, reply: r.reply === true })
     }
     return (messageId) => byMessage.get(messageId) ?? NO_ASK_INFO
   }, [chatAsks])
@@ -443,6 +443,7 @@ export default function MessagesRender() {
     accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
     suggests: (name) => i18n._(COPY.chat.askSuggests, { name }), someone: i18n._(COPY.chat.askSomeone),
     title: (num) => i18n._(COPY.chat.askTitle, { num }),
+    asReply: i18n._(COPY.chat.askAsReply),
   }), [i18n])
   // Comments on words (C301 (c)): the COMMENT box, "more" and "less", and what is said when none can be written.
   const commentWords = useMemo(() => {

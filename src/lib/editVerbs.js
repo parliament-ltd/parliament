@@ -36,6 +36,28 @@ export function planHoldEdits(step, screens = {}) {
   }
 }
 
+// answers: (C301 (e); ruled 16 November): how a prompt in the text is
+// answered, as the bar's list sets it on its row. A change undo: takes back.
+//
+//   answers:242 reply   in the reply itself, nothing placed in the text
+//   answers:242 text    in the text, after its passage, to accept or reject (C218)
+export function planAnswers(step, screens = {}) {
+  const known = knownChanges(screens)
+  const vals = step.match?.values ?? []
+  const how = vals[vals.length - 1]?.value
+  const nums = [...new Set(vals.slice(0, -1).flatMap((v) => (v.kind === 'list' ? v.items : [v])).filter((v) => v.kind === 'address' && !v.letter).map((v) => v.num))]
+  if (!nums.length || (how !== 'reply' && how !== 'text')) return { says: { message: 'answersHow' }, act: null }
+  if (!known) return { says: { message: 'answersNotPrompt', values: { num: nums[0] } }, act: null }
+  const odd = nums.find((n) => known.get(n)?.kind !== 'ask')
+  if (odd != null) return { says: { message: 'answersNotPrompt', values: { num: odd } }, act: null }
+  const sent = nums.find((n) => known.get(n).sent)
+  if (sent != null) return { says: { message: 'answersSent', values: { num: sent } }, act: null }
+  const reply = how === 'reply'
+  const moving = nums.filter((n) => known.get(n).reply !== reply)
+  if (!moving.length) return { says: { message: 'answersAlready', values: { nums, how } }, act: null }
+  return { says: { message: reply ? 'answersReply' : 'answersText', values: { nums: moving } }, act: { kind: 'answersAs', asks: moving.map((n) => ({ num: n, id: known.get(n).id })), reply } }
+}
+
 // ask: (stage 11, piece 4; C218 (a), option 2). Ctrl+K stays the bar's, so an
 // ask starts with Ctrl+Shift+K in a reply, or here:
 //
@@ -112,7 +134,7 @@ export function planRipple(step, screens = {}) {
 // room's own, as piece 3 had it.
 function knownChanges(screens) {
   const rows = (screens.records?.rows ?? []).filter((r) => (r.kind === 'edit' || r.kind === 'ask') && r.change)
-  if (rows.length) return new Map(rows.map((r) => [r.num, { id: r.id, list: r.store, held: r.change.held, sent: Boolean(r.change.sent) }]))
+  if (rows.length) return new Map(rows.map((r) => [r.num, { id: r.id, list: r.store, held: r.change.held, sent: Boolean(r.change.sent), kind: r.kind, reply: Boolean(r.change.reply) }]))
   return screens.heldEdits?.byNum ?? null
 }
 
@@ -204,6 +226,9 @@ export function planSettle(step, screens = {}, how = 'accept') {
     if (notAsk) return { says: { message: 'settleNotAsk', values: { num: notAsk.num } }, act: null }
     const settled = picked.find((r) => r.kind === 'suggestion' && r.change.state !== 'open')
     if (settled) return { says: { message: 'settleSugDone', values: { num: settled.num, state: settled.change.state } }, act: null }
+    // Answered in the reply (C301 (e)): nothing in the text to settle.
+    const replied = picked.find((r) => r.kind === 'ask' && r.change.state === 'replied')
+    if (replied) return { says: { message: 'settleReplied', values: { num: replied.num } }, act: null }
     const waiting = picked.find((r) => r.kind === 'ask' && r.change.state !== 'answered')
     if (waiting) return { says: { message: 'settleNotAnswered', values: { num: waiting.num, state: waiting.change.state } }, act: null }
     // An answer kept on its card only cannot go into the reply.

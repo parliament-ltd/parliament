@@ -13,10 +13,13 @@ const LEAD = 'p>'
 // (C174), a prompt's or an edit's hold: or hold:off (C298).
 
 /**
+ * A prompt's row says how it is answered, "in the text · as a reply"; a
+ * click on the other runs answers: (C301 (e)).
  * @param {{ rows: ReturnType<typeof import('../lib/sendList').listOf>, words: boolean,
- *   onBranch: (chatId: string) => void, onItem: (num: number, held: boolean) => void, onFold: () => void }} props
+ *   onBranch: (chatId: string) => void, onItem: (num: number, held: boolean) => void,
+ *   onAnswers: (num: number, reply: boolean) => void, onFold: () => void }} props
  */
-export default function SendList({ rows, words, onBranch, onItem, onFold }) {
+export default function SendList({ rows, words, onBranch, onItem, onAnswers, onFold }) {
   const { i18n } = useLingui()
   const C = COPY.sendList
   const requests = rows.filter((b) => b.ticked && (words || b.going.prompts + b.going.edits > 0)).length
@@ -47,13 +50,24 @@ export default function SendList({ rows, words, onBranch, onItem, onFold }) {
               </span>
             </button>
             {b.prompts.map((x) => (
-              <button key={x.num} type="button" className={`ch-slist-it${x.held ? ' held' : ''}`} aria-pressed={!x.held} onMouseDown={keep} onClick={() => onItem(x.num, x.held)}
-                title={i18n._(COPY.shell.focusRuns, { command: x.held ? `hold:off ${x.num}` : `hold:${x.num}` })}>
-                <span className={`ch-slist-box${x.held ? '' : ' on'}`} aria-hidden="true" />
-                <span className="pl" dir="auto"><b dir="ltr">{LEAD}</b>{x.question}</span>
-                {x.passage.trim() && <span className="on-what" dir="auto">{i18n._(C.on, { passage: x.passage.trim() })}</span>}
-                {x.held && <span className="how">{i18n._(C.waits)}</span>}
-              </button>
+              <div key={x.num} className={`ch-slist-pr${x.held ? ' held' : ''}`}>
+                <button type="button" className={`ch-slist-it${x.held ? ' held' : ''}`} aria-pressed={!x.held} onMouseDown={keep} onClick={() => onItem(x.num, x.held)}
+                  title={i18n._(COPY.shell.focusRuns, { command: x.held ? `hold:off ${x.num}` : `hold:${x.num}` })}>
+                  <span className={`ch-slist-box${x.held ? '' : ' on'}`} aria-hidden="true" />
+                  <span className="pl" dir="auto"><b dir="ltr">{LEAD}</b>{x.question}</span>
+                  {x.passage.trim() && <span className="on-what" dir="auto">{i18n._(C.on, { passage: x.passage.trim() })}</span>}
+                </button>
+                {/* How it is answered (C301 (e)): the one in force underlined, the other a click away. */}
+                {x.held ? <span className="how">{i18n._(C.waits)}</span> : (
+                  <span className="how">
+                    <button type="button" className={x.reply ? undefined : 'on'} aria-pressed={!x.reply} onMouseDown={keep} onClick={() => { if (x.reply) onAnswers(x.num, false) }}
+                      title={i18n._(COPY.shell.focusRuns, { command: `answers:${x.num} text` })}>{i18n._(C.inText)}</button>
+                    <span aria-hidden="true"> · </span>
+                    <button type="button" className={x.reply ? 'on' : undefined} aria-pressed={x.reply} onMouseDown={keep} onClick={() => { if (!x.reply) onAnswers(x.num, true) }}
+                      title={i18n._(COPY.shell.focusRuns, { command: `answers:${x.num} reply` })}>{i18n._(C.asReply)}</button>
+                  </span>
+                )}
+              </div>
             ))}
             {b.edits.map((x) => (
               <button key={x.num} type="button" className={`ch-slist-it${x.held ? ' held' : ''}`} aria-pressed={!x.held} onMouseDown={keep} onClick={() => onItem(x.num, x.held)}

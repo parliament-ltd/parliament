@@ -279,6 +279,10 @@ export const VERBS = Object.freeze([
   // Ctrl+Alt+P does in a reply, and ask:, its older name, still does.
   v({ verb: 'prompt', group: 'editing', example: 'prompt:"Add the year it opened"', forms: ['prompt:', 'prompt:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 15,
     gloss: /*i18n*/ { id: 'verb.prompt', message: 'Write a prompt in the text, on the words selected in a reply. It goes with your next Enter' } }),
+  // How a prompt in the text is answered (C301 (e)): in the reply itself, or
+  // in the text after its passage; the bar's list sets it on each row.
+  v({ verb: 'answers', group: 'editing', example: 'answers:242 reply', forms: ['answers:242 reply', 'answers:242 text'], takes: [['addresses', ['reply', 'text']]], on: EDITING, stage: 15, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.answers', message: 'Have a prompt in the text answered in the reply itself, or in the text after its passage' } }),
   v({ verb: 'ask', group: 'editing', example: 'ask:"Add the year it opened"', forms: ['ask:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 11,
     gloss: /*i18n*/ { id: 'verb.ask', message: 'An older name: ask: writes a prompt in the text, as prompt: does', comment: 'Commands stay English' } }),
   // strikethrough: (C225 (c)): Ctrl+Shift+X in a reply does the same. The

@@ -975,6 +975,11 @@ msgstr "もう一度尋ねる"
 msgid "chat.askAgainAs"
 msgstr "{next}としてもう一度尋ねる"
 
+#. After a prompt in the text answered in the reply itself (C301 (e))
+#. js-lingui-explicit-id
+msgid "chat.askAsReply"
+msgstr "返答として"
+
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "{language}で「{text}」と質問"
@@ -1397,6 +1402,10 @@ msgstr "返答の「{passage}」の後の位置"
 #. js-lingui-explicit-id
 msgid "collection.askOn"
 msgstr "「{passage}」について"
+
+#. js-lingui-explicit-id
+msgid "collection.askReplied"
+msgstr "返答の中で回答済み"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
@@ -2045,6 +2054,32 @@ msgstr "{verb} は単独の行で実行します。送り先と費用をEnter行
 #. js-lingui-explicit-id
 msgid "enter.answererFailed"
 msgstr "選択を保存できませんでした。もう一度お試しください"
+
+#. js-lingui-explicit-id
+msgid "enter.answersAlready"
+msgstr "{how, select, reply {{nums}はすでに返答の中で答える設定です} other {{nums}はすでにテキスト内で答える設定です}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersHow"
+msgstr "answers: にはプロンプトの番号と、reply か text を指定します：answers:242 reply"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersNotPrompt"
+msgstr "{num}はテキスト内のプロンプトではありません。answers: はプロンプトへの答え方を決めます"
+
+#. js-lingui-explicit-id
+msgid "enter.answersReply"
+msgstr "Enterで、{nums}には返答そのものの中で答えてもらい、テキストには何も入れません"
+
+#. js-lingui-explicit-id
+msgid "enter.answersSent"
+msgstr "プロンプト{num}はモデルに送られたため、答え方は変わりません"
+
+#. js-lingui-explicit-id
+msgid "enter.answersText"
+msgstr "Enterで、{nums}にはテキスト内の箇所のあとに答えてもらい、採用か却下を選べるようにします"
 
 #. js-lingui-explicit-id
 msgid "enter.apiAdd"
@@ -5654,6 +5689,10 @@ msgstr "{num}はテキスト内のプロンプトでも提案でもありませ�
 msgid "enter.settleReject"
 msgstr "{count, plural, other {Enterで、プロンプト{nums}への回答を取り消し、元の箇所を残します}}"
 
+#. js-lingui-explicit-id
+msgid "enter.settleReplied"
+msgstr "プロンプト{num}は返答の中で答えられたため、テキストで採用・却下するものはありません"
+
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
@@ -8828,6 +8867,10 @@ msgid "screensMap.window"
 msgstr "別ウインドウ"
 
 #. js-lingui-explicit-id
+msgid "sendList.asReply"
+msgstr "返答として"
+
+#. js-lingui-explicit-id
 msgid "sendList.edit"
 msgstr "編集"
 
@@ -8847,6 +8890,10 @@ msgstr "{count, plural, other {#件を保留}}"
 #. js-lingui-explicit-id
 msgid "sendList.here"
 msgstr "表示中"
+
+#. js-lingui-explicit-id
+msgid "sendList.inText"
+msgstr "テキスト内で"
 
 #. js-lingui-explicit-id
 msgid "sendList.nothing"
@@ -9823,6 +9870,10 @@ msgstr "コレクションに項目を、ルームにブロックを入れる"
 #. js-lingui-explicit-id
 msgid "verb.again"
 msgstr "編集したプロンプトから、新しいブランチとしてもう一度尋ねる"
+
+#. js-lingui-explicit-id
+msgid "verb.answers"
+msgstr "テキスト内のプロンプトに、返答そのものの中で答えてもらうか、テキスト内の箇所のあとに答えてもらう"
 
 #. js-lingui-explicit-id
 msgid "verb.api"

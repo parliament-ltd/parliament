@@ -189,11 +189,13 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
   }
   for (const a of asks.filter(numbered)) {
     const answer = a.answer && typeof a.answer === 'object'
-      ? { text: str(a.answer.text), by: str(a.answer.by) || null, at: str(a.answer.at) || null, inPlace: Boolean(a.answer.inPlace) }
+      ? { text: str(a.answer.text), by: str(a.answer.by) || null, at: str(a.answer.at) || null, inPlace: Boolean(a.answer.inPlace), inReply: str(a.answer.inReply) || null }
       : null
     rows.push({ ...marking('ask', 'asks', a, str(a.question), a.conversationId), change: {
       kind: 'ask', mark: str(a.edit), part: 'reply', question: str(a.question), passage: str(a.passage), point: Boolean(a.point),
       state: str(a.state) || 'open', answer, held: Boolean(a.held), sent: sentOf(a.sent),
+      // Answered in the reply, not in the text (C301 (e)).
+      reply: a.reply === true,
     } })
   }
   // Suggestions (stage 12; C229): Ripple's or a sweep's, with where each came from.

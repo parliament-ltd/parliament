@@ -423,7 +423,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       <div className="ch-dock-in">
         {/* What Enter sends, by branch, above the field (C301 (d), the list). */}
         {sendList && field.mode === 'prompt' && !folded && (
-          <SendList rows={sendList.rows} words={Boolean(field.text.prompt?.trim())} onBranch={sendList.onBranch} onItem={sendList.onItem} onFold={sendList.onFold} />
+          <SendList rows={sendList.rows} words={Boolean(field.text.prompt?.trim())} onBranch={sendList.onBranch} onItem={sendList.onItem} onAnswers={sendList.onAnswers} onFold={sendList.onFold} />
         )}
         <div className="ch-frow">
         <Field

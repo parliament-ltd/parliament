@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, getSuggestionsOfChat, answerAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, getSuggestionsOfChat, answerAsks, replyAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { changeStored } from '../editing/storedChange'
 import { noteFor, waiting, tellNote } from '../editing/told'
 import { answersIn } from '../editing/answers'
 import { askToKeepStorage } from '../lib/storageKeep'
@@ -525,7 +526,7 @@ export function ChatProvider({ children }) {
       // The answers to the asks this prompt carried, put in place (C218 (b)).
       if (note.askIds.length && finalContent) {
         const found = answersIn(finalContent)
-        const answers = askRecords.filter((a) => note.askIds.includes(a.id) && found.has(a.num))
+        const answers = askRecords.filter((a) => note.askIds.includes(a.id) && a.reply !== true && found.has(a.num))
           .map((a) => ({ id: a.id, text: found.get(a.num), by: model, at: new Date().toISOString() }))
         if (answers.length) {
           const placed = await answerAsks(answers).catch(() => [])
@@ -533,6 +534,29 @@ export function ChatProvider({ children }) {
             const byId = new Map(placed.map((p) => [p.messageId, p.blocks]))
             updateMessages(conversationId, (prev) => prev.map((m) => (byId.has(m.id) ? { ...m, blocks: byId.get(m.id) } : m)))
           }
+        }
+      }
+
+      // The prompts in the text to be answered in the reply (C301 (e)): the
+      // finished reply is their answer; their marks leave the text, the
+      // passage as it was.
+      const replied = cut || !finalContent ? [] : askRecords.filter((a) => note.askIds.includes(a.id) && a.reply === true)
+      if (replied.length) {
+        const at = new Date().toISOString()
+        const current = new Map((hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId).catch(() => [])).map((m) => [m.id, m]))
+        const texts = []
+        for (const messageId of new Set(replied.map((a) => a.messageId))) {
+          let blocks = current.get(messageId)?.blocks ?? null
+          for (const a of replied.filter((x) => x.messageId === messageId)) {
+            const next = Array.isArray(blocks) ? changeStored(blocks, 'drop', a.edit) : null
+            if (next) blocks = next.blocks
+          }
+          if (Array.isArray(blocks)) texts.push({ messageId, blocks })
+        }
+        const rewritten = await replyAsks(replied.map((a) => ({ id: a.id, by: model, at, inReply: assistantMsg.id })), texts).catch(() => [])
+        if (rewritten.length) {
+          const byId = new Map(rewritten.map((t) => [t.messageId, t.blocks]))
+          updateMessages(conversationId, (prev) => prev.map((m) => (byId.has(m.id) ? { ...m, blocks: byId.get(m.id) } : m)))
         }
       }
 

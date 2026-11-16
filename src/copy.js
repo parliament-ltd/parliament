@@ -1369,6 +1369,14 @@ export const COPY = {
     undoSugUse: /*i18n*/ { id: 'enter.undoSugUse', message: 'A suggestion is settled with accept:{num} or reject:{num}', comment: 'Commands stay English' },
     deleteSugUse: /*i18n*/ { id: 'enter.deleteSugUse', message: 'A suggestion is turned down with reject:{num}, and kept as the record of it', comment: 'Commands stay English' },
     settleNotAsk: /*i18n*/ { id: 'enter.settleNotAsk', message: '{num} is not a prompt in the text or a suggestion. accept: and reject: settle the answer to a prompt, or a suggestion', comment: 'Commands stay English' },
+    settleReplied: /*i18n*/ { id: 'enter.settleReplied', message: 'Prompt {num} was answered in the reply, so there is nothing in the text to accept or reject' },
+    // answers: (C301 (e)). Commands stay English.
+    answersReply: /*i18n*/ { id: 'enter.answersReply', message: 'Enter has {nums} answered in the reply itself, with nothing placed in the text' },
+    answersText: /*i18n*/ { id: 'enter.answersText', message: 'Enter has {nums} answered in the text, after its passage, to accept or reject' },
+    answersAlready: /*i18n*/ { id: 'enter.answersAlready', message: '{how, select, reply {{nums} is answered in the reply already} other {{nums} is answered in the text already}}' },
+    answersNotPrompt: /*i18n*/ { id: 'enter.answersNotPrompt', message: '{num} is not a prompt in the text. answers: says how one is answered', comment: 'Commands stay English' },
+    answersSent: /*i18n*/ { id: 'enter.answersSent', message: 'Prompt {num} has gone to a model, so how it is answered stays' },
+    answersHow: /*i18n*/ { id: 'enter.answersHow', message: 'answers: takes a prompt\'s number, then reply or text: answers:242 reply', comment: 'Commands stay English' },
     settleNotAnswered: /*i18n*/ { id: 'enter.settleNotAnswered', message: 'Prompt {num} has no answer yet' },
     settleCardOnly: /*i18n*/ { id: 'enter.settleCardOnly', message: 'The passage of prompt {num} changed after it was written, so its answer is on its card only. reject:{num} lets it go', comment: 'Commands stay English' },
     deleteAsks: /*i18n*/ { id: 'enter.deleteAsks', message: 'Enter drops {count, plural, one {prompt} other {prompts}} {nums}. undo: brings {count, plural, one {it} other {them}} back', comment: 'Commands stay English' },
@@ -1522,6 +1530,9 @@ export const COPY = {
     on: /*i18n*/ { id: 'sendList.on', message: 'on “{passage}”' },
     waits: /*i18n*/ { id: 'sendList.waits', message: 'waits', comment: 'A prompt or edit held back: it waits for a later Enter' },
     edit: /*i18n*/ { id: 'sendList.edit', message: 'edit' },
+    // How a prompt in the text is answered (C301 (e)).
+    inText: /*i18n*/ { id: 'sendList.inText', message: 'in the text' },
+    asReply: /*i18n*/ { id: 'sendList.asReply', message: 'as a reply' },
   },
 
   markupMenu: {
@@ -2287,6 +2298,7 @@ export const COPY = {
     askAnsweredHere: /*i18n*/ { id: 'collection.askAnsweredHere', message: 'answered here only: the passage changed since' },
     askAccepted: /*i18n*/ { id: 'collection.askAccepted', message: 'accepted' },
     askTakenBack: /*i18n*/ { id: 'collection.askTakenBack', message: 'taken back' },
+    askReplied: /*i18n*/ { id: 'collection.askReplied', message: 'answered in the reply' },
     askAnsweredBy: /*i18n*/ { id: 'collection.askAnsweredBy', message: 'answered by {name}' },
     askOn: /*i18n*/ { id: 'collection.askOn', message: 'on “{passage}”' },
     askAtPoint: /*i18n*/ { id: 'collection.askAtPoint', message: 'at a point in the reply, after “{passage}”' },
@@ -2910,6 +2922,7 @@ export const COPY = {
     askSuggests: /*i18n*/ { id: 'chat.askSuggests', message: '{name} suggests', comment: '{name} is a model name, from the list' },
     askSomeone: /*i18n*/ { id: 'chat.askSomeone', message: 'The model', comment: 'Who suggests, when the model is not known' },
     askTitle: /*i18n*/ { id: 'chat.askTitle', message: 'Prompt {num}: find its card' },
+    askAsReply: /*i18n*/ { id: 'chat.askAsReply', message: 'as a reply', comment: 'After a prompt in the text answered in the reply itself (C301 (e))' },
     // A suggestion's marker in the text (stage 12; C229): ripple 244: accept · reject.
     sugRipple: /*i18n*/ { id: 'chat.sugRipple', message: 'ripple', comment: 'Before a Ripple suggestion number in the text: ripple 244' },
     sugSweep: /*i18n*/ { id: 'chat.sugSweep', message: 'sweep', comment: 'Before a sweep suggestion number in the text: sweep 245' },

@@ -975,6 +975,11 @@ msgstr ""
 msgid "chat.askAgainAs"
 msgstr ""
 
+#. After a prompt in the text answered in the reply itself (C301 (e))
+#. js-lingui-explicit-id
+msgid "chat.askAsReply"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr ""
@@ -1396,6 +1401,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.askOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askReplied"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2044,6 +2053,32 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.answererFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.answersAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersHow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersNotPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.answersReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.answersSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.answersText"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5654,6 +5689,10 @@ msgstr ""
 msgid "enter.settleReject"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.settleReplied"
+msgstr ""
+
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
@@ -8828,6 +8867,10 @@ msgid "screensMap.window"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "sendList.asReply"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "sendList.edit"
 msgstr ""
 
@@ -8846,6 +8889,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "sendList.here"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "sendList.inText"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9822,6 +9869,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.again"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.answers"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -975,6 +975,11 @@ msgstr "fråga igen"
 msgid "chat.askAgainAs"
 msgstr "fråga igen som {next}"
 
+#. After a prompt in the text answered in the reply itself (C301 (e))
+#. js-lingui-explicit-id
+msgid "chat.askAsReply"
+msgstr "som svar"
+
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "Frågan ställdes på {language} som ”{text}”"
@@ -1397,6 +1402,10 @@ msgstr "vid en punkt i svaret, efter ”{passage}”"
 #. js-lingui-explicit-id
 msgid "collection.askOn"
 msgstr "om ”{passage}”"
+
+#. js-lingui-explicit-id
+msgid "collection.askReplied"
+msgstr "besvarad i svaret"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
@@ -2045,6 +2054,32 @@ msgstr "{verb} körs på en egen rad, så att dess Enter-rad kan säga vem som t
 #. js-lingui-explicit-id
 msgid "enter.answererFailed"
 msgstr "Valet sparades inte. Försök igen"
+
+#. js-lingui-explicit-id
+msgid "enter.answersAlready"
+msgstr "{how, select, reply {{nums} besvaras redan i svaret} other {{nums} besvaras redan i texten}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersHow"
+msgstr "answers: tar en prompts nummer, sedan reply eller text: answers:242 reply"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersNotPrompt"
+msgstr "{num} är ingen prompt i texten. answers: anger hur en sådan besvaras"
+
+#. js-lingui-explicit-id
+msgid "enter.answersReply"
+msgstr "Enter låter {nums} besvaras i själva svaret, utan att något läggs in i texten"
+
+#. js-lingui-explicit-id
+msgid "enter.answersSent"
+msgstr "Prompt {num} har gått till en modell, så hur den besvaras ligger fast"
+
+#. js-lingui-explicit-id
+msgid "enter.answersText"
+msgstr "Enter låter {nums} besvaras i texten, efter textavsnittet, att godta eller avvisa"
 
 #. js-lingui-explicit-id
 msgid "enter.apiAdd"
@@ -5654,6 +5689,10 @@ msgstr "{num} är varken en prompt i texten eller ett förslag. accept: och reje
 msgid "enter.settleReject"
 msgstr "Enter tar tillbaka {count, plural, one {svaret på prompt} other {svaren på promptarna}} {nums}, och textavsnittet blir kvar"
 
+#. js-lingui-explicit-id
+msgid "enter.settleReplied"
+msgstr "Prompt {num} besvarades i svaret, så det finns inget i texten att godta eller avvisa"
+
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
@@ -8828,6 +8867,10 @@ msgid "screensMap.window"
 msgstr "ett eget fönster"
 
 #. js-lingui-explicit-id
+msgid "sendList.asReply"
+msgstr "som svar"
+
+#. js-lingui-explicit-id
 msgid "sendList.edit"
 msgstr "redigering"
 
@@ -8847,6 +8890,10 @@ msgstr "{count, plural, one {# hålls tillbaka} other {# hålls tillbaka}}"
 #. js-lingui-explicit-id
 msgid "sendList.here"
 msgstr "på skärmen"
+
+#. js-lingui-explicit-id
+msgid "sendList.inText"
+msgstr "i texten"
 
 #. js-lingui-explicit-id
 msgid "sendList.nothing"
@@ -9823,6 +9870,10 @@ msgstr "Lägg saker i samlingen, eller block i ett rum"
 #. js-lingui-explicit-id
 msgid "verb.again"
 msgstr "Fråga igen utifrån den redigerade prompten, som en ny gren"
+
+#. js-lingui-explicit-id
+msgid "verb.answers"
+msgstr "Låt en prompt i texten besvaras i själva svaret, eller i texten efter textavsnittet"
 
 #. js-lingui-explicit-id
 msgid "verb.api"

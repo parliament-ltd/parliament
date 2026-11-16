@@ -83,11 +83,13 @@ describe('answers in a reply', () => {
 describe('the marker after a prompt in the text (C301 (d), (e))', () => {
   const words = { accept: 'accept', undo: 'reject', suggests: (name) => `${name} suggests`, someone: 'The model', title: (n) => String(n) }
   it('says p> and its words while it waits, as the bar writes a prompt', () => {
-    expect(markerOf({ num: 241, question: 'say it plainer' }, false, words)).toEqual({ lead: 'p>', said: 'say it plainer', settle: false })
-    expect(markerOf(null, false, words)).toEqual({ lead: 'p>', said: '', settle: false })
+    expect(markerOf({ num: 241, question: 'say it plainer' }, false, words)).toEqual({ lead: 'p>', said: 'say it plainer', settle: false, as: null })
+    expect(markerOf(null, false, words)).toEqual({ lead: 'p>', said: '', settle: false, as: null })
+    // One to be answered in the reply says so (C301 (e)).
+    expect(markerOf({ num: 242, question: 'why?', reply: true }, false, { ...words, asReply: 'as a reply' }).as).toBe('as a reply')
   })
   it('says who suggests the answer once answered, to accept or reject', () => {
-    expect(markerOf({ num: 241, question: 'x', by: 'Sonnet 5.5' }, true, words)).toEqual({ lead: null, said: 'Sonnet 5.5 suggests', settle: true })
+    expect(markerOf({ num: 241, question: 'x', by: 'Sonnet 5.5' }, true, words)).toEqual({ lead: null, said: 'Sonnet 5.5 suggests', settle: true, as: null })
     expect(markerOf({ num: 241 }, true, words).said).toBe('The model suggests')
   })
 })

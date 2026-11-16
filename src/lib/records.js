@@ -579,6 +579,35 @@ export async function answerAsks(db, answers) {
   })
 }
 
+/**
+ * Prompts in the text answered in the reply itself (C301 (e); approved 16
+ * November): each marked replied, its answer naming who answered, when, and
+ * the reply; its message's stored form without its marks, worked out by the
+ * editor's rules (storedChange.js) and given here, so its passage stays as it
+ * was. One transaction.
+ * @param {Array<{ id: string, by: string, at: string, inReply: string }>} replied by ask record id
+ * @param {Array<{ messageId: string, blocks: object[] }>} texts the stored forms without them
+ */
+export async function replyAsks(db, replied, texts = []) {
+  if (!isV6(db) || !replied?.length) return []
+  return write(db, ['asks', 'messages'], async (tx) => {
+    const changes = []
+    for (const t of texts) {
+      const message = await tx.objectStore('messages').get(t.messageId)
+      if (!message || !Array.isArray(t.blocks)) continue
+      await tx.objectStore('messages').put({ ...message, blocks: t.blocks })
+      changes.push({ kind: 'message', op: 'updated', id: message.id })
+    }
+    for (const r of replied) {
+      const ask = await tx.objectStore('asks').get(r.id)
+      if (!ask || ask.answer || ask.state !== 'open') continue
+      await tx.objectStore('asks').put({ ...ask, state: 'replied', answer: { by: r.by, at: r.at, inReply: r.inReply }, updatedAt: r.at })
+      changes.push({ kind: 'ask', op: 'updated', id: ask.id, num: ask.num })
+    }
+    return { result: texts.filter((t) => Array.isArray(t.blocks)), changes }
+  })
+}
+
 /** An answered ask accepted or taken back (C218). */
 export async function settleAskRecord(db, id, state, at = new Date().toISOString()) {
   if (!isV6(db)) return null

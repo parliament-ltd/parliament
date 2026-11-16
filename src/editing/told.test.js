@@ -99,3 +99,19 @@ describe('tell: notes in the note (C225 (d))', () => {
     expect(withTold({ content: 'Go on.', told: part })).toBe(`${part}\n\nGo on.`)
   })
 })
+
+describe('prompts in the text answered in the reply (C301 (e))', () => {
+  const reply = { id: 'a1', role: 'assistant', content: 'A freeze until March.' }
+  const ask = (n, extra = {}) => ({ id: `a1:q${n}`, edit: `q${n}`, messageId: 'a1', num: n, question: `question ${n}`, passage: 'a freeze until March', point: false, state: 'open', held: false, sent: null, ...extra })
+  it('asks those in the reply itself, apart from those answered in the text, and tells both', () => {
+    const note = noteFor([{ id: 'u1', role: 'user', content: 'x' }, reply], [], { asks: [ask(241), ask(242, { reply: true })] })
+    expect(note.text).toContain('Answer each ask in a block of its own')
+    expect(note.text).toContain('- Ask 241, about "a freeze until March": question 241')
+    expect(note.text).toContain('wants these answered in your reply itself, not in a block:\n- Ask 242, about "a freeze until March": question 242')
+    expect(note.askIds).toEqual(['a1:q241', 'a1:q242'])
+  })
+  it('asks only for the reply when every one is to be answered there', () => {
+    const note = noteFor([reply], [], { asks: [ask(242, { reply: true })] })
+    expect(note.text).not.toContain('[ask N]')
+  })
+})

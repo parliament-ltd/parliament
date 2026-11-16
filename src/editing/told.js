@@ -64,13 +64,25 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sw
       const where = m.role === 'user' ? `their prompt ${prompts}`
         : m.source ? `an answer from ${m.source.name ?? m.source.id ?? 'a source'}, which you have not seen`
           : `your reply ${replies}`
-      const lines = [...theirs].sort((a, b) => (a.num ?? 0) - (b.num ?? 0)).map((a) => (a.point
+      const line = (a) => (a.point
         ? `- Ask ${a.num}, at the point after "${a.passage}": ${a.question}`
-        : `- Ask ${a.num}, about "${a.passage}": ${a.question}`))
-      askParts.push([
-        `The person asks about ${where}, in their own words. Answer each ask in a block of its own, as plain text: [ask N] on a line, then your answer, which takes the place of the passage (or goes at the point), then [/ask]. Write the rest of your reply as usual.`,
-        ...lines,
-      ].join('\n'))
+        : `- Ask ${a.num}, about "${a.passage}": ${a.question}`)
+      const sorted = [...theirs].sort((a, b) => (a.num ?? 0) - (b.num ?? 0))
+      const inText = sorted.filter((a) => a.reply !== true)
+      // As a reply (C301 (e)): answered in the reply itself, nothing placed in the text.
+      const asReply = sorted.filter((a) => a.reply === true)
+      if (inText.length) {
+        askParts.push([
+          `The person asks about ${where}, in their own words. Answer each ask in a block of its own, as plain text: [ask N] on a line, then your answer, which takes the place of the passage (or goes at the point), then [/ask]. Write the rest of your reply as usual.`,
+          ...inText.map(line),
+        ].join('\n'))
+      }
+      if (asReply.length) {
+        askParts.push([
+          `The person asks about ${where}, in their own words, and wants these answered in your reply itself, not in a block:`,
+          ...asReply.map(line),
+        ].join('\n'))
+      }
       for (const a of theirs) askIds.push(a.id)
     }
     // Changes the person accepted from a sweep, which the helper suggested

@@ -110,6 +110,7 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | --- | --- | --- | --- | --- |
 | `tell:"Keep it under a page"` | Write a note the model reads with your next prompt | `tell:"Keep it under a page"` | Rooms | yes |
 | `prompt:"Add the year it opened"` | Write a prompt in the text, on the words selected in a reply. It goes with your next Enter | `prompt:`, `prompt:"Add the year it opened"` | Rooms, Plan, Reflection, Collection | no |
+| `answers:242 reply` | Have a prompt in the text answered in the reply itself, or in the text after its passage | `answers:242 reply`, `answers:242 text` | Rooms, Plan, Reflection, Collection | yes |
 | `ask:"Add the year it opened"` | An older name: ask: writes a prompt in the text, as prompt: does | `ask:"Add the year it opened"` | Rooms, Plan, Reflection, Collection | no |
 | `strikethrough:` | Strike the selected words in a reply. Its number with undo: takes it back | `strikethrough:` | Rooms, Plan, Reflection, Collection | no |
 | `to:201a` | Send the next prompt to one branch, or to all | `to:201a`, `to:201a, 201c`, `to:all` | everywhere | yes |

@@ -18,7 +18,7 @@ describe('what waits in each branch', () => {
   it('lists each branch\'s prompts and edits not yet sent, held ones too, in number order', () => {
     expect(by.get('a').prompts.map((p) => p.num)).toEqual([241, 242])
     expect(by.get('a').edits.map((e) => e.num)).toEqual([243])
-    expect(by.get('b').prompts).toEqual([{ num: 250, question: 'q250', passage: 'p250', point: false, held: false }, { num: 251, question: 'q251', passage: 'p251', point: false, held: true }])
+    expect(by.get('b').prompts).toEqual([{ num: 250, question: 'q250', passage: 'p250', point: false, held: false, reply: false }, { num: 251, question: 'q251', passage: 'p251', point: false, held: true, reply: false }])
     expect(by.get('c')).toEqual({ prompts: [], edits: [] })
   })
   it('counts what goes, leaving out what is held back', () => {

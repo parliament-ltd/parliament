@@ -49,7 +49,9 @@ export const FIELDS = Object.freeze({
   // Edits in a reply or a prompt, and asks: each with its chat (stage 11; C212 (c), (d)).
   edits: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'struck', 'added', 'places', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
   // passage, point: what an ask was about when asked, so a changed passage keeps its answer to its card (C218).
-  asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'passage', 'point', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
+  // reply: a prompt in the text to be answered in the reply, not in the text;
+  // state 'replied' once it has been (C301 (e)). A backup without it reads as before.
+  asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'passage', 'point', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom', 'reply'],
   // Suggestions from Ripple and sweeps, each with its chat (stage 12; C229 (b)).
   // sent: a sweep's change, accepted, told to the chat's model (C233 (a)).
   suggestions: ['id', 'mark', 'num', 'conversationId', 'messageId', 'part', 'kind', 'struck', 'suggested', 'places', 'from', 'model', 'state', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],

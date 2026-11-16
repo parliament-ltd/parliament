@@ -159,3 +159,37 @@ describe('saving an edited reply (C212)', () => {
     expect((await db.get('conversations', c.id)).storageBytes).toBe(before + JSON.stringify(blocks).length)
   })
 })
+
+describe('a prompt in the text answered in the reply (C301 (e))', () => {
+  let db
+  let c
+  let reply
+  beforeEach(async () => {
+    db = await open()
+    c = await R.createChat(db, chat())
+    reply = await R.addMessageRecord(db, message(c.id, 'assistant', 'A freeze until March.'))
+  })
+  afterEach(() => db.close())
+
+  it('marks it replied, naming the reply, and keeps the text it is given, without its marks', async () => {
+    const marked = [{ id: 'b1', type: 'paragraph', text: [{ text: 'A freeze until March', ask: 'q1' }, { text: '.' }] }]
+    await R.saveEditedMessage(db, reply.id, { blocks: marked, edits: new Map(), asks: new Map([['q1', { question: 'is this too strict?', passage: 'A freeze until March', point: false, places: [] }]]), now: at() })
+    const [ask] = await R.asksOfChat(db, c.id)
+    await R.changeRecords(db, [{ store: 'asks', id: ask.id, num: ask.num, set: { reply: true } }])
+    const plain = [{ id: 'b1', type: 'paragraph', text: [{ text: 'A freeze until March.' }] }]
+    const out = await R.replyAsks(db, [{ id: ask.id, by: 'claude-sonnet', at: at(), inReply: 'm-next' }], [{ messageId: reply.id, blocks: plain }])
+    expect(out).toEqual([{ messageId: reply.id, blocks: plain }])
+    const [after] = await R.asksOfChat(db, c.id)
+    expect(after).toMatchObject({ reply: true, state: 'replied', answer: { by: 'claude-sonnet', inReply: 'm-next' } })
+    expect(after.answer.text).toBeUndefined()
+    // Once replied, it is not replied again.
+    await R.replyAsks(db, [{ id: ask.id, by: 'other', at: at(), inReply: 'm-other' }])
+    expect((await R.asksOfChat(db, c.id))[0].answer.inReply).toBe('m-next')
+  })
+
+  it('carries reply in a backup, and leaves a backup without it as it was', async () => {
+    const { rebuildRecord } = await import('./backupSchema')
+    expect(rebuildRecord('asks', { id: 'x', reply: true, state: 'replied', answer: { by: 'm', at: 't', inReply: 'r' } })).toMatchObject({ reply: true, state: 'replied', answer: { inReply: 'r' } })
+    expect(rebuildRecord('asks', { id: 'x', state: 'open' })).not.toHaveProperty('reply')
+  })
+})

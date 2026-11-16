@@ -975,6 +975,11 @@ msgstr "ask again"
 msgid "chat.askAgainAs"
 msgstr "ask again as {next}"
 
+#. After a prompt in the text answered in the reply itself (C301 (e))
+#. js-lingui-explicit-id
+msgid "chat.askAsReply"
+msgstr "as a reply"
+
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "Asked in {language} as “{text}”"
@@ -1397,6 +1402,10 @@ msgstr "at a point in the reply, after “{passage}”"
 #. js-lingui-explicit-id
 msgid "collection.askOn"
 msgstr "on “{passage}”"
+
+#. js-lingui-explicit-id
+msgid "collection.askReplied"
+msgstr "answered in the reply"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
@@ -2045,6 +2054,32 @@ msgstr "{verb} runs on a line of its own, so its Enter line can name who receive
 #. js-lingui-explicit-id
 msgid "enter.answererFailed"
 msgstr "The choice was not kept. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.answersAlready"
+msgstr "{how, select, reply {{nums} is answered in the reply already} other {{nums} is answered in the text already}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersHow"
+msgstr "answers: takes a prompt's number, then reply or text: answers:242 reply"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersNotPrompt"
+msgstr "{num} is not a prompt in the text. answers: says how one is answered"
+
+#. js-lingui-explicit-id
+msgid "enter.answersReply"
+msgstr "Enter has {nums} answered in the reply itself, with nothing placed in the text"
+
+#. js-lingui-explicit-id
+msgid "enter.answersSent"
+msgstr "Prompt {num} has gone to a model, so how it is answered stays"
+
+#. js-lingui-explicit-id
+msgid "enter.answersText"
+msgstr "Enter has {nums} answered in the text, after its passage, to accept or reject"
 
 #. js-lingui-explicit-id
 msgid "enter.apiAdd"
@@ -5654,6 +5689,10 @@ msgstr "{num} is not a prompt in the text or a suggestion. accept: and reject: s
 msgid "enter.settleReject"
 msgstr "Enter takes back the {count, plural, one {answer to prompt} other {answers to prompts}} {nums}, and the passage stays"
 
+#. js-lingui-explicit-id
+msgid "enter.settleReplied"
+msgstr "Prompt {num} was answered in the reply, so there is nothing in the text to accept or reject"
+
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
@@ -8828,6 +8867,10 @@ msgid "screensMap.window"
 msgstr "its own window"
 
 #. js-lingui-explicit-id
+msgid "sendList.asReply"
+msgstr "as a reply"
+
+#. js-lingui-explicit-id
 msgid "sendList.edit"
 msgstr "edit"
 
@@ -8847,6 +8890,10 @@ msgstr "{count, plural, one {# held back} other {# held back}}"
 #. js-lingui-explicit-id
 msgid "sendList.here"
 msgstr "on screen"
+
+#. js-lingui-explicit-id
+msgid "sendList.inText"
+msgstr "in the text"
 
 #. js-lingui-explicit-id
 msgid "sendList.nothing"
@@ -9823,6 +9870,10 @@ msgstr "Put things into the collection, or blocks into a room"
 #. js-lingui-explicit-id
 msgid "verb.again"
 msgstr "Ask again from the edited prompt, as a new branch"
+
+#. js-lingui-explicit-id
+msgid "verb.answers"
+msgstr "Have a prompt in the text answered in the reply itself, or in the text after its passage"
 
 #. js-lingui-explicit-id
 msgid "verb.api"

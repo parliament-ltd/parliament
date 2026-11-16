@@ -8,7 +8,7 @@
 // the room's own branch, unless to: has chosen the branches (C174).
 
 /**
- * @typedef {{ num: number, question: string, passage: string, point: boolean, held: boolean }} WaitingPrompt
+ * @typedef {{ num: number, question: string, passage: string, point: boolean, held: boolean, reply: boolean }} WaitingPrompt
  * @typedef {{ num: number, struck: string, added: string, held: boolean }} WaitingEdit
  * @typedef {{ prompts: WaitingPrompt[], edits: WaitingEdit[] }} Waiting
  */
@@ -27,7 +27,7 @@ export function waitingByChat(rows, chats) {
     const here = out.get(r?.chatId)
     const c = r?.change
     if (!here || !c || c.sent || !Number.isInteger(r.num)) continue
-    if (r.kind === 'ask' && c.state === 'open') here.prompts.push({ num: r.num, question: c.question ?? '', passage: c.passage ?? '', point: Boolean(c.point), held: Boolean(c.held) })
+    if (r.kind === 'ask' && c.state === 'open') here.prompts.push({ num: r.num, question: c.question ?? '', passage: c.passage ?? '', point: Boolean(c.point), held: Boolean(c.held), reply: c.reply === true })
     else if (r.kind === 'edit') here.edits.push({ num: r.num, struck: c.struck ?? '', added: c.added ?? '', held: Boolean(c.held) })
   }
   for (const w of out.values()) { w.prompts.sort(byNum); w.edits.sort(byNum) }

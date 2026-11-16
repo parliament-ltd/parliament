@@ -86,6 +86,7 @@
 .p-text .pm-ask-point { display: inline-block; width: 6px; height: 6px; margin: 0 2px; border-radius: 50%; background: var(--ch-prompt); vertical-align: middle; }
 .p-text .pm-ask-marker { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--ch-serif); color: var(--ch-prompt); }
 .p-text .pm-ask-marker.answered { color: var(--ch-ai); white-space: nowrap; }
+.p-text .pm-ask-marker .pm-ask-as { color: var(--ch-marg); }
 .p-text .pm-ask-marker b { margin-inline-end: 3px; font: 600 10.5px var(--ch-mono); font-style: normal; letter-spacing: -.02em; }
 .p-text .pm-ask-marker button { font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 2px; padding: 0; background: none; border: 0; cursor: pointer; }
 .p-text .pm-ask-marker button.pm-ask-find { text-decoration: none; }

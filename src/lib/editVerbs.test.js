@@ -51,6 +51,19 @@ describe('accept: and reject: on answered asks', () => {
   })
 })
 
+describe('answers: how a prompt in the text is answered (C301 (e))', () => {
+  it('has a prompt not yet sent answered in the reply, or in the text again', () => {
+    expect(at('>answers:246 reply')).toMatchObject({ text: 'Enter has 246 answered in the reply itself, with nothing placed in the text', act: { kind: 'answersAs', asks: [{ num: 246 }], reply: true } })
+    expect(at('>answers:246 text').text).toBe('246 is answered in the text already')
+  })
+  it('refuses one sent, and what is not a prompt in the text', () => {
+    expect(at('>answers:244 reply').text).toBe('Prompt 244 has gone to a model, so how it is answered stays')
+    expect(at('>answers:242 reply').text).toBe('242 is not a prompt in the text. answers: says how one is answered')
+    // With no reply or text, the command's own words say what it takes.
+    expect(at('>answers:246').act ?? null).toBeNull()
+  })
+})
+
 describe('delete: on asks, and the other commands', () => {
   it('drops an ask not yet sent, and keeps one sent', () => {
     expect(at('>delete:246').act).toEqual({ kind: 'storedChange', changes: [{ how: 'drop', num: 246, mark: 'q3', messageId: 'm1', conversationId: 'c202' }] })

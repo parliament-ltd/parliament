@@ -975,6 +975,11 @@ msgstr "再问一次"
 msgid "chat.askAgainAs"
 msgstr "以 {next} 再问一次"
 
+#. After a prompt in the text answered in the reply itself (C301 (e))
+#. js-lingui-explicit-id
+msgid "chat.askAsReply"
+msgstr "作为回复"
+
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "以{language}提问：“{text}”"
@@ -1397,6 +1402,10 @@ msgstr "位于回复中“{passage}”之后"
 #. js-lingui-explicit-id
 msgid "collection.askOn"
 msgstr "关于“{passage}”"
+
+#. js-lingui-explicit-id
+msgid "collection.askReplied"
+msgstr "已在回复中回答"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
@@ -2045,6 +2054,32 @@ msgstr "{verb} 需单独占一行运行，这样它的 Enter 提示行才能写�
 #. js-lingui-explicit-id
 msgid "enter.answererFailed"
 msgstr "选择未能保存。请重试"
+
+#. js-lingui-explicit-id
+msgid "enter.answersAlready"
+msgstr "{how, select, reply {{nums} 已设为在回复中回答} other {{nums} 已设为在正文中回答}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersHow"
+msgstr "answers: 需要提示词的编号，再加 reply 或 text：answers:242 reply"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersNotPrompt"
+msgstr "{num} 不是正文中的提示词。answers: 用于设定它的回答方式"
+
+#. js-lingui-explicit-id
+msgid "enter.answersReply"
+msgstr "按 Enter 让 {nums} 在回复本身中回答，不在正文中放入任何内容"
+
+#. js-lingui-explicit-id
+msgid "enter.answersSent"
+msgstr "提示词 {num} 已发给模型，它的回答方式不再改变"
+
+#. js-lingui-explicit-id
+msgid "enter.answersText"
+msgstr "按 Enter 让 {nums} 在正文中、原文之后回答，供你接受或拒绝"
 
 #. js-lingui-explicit-id
 msgid "enter.apiAdd"
@@ -5654,6 +5689,10 @@ msgstr "{num} 不是正文中的提示词或建议。accept: 和 reject: 用于�
 msgid "enter.settleReject"
 msgstr "按 Enter 撤销{count, plural, other {提示词}} {nums} 的回答，原文保持不变"
 
+#. js-lingui-explicit-id
+msgid "enter.settleReplied"
+msgstr "提示词 {num} 已在回复中回答，正文中没有可接受或拒绝的内容"
+
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
@@ -8828,6 +8867,10 @@ msgid "screensMap.window"
 msgstr "独立窗口"
 
 #. js-lingui-explicit-id
+msgid "sendList.asReply"
+msgstr "作为回复"
+
+#. js-lingui-explicit-id
 msgid "sendList.edit"
 msgstr "编辑"
 
@@ -8847,6 +8890,10 @@ msgstr "{count, plural, other {# 项暂缓}}"
 #. js-lingui-explicit-id
 msgid "sendList.here"
 msgstr "正在显示"
+
+#. js-lingui-explicit-id
+msgid "sendList.inText"
+msgstr "在正文中"
 
 #. js-lingui-explicit-id
 msgid "sendList.nothing"
@@ -9823,6 +9870,10 @@ msgstr "把内容放入合集，或把模块放入房间"
 #. js-lingui-explicit-id
 msgid "verb.again"
 msgstr "用编辑后的提示词再问一次，作为新分支"
+
+#. js-lingui-explicit-id
+msgid "verb.answers"
+msgstr "让正文中的提示词在回复本身中回答，或在正文中原文之后回答"
 
 #. js-lingui-explicit-id
 msgid "verb.api"

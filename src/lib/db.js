@@ -10,7 +10,7 @@ import { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, BUILTIN_AUTHOR, u
 import {
   createChat, updateChat, removeChat, createBranchChat, createSummaryChat, setPromptGroup,
   addMessageRecord, updateMessageRecord, removeMessage, saveEditedMessage as saveEditedMessageRecord,
-  editsOfChat, markEditsSent as markEditsSentRecord, asksOfChat, answerAsks as answerAsksRecord, settleAskRecord,
+  editsOfChat, markEditsSent as markEditsSentRecord, asksOfChat, answerAsks as answerAsksRecord, replyAsks as replyAsksRecord, settleAskRecord,
   suggestionsOfChat, addSuggestions as addSuggestionsRecord, settleSuggestionRecord,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
@@ -521,6 +521,11 @@ export async function getAsksOfChat(conversationId) {
 }
 
 /** The model's answers to asks, placed in their replies (C218 (b)). */
+/** Prompts in the text answered in the reply itself (C301 (e)). */
+export async function replyAsks(replied, texts) {
+  return replyAsksRecord(await initDB(), replied, texts)
+}
+
 export async function answerAsks(answers) {
   return answerAsksRecord(await initDB(), answers)
 }

@@ -975,6 +975,11 @@ msgstr "kysy uudelleen"
 msgid "chat.askAgainAs"
 msgstr "kysy uudelleen haarana {next}"
 
+#. After a prompt in the text answered in the reply itself (C301 (e))
+#. js-lingui-explicit-id
+msgid "chat.askAsReply"
+msgstr "vastauksena"
+
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "Kysytty kielellä {language}: ”{text}”"
@@ -1397,6 +1402,10 @@ msgstr "vastauksen kohdassa tekstin ”{passage}” jälkeen"
 #. js-lingui-explicit-id
 msgid "collection.askOn"
 msgstr "kohdasta ”{passage}”"
+
+#. js-lingui-explicit-id
+msgid "collection.askReplied"
+msgstr "vastattu vastauksessa"
 
 #. js-lingui-explicit-id
 msgid "collection.askTakenBack"
@@ -2045,6 +2054,32 @@ msgstr "{verb} ajetaan omalla rivillään, jotta sen Enter-rivi voi kertoa, kuka
 #. js-lingui-explicit-id
 msgid "enter.answererFailed"
 msgstr "Valintaa ei tallennettu. Yritä uudelleen"
+
+#. js-lingui-explicit-id
+msgid "enter.answersAlready"
+msgstr "{how, select, reply {Kehotteeseen {nums} vastataan jo vastauksessa} other {Kehotteeseen {nums} vastataan jo tekstissä}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersHow"
+msgstr "answers: ottaa kehotteen numeron ja sitten reply tai text: answers:242 reply"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.answersNotPrompt"
+msgstr "{num} ei ole kehote tekstissä. answers: kertoo, miten sellaiseen vastataan"
+
+#. js-lingui-explicit-id
+msgid "enter.answersReply"
+msgstr "Enter antaa kehotteisiin {nums} vastata itse vastauksessa, eikä tekstiin lisätä mitään"
+
+#. js-lingui-explicit-id
+msgid "enter.answersSent"
+msgstr "Kehote {num} on jo lähetetty mallille, joten sen vastaustapa pysyy"
+
+#. js-lingui-explicit-id
+msgid "enter.answersText"
+msgstr "Enter antaa kehotteisiin {nums} vastata tekstissä tekstikohdan jälkeen, hyväksyttäväksi tai hylättäväksi"
 
 #. js-lingui-explicit-id
 msgid "enter.apiAdd"
@@ -5654,6 +5689,10 @@ msgstr "{num} ei ole kehote tekstissä eikä ehdotus. accept: ja reject: ratkais
 msgid "enter.settleReject"
 msgstr "Enter kumoaa {count, plural, one {kehotteen {nums} vastauksen} other {kehotteiden {nums} vastaukset}}, ja alkuperäinen tekstikohta säilyy"
 
+#. js-lingui-explicit-id
+msgid "enter.settleReplied"
+msgstr "Kehotteeseen {num} vastattiin vastauksessa, joten tekstissä ei ole mitään hyväksyttävää tai hylättävää"
+
 #. state is accepted or rejected
 #. js-lingui-explicit-id
 msgid "enter.settleSugDone"
@@ -8828,6 +8867,10 @@ msgid "screensMap.window"
 msgstr "oma ikkuna"
 
 #. js-lingui-explicit-id
+msgid "sendList.asReply"
+msgstr "vastauksena"
+
+#. js-lingui-explicit-id
 msgid "sendList.edit"
 msgstr "muokkaus"
 
@@ -8847,6 +8890,10 @@ msgstr "{count, plural, one {# pidätetty} other {# pidätetty}}"
 #. js-lingui-explicit-id
 msgid "sendList.here"
 msgstr "näytöllä"
+
+#. js-lingui-explicit-id
+msgid "sendList.inText"
+msgstr "tekstissä"
 
 #. js-lingui-explicit-id
 msgid "sendList.nothing"
@@ -9823,6 +9870,10 @@ msgstr "Lisää kohteita kokoelmaan tai lohkoja huoneeseen"
 #. js-lingui-explicit-id
 msgid "verb.again"
 msgstr "Kysy uudelleen muokatulla kehotteella uutena haarana"
+
+#. js-lingui-explicit-id
+msgid "verb.answers"
+msgstr "Anna tekstissä olevaan kehotteeseen vastata itse vastauksessa tai tekstissä tekstikohdan jälkeen"
 
 #. js-lingui-explicit-id
 msgid "verb.api"

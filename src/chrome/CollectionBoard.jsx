@@ -153,7 +153,8 @@ function ChangeCard({ card, clean, fresh, picked = false, onPick = null, onFind,
         : c.held ? i18n._(C.changeHeld) : i18n._(C.changeWaits)
   } else {
     const st = c.state
-    state = st === 'answered' ? i18n._(c.answer?.inPlace ? C.askAnswered : C.askAnsweredHere)
+    state = st === 'replied' ? i18n._(C.askReplied)
+      : st === 'answered' ? i18n._(c.answer?.inPlace ? C.askAnswered : C.askAnsweredHere)
       : st === 'accepted' ? i18n._(C.askAccepted)
         : st === 'taken back' ? i18n._(C.askTakenBack)
           : c.sent ? i18n._(C.askAsked, { name: sentTo ?? '' })

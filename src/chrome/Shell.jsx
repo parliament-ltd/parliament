@@ -1231,6 +1231,9 @@ export default function Shell() {
     const spot = row.kind === 'note' ? `[data-comment-of="${num}"], .p-cm-msg[data-comment="${num}"]` : !mark ? null : row.kind === 'edit' ? `ins[data-edit="${mark}"], del[data-edit="${mark}"]`
       : row.kind === 'suggestion' ? `.pm-sug-marker[data-suggestion="${mark}"], del[data-suggestion="${mark}"]`
         : `.pm-ask-marker[data-ask="${mark}"], .pm-ask-point[data-ask="${mark}"]`
+    // A prompt answered in the reply: the reply (C301 (e)).
+    const inReply = row.kind === 'ask' && row.change?.state === 'replied' && /^[\w-]{1,128}$/.test(row.change.answer?.inReply ?? '') ? row.change.answer.inReply : null
+    if (inReply) { flashWhenDrawn([`[id="msg-${inReply}"]`]); return null }
     // A comment on words edited away stays on its message, and says so (C301 (c)).
     const gone = row.kind === 'note' && row.passage ? () => setBarSaid({ says: { message: 'findGone' } }) : null
     flashWhenDrawn([spot ?? `[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null], 60, gone)
@@ -1701,6 +1704,13 @@ export default function Shell() {
       // thinking:on / thinking:off (C165): a setting of the person's.
       await updateSettingNow.current('thinking', what.on)
       if (touched.current) touched.current.setting = { key: 'thinking', before: what.before }
+      remember(body)
+      return null
+    }
+    if (what.kind === 'answersAs') {
+      // answers: (C301 (e)): in the reply or in the text, a change undo: takes back.
+      const done = await changeRecords(db.current, what.asks.map((a) => ({ store: 'asks', id: a.id, num: a.num, set: { reply: what.reply } })))
+      if (touched.current) touched.current.records.push(...done)
       remember(body)
       return null
     }
@@ -4527,7 +4537,7 @@ export default function Shell() {
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
           languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`, { say: true })} onLanguagePickerClose={() => setLangPicking(false)}
           markupMenu={markupPicking ? { show: markupShow, mode: markupMode, waiting: markupWaiting, at: markupAt } : null} onMarkupRun={runClicked} onMarkupMenuClose={() => setMarkupPicking(false)}
-          sendList={listShown ? { rows: listRows, onBranch: toggleReplyTarget, onItem: (num, held) => runClicked(held ? `hold:off ${num}` : `hold:${num}`), onFold: () => { setListFoldedFor(listGroup); setListOpenFor(null) } } : null}
+          sendList={listShown ? { rows: listRows, onBranch: toggleReplyTarget, onItem: (num, held) => runClicked(held ? `hold:off ${num}` : `hold:${num}`), onAnswers: (num, reply) => runClicked(`answers:${num} ${reply ? 'reply' : 'text'}`), onFold: () => { setListFoldedFor(listGroup); setListOpenFor(null) } } : null}
           onSeeList={listAny && !listShown ? () => { setListOpenFor(listGroup); setListFoldedFor(null) } : null} />,
         barHost,
       )}
