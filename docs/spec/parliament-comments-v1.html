@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comments</title>
+<!--
+  C301 (c) (proposed 15 November): notes become comments, written on words
+  in the text with Ctrl+Alt+M, listed in the Collection's Comments tab, and
+  written on picked cards from the Collection's foot. Never sent. Values from
+  src/styles/tokens.css, src/editing/editing.css and src/chrome/chrome.css;
+  the comment in the text as parliament-markup-v1.html drew it.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5; --tray: #F6F5F1;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --divider: rgba(25, 25, 25, .08); --wash: rgba(25, 25, 25, .045);
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C;
+    --note: #5A4AB0; --note-tint: rgba(124, 108, 212, .16);
+    --high: #B63674; --high-tint: rgba(236, 72, 153, .16);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 720px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  .marg .on { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  code { font: 400 12px var(--mono); }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .num { font: 400 var(--t-id) var(--mono); color: var(--ink-3); }
+  .chead .right { margin-inline-start: auto; }
+
+  /* The room */
+  .reply { padding: 14px 22px 18px; font: 400 15.5px/1.7 var(--serif); }
+  .reply p { margin: 0 0 .8em; }
+  .reply .who { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); margin-bottom: 6px; }
+  .reply mark.hl { background: var(--high-tint); color: inherit; border-radius: 2px; padding: 0 1px; }
+  .cm-at { background: var(--note-tint); border-radius: 2px; padding: 0 1px; }
+  .cm { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--note); }
+  .cm .more { color: var(--note); text-decoration: underline dotted; text-underline-offset: 2px; }
+  .cm svg, .cl svg, .ico { width: 11px; height: 11px; vertical-align: -1px; margin-inline-end: 3px; }
+  .on-msg { margin: 2px 0 0; padding: 6px 10px; border-inline-start: 2px solid var(--note); background: rgba(124, 108, 212, .06); border-radius: 0 6px 6px 0; font: italic 400 12.5px/1.5 var(--serif); color: var(--note); }
+  .on-msg .marg { margin-inline-start: 6px; }
+
+  /* The bar */
+  .bar { margin-top: 16px; background: var(--surface); border: .5px solid var(--border); border-radius: 14px; }
+  .field { position: relative; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 14px; overflow: hidden; background: rgb(var(--navy)); color: #fff; }
+  .field .chip { padding: 2px 7px; border-radius: 9px; background: rgba(255,255,255,.14); font: 600 9px var(--sans); letter-spacing: .06em; }
+  .field .v { font: 400 13px var(--mono); }
+  .enter { margin: 7px 6px 0; }
+  .enter b { font-weight: 400; color: var(--ink); }
+
+  /* The box at the passage */
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 760px) { .two { grid-template-columns: 1fr 1fr; } }
+  .at-card { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 16px 18px 18px; font: 400 15.5px/1.7 var(--serif); }
+  .at-card .sel { background: rgba(43, 92, 184, .16); }
+  .wbox { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; background: var(--surface); border: 1px solid var(--note); border-radius: 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, .08); padding: 6px 9px; font: 400 13px var(--sans); }
+  .wbox .lab { font: 600 10.5px var(--sans); letter-spacing: .06em; color: var(--note); }
+  .wbox .v { flex: 1; }
+  .wbox .keys { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .at-card .said { margin-top: 8px; font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+
+  /* The Collection */
+  .inner { padding: 8px 16px 0; }
+  .col-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 4px 0 6px; }
+  .col-name { font: 600 var(--t-small) var(--sans); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 2px 14px; padding: 4px 0; border-bottom: .5px solid var(--border-2); font: 400 12px var(--sans); color: var(--ink-3); }
+  .tabs span.on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .tabs .n { margin-inline-start: 4px; font: 400 var(--t-id) var(--mono); opacity: .8; }
+  .tabs .was { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); margin-inline-start: 4px; }
+  .mk { display: flex; gap: 10px; padding: 10px 0 9px; border-bottom: .5px solid var(--border-2); }
+  .mk.sel { background: var(--subtle); box-shadow: -16px 0 0 var(--subtle), 16px 0 0 var(--subtle); }
+  .box { flex: none; width: 15px; height: 15px; margin-top: 3px; border: 1px solid var(--soft); border-radius: 3px; position: relative; }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+  .body { flex: 1; min-width: 0; }
+  .q { font: italic 400 var(--t-small)/1.5 var(--serif); border-inline-start: 2px solid var(--soft); padding-inline-start: 9px; color: var(--ink-2); }
+  .q.cm-q { border-inline-start-color: var(--note); background: rgba(124, 108, 212, .06); }
+  .q.high { border-inline-start-color: var(--high); }
+  .t { margin-top: 4px; font: 400 var(--t-small)/1.5 var(--sans); }
+  .t.cm-t::before { content: ""; }
+  .qs { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .qs > div { font: italic 400 12px/1.45 var(--serif); color: var(--ink-2); padding-inline-start: 8px; border-inline-start: 1.5px solid var(--soft); }
+  .qs .id { margin-inline-start: 6px; font: 400 var(--t-id) var(--mono); font-style: normal; }
+  .mk-marg { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 5px; }
+  .mk-marg .id { font: 400 var(--t-id) var(--mono); font-style: normal; text-decoration: underline dotted; text-underline-offset: 2px; }
+  .mk-marg a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+  .kindw { color: var(--note); font-style: normal; font: 600 10px var(--sans); letter-spacing: .05em; text-transform: uppercase; }
+  .acts-foot { border-top: 1px solid var(--divider); padding: 8px 16px 12px; margin-top: 4px; }
+  .scope { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+  .scope b { font: 600 12px var(--sans); color: var(--ink); font-style: normal; }
+  .pick { font: 400 var(--t-id) var(--mono); font-style: normal; color: var(--you); }
+  .actrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .act { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border: .5px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--ink); font: 500 12px var(--sans); }
+  .act small { color: var(--ink-3); font: 400 10.5px var(--sans); }
+  .act.new { border-color: var(--note); }
+
+  /* Words and data */
+  table.t2 { width: 100%; border-collapse: collapse; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; overflow: hidden; font: 400 13px var(--sans); }
+  .t2 th, .t2 td { padding: 7px 12px; text-align: start; border-bottom: .5px solid var(--border-2); vertical-align: top; }
+  .t2 th { font: 600 11px var(--sans); color: var(--ink-3); background: var(--subtle); }
+  .t2 td.k { color: var(--ink-2); white-space: nowrap; }
+  .t2 td .old { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-2); }
+  pre { margin: 0; padding: 12px 14px; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; font: 400 12px/1.6 var(--mono); color: var(--ink-2); overflow-x: auto; }
+  pre .add { color: var(--you); }
+  pre .c { color: var(--ink-3); }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 760px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair h3 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 4px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="bubble" viewBox="0 0 12 12"><path d="M2 2.5h8a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H6l-2.5 2v-2H2a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+<div class="page">
+  <div class="intro">
+    <h1>Comments</h1>
+    <p>C301 (c), proposed. Notes become comments: written on words in the text, on a whole message, or on cards picked in the Collection, and never sent to a model. The comment in the text is as the markup mockup drew it. One change to what is stored is shown in section 5, before anything is built.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · In the text</h2>
+    <p class="lede">A comment on words: a purple tint over them, then a bubble and its words, small, after the passage. A long one shows its first line and "more". A comment on the whole message, as note:reply writes now, sits under it. Show · Comments in the markup menu hides them all, and its row is no longer faint.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Committee notes</h2><span class="num">201</span><span class="marg right">branch <span class="on">201a</span> · 201b</span></div>
+      <div class="reply">
+        <div class="who">Sonnet 5.5 answered, 10:42</div>
+        <p>First, the budget, which <mark class="hl">nineteen members asked to see before any vote</mark>. Second, <span class="cm-at">the hiring plan</span><span class="cm"><svg><use href="#bubble"/></svg>Anna wanted five, ask her</span>, with a freeze until March. Third, <span class="cm-at">the move to the new building</span><span class="cm"><svg><use href="#bubble"/></svg>I think this belongs first, the lease runs out in… <span class="more">more</span></span></p>
+        <p>The move should take eighteen months.</p>
+        <div class="on-msg"><svg class="ico" style="color:var(--note)"><use href="#bubble"/></svg>Check the figures against the minutes before sending this on.<span class="marg">comment 233, on this reply</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · Writing one</h2>
+    <p class="lede">Select words, then Ctrl+Alt+M: a box opens at the passage. Or from the bar: comment:reply "…" on the message last in focus, comment:"…" on its own. note: stays, as an older name.</p>
+    <div class="two">
+      <div class="at-card">
+        <span>Second, </span><span class="sel">the hiring plan</span><span>, with a freeze</span>
+        <div class="wbox"><span class="lab">COMMENT</span><span class="v">Anna wanted five, ask her</span><span class="keys">Ctrl+Alt+M</span></div>
+        <div class="said">For you and anyone you share it with. Never sent to a model.</div>
+      </div>
+      <div>
+        <div class="bar"><div class="field"><span class="chip">COMMAND</span><span class="v">&gt;comment:reply "Check the figures against the minutes"</span></div></div>
+        <div class="enter marg"><b>Enter writes a comment on the reply in 201a. It is never sent</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · In the Collection</h2>
+    <p class="lede">The Notes tab becomes Comments. A comment on words shows them above its own, in its purple; one on picked cards quotes them beneath it, as a note does now. Picked cards are commented on together from the foot, where Note becomes Comment.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Collection</h2><span class="marg right">by yours · source · date</span></div>
+      <div class="inner">
+        <div class="col-head"><span class="col-name">Committee review</span><span class="marg">201, 214</span></div>
+        <div class="tabs"><span>All</span><span>Edits</span><span>Asks</span><span>Highlights<span class="n">2</span></span><span class="on">Comments<span class="n">3</span></span><span>Messages</span></div>
+
+        <div class="mk">
+          <span class="box"></span>
+          <div class="body">
+            <div class="q cm-q">the hiring plan</div>
+            <div class="t">Anna wanted five, ask her</div>
+            <div class="mk-marg marg"><span class="kindw">comment</span><span class="id">231</span><span>on 201a</span><a>find it</a><span>never sent</span></div>
+          </div>
+        </div>
+        <div class="mk sel">
+          <span class="box on"></span>
+          <div class="body">
+            <div class="q cm-q">the move to the new building</div>
+            <div class="t">I think this belongs first, the lease runs out in June and the landlord will not extend.</div>
+            <div class="mk-marg marg"><span class="kindw">comment</span><span class="id">232</span><span>on 201a</span><a>find it</a><span>never sent</span></div>
+          </div>
+        </div>
+        <div class="mk sel">
+          <span class="box on"></span>
+          <div class="body">
+            <div class="q high">nineteen members asked to see before any vote</div>
+            <div class="mk-marg marg"><span>highlight</span><span class="id">229</span><span>on 201a</span><a>find it</a></div>
+          </div>
+        </div>
+        <div class="mk">
+          <span class="box"></span>
+          <div class="body">
+            <div class="t">Thread for the board paper: the move first, then the hiring plan.</div>
+            <div class="qs"><div>the move to the new building<span class="id">232</span></div><div>nineteen members asked to see before any vote<span class="id">229</span></div></div>
+            <div class="mk-marg marg"><span class="kindw">comment</span><span class="id">234</span><span>on 232, 229</span><span>never sent</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="acts-foot">
+        <div class="scope marg"><b>2 selected</b><span class="pick">232</span><span class="pick">229</span></div>
+        <div class="actrow">
+          <span class="act new">Comment <small>quoting 2</small></span>
+          <span class="act">Tag</span>
+          <span class="act">Summarize <small>1 call</small></span>
+          <span class="act">Prompt <small>new chat</small></span>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>Comment writes comment:232, 229 "…" in the bar, as Note writes note:… now. Tag, Summarize and Prompt stay as they are.</li>
+      <li>Find it opens the room at the passage, as a highlight's does.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · Words that change</h2>
+    <p class="lede">Note becomes comment wherever it is said. What is stored keeps its kind, note, so every backup reads as before.</p>
+    <table class="t2">
+      <thead><tr><th>Where</th><th>Now</th><th>Becomes</th></tr></thead>
+      <tbody>
+        <tr><td class="k">The command</td><td><code>note:</code></td><td><code>comment:</code>, with <code>note:</code> still read</td></tr>
+        <tr><td class="k">The Collection's tab</td><td>Notes</td><td>Comments</td></tr>
+        <tr><td class="k">The Collection's foot</td><td>Note</td><td>Comment</td></tr>
+        <tr><td class="k">A card's kind, Records' Kind column</td><td>note 233</td><td>comment 233</td></tr>
+        <tr><td class="k">Filters</td><td><code>type:note</code></td><td><code>type:comment</code>, with <code>type:note</code> still read</td></tr>
+        <tr><td class="k">The markup menu</td><td>Comments, faint: next</td><td>Comments, shown or hidden in the text</td></tr>
+        <tr><td class="k">The Enter line</td><td>"A note is never sent"</td><td>"A comment is never sent"</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · What is stored: two fields on a note, shown before building</h2>
+    <p class="lede">A comment on words needs to know which words. A note gains two fields, both optional, keeping what a highlight keeps: <code>passage</code>, the words it is on (a highlight keeps them as its <code>text</code>, which in a note is the comment itself), and <code>nth</code>, which time those words come in the message (C285). Nothing else changes.</p>
+    <div class="pair">
+      <div>
+        <h3>A note on a reply, now</h3>
+<pre>{
+  id: "n-7f3a…",
+  num: 233,
+  conversationId: "c-201a",
+  messageId: "m-91c2…",
+  text: "Check the figures against the minutes",
+  createdAt: "2026-11-15T16:02:11Z"
+}</pre>
+      </div>
+      <div>
+        <h3>A comment on words</h3>
+<pre>{
+  id: "n-c41e…",
+  num: 231,
+  conversationId: "c-201a",
+  messageId: "m-91c2…",
+  text: "Anna wanted five, ask her",
+<span class="add">  passage: "the hiring plan",</span>
+<span class="add">  nth: 0,</span>
+  createdAt: "2026-11-15T16:04:40Z"
+}</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>No migration: no note is rewritten, and no store, index or database version changes. A note without the two fields is a comment on its message, or on its own, as now.</li>
+      <li>Backups carry the two fields from this version on. A backup made before reads exactly as now.</li>
+      <li>An older Parliament restoring a newer backup keeps only the fields it knows, so a comment on words comes back as a comment on its message, its words intact. Nothing is lost but where in the message it was.</li>
+      <li>If the words are later edited away, the comment stays on its message, and find it says its words are no longer in the chat, as a highlight's does.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>The stored change:</b> passage and nth on a note, as section 5 shows.</li>
+        <li><b>In the text:</b> the words after the passage, their first line only when long, as section 1 draws.</li>
+        <li><b>The renaming:</b> everywhere section 4 lists, with note: and type:note still read.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
