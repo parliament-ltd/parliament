@@ -3,6 +3,15 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.19.0, 16 November 2026
+
+- Tasks: the Tasks board lists every task, each with a box to tick. Add one with the plus, or new:task "…" in the bar. A task has a name, a description if you like, a kind (yours, a prompt, a search or a command), a model, rooms and a flow: one by one, or all at once.
+- A task's sub-tasks run with run: and the task's number. A to-do of yours holds the ones after it until you tick it, and a command waits in the bar for your Enter. Each sub-task can go into its task's room, a room of its own, or a branch of the task.
+- What were lists are tasks now, and their tasks are sub-tasks: new:subtask 207 "…", tick:207 and tick:207 2. The older words still work.
+- Write in an empty room to start one. Your text stays a draft, changed without marks, until a model reads it; with Suggesting on, your changes to a draft are marked. Each branch keeps its own copy.
+- The strip writes Import: and Tour: as it writes the boards, the birds fold the boards away and back, and Focus works on an empty room.
+- Boards fill the page down and across before they get narrower.
+
 ## 0.18.0, 16 November 2026
 
 - Parliament opens on an empty room, with the bar at its foot. Closing the welcome page and reset: leave an empty room too, and tour: brings the welcome steps back.
