@@ -1,0 +1,1 @@
+{"xor circuit":{"m":[["n","gate for exclusive OR; a circuit in a computer that fires only if only one of its inputs fire"]],"s":["X-OR circuit","XOR gate"],"w":"XOR circuit"},"xor gate":{"m":[["n","gate for exclusive OR; a circuit in a computer that fires only if only one of its inputs fire"]],"s":["X-OR circuit","XOR circuit"],"w":"XOR gate"}}
