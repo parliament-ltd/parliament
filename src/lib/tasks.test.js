@@ -79,8 +79,12 @@ describe('ticking, in the database', () => {
     // A ticked to-do can still be deleted: it was never sent.
     await R.tickTodo(db, { docketId, letter: 'a', stepId: step.id, done: true, now: at() })
     await R.removeStep(db, { docketId, letter: 'a', stepId: step.id, now: at() })
-    // A prompt cannot be ticked.
+    // A prompt not yet sent is ticked done without sending it, and made
+    // ready again (v4); one that has started is refused.
     const p = await R.planStep(db, { docketId, letter: 'a', prompt: 'Tighten it', newId, now: at() })
+    expect((await R.tickTodo(db, { docketId, letter: 'a', stepId: p.step.id, done: true, now: at() })).step).toMatchObject({ status: STATUS.DONE, prompt: 'Tighten it' })
+    expect((await R.tickTodo(db, { docketId, letter: 'a', stepId: p.step.id, done: false, now: at() })).step).toMatchObject({ status: STATUS.READY })
+    await R.markStep(db, { docketId, n: 1, letter: 'a', stepId: p.step.id, status: STATUS.RUNNING, now: at() })
     await expect(R.tickTodo(db, { docketId, letter: 'a', stepId: p.step.id, done: true, now: at() })).rejects.toMatchObject({ code: 'notTodo' })
   })
 })

@@ -62,7 +62,7 @@ export const FIELDS = Object.freeze({
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],
   // Version 6.
   // ripple: Ripple on for the plan's branches (stage 12; C229 (f)).
-  dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine', 'ripple'],
+  dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine', 'ripple', 'description', 'model', 'rooms', 'flow', 'doneAt'],
   runs: ['id', 'docketId', 'n', 'createdAt', 'cost', 'branches'],
   // order: the cards and headings in the person's own order (C144 (j)).
   // pinned: written false from the start; true once pin:"…" pins it (C287).
@@ -86,7 +86,7 @@ export function rebuildRecord(store, record) {
 const RUN_BRANCH_FIELDS = ['status', 'room', 'chatId', 'steps']
 // todo: a to-do of yours, its words and when it was ticked (C301 (g)); a
 // backup without it reads as before.
-const STEP_FIELDS = ['id', 'status', 'model', 'room', 'messageId', 'prompt', 'condition', 'addedAt', 'ended', 'tokens', 'cost', 'group', 'todo']
+const STEP_FIELDS = ['id', 'status', 'model', 'room', 'messageId', 'prompt', 'condition', 'addedAt', 'ended', 'tokens', 'cost', 'group', 'todo', 'title', 'command']
 function pick(record, fields) {
   const out = {}
   for (const f of fields) if (record?.[f] !== undefined) out[f] = record[f]

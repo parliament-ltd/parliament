@@ -44,10 +44,19 @@ export const ENDED = Object.freeze(['stopped', 'failed', 'stalled', 'left', 'unm
 // What may hold a later step back (A15; C196 (e)); null: none.
 export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothing'])
 
-/** A step written ahead of any run, ready unless held. todo: a to-do's words (C301 (g)). */
-export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, todo = null, now }) {
+/**
+ * A step written ahead of any run, ready unless held. todo: a to-do's words
+ * (C301 (g)); title: a sub-task's name; command: a command line of yours,
+ * put in the bar when a run reaches it (v4).
+ */
+export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, todo = null, title = '', command = null, now }) {
+  const cmd = todo == null && command != null && String(command).trim() ? String(command).trim().slice(0, COMMAND_MOST) : null
+  const name = String(title ?? '').replace(/s+/g, ' ').trim().slice(0, TITLE_MOST)
   return {
-    id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: todo != null ? '' : String(prompt ?? ''), model: todo != null ? null : model,
+    id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: todo != null || cmd ? '' : String(prompt ?? ''), model: todo != null || cmd ? null : model,
+    ...(name ? { title: name } : {}),
+    // Its prompt stays empty, so an older Parliament sees an empty step and runs nothing.
+    ...(cmd ? { command: cmd } : {}),
     ...(room ? { room } : {}), condition, addedAt: now,
     // The prompt to several, one after another, this step is one of (C202).
     ...(group ? { group } : {}),
@@ -60,6 +69,9 @@ export function plannedStep({ id, prompt, model = null, room = null, condition =
 
 /** The most words a to-do holds (C301 (g)). */
 export const TODO_MOST = 2000
+/** The longest a sub-task's title, and a command line, can be (v4). */
+export const TITLE_MOST = 200
+export const COMMAND_MOST = 2000
 
 /** Whether a step is a to-do of yours, ticked or not (C301 (g)). */
 export const isTodo = (step) => Boolean(step?.todo && typeof step.todo === 'object')

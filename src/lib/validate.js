@@ -341,6 +341,12 @@ function validateDocket(item) {
   if (item.num !== undefined && !isNumber(item.num)) return 'docket.num must be a number'
   if (!Array.isArray(item.branches))        return 'docket.branches must be an array'
   if (!Array.isArray(item.order))           return 'docket.order must be an array'
+  // A task's own fields (C301 (g), ruled 16 November, v4), each as written.
+  if (item.description !== undefined && !isString(item.description, 4000)) return 'docket.description invalid'
+  if (item.model != null && !isString(item.model, 200)) return 'docket.model invalid'
+  if (item.rooms !== undefined && !(Array.isArray(item.rooms) && item.rooms.length <= 20 && item.rooms.every(isId))) return 'docket.rooms invalid'
+  if (item.flow !== undefined && item.flow !== 'oneByOne' && item.flow !== 'together') return 'docket.flow invalid'
+  if (item.doneAt != null && !isISODate(item.doneAt)) return 'docket.doneAt invalid'
   return rowFields(item, 'docket')
 }
 
@@ -371,6 +377,9 @@ function validateRun(item) {
       if (s.condition != null && !STEP_CONDITIONS.has(s.condition)) return 'run.step.condition invalid'
       // A to-do of yours (C301 (g)): its words, and when it was ticked or null.
       if (s.todo !== undefined && !isTodoNote(s.todo)) return 'run.step.todo invalid'
+      // A sub-task's title, and a command of yours, kept as written, its prompt empty (v4).
+      if (s.title !== undefined && !isString(s.title, 200)) return 'run.step.title invalid'
+      if (s.command !== undefined && !isString(s.command, 2000)) return 'run.step.command invalid'
     }
   }
   return null

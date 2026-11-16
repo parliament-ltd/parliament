@@ -126,7 +126,11 @@ export function withSteps(runBranch, fresh) {
   // keeps its place after the step before it (C201). So does a to-do of
   // yours, which is never sent, ticked or not (C301 (g)). The others planned
   // ahead follow every step that started, in their own order.
+  // A command of yours, and a sub-task sent into another chat (a room's, or
+  // a chat of its own), keep theirs too (v4).
   const settled = (s) => (s.status === STATUS.WAITING && s.ended === 'unmet') || isTodo(s)
+    || (typeof s.command === 'string' && s.command !== '')
+    || s.status === STATUS.DONE || s.status === STATUS.PAUSED || s.status === STATUS.RUNNING
   const steps = [...ran]
   for (const u of rest) {
     if (!settled(u)) { steps.push(u); continue }
@@ -150,12 +154,14 @@ export const startedCount = (steps) => steps.filter((s) => s.messageId).length
  * models, rooms and conditions; no chat until the branch runs. promptOf:
  * messageId -> the text that was sent.
  */
-export function runFromRun(prev, { id, n, now, newId, promptOf, order }) {
+export function runFromRun(prev, { id, n, now, newId, promptOf, order, keep = null }) {
   const branches = {}
   for (const letter of order ?? Object.keys(prev.branches)) {
     const b = prev.branches[letter]
     if (!b) continue
-    const steps = (b.steps || []).map((s) => ({
+    // A task's sub-tasks are its branch a; a branch a run made for one of
+    // them, all at once, starts the next run empty (v4).
+    const steps = (keep && !keep.includes(letter) ? [] : (b.steps || [])).map((s) => ({
       id: newId(),
       status: s.status === STATUS.WAITING ? STATUS.WAITING : STATUS.READY,
       prompt: s.messageId ? String(promptOf(s.messageId) ?? s.prompt ?? '') : String(s.prompt ?? ''),
@@ -165,21 +171,44 @@ export function runFromRun(prev, { id, n, now, newId, promptOf, order }) {
       addedAt: now,
       // A to-do comes forward unticked, never a prompt (C301 (g)).
       ...(isTodo(s) ? { prompt: '', model: null, todo: { text: String(s.todo.text ?? ''), doneAt: null } } : {}),
+      // A sub-task's title and a command of yours come forward as written (v4).
+      ...(typeof s.title === 'string' && s.title ? { title: s.title } : {}),
+      ...(typeof s.command === 'string' && s.command ? { prompt: '', model: null, command: s.command } : {}),
     }))
     branches[letter] = { status: branchStatus(steps), room: b.room ?? null, chatId: null, steps }
   }
   return { id, docketId: prev.docketId, n, createdAt: now, cost: null, branches }
 }
 
-/** A plan with no chat yet: branch a, named for the plan, in run 1 (`new:plan`). */
-export function emptyPlan({ id, runId, num, title = '', now }) {
+/**
+ * A plan with no chat yet: branch a, named for the plan, in run 1
+ * (`new:plan`). task: a task's own fields (v4: description, model, rooms,
+ * flow), which make it a task.
+ */
+export function emptyPlan({ id, runId, num, title = '', now, task = null }) {
   return {
     docket: {
       id, num, title, createdAt: now, updatedAt: now, pinned: false, tags: [], archived: false,
       branches: [{ letter: 'a', name: title, createdAt: now }], order: ['a'], nextLetter: 1,
+      ...(task ? taskFields(task) : {}),
     },
     run: { id: runId, docketId: id, n: 1, createdAt: now, cost: null, branches: { a: { status: STATUS.READY, room: null, chatId: null, steps: [] } } },
   }
+}
+
+/**
+ * A task's own fields as stored (v4), from what was asked: a description,
+ * the model its sub-tasks take (null: they are yours), the rooms they go
+ * into (chat ids), a flow, and when it was ticked done.
+ */
+export function taskFields({ description, model, rooms, flow, doneAt } = {}) {
+  const out = {}
+  if (description !== undefined) out.description = String(description ?? '').trim().slice(0, 4000)
+  if (model !== undefined) out.model = typeof model === 'string' && model ? model.slice(0, 200) : null
+  if (rooms !== undefined) out.rooms = [...new Set((Array.isArray(rooms) ? rooms : []).filter((r) => typeof r === 'string' && r && r.length <= 128))].slice(0, 20)
+  if (flow !== undefined) out.flow = flow === 'together' ? 'together' : 'oneByOne'
+  if (doneAt !== undefined) out.doneAt = typeof doneAt === 'string' && doneAt ? doneAt : null
+  return out
 }
 
 /** A branch with no chat yet, added to a plan and to one of its runs. */

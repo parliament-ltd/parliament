@@ -14,8 +14,9 @@
 import { FIRST_NUM } from './addresses'
 import { tabBus } from './bus'
 import { stepsFromTurns, storedSteps, forkStep, collabsFromPersonas } from './migrations/v6Plan'
-import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch } from './recordsModel'
-import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED, isTodo, TODO_MOST } from './docketModel'
+import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch, taskFields } from './recordsModel'
+import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED, isTodo, TODO_MOST, TITLE_MOST, COMMAND_MOST } from './docketModel'
+import { FLOWS, isCommand, modelOf } from './taskModel'
 import { placeAnswer } from '../editing/answers'
 import { withoutSuggestions } from '../editing/blocks'
 import { readIt } from './writing'
@@ -1326,14 +1327,14 @@ export async function putPlanBack(db, back) {
  * A step planned ahead in one branch of a run (new:step), after the first
  * `after` steps or at the end; never before a step that has started.
  */
-export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, todo = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
+export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, todo = null, title = '', command = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
   return write(db, ['dockets', 'runs'], async (tx) => {
     const { docket, run } = await planAt(tx, docketId, n)
     const branch = run.branches[letter]
     if (!branch) throw new PlanError('noBranch')
     const steps = [...branch.steps]
     const at = Math.max(startedCount(steps), Math.min(after ?? steps.length, steps.length))
-    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, todo, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
+    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, todo, title, command, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
     steps.splice(at, 0, step)
     const changes = []
     const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
@@ -1352,8 +1353,17 @@ export async function changeStep(db, { docketId, n = null, letter, stepId, set, 
     if (isFixed(branch.steps[i].status) || branch.steps[i].messageId) throw new PlanError('fixed')
     const next = { ...branch.steps[i] }
     // A to-do's words are its own, never a prompt (C301 (g)).
+    if (set.title !== undefined) {
+      const name = String(set.title ?? '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
+      if (name) next.title = name
+      else delete next.title
+    }
     if (isTodo(next)) {
       if (set.prompt !== undefined || set.text !== undefined) next.todo = { ...next.todo, text: String(set.text ?? set.prompt).slice(0, TODO_MOST) }
+    } else if (isCommand(next)) {
+      // A command of yours stays one: its line, as you wrote it (v4).
+      const line = set.command ?? set.text
+      if (line !== undefined && String(line).trim()) next.command = String(line).trim().slice(0, COMMAND_MOST)
     } else {
       if (set.prompt !== undefined) next.prompt = String(set.prompt)
       if (set.model !== undefined) next.model = set.model
@@ -1369,8 +1379,10 @@ export async function changeStep(db, { docketId, n = null, letter, stepId, set, 
 
 /**
  * tick: and tick:off (C301 (g), ruled 16 November): a to-do of yours ticked
- * done, or open again, in one run. Refused on a prompt, which is done when
- * its answer comes. Returns the step as it is now.
+ * done, or open again, in one run. A command, or a prompt not yet sent, is
+ * marked done without running it, or made ready again (v4); one that has
+ * been sent is done when its answer comes, and is refused. Returns the step
+ * as it is now.
  */
 export async function tickTodo(db, { docketId, n = null, letter, stepId, done, now = new Date().toISOString() }) {
   return write(db, ['dockets', 'runs'], async (tx) => {
@@ -1380,7 +1392,16 @@ export async function tickTodo(db, { docketId, n = null, letter, stepId, done, n
     const i = branch.steps.findIndex((s) => s.id === stepId)
     if (i < 0) throw new PlanError('noStep')
     const was = branch.steps[i]
-    if (!isTodo(was)) throw new PlanError('notTodo')
+    if (!isTodo(was)) {
+      if (was.messageId || was.status === STATUS.RUNNING) throw new PlanError('notTodo')
+      if ((was.status === STATUS.DONE) === Boolean(done)) return { result: { step: was, back: null }, changes: [] }
+      const next = { ...was, status: done ? STATUS.DONE : STATUS.READY }
+      delete next.ended
+      const steps = branch.steps.map((x, k) => (k === i ? next : x))
+      const changes = []
+      const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+      return { result: { step: next, back }, changes }
+    }
     if (Boolean(was.todo.doneAt) === Boolean(done)) return { result: { step: was, back: null }, changes: [] }
     const next = done
       ? { ...was, status: STATUS.DONE, todo: { ...was.todo, doneAt: now } }
@@ -1421,7 +1442,7 @@ export async function newRun(db, { docketId, newId = () => crypto.randomUUID(), 
     for (const b of Object.values(prev.branches)) {
       for (const s of b.steps || []) if (s.messageId) texts.set(s.messageId, (await tx.objectStore('messages').get(s.messageId))?.content ?? s.prompt ?? '')
     }
-    const run = runFromRun(prev, { id: newId(), n: prev.n + 1, now, newId, promptOf: (id) => texts.get(id), order: docket.order })
+    const run = runFromRun(prev, { id: newId(), n: prev.n + 1, now, newId, promptOf: (id) => texts.get(id), order: docket.order, keep: FLOWS.includes(docket.flow) ? ['a'] : null })
     const nextDocket = { ...docket, updatedAt: now }
     await tx.objectStore('runs').put(run)
     await tx.objectStore('dockets').put(nextDocket)
@@ -1431,16 +1452,75 @@ export async function newRun(db, { docketId, newId = () => crypto.randomUUID(), 
 }
 
 /** new:plan: a plan with nothing in it yet, numbered (docket spec §7). */
-export async function newPlan(db, { title = '', newId = () => crypto.randomUUID(), now = new Date().toISOString() } = {}) {
+export async function newPlan(db, { title = '', task = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() } = {}) {
   return write(db, ['dockets', 'runs', 'counters'], async (tx) => {
     const num = await takeNum(tx)
-    const { docket, run } = emptyPlan({ id: newId(), runId: newId(), num, title, now })
+    const { docket, run } = emptyPlan({ id: newId(), runId: newId(), num, title, now, task })
     await tx.objectStore('dockets').put(docket)
     await tx.objectStore('runs').put(run)
     const back = backOf({ dockets: [[null, docket]], runs: [[null, run]] })
     return { result: { docket, run, back }, changes: [{ kind: 'docket', op: 'created', id: docket.id, num }] }
   })
 }
+
+/**
+ * A task's own fields changed (v4): its name (its branch a follows, if it
+ * was named for it), description, model, rooms and flow. The flow is
+ * refused once the task has run.
+ */
+export async function changeTask(db, { docketId, set, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, runs } = await planAt(tx, docketId, null)
+    const next = { ...docket, ...taskFields(set), updatedAt: now }
+    if (set.flow !== undefined && (docket.flow ?? 'oneByOne') !== next.flow && ranTask(runs)) throw new PlanError('ran')
+    if (set.title !== undefined) {
+      const title = String(set.title ?? '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
+      next.title = title
+      next.branches = docket.branches.map((b) => (b.letter === 'a' && (b.name ?? '') === (docket.title ?? '') ? { ...b, name: title } : b))
+    }
+    // A plan is made a task when it is first given a task's field.
+    if (!FLOWS.includes(next.flow)) next.flow = 'oneByOne'
+    await tx.objectStore('dockets').put(next)
+    const back = backOf({ dockets: [[docket, next]] })
+    return { result: { docket: next, back }, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
+  })
+}
+
+/**
+ * tick:207 (v4): a whole task ticked done, and those of its sub-tasks still
+ * open that are yours with it; or open again (its sub-tasks as they are).
+ */
+export async function tickTask(db, { docketId, done, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, null)
+    if (Boolean(docket.doneAt) === Boolean(done)) return { result: { docket, back: null }, changes: [] }
+    const next = { ...docket, doneAt: done ? now : null, updatedAt: now }
+    if (!FLOWS.includes(next.flow)) next.flow = 'oneByOne'
+    const lane = run.branches.a
+    let nextRun = run
+    if (done && lane) {
+      const steps = (lane.steps ?? []).map((st) => {
+        if (st.messageId || st.status === STATUS.RUNNING || st.status === STATUS.DONE) return st
+        if (isTodo(st)) return { ...st, status: STATUS.DONE, todo: { ...st.todo, doneAt: now } }
+        if (!isCommand(st) && !modelOf(st, docket)) return { ...st, status: STATUS.DONE }
+        return st
+      })
+      if (steps.some((st, k) => st !== lane.steps[k])) nextRun = { ...run, branches: { ...run.branches, a: { ...lane, steps, status: branchStatus(steps) } } }
+    }
+    await tx.objectStore('dockets').put(next)
+    const changes = [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }]
+    if (nextRun !== run) {
+      await tx.objectStore('runs').put(nextRun)
+      changes.push({ kind: 'run', op: 'updated', id: run.id })
+    }
+    const back = backOf({ dockets: [[docket, next]], runs: nextRun !== run ? [[run, nextRun]] : [] })
+    return { result: { docket: next, back }, changes }
+  })
+}
+
+// Whether a task has run: a chat made, a step sent, or one running or paused.
+const ranTask = (runs) => runs.length > 1 || hasRun(runs)
+  || runs.some((r) => Object.values(r.branches ?? {}).some((b) => (b?.steps ?? []).some((st) => st.status === STATUS.RUNNING || st.status === STATUS.PAUSED)))
 
 /** A branch with no chat yet, added to a plan in one run (new:branch on the plan board). */
 export async function newPlanBranch(db, { docketId, n = null, name = '', room = null, now = new Date().toISOString() }) {
