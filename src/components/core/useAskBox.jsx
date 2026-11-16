@@ -115,6 +115,7 @@ export function useAskBox(viewRef, onKept, words, canAsk) {
         }}
         onBlur={(e) => { if (!e.currentTarget.value.trim()) setBox(null) }}
       />
+      {words.keys && <span className="p-cm-keys">{words.keys}</span>}
     </div>
   )
   const options = useMemo(() => ({ onAsk: (view) => open(view) }), [open])

@@ -21,6 +21,7 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - marking (notes, keywords, quotes, favourites together) → merkintä (merkinnät).
 - note → muistiinpano.
 - comment → kommentti (C301 (c), 15 November: notes became comments, and every line that said muistiinpano of one now says kommentti; the type: word is comment). Markup menu's Kommentit already had it.
+- prompt in the text → kehote tekstissä (C301 (d), 15 November: asks became prompts in the text; every line that said kysymys of one now says kehote; its box is kehoteruutu; an answered one reads "{name} ehdottaa", with hyväksy and hylkää).
 - keyword (kind.term) → avainsana.
 - quote → lainaus; the Quote button → Lainaa.
 - highlight → korostus. "Lit" for keywords is rendered as "erottuvat omalla värillään" so it does not overlap.

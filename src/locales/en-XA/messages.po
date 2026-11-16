@@ -979,20 +979,30 @@ msgstr ""
 msgid "chat.askedAs"
 msgstr ""
 
-#. The label of the box an ask is written in
+#. The label of the box a prompt in the text is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr ""
-
-#. Before an ask number in the text: ask 241
-#. js-lingui-explicit-id
-msgid "chat.askMarker"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
 msgstr ""
 
+#. Who suggests, when the model is not known
+#. js-lingui-explicit-id
+msgid "chat.askSomeone"
+msgstr ""
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "chat.askSuggests"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.askTitle"
+msgstr ""
+
+#. Takes back the answer to a prompt in the text
 #. js-lingui-explicit-id
 msgid "chat.askUndo"
 msgstr ""
@@ -9746,6 +9756,7 @@ msgstr ""
 msgid "verb.arrange"
 msgstr ""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.ask"
 msgstr ""
@@ -9967,6 +9978,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.prompt"
 msgstr ""
 
 #. js-lingui-explicit-id

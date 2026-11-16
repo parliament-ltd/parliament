@@ -83,30 +83,60 @@ export function dropAsk(state, id) {
   return tr
 }
 
+const WORDS = { accept: 'accept', undo: 'reject', suggests: (name) => `${name} suggests`, someone: 'The model', title: (num) => String(num) }
+
 /**
- * The markers after each ask: "ask 241" while it waits, "ask 241: accept ·
- * undo" once answered. Given anew with tr.setMeta(asksKey, info), info a Map
- * of ask id to { num, state }; onSettle(id, 'accept'|'undo') when clicked.
- * @param {{ onSettle?: (id: string, how: 'accept'|'undo') => void, words?: { ask: string, accept: string, undo: string } }} opts
+ * What the marker after a prompt in the text says (C301 (d), (e);
+ * parliament-markup-v1.html): while it waits, p> and its words, as the bar
+ * writes a prompt; once answered, who suggests the answer, to accept or
+ * reject. Words are the person's own and the model's name: set as text.
+ * @returns {{ lead: string|null, said: string, settle: boolean }}
  */
-export function asksPlugin({ onSettle, words = { ask: 'ask', accept: 'accept', undo: 'undo' } } = {}) {
+export function markerOf(info, answered, words = WORDS) {
+  if (answered) return { lead: null, said: words.suggests(info?.by || words.someone), settle: true }
+  return { lead: 'p>', said: String(info?.question ?? ''), settle: false }
+}
+
+/**
+ * The marks around each prompt in the text (an ask by its old name, C218):
+ * corner brackets at its passage's ends while it waits, and the marker
+ * after it. Given anew with tr.setMeta(asksKey, info), info a Map of ask id
+ * to { num, state, question, by }; onSettle(id, 'accept'|'undo') when clicked.
+ * @param {{ onSettle?: (id: string, how: 'accept'|'undo') => void, words?: { accept: string, undo: string, suggests: (name: string) => string, someone: string, title: (num: number) => string } }} opts
+ */
+export function asksPlugin({ onSettle, words: given } = {}) {
+  const words = { ...WORDS, ...(given ?? {}) }
+  const bracket = (side) => () => {
+    const b = document.createElement('span')
+    b.className = `pm-ask-bracket ${side}`
+    b.setAttribute('aria-hidden', 'true')
+    return b
+  }
   const marker = (id, info, answered) => () => {
     const box = document.createElement('span')
     box.className = `pm-ask-marker${answered ? ' answered' : ''}`
     box.contentEditable = 'false'
     box.setAttribute('data-ask', id)
+    box.setAttribute('dir', 'auto')
     // Its number, for calm's numbered dot (C255 (a)).
     if (info?.num) box.setAttribute('data-num', String(info.num))
-    // "ask 241" finds its card on the Collection (C220 (f)).
+    const { lead, said } = markerOf(info, answered, words)
+    // A click finds its card on the Collection (C220 (f)).
+    const find = document.createElement(info?.num ? 'button' : 'span')
+    find.className = 'pm-ask-find'
+    if (lead) {
+      const b = document.createElement('b')
+      b.textContent = lead
+      find.append(b)
+    }
+    find.append(document.createTextNode(said))
     if (info?.num) {
-      const find = document.createElement('button')
       find.type = 'button'
-      find.className = 'pm-ask-find'
-      find.textContent = `${words.ask} ${info.num}`
+      find.title = words.title(info.num)
       find.addEventListener('mousedown', (e) => e.preventDefault())
       find.addEventListener('click', () => window.dispatchEvent(new CustomEvent('parliament-find-card', { detail: { num: info.num } })))
-      box.append(find)
-    } else box.append(document.createTextNode(words.ask))
+    }
+    box.append(find)
     if (answered) {
       const button = (label, how) => {
         const b = document.createElement('button')
@@ -116,13 +146,15 @@ export function asksPlugin({ onSettle, words = { ask: 'ask', accept: 'accept', u
         b.addEventListener('click', () => onSettle?.(id, how))
         return b
       }
-      box.append(document.createTextNode(': '), button(words.accept, 'accept'), document.createTextNode(' · '), button(words.undo, 'undo'))
+      box.append(document.createTextNode(' · '), button(words.accept, 'accept'), document.createTextNode(' · '), button(words.undo, 'undo'))
     }
     return box
   }
   const draw = (doc, info) => {
     const ends = new Map()
     const ids = new Set()
+    // Each waiting passage's ends, for its brackets.
+    const passages = new Map()
     doc.descendants((node, pos) => {
       if (node.type === schema.nodes.ask_point) {
         ids.add(node.attrs.ask)
@@ -134,16 +166,26 @@ export function asksPlugin({ onSettle, words = { ask: 'ask', accept: 'accept', u
         if (m.type !== ASK && m.type !== ANSWER && m.type !== REPLACED) continue
         const id = m.attrs.ask
         ids.add(id)
+        if (m.type === ASK) {
+          const p = passages.get(id)
+          passages.set(id, { from: Math.min(p?.from ?? Infinity, pos), to: Math.max(p?.to ?? 0, pos + node.nodeSize) })
+        }
         const was = ends.get(id)
         ends.set(id, { at: Math.max(was?.at ?? 0, pos + node.nodeSize), answered: (was?.answered ?? false) || m.type === ANSWER })
       }
       return false
     })
-    const decos = [...ids].map((id) => {
+    const decos = []
+    for (const id of ids) {
       const e = ends.get(id)
       const i = info?.get?.(id) ?? null
-      return Decoration.widget(e.at, marker(id, i, e.answered), { side: 1, key: `ask:${id}:${i?.num ?? ''}:${e.answered}`, stopEvent: () => true, ignoreSelection: true })
-    })
+      const p = passages.get(id)
+      if (p && !e.answered) {
+        decos.push(Decoration.widget(p.from, bracket('open'), { side: -1, key: `ask-open:${id}`, ignoreSelection: true }))
+        decos.push(Decoration.widget(p.to, bracket('close'), { side: 1, key: `ask-close:${id}`, ignoreSelection: true }))
+      }
+      decos.push(Decoration.widget(e.at, marker(id, i, e.answered), { side: 2, key: `ask:${id}:${i?.num ?? ''}:${e.answered}:${i?.question ?? ''}:${i?.by ?? ''}`, stopEvent: () => true, ignoreSelection: true }))
+    }
     return DecorationSet.create(doc, decos)
   }
   return new Plugin({

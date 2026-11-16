@@ -4830,6 +4830,11 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **The words:** note became comment wherever section 4 listed, and in the Enter lines that name a card's kind (summarize:, compare:, export:, delete:), in English, Swedish, Finnish, Japanese and Chinese, each glossary saying so. Left as they were: a `tell:` note, which goes to a model and is another thing; and the backup, Settings and privacy lines that count "notes", which describe what is stored.
   - **Not built:** a comment on words in a message that is not edited in place (a source's list of results, a reply still arriving); changing a comment's words in the text. `delete:205` removes one.
   - **Found in passing:** the editor redraws its own spans, so a flash put on the tint was lost at once; find flashes the comment's words after it instead.
+- **(d) Built in part 15 November: prompts in the text, by name and look.** Stefan: "Yes, prompts next".
+  - **In the text:** an ask is a prompt in the text now. Ctrl+Alt+P (⌘⌥P on a Mac) on words selected in a reply opens the PROMPT box, as ruled; Ctrl+Shift+K still does. While it waits, its passage is tinted between vermillion corner brackets (`#C2410C`, the token `--ch-prompt`), then `p>` and its words, small; a click finds its card. Answered, it reads "Sonnet 5.5 suggests · accept · reject", the answer green and dotted, as a suggestion is (e). The markup menu's Prompts row hides the tint, the brackets and the waiting words.
+  - **Commands and words:** `prompt:` opens the box or keeps a prompt, and `ask:` is still read, listed as an older name; `type:prompt`, with `type:ask` still read. Ask became prompt in the Collection's tab and cards, the Enter lines, Reflection's counts and the box, in all five languages, each glossary saying so. Stored as before: the record's kind stays ask.
+  - **Also, missed in (c):** compare:'s gloss and Reflection's count still said notes; they say comments now.
+  - **Not built yet:** "as a reply" on a prompt's row, and the bar's list by branch with one request per branch. The first needs one optional field on an ask, to be shown before building; the second needs a send into a branch that is not on screen, which nothing does today (a send goes to the chat the room shows). Both are to be proposed next.
 
 
 ## Proposed CLAUDE.md rewrite

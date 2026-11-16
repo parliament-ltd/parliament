@@ -979,23 +979,33 @@ msgstr "fråga igen som {next}"
 msgid "chat.askedAs"
 msgstr "Frågan ställdes på {language} som ”{text}”"
 
-#. The label of the box an ask is written in
+#. The label of the box a prompt in the text is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr "FRÅGA"
-
-#. Before an ask number in the text: ask 241
-#. js-lingui-explicit-id
-msgid "chat.askMarker"
-msgstr "fråga"
+msgstr "PROMPT"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr "Fråga med egna ord: gör det kortare, eller lägg till året då det öppnade"
+msgstr "Med egna ord: gör det kortare, eller lägg till året då det öppnade"
+
+#. Who suggests, when the model is not known
+#. js-lingui-explicit-id
+msgid "chat.askSomeone"
+msgstr "Modellen"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "chat.askSuggests"
+msgstr "{name} föreslår"
 
 #. js-lingui-explicit-id
+msgid "chat.askTitle"
+msgstr "Prompt {num}: hitta dess kort"
+
+#. Takes back the answer to a prompt in the text
+#. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr "ångra"
+msgstr "avvisa"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1378,7 +1388,7 @@ msgstr "besvarad bara här: textavsnittet har ändrats sedan dess"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr "ställd till {name}"
+msgstr "skickad till {name}"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
@@ -1398,7 +1408,7 @@ msgstr "efter"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {kommentar {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {plan {num}} edit {redigering {num}} ask {fråga {num}} suggestion {förslag {num}} other {{num}}}"
+msgstr "{kind, select, note {kommentar {num}} term {markering {num}} quote {citat {num}} highlight {markering {num}} chat {chatt {num}} docket {plan {num}} edit {redigering {num}} ask {prompt {num}} suggestion {förslag {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1711,7 +1721,7 @@ msgstr "Alla"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr "Frågor"
+msgstr "Promptar"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
@@ -2156,27 +2166,27 @@ msgstr "Ge den ett namn: arrange:save \"granskningsbord\""
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr "Enter sparar frågan vid orden du markerade i ett svar, eller där markören stod. Den följer med din nästa prompt"
+msgstr "Enter sparar den här prompten vid orden du markerade i ett svar, eller där markören stod. Den följer med ditt nästa Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr "Sparad som fråga. Den följer med din nästa prompt"
+msgstr "Sparad som prompt i texten. Den följer med ditt nästa Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr "En fråga får vara högst {max} tecken"
+msgstr "En prompt i texten får vara högst {max} tecken"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr "Klicka först i ett svar, eller markera orden du vill fråga om, sedan ask: igen"
+msgstr "Klicka först i ett svar, eller markera orden den gäller, sedan prompt: igen"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "Frågor är till för svar. I din prompt stryker du igenom eller skriver över"
+msgstr "Promptar i texten är till för svar. I din egen prompt stryker du igenom eller skriver över"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr "Enter öppnar frågerutan vid orden du markerade i ett svar, eller där markören stod"
+msgstr "Enter öppnar promptrutan vid orden du markerade i ett svar, eller där markören stod"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
@@ -2379,7 +2389,7 @@ msgstr "{num} finns inte längre där den var, så inget ändrades"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr "{num} är en redigering eller en fråga. Dess egna kommandon gäller den: hold:, undo:, accept:, reject:, jump:"
+msgstr "{num} är en redigering eller en prompt i texten. Dess egna kommandon gäller den: hold:, undo:, accept:, reject:, jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2776,12 +2786,12 @@ msgstr "Det som inte har skickats raderas på en egen rad"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr "Enter tar bort {count, plural, one {fråga} other {frågorna}} {nums}. undo: tar tillbaka {count, plural, one {den} other {dem}}"
+msgstr "Enter tar bort {count, plural, one {prompt} other {promptarna}} {nums}. undo: tar tillbaka {count, plural, one {den} other {dem}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr "Fråga {num} har gått till en modell, så den ligger kvar. accept: eller reject: avgör dess svar"
+msgstr "Prompt {num} har gått till en modell, så den ligger kvar. accept: eller reject: avgör dess svar"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4598,24 +4608,24 @@ msgstr "Från språkversionen på {language}, eller den engelska om inget hittas
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr "Följer med, en enda gång: {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# fråga} other {# frågor}} · {name} läser dem"
+msgstr "Följer med, en enda gång: {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# prompt i texten} other {# promptar i texten}} · {name} läser dem"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr "Inget skrivet: bara {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# fråga} other {# frågor}} meddelas till {name}"
+msgstr "Inget skrivet: bara {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# prompt i texten} other {# promptar i texten}} meddelas till {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr "Enter skickar bara {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# fråga} other {# frågor}} till {name}, cirka {tokens} tokens · {source} läser inget"
+msgstr "Enter skickar bara {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# prompt i texten} other {# promptar i texten}} till {name}, cirka {tokens} tokens · {source} läser inget"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr "{total, plural, one {Din} other {Dina}} {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# fråga} other {# frågor}} {total, plural, one {skickas} other {skickas}} till {name} samtidigt, cirka {tokens} tokens · {source} läser inget"
+msgstr "{total, plural, one {Din} other {Dina}} {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# prompt i texten} other {# promptar i texten}} {total, plural, one {skickas} other {skickas}} till {name} samtidigt, cirka {tokens} tokens · {source} läser inget"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr "{source} läser inte {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# fråga} other {# frågor}}. En modell läser dem när den har en nyckel: api:"
+msgstr "{source} läser inte {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# prompt i texten} other {# promptar i texten}}. En modell läser dem när den har en nyckel: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -5582,12 +5592,12 @@ msgstr "Enter slår på namngivning av nya chattar: efter en chatts första svar
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr "Enter för in {count, plural, one {svaret på fråga} other {svaren på frågorna}} {nums} i texten, och det ursprungliga textavsnittet försvinner"
+msgstr "Enter för in {count, plural, one {svaret på prompt} other {svaren på promptarna}} {nums} i texten, och det ursprungliga textavsnittet försvinner"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr "Textavsnittet för fråga {num} ändrades efter att frågan ställdes, så svaret finns bara på dess kort. reject:{num} släpper det"
+msgstr "Textavsnittet för prompt {num} ändrades efter att prompten skrevs, så svaret finns bara på dess kort. reject:{num} släpper det"
 
 #. js-lingui-explicit-id
 msgid "enter.settleEditsLetGo"
@@ -5603,16 +5613,16 @@ msgstr "Inga svar, förslag eller kvarhållna redigeringar väntar i chatten hä
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr "Fråga {num} har inget svar än"
+msgstr "Prompt {num} har inget svar än"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr "{num} är varken en fråga eller ett förslag. accept: och reject: avgör svaret på en fråga, eller ett förslag"
+msgstr "{num} är varken en prompt i texten eller ett förslag. accept: och reject: avgör svaret på en prompt, eller ett förslag"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr "Enter tar tillbaka {count, plural, one {svaret på fråga} other {svaren på frågorna}} {nums}, och textavsnittet blir kvar"
+msgstr "Enter tar tillbaka {count, plural, one {svaret på prompt} other {svaren på promptarna}} {nums}, och textavsnittet blir kvar"
 
 #. state is accepted or rejected
 #. js-lingui-explicit-id
@@ -6217,12 +6227,12 @@ msgstr "I {board} tar type: en av highlight, quote eller comment"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr "Fråga {num} är besvarad: accept:{num} behåller svaret, reject:{num} tar tillbaka det"
+msgstr "Prompt {num} är besvarad: accept:{num} behåller svaret, reject:{num} tar tillbaka det"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr "En fråga som väntar på att skickas tas bort med delete:{num}"
+msgstr "En prompt som väntar på att skickas tas bort med delete:{num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7157,7 +7167,7 @@ msgstr "{count, plural, one {{names} är en förhandsversion, och det du skickar
 
 #. js-lingui-explicit-id
 msgid "kind.ask"
-msgstr "Fråga"
+msgstr "Prompt"
 
 #. js-lingui-explicit-id
 msgid "kind.chat"
@@ -7845,7 +7855,7 @@ msgstr "{kind, select, edits {Redigeringar} highlights {Markeringar} prompts {Pr
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {Dina, och ändringar som föreslås dig} highlights {Orden du har markerat} prompts {Frågor i texten, väntande eller besvarade} other {Dina, på ord och på hela meddelanden, och de skickas aldrig}}"
+msgstr "{kind, select, edits {Dina, och ändringar som föreslås dig} highlights {Orden du har markerat} prompts {Dina i texten, väntande eller besvarade} other {Dina, på ord och på hela meddelanden, och de skickas aldrig}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -8397,7 +8407,7 @@ msgstr "spara som anteckning"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr "{count, plural, one {# fråga} other {# frågor}}"
+msgstr "{count, plural, one {# prompt i texten} other {# promptar i texten}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
@@ -8417,7 +8427,7 @@ msgstr "Inget markerat än."
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr "{count, plural, one {# anteckning} other {# anteckningar}}"
+msgstr "{count, plural, one {# kommentar} other {# kommentarer}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
@@ -9746,9 +9756,10 @@ msgstr "Lägg undan något utan att radera det"
 msgid "verb.arrange"
 msgstr "Byt till eller spara en hel uppställning, fönster inräknade. arrange:save kan avsluta en rad med layoutkommandon, som open:202 203 records spread arrange:save \"morgon\""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr "Fråga om de markerade orden i ett svar, med egna ord. Frågan följer med din nästa prompt"
+msgstr "Ett äldre namn: ask: skriver en prompt i texten, som prompt: gör"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
@@ -9797,7 +9808,7 @@ msgstr "Skriv en kommentar för människor. Den skickas aldrig"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Ställ två sida vid sida och markera orden som skiljer sig åt: anteckningar, markeringar, citat eller de senaste svaren i två grenar. Inget skickas till en AI-modell. Lägg till meaning för att fråga en modell hur de skiljer sig i innebörd"
+msgstr "Ställ två sida vid sida och markera orden som skiljer sig åt: kommentarer, markeringar, citat eller de senaste svaren i två grenar. Inget skickas till en AI-modell. Lägg till meaning för att fråga en modell hur de skiljer sig i innebörd"
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
@@ -9968,6 +9979,10 @@ msgstr "Lägg en eller flera tavlor, eller fältet, i ett eget fönster, placera
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "Byt ut e-postadresser, telefonnummer samt bank- och kortnummer mot platshållare innan en prompt skickas, även namn, eller inte"
+
+#. js-lingui-explicit-id
+msgid "verb.prompt"
+msgstr "Skriv en prompt i texten, vid de markerade orden i ett svar. Den följer med ditt nästa Enter"
 
 #. js-lingui-explicit-id
 msgid "verb.quote"

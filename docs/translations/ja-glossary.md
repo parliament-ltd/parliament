@@ -29,6 +29,7 @@
 - marking → マーキング. The study word for marking passages; マーク alone is too vague, and 倍率 already takes the cost "marks".
 - note → メモ. As Apple's Notes (メモ).
 - comment → コメント (C301 (c), 15 November: notes became comments, and every line that said メモ of one now says コメント; the type: word is comment). A tell: note stays メモ.
+- prompt in the text → テキスト内のプロンプト (C301 (d), 15 November: asks became prompts in the text; every line that said 依頼 or 質問 of one now says プロンプト; its box is プロンプト欄; an answered one reads "{name}の提案", with 却下 for reject).
 - keyword (term) → キーワード
 - highlight → ハイライト
 - quote → 引用. "Cited" sources become 参照した情報源, to keep 引用 for quotes.

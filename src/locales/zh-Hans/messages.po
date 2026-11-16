@@ -979,23 +979,33 @@ msgstr "以 {next} 再问一次"
 msgid "chat.askedAs"
 msgstr "以{language}提问：“{text}”"
 
-#. The label of the box an ask is written in
+#. The label of the box a prompt in the text is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr "提问"
-
-#. Before an ask number in the text: ask 241
-#. js-lingui-explicit-id
-msgid "chat.askMarker"
-msgstr "提问"
+msgstr "提示词"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr "用你自己的话提问：比如“改短一些”，或“补上它开放的年份”"
+msgstr "用你自己的话写：比如“改短一些”，或“补上它开放的年份”"
+
+#. Who suggests, when the model is not known
+#. js-lingui-explicit-id
+msgid "chat.askSomeone"
+msgstr "模型"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "chat.askSuggests"
+msgstr "{name} 建议"
 
 #. js-lingui-explicit-id
+msgid "chat.askTitle"
+msgstr "提示词 {num}：查找它的卡片"
+
+#. Takes back the answer to a prompt in the text
+#. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr "撤销"
+msgstr "拒绝"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1378,7 +1388,7 @@ msgstr "仅在此处回答：原文此后已改动"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr "已向 {name} 提问"
+msgstr "已发给 {name}"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
@@ -1398,7 +1408,7 @@ msgstr "按"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} edit {编辑 {num}} ask {提问 {num}} suggestion {建议 {num}} other {{num}}}"
+msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {num}} highlight {高亮 {num}} chat {对话 {num}} docket {计划 {num}} edit {编辑 {num}} ask {提示词 {num}} suggestion {建议 {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1711,7 +1721,7 @@ msgstr "全部"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr "提问"
+msgstr "提示词"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
@@ -2156,27 +2166,27 @@ msgstr "请为它命名：arrange:save \"审阅台\""
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr "按 Enter 将这条提问留在回复中你选中的文字处，或光标所在的位置。它会随你的下一条提示词发送"
+msgstr "按 Enter 将这条提示词留在回复中你选中的文字处，或光标所在的位置。下次按 Enter 时随之发送"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr "已保存为提问。它会随你的下一条提示词发送"
+msgstr "已保存为正文中的提示词。下次按 Enter 时随之发送"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr "一条提问最多 {max} 个字符"
+msgstr "正文中的一条提示词最多 {max} 个字符"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr "请先点击进入一条回复，或选中要提问的文字，然后再次输入 ask:"
+msgstr "请先点击进入一条回复，或选中它针对的文字，然后再次输入 prompt:"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "提问只用于回复。在你的提示词中，可以加删除线或直接改写"
+msgstr "正文中的提示词只用于回复。在你自己的提示词中，可以加删除线或直接改写"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr "按 Enter 在回复中你选中的文字处，或光标所在的位置，打开提问框"
+msgstr "按 Enter 在回复中你选中的文字处，或光标所在的位置，打开提示词框"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
@@ -2379,7 +2389,7 @@ msgstr "{num} 已不在原来的位置，因此没有任何改动"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr "{num} 是一处编辑或一条提问。请用它自己的命令操作：hold:、undo:、accept:、reject:、jump:"
+msgstr "{num} 是一处编辑或一条正文中的提示词。请用它自己的命令操作：hold:、undo:、accept:、reject:、jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2776,12 +2786,12 @@ msgstr "尚未发送的内容请单独用一行删除"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr "按 Enter 去掉{count, plural, other {提问}} {nums}。undo: 可恢复{count, plural, =1 {它} other {它们}}"
+msgstr "按 Enter 去掉{count, plural, other {提示词}} {nums}。undo: 可恢复{count, plural, =1 {它} other {它们}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr "提问 {num} 已发给模型，因此会保留。accept: 或 reject: 可处理它的回答"
+msgstr "提示词 {num} 已发给模型，因此会保留。accept: 或 reject: 可处理它的回答"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4598,24 +4608,24 @@ msgstr "来自其{language}版本；若那里找不到，则用英文版"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr "随提示词附带，只告知一次：{edits, plural, =0 {} other {# 处编辑}}{both, select, yes {和 } other {}}{asks, plural, =0 {} other {# 条提问}} · {name} 会读取它们"
+msgstr "随提示词附带，只告知一次：{edits, plural, =0 {} other {# 处编辑}}{both, select, yes {和 } other {}}{asks, plural, =0 {} other {# 条正文中的提示词}} · {name} 会读取它们"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr "未输入新内容：只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}告知 {name}"
+msgstr "未输入新内容：只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}告知 {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr "按 Enter 只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}发给 {name}，约 {tokens} 个 token · {source} 不会读取任何一项"
+msgstr "按 Enter 只将你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}发给 {name}，约 {tokens} 个 token · {source} 不会读取任何一项"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr "你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}{total, plural, other {会}}同时发给 {name}，约 {tokens} 个 token · {source} 不会读取任何一项"
+msgstr "你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}{total, plural, other {会}}同时发给 {name}，约 {tokens} 个 token · {source} 不会读取任何一项"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr "{source} 不会读取你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条提问}}。有了密钥后，模型会读取它们：api:"
+msgstr "{source} 不会读取你的{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}。有了密钥后，模型会读取它们：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -5582,12 +5592,12 @@ msgstr "按 Enter 开启新对话命名：对话收到首个回答后，会发�
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr "按 Enter 将{count, plural, other {提问}} {nums} 的回答保留在回复中，原文随之删去"
+msgstr "按 Enter 将{count, plural, other {提示词}} {nums} 的回答保留在回复中，原文随之删去"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr "提问 {num} 所针对的原文在提问后已改动，因此它的回答只显示在卡片上。reject:{num} 可将其放弃"
+msgstr "提示词 {num} 所针对的原文在写下后已改动，因此它的回答只显示在卡片上。reject:{num} 可将其放弃"
 
 #. js-lingui-explicit-id
 msgid "enter.settleEditsLetGo"
@@ -5603,16 +5613,16 @@ msgstr "此处对话中没有待处理的回答、建议或搁置的编辑"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr "提问 {num} 还没有回答"
+msgstr "提示词 {num} 还没有回答"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr "{num} 不是提问或建议。accept: 和 reject: 用于处理提问的回答或建议"
+msgstr "{num} 不是正文中的提示词或建议。accept: 和 reject: 用于处理提示词的回答或建议"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr "按 Enter 撤销{count, plural, other {提问}} {nums} 的回答，原文保持不变"
+msgstr "按 Enter 撤销{count, plural, other {提示词}} {nums} 的回答，原文保持不变"
 
 #. state is accepted or rejected
 #. js-lingui-explicit-id
@@ -6217,12 +6227,12 @@ msgstr "在{board}上，type: 可接 highlight、quote 或 comment 之一"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr "提问 {num} 已有回答：accept:{num} 保留回答，reject:{num} 撤销回答"
+msgstr "提示词 {num} 已有回答：accept:{num} 保留回答，reject:{num} 撤销回答"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr "等待发送的提问要用 delete:{num} 去掉"
+msgstr "等待发送的提示词要用 delete:{num} 去掉"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7157,7 +7167,7 @@ msgstr "{count, plural, other {{names} 是预览版，无论你如何选择，�
 
 #. js-lingui-explicit-id
 msgid "kind.ask"
-msgstr "提问"
+msgstr "提示词"
 
 #. js-lingui-explicit-id
 msgid "kind.chat"
@@ -7845,7 +7855,7 @@ msgstr "{kind, select, edits {编辑} highlights {高亮} prompts {提示词} ot
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {你的编辑，以及向你建议的修改} highlights {你标记的文字} prompts {正文中的提问，待发送或已回答} other {你写在文字或整条消息上的批注，绝不会被发送}}"
+msgstr "{kind, select, edits {你的编辑，以及向你建议的修改} highlights {你标记的文字} prompts {你写在正文中的提示词，待发送或已回答} other {你写在文字或整条消息上的批注，绝不会被发送}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -8397,7 +8407,7 @@ msgstr "保存为笔记"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr "{count, plural, other {# 条提问}}"
+msgstr "{count, plural, other {# 条正文中的提示词}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
@@ -8417,7 +8427,7 @@ msgstr "还没有任何标记。"
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr "{count, plural, other {# 条笔记}}"
+msgstr "{count, plural, other {# 条批注}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
@@ -9746,9 +9756,10 @@ msgstr "收起内容而不删除"
 msgid "verb.arrange"
 msgstr "切换到或保存一整套排布，包括窗口。arrange:save 可以放在一行布局命令的末尾，例如 open:202 203 records spread arrange:save \"早晨\""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr "用你自己的话，就回复中选中的文字提问。它会随你的下一条提示词发送"
+msgstr "旧名称：ask: 和 prompt: 一样，在正文中写一条提示词"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
@@ -9797,7 +9808,7 @@ msgstr "写一条给人看的批注。它绝不会被发送"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "将两项并排对照，并标出不同的词：笔记、高亮、摘录，或两个分支各自的最后一条回复。不会向 AI 模型发送任何内容。在末尾加上 meaning，则会请模型说明两者含义上的不同"
+msgstr "将两项并排对照，并标出不同的词：批注、高亮、摘录，或两个分支各自的最后一条回复。不会向 AI 模型发送任何内容。在末尾加上 meaning，则会请模型说明两者含义上的不同"
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
@@ -9968,6 +9979,10 @@ msgstr "把一个或多个面板或输入栏放到独立窗口中、调整窗口
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "发送提示词前，将电子邮件地址、电话号码、银行账号和卡号替换为占位符，可包括人名，也可关闭"
+
+#. js-lingui-explicit-id
+msgid "verb.prompt"
+msgstr "在回复中选中的文字处写一条正文中的提示词。下次按 Enter 时随之发送"
 
 #. js-lingui-explicit-id
 msgid "verb.quote"

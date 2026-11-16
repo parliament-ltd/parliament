@@ -979,23 +979,33 @@ msgstr "ask again as {next}"
 msgid "chat.askedAs"
 msgstr "Asked in {language} as “{text}”"
 
-#. The label of the box an ask is written in
+#. The label of the box a prompt in the text is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr "ASK"
-
-#. Before an ask number in the text: ask 241
-#. js-lingui-explicit-id
-msgid "chat.askMarker"
-msgstr "ask"
+msgstr "PROMPT"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr "Ask in your own words: make it shorter, or add the year it opened"
+msgstr "In your own words: make it shorter, or add the year it opened"
+
+#. Who suggests, when the model is not known
+#. js-lingui-explicit-id
+msgid "chat.askSomeone"
+msgstr "The model"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "chat.askSuggests"
+msgstr "{name} suggests"
 
 #. js-lingui-explicit-id
+msgid "chat.askTitle"
+msgstr "Prompt {num}: find its card"
+
+#. Takes back the answer to a prompt in the text
+#. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr "undo"
+msgstr "reject"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1378,7 +1388,7 @@ msgstr "answered here only: the passage changed since"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr "asked of {name}"
+msgstr "sent to {name}"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
@@ -1398,7 +1408,7 @@ msgstr "by"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {ask {num}} suggestion {suggestion {num}} other {{num}}}"
+msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} edit {edit {num}} ask {prompt {num}} suggestion {suggestion {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1711,7 +1721,7 @@ msgstr "All"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr "Asks"
+msgstr "Prompts"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
@@ -2156,27 +2166,27 @@ msgstr "Name it: arrange:save \"review desk\""
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr "Enter keeps this ask on the words you selected in a reply, or where the cursor was. It goes with your next prompt"
+msgstr "Enter keeps this prompt on the words you selected in a reply, or where the cursor was. It goes with your next Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr "Kept as an ask. It goes with your next prompt"
+msgstr "Kept as a prompt in the text. It goes with your next Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr "An ask holds up to {max} characters"
+msgstr "A prompt in the text holds up to {max} characters"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr "Click into a reply first, or select the words to ask about, then ask: again"
+msgstr "Click into a reply first, or select the words it is about, then prompt: again"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "Asks are for replies. In your prompt, strike or type over it"
+msgstr "Prompts in the text are for replies. In your own prompt, strike or type over it"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr "Enter opens the ask box on the words you selected in a reply, or where the cursor was"
+msgstr "Enter opens the prompt box on the words you selected in a reply, or where the cursor was"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
@@ -2379,7 +2389,7 @@ msgstr "{num} is no longer where it was, so nothing changed"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr "{num} is an edit or an ask. Its own commands act on it: hold:, undo:, accept:, reject:, jump:"
+msgstr "{num} is an edit or a prompt in the text. Its own commands act on it: hold:, undo:, accept:, reject:, jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2776,12 +2786,12 @@ msgstr "Delete what has not been sent on a line of its own"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr "Enter drops {count, plural, one {ask} other {asks}} {nums}. undo: brings {count, plural, one {it} other {them}} back"
+msgstr "Enter drops {count, plural, one {prompt} other {prompts}} {nums}. undo: brings {count, plural, one {it} other {them}} back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr "Ask {num} has gone to a model, so it stays. accept: or reject: settles its answer"
+msgstr "Prompt {num} has gone to a model, so it stays. accept: or reject: settles its answer"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4598,24 +4608,24 @@ msgstr "From its {language} edition, or the English one if nothing is found ther
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr "With it, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} · {name} reads them"
+msgstr "With it, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} · {name} reads them"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr "Nothing typed: just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}}, told to {name}"
+msgstr "Nothing typed: just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}, told to {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr "Enter sends just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} to {name}, about {tokens} tokens · {source} reads none"
+msgstr "Enter sends just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} to {name}, about {tokens} tokens · {source} reads none"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr "Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} {total, plural, one {goes} other {go}} to {name} at the same time, about {tokens} tokens · {source} reads none"
+msgstr "Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} {total, plural, one {goes} other {go}} to {name} at the same time, about {tokens} tokens · {source} reads none"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr "{source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}}. A model reads them once it has a key: api:"
+msgstr "{source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}. A model reads them once it has a key: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -5582,12 +5592,12 @@ msgstr "Enter turns on naming new chats: after a chat’s first answer, one smal
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr "Enter keeps the {count, plural, one {answer to ask} other {answers to asks}} {nums} in the reply, and the passage goes"
+msgstr "Enter keeps the {count, plural, one {answer to prompt} other {answers to prompts}} {nums} in the reply, and the passage goes"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr "The passage of ask {num} changed after it was asked, so its answer is on its card only. reject:{num} lets it go"
+msgstr "The passage of prompt {num} changed after it was written, so its answer is on its card only. reject:{num} lets it go"
 
 #. js-lingui-explicit-id
 msgid "enter.settleEditsLetGo"
@@ -5603,16 +5613,16 @@ msgstr "No answers, suggestions or held edits wait in the chat here"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr "Ask {num} has no answer yet"
+msgstr "Prompt {num} has no answer yet"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr "{num} is not an ask or a suggestion. accept: and reject: settle the answer to an ask, or a suggestion"
+msgstr "{num} is not a prompt in the text or a suggestion. accept: and reject: settle the answer to a prompt, or a suggestion"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr "Enter takes back the {count, plural, one {answer to ask} other {answers to asks}} {nums}, and the passage stays"
+msgstr "Enter takes back the {count, plural, one {answer to prompt} other {answers to prompts}} {nums}, and the passage stays"
 
 #. state is accepted or rejected
 #. js-lingui-explicit-id
@@ -6217,12 +6227,12 @@ msgstr "On {board}, type: takes one of highlight, quote or comment"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr "Ask {num} is answered: accept:{num} keeps the answer, reject:{num} takes it back"
+msgstr "Prompt {num} is answered: accept:{num} keeps the answer, reject:{num} takes it back"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr "An ask waiting to go is dropped with delete:{num}"
+msgstr "A prompt waiting to go is dropped with delete:{num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7157,7 +7167,7 @@ msgstr "{count, plural, one {{names} is a preview, trained on whatever you choos
 
 #. js-lingui-explicit-id
 msgid "kind.ask"
-msgstr "Ask"
+msgstr "Prompt"
 
 #. js-lingui-explicit-id
 msgid "kind.chat"
@@ -7845,7 +7855,7 @@ msgstr "{kind, select, edits {Edits} highlights {Highlights} prompts {Prompts} o
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Asks in the text, waiting or answered} other {Yours, on words and on whole messages, never sent}}"
+msgstr "{kind, select, edits {Yours, and changes suggested to you} highlights {The words you marked} prompts {Yours in the text, waiting or answered} other {Yours, on words and on whole messages, never sent}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -8397,7 +8407,7 @@ msgstr "keep as a note"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr "{count, plural, one {# ask} other {# asks}}"
+msgstr "{count, plural, one {# prompt in the text} other {# prompts in the text}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
@@ -8417,7 +8427,7 @@ msgstr "Nothing marked yet."
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr "{count, plural, one {# note} other {# notes}}"
+msgstr "{count, plural, one {# comment} other {# comments}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
@@ -9746,9 +9756,10 @@ msgstr "Put something away without deleting it"
 msgid "verb.arrange"
 msgstr "Switch to or save a whole arrangement, windows included. arrange:save can end a line of layout commands, as open:202 203 records spread arrange:save \"morning\""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr "Ask about the selected words in a reply, in your own words. It goes with your next prompt"
+msgstr "An older name: ask: writes a prompt in the text, as prompt: does"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
@@ -9797,7 +9808,7 @@ msgstr "Write a comment for people. It is never sent"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Set two side by side and mark the words that differ: notes, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ"
+msgstr "Set two side by side and mark the words that differ: comments, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ"
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
@@ -9968,6 +9979,10 @@ msgstr "Put one or more boards, or the bar, in a window of their own, place it, 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, names too, or not"
+
+#. js-lingui-explicit-id
+msgid "verb.prompt"
+msgstr "Write a prompt in the text, on the words selected in a reply. It goes with your next Enter"
 
 #. js-lingui-explicit-id
 msgid "verb.quote"

@@ -409,7 +409,9 @@ export default function MessagesRender() {
     const byMessage = new Map()
     for (const r of [...chatAsks.values()].flat()) {
       if (!byMessage.has(r.messageId)) byMessage.set(r.messageId, new Map())
-      byMessage.get(r.messageId).set(r.edit, { num: r.num, state: r.state })
+      // Its words, shown after it while it waits, and who answered (C301 (d), (e)).
+      const by = r.answer?.by ? modelFacts(r.answer.by)?.name ?? destination(r.answer.by)?.name ?? null : null
+      byMessage.get(r.messageId).set(r.edit, { num: r.num, state: r.state, question: typeof r.question === 'string' ? r.question : '', by })
     }
     return (messageId) => byMessage.get(messageId) ?? NO_ASK_INFO
   }, [chatAsks])
@@ -437,8 +439,10 @@ export default function MessagesRender() {
     ripple: i18n._(COPY.chat.sugRipple), sweep: i18n._(COPY.chat.sugSweep), accept: i18n._(COPY.chat.sugAccept), reject: i18n._(COPY.chat.sugReject),
   }), [i18n])
   const askWords = useMemo(() => ({
-    label: i18n._(COPY.chat.askLabel), placeholder: i18n._(COPY.chat.askPlaceholder),
-    ask: i18n._(COPY.chat.askMarker), accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
+    label: i18n._(COPY.chat.askLabel), placeholder: i18n._(COPY.chat.askPlaceholder), keys: modKey() === '⌘' ? '⌘⌥P' : 'Ctrl+Alt+P',
+    accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
+    suggests: (name) => i18n._(COPY.chat.askSuggests, { name }), someone: i18n._(COPY.chat.askSomeone),
+    title: (num) => i18n._(COPY.chat.askTitle, { num }),
   }), [i18n])
   // Comments on words (C301 (c)): the COMMENT box, "more" and "less", and what is said when none can be written.
   const commentWords = useMemo(() => {

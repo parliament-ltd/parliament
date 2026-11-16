@@ -33,19 +33,19 @@ describe('undo:242, one edit', () => {
     expect(p.act).toEqual({ kind: 'storedChange', changes: [{ how: 'undoEdit', num: 242, mark: 'e1', messageId: 'm1', conversationId: 'c202' }] })
     expect(at('>undo:243')).toMatchObject({ act: null, text: 'Edit 243 has been told to a model, so it stays. Change the text again, and that goes as a new edit' })
     expect(at('>undo:202').text).toBe('undo: with a number takes back one edit, and 202 is not one')
-    expect(at('>undo:246').text).toBe('An ask waiting to go is dropped with delete:246')
+    expect(at('>undo:246').text).toBe('A prompt waiting to go is dropped with delete:246')
   })
 })
 
 describe('accept: and reject: on answered asks', () => {
   it('settles an answer in place, and only reject: one on its card only', () => {
-    expect(at('>accept:244').text).toBe('Enter keeps the answer to ask 244 in the reply, and the passage goes')
+    expect(at('>accept:244').text).toBe('Enter keeps the answer to prompt 244 in the reply, and the passage goes')
     expect(at('>accept:244').act.changes[0]).toMatchObject({ how: 'accept', mark: 'q1' })
     expect(at('>reject:244').act.changes[0]).toMatchObject({ how: 'undo' })
     expect(at('>accept:245').act).toBeNull()
     expect(at('>reject:245').act.changes[0]).toMatchObject({ how: 'undoHere' })
-    expect(at('>accept:246').text).toBe('Ask 246 has no answer yet')
-    expect(at('>accept:242').text).toBe('242 is not an ask or a suggestion. accept: and reject: settle the answer to an ask, or a suggestion')
+    expect(at('>accept:246').text).toBe('Prompt 246 has no answer yet')
+    expect(at('>accept:242').text).toBe('242 is not a prompt in the text or a suggestion. accept: and reject: settle the answer to a prompt, or a suggestion')
     expect(at('>accept:all').act.changes.map((c) => c.num)).toEqual([244])
     expect(at('>reject:all').act.changes.map((c) => c.how)).toEqual(['undo', 'undoHere'])
   })
@@ -54,12 +54,12 @@ describe('accept: and reject: on answered asks', () => {
 describe('delete: on asks, and the other commands', () => {
   it('drops an ask not yet sent, and keeps one sent', () => {
     expect(at('>delete:246').act).toEqual({ kind: 'storedChange', changes: [{ how: 'drop', num: 246, mark: 'q3', messageId: 'm1', conversationId: 'c202' }] })
-    expect(at('>delete:244').text).toBe('Ask 244 has gone to a model, so it stays. accept: or reject: settles its answer')
+    expect(at('>delete:244').text).toBe('Prompt 244 has gone to a model, so it stays. accept: or reject: settles its answer')
     expect(at('>delete:242').text).toBe('An edit is taken back with undo:242')
   })
 
   it('refuses pin: and the like on an edit, and holds it from the Collection', () => {
-    expect(at('>pin:242').text).toBe('242 is an edit or an ask. Its own commands act on it: hold:, undo:, accept:, reject:, jump:')
+    expect(at('>pin:242').text).toBe('242 is an edit or a prompt in the text. Its own commands act on it: hold:, undo:, accept:, reject:, jump:')
     expect(at('>hold:242', 'collection').act).toEqual({ kind: 'holdEdits', edits: [{ num: 242, id: 'm1:e1', list: 'edits' }], held: true })
     expect(at('>hold:246', 'collection').act.edits[0].list).toBe('asks')
   })

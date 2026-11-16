@@ -979,23 +979,33 @@ msgstr "kysy uudelleen haarana {next}"
 msgid "chat.askedAs"
 msgstr "Kysytty kielellä {language}: ”{text}”"
 
-#. The label of the box an ask is written in
+#. The label of the box a prompt in the text is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr "KYSYMYS"
-
-#. Before an ask number in the text: ask 241
-#. js-lingui-explicit-id
-msgid "chat.askMarker"
-msgstr "kysymys"
+msgstr "KEHOTE"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr "Kysy omin sanoin: lyhennä tätä tai lisää vuosi, jolloin se avattiin"
+msgstr "Omin sanoin: lyhennä tätä tai lisää vuosi, jolloin se avattiin"
+
+#. Who suggests, when the model is not known
+#. js-lingui-explicit-id
+msgid "chat.askSomeone"
+msgstr "Malli"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "chat.askSuggests"
+msgstr "{name} ehdottaa"
 
 #. js-lingui-explicit-id
+msgid "chat.askTitle"
+msgstr "Kehote {num}: etsi sen kortti"
+
+#. Takes back the answer to a prompt in the text
+#. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr "kumoa"
+msgstr "hylkää"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1378,7 +1388,7 @@ msgstr "vastattu vain täällä: tekstikohta on muuttunut sen jälkeen"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr "kysytty mallilta {name}"
+msgstr "lähetetty mallille {name}"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
@@ -1398,7 +1408,7 @@ msgstr "lajittelu"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {kommentti {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} edit {muokkaus {num}} ask {kysymys {num}} suggestion {ehdotus {num}} other {{num}}}"
+msgstr "{kind, select, note {kommentti {num}} term {korostus {num}} quote {lainaus {num}} highlight {korostus {num}} chat {keskustelu {num}} docket {suunnitelma {num}} edit {muokkaus {num}} ask {kehote {num}} suggestion {ehdotus {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1711,7 +1721,7 @@ msgstr "Kaikki"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr "Kysymykset"
+msgstr "Kehotteet"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
@@ -2156,27 +2166,27 @@ msgstr "Anna sille nimi: arrange:save \"arviointipöytä\""
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr "Enter tallentaa tämän kysymyksen vastauksesta valitsemiisi sanoihin tai kohtaan, jossa kohdistin oli. Se lähtee seuraavan kehotteesi mukana"
+msgstr "Enter tallentaa tämän kehotteen vastauksesta valitsemiisi sanoihin tai kohtaan, jossa kohdistin oli. Se lähtee seuraavalla Enterillä"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr "Tallennettu kysymykseksi. Se lähtee seuraavan kehotteesi mukana"
+msgstr "Tallennettu kehotteeksi tekstiin. Se lähtee seuraavalla Enterillä"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr "Kysymyksessä saa olla enintään {max} merkkiä"
+msgstr "Tekstissä olevassa kehotteessa saa olla enintään {max} merkkiä"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr "Napsauta ensin vastausta tai valitse sanat, joista haluat kysyä, ja kirjoita sitten uudelleen ask:"
+msgstr "Napsauta ensin vastausta tai valitse sanat, joita se koskee, ja kirjoita sitten uudelleen prompt:"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "Kysymykset tehdään vastauksiin. Omassa kehotteessasi yliviivaa tai kirjoita päälle"
+msgstr "Kehotteet tekstissä tehdään vastauksiin. Omassa kehotteessasi yliviivaa tai kirjoita päälle"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr "Enter avaa kysymysruudun vastauksesta valitsemiisi sanoihin tai kohtaan, jossa kohdistin oli"
+msgstr "Enter avaa kehoteruudun vastauksesta valitsemiisi sanoihin tai kohtaan, jossa kohdistin oli"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
@@ -2379,7 +2389,7 @@ msgstr "{num} ei ole enää paikallaan, joten mikään ei muuttunut"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr "{num} on muokkaus tai kysymys. Sitä käsitellään sen omilla komennoilla: hold:, undo:, accept:, reject:, jump:"
+msgstr "{num} on muokkaus tai kehote tekstissä. Sitä käsitellään sen omilla komennoilla: hold:, undo:, accept:, reject:, jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2776,12 +2786,12 @@ msgstr "Poista se, mitä ei ole lähetetty, omalla rivillään"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr "Enter poistaa {count, plural, one {kysymyksen} other {kysymykset}} {nums}. undo: tuo {count, plural, one {sen} other {ne}} takaisin"
+msgstr "Enter poistaa {count, plural, one {kehotteen} other {kehotteet}} {nums}. undo: tuo {count, plural, one {sen} other {ne}} takaisin"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr "Kysymys {num} on jo lähetetty mallille, joten se säilyy. accept: tai reject: ratkaisee sen vastauksen"
+msgstr "Kehote {num} on jo lähetetty mallille, joten se säilyy. accept: tai reject: ratkaisee sen vastauksen"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4598,24 +4608,24 @@ msgstr "Kieliversiosta {language}, tai englanninkielisestä, jos sieltä ei löy
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr "Mukana kertaalleen: {edits, plural, =0 {} one {# muokkaus} other {# muokkausta}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kysymys} other {# kysymystä}} · {name} lukee ne"
+msgstr "Mukana kertaalleen: {edits, plural, =0 {} one {# muokkaus} other {# muokkausta}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehote tekstissä} other {# kehotetta tekstissä}} · {name} lukee ne"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr "Ei kirjoitettua tekstiä: vain {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kysymyksesi} other {# kysymystäsi}}, kerrotaan mallille {name}"
+msgstr "Ei kirjoitettua tekstiä: vain {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}, kerrotaan mallille {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr "Enter lähettää mallille {name} vain {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kysymyksesi} other {# kysymystäsi}}, noin {tokens} tokenia · {source} ei lue niitä"
+msgstr "Enter lähettää mallille {name} vain {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}, noin {tokens} tokenia · {source} ei lue niitä"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr "Samaan aikaan mallille {name} {total, plural, one {menee} other {menee}} {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kysymyksesi} other {# kysymystäsi}}, noin {tokens} tokenia · {source} ei lue niitä"
+msgstr "Samaan aikaan mallille {name} {total, plural, one {menee} other {menee}} {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}, noin {tokens} tokenia · {source} ei lue niitä"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr "{source} ei lue näitä: {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kysymyksesi} other {# kysymystäsi}}. Malli lukee ne, kun sillä on avain: api:"
+msgstr "{source} ei lue näitä: {edits, plural, =0 {} one {# muokkauksesi} other {# muokkaustasi}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteesi tekstissä} other {# kehotettasi tekstissä}}. Malli lukee ne, kun sillä on avain: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -5582,12 +5592,12 @@ msgstr "Enter ottaa käyttöön uusien keskustelujen nimeämisen: keskustelun en
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr "Enter jättää {count, plural, one {kysymyksen {nums} vastauksen} other {kysymysten {nums} vastaukset}} tekstiin, ja alkuperäinen tekstikohta poistuu"
+msgstr "Enter jättää {count, plural, one {kehotteen {nums} vastauksen} other {kehotteiden {nums} vastaukset}} tekstiin, ja alkuperäinen tekstikohta poistuu"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr "Kysymyksen {num} tekstikohta muuttui kysymisen jälkeen, joten sen vastaus on vain sen kortilla. reject:{num} hylkää sen"
+msgstr "Kehotteen {num} tekstikohta muuttui kirjoittamisen jälkeen, joten sen vastaus on vain sen kortilla. reject:{num} hylkää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.settleEditsLetGo"
@@ -5603,16 +5613,16 @@ msgstr "Tässä keskustelussa ei odota vastauksia, ehdotuksia eikä pidossa olev
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr "Kysymyksellä {num} ei ole vielä vastausta"
+msgstr "Kehotteella {num} ei ole vielä vastausta"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr "{num} ei ole kysymys eikä ehdotus. accept: ja reject: ratkaisevat kysymyksen vastauksen tai ehdotuksen"
+msgstr "{num} ei ole kehote tekstissä eikä ehdotus. accept: ja reject: ratkaisevat kehotteen vastauksen tai ehdotuksen"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr "Enter kumoaa {count, plural, one {kysymyksen {nums} vastauksen} other {kysymysten {nums} vastaukset}}, ja alkuperäinen tekstikohta säilyy"
+msgstr "Enter kumoaa {count, plural, one {kehotteen {nums} vastauksen} other {kehotteiden {nums} vastaukset}}, ja alkuperäinen tekstikohta säilyy"
 
 #. state is accepted or rejected
 #. js-lingui-explicit-id
@@ -6217,12 +6227,12 @@ msgstr "Taulussa {board} type: hyväksyy yhden näistä: highlight, quote tai co
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr "Kysymykseen {num} on vastattu: accept:{num} säilyttää vastauksen, reject:{num} kumoaa sen"
+msgstr "Kehotteeseen {num} on vastattu: accept:{num} säilyttää vastauksen, reject:{num} kumoaa sen"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr "Lähtöä odottava kysymys poistetaan komennolla delete:{num}"
+msgstr "Lähtöä odottava kehote poistetaan komennolla delete:{num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7157,7 +7167,7 @@ msgstr "{count, plural, one {{names} on esiversio, ja sille lähetettyä käytet
 
 #. js-lingui-explicit-id
 msgid "kind.ask"
-msgstr "Kysymys"
+msgstr "Kehote"
 
 #. js-lingui-explicit-id
 msgid "kind.chat"
@@ -7845,7 +7855,7 @@ msgstr "{kind, select, edits {Muokkaukset} highlights {Korostukset} prompts {Keh
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {Omasi ja sinulle ehdotetut muutokset} highlights {Korostamasi sanat} prompts {Kysymykset tekstissä, odottavat tai vastatut} other {Omasi, sanoihin tai kokonaisiin viesteihin; niitä ei koskaan lähetetä}}"
+msgstr "{kind, select, edits {Omasi ja sinulle ehdotetut muutokset} highlights {Korostamasi sanat} prompts {Omasi tekstissä, odottavat tai vastatut} other {Omasi, sanoihin tai kokonaisiin viesteihin; niitä ei koskaan lähetetä}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -8397,7 +8407,7 @@ msgstr "tallenna muistiinpanoksi"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr "{count, plural, one {# kysymys} other {# kysymystä}}"
+msgstr "{count, plural, one {# kehote tekstissä} other {# kehotetta tekstissä}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
@@ -8417,7 +8427,7 @@ msgstr "Mitään ei ole vielä merkitty."
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr "{count, plural, one {# muistiinpano} other {# muistiinpanoa}}"
+msgstr "{count, plural, one {# kommentti} other {# kommenttia}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
@@ -9746,9 +9756,10 @@ msgstr "Siirrä jotain syrjään poistamatta sitä"
 msgid "verb.arrange"
 msgstr "Vaihda kokonaiseen järjestelyyn tai tallenna se, ikkunat mukaan lukien. arrange:save voi päättää asettelukomentojen rivin, esimerkiksi open:202 203 records spread arrange:save \"aamu\""
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr "Kysy vastauksen valituista sanoista omin sanoin. Kysymys lähtee seuraavan kehotteesi mukana"
+msgstr "Vanhempi nimi: ask: kirjoittaa kehotteen tekstiin, kuten prompt:"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
@@ -9797,7 +9808,7 @@ msgstr "Kirjoita kommentti ihmisille. Sitä ei koskaan lähetetä"
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "Aseta rinnakkain kaksi muistiinpanoa, korostusta tai lainausta tai kahden haaran viimeisimmät vastaukset ja merkitse sanat, jotka eroavat. Mitään ei lähetetä tekoälymallille. Lisää sana meaning, niin kysyt mallilta, miten ne eroavat merkitykseltään"
+msgstr "Aseta rinnakkain kaksi kommenttia, korostusta tai lainausta tai kahden haaran viimeisimmät vastaukset ja merkitse sanat, jotka eroavat. Mitään ei lähetetä tekoälymallille. Lisää sana meaning, niin kysyt mallilta, miten ne eroavat merkitykseltään"
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
@@ -9968,6 +9979,10 @@ msgstr "Siirrä taulu, useita tauluja tai palkki omaan ikkunaansa, sijoita se ta
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "Korvaa sähköpostiosoitteet, puhelinnumerot sekä tili- ja korttinumerot paikkamerkeillä ennen kehotteen lähettämistä, halutessasi myös nimet, tai jätä korvaamatta"
+
+#. js-lingui-explicit-id
+msgid "verb.prompt"
+msgstr "Kirjoita kehote tekstiin, vastauksesta valittuihin sanoihin. Se lähtee seuraavalla Enterillä"
 
 #. js-lingui-explicit-id
 msgid "verb.quote"

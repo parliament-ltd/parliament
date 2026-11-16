@@ -1351,11 +1351,16 @@ describe('ask: an ask from the bar (stage 11, piece 4; C218 (a))', () => {
     const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: {} })
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
   }
-  it('opens the ask box, or keeps the ask written after it', () => {
+  it('opens the prompt box, or keeps the prompt written after it (C301 (d))', () => {
+    expect(at('>prompt:')).toMatchObject({ act: { kind: 'ask', question: null } })
+    expect(at('>prompt:').text).toMatch(/^Enter opens the prompt box/)
+    expect(at('>prompt:"Add the year it opened"').act).toEqual({ kind: 'ask', question: 'Add the year it opened' })
+    expect(at('>prompt:' + '"' + 'x'.repeat(1001) + '"')).toMatchObject({ act: null, text: 'A prompt in the text holds up to 1000 characters' })
+  })
+
+  it('reads ask:, its older name, as prompt:', () => {
     expect(at('>ask:')).toMatchObject({ act: { kind: 'ask', question: null } })
-    expect(at('>ask:').text).toMatch(/^Enter opens the ask box/)
     expect(at('>ask:"Add the year it opened"').act).toEqual({ kind: 'ask', question: 'Add the year it opened' })
-    expect(at('>ask:' + '"' + 'x'.repeat(1001) + '"')).toMatchObject({ act: null, text: 'An ask holds up to 1000 characters' })
   })
 })
 
@@ -1393,7 +1398,7 @@ describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
     expect(p.ready).toBe(true)
     expect(also(p)).toContain('With it, told once: 3 edits · Haiku 9 reads them')
     const both = promptPreview('Go on.', { ...room, answerer: model, edits: { count: 2, asks: 1, chars: 120 } })
-    expect(also(both)).toContain('With it, told once: 2 edits and 1 ask · Haiku 9 reads them')
+    expect(also(both)).toContain('With it, told once: 2 edits and 1 prompt in the text · Haiku 9 reads them')
   })
   it('sends just the edits on an empty Enter', () => {
     const p = promptPreview('', { ...room, answerer: model, edits: { count: 1, chars: 80 } })
@@ -1408,7 +1413,7 @@ describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
     const reader = { id: 'm', group: 'model', name: 'Haiku 9' }
     const only = promptPreview('', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 2, asks: 1, chars: 0 } })
     expect(only).toMatchObject({ ready: true, editsOnly: true, toReader: true })
-    expect(say(i18n, only.says.message, only.says.values)).toBe('Enter sends just your 2 edits and 1 ask to Haiku 9, about 100 tokens · Wikipedia reads none')
+    expect(say(i18n, only.says.message, only.says.values)).toBe('Enter sends just your 2 edits and 1 prompt in the text to Haiku 9, about 100 tokens · Wikipedia reads none')
     const along = promptPreview('glass', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 1, chars: 0 } })
     expect(also(along)).toContain('Your 1 edit goes to Haiku 9 at the same time, about 100 tokens · Wikipedia reads none')
   })

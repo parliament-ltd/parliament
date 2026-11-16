@@ -13,6 +13,7 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - marking (the collective word for notes, keywords, quotes and favourites) → 标记
 - note → 笔记 (not 备注, which reads as a field annotation; these are notes people write and keep)
 - comment → 批注 (C301 (c), 15 November: notes became comments, and every line that said 笔记 of one now says 批注, as the markup menu already had it; the type: word is comment). A tell: note stays 笔记.
+- prompt in the text → 正文中的提示词 (C301 (d), 15 November: asks became prompts in the text; every line that said 提问 of one now says 提示词; its box is 提示词框; an answered one reads "{name} 建议", with 拒绝 for reject).
 - keyword (kind.term) → 关键词
 - highlight (one passage marked where it sits) → 高亮
 - quote (n., a passage kept beside the chat, never sent) → 摘录 (hard choice: 引用 means citing, and is kept for the verb "quoting" in "a note quoting 218" → 引用 218. 摘录 is an excerpt you keep, which is what a quote is here)

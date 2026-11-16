@@ -50,6 +50,8 @@
   --ch-you: #2B5CB8;            /* 6.1, your words, solid underline */
   --ch-ai: #2E7458;             /* 5.4, an ask's answer or a sweep, dotted */
   --ch-rust: #94491F;           /* 6.3, Ripple, dashed */
+  --ch-prompt: #C2410C;         /* 5.0, a prompt in the text, with corner brackets and p> (C301 (d)) */
+  --ch-prompt-tint: rgba(194, 65, 12, .07);
   --ch-mark-edit: rgba(43, 92, 184, .45);
   --ch-mark-ask: rgba(46, 116, 88, .45);
   --ch-mark-note: rgba(124, 108, 212, .45);

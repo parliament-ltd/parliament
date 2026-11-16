@@ -3,7 +3,7 @@ import { EditorState, TextSelection } from 'prosemirror-state'
 import { replyFromMarkdown } from './fromMarkdown'
 import { toBlocks, fromBlocks, wordsOf } from './blocks'
 import { asksIn, editsIn } from './edits'
-import { startAsk, settleAsk, dropAsk, placeAnswer, answersIn, withoutAnswers } from './asks'
+import { startAsk, settleAsk, dropAsk, placeAnswer, answersIn, withoutAnswers, markerOf } from './asks'
 import { track, createIds, SKIP } from './track'
 
 // Asks (stage 11, piece 4; C218).
@@ -77,5 +77,17 @@ describe('answers in a reply', () => {
     const content = 'Here you are.\n\n[ask 241]\nnearly a century\n[/ask]\n\n[ask 242] In 1880 it still burned. [/ask]\n\nAnything else?'
     expect([...answersIn(content)]).toEqual([[241, 'nearly a century'], [242, 'In 1880 it still burned.']])
     expect(withoutAnswers(content)).toBe('Here you are.\n\nAnything else?')
+  })
+})
+
+describe('the marker after a prompt in the text (C301 (d), (e))', () => {
+  const words = { accept: 'accept', undo: 'reject', suggests: (name) => `${name} suggests`, someone: 'The model', title: (n) => String(n) }
+  it('says p> and its words while it waits, as the bar writes a prompt', () => {
+    expect(markerOf({ num: 241, question: 'say it plainer' }, false, words)).toEqual({ lead: 'p>', said: 'say it plainer', settle: false })
+    expect(markerOf(null, false, words)).toEqual({ lead: 'p>', said: '', settle: false })
+  })
+  it('says who suggests the answer once answered, to accept or reject', () => {
+    expect(markerOf({ num: 241, question: 'x', by: 'Sonnet 5.5' }, true, words)).toEqual({ lead: null, said: 'Sonnet 5.5 suggests', settle: true })
+    expect(markerOf({ num: 241 }, true, words).said).toBe('The model suggests')
   })
 })

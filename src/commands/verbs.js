@@ -53,7 +53,8 @@ const EDITING = ['room', 'docket', 'reflection', 'collection']
 const BUILDING = ['lab', 'room']
 // The kinds as people name them (C131: a term is a keyword, a docket a plan).
 // comment: a note, by its new name (C301 (c)); note still reads.
-const KINDS = ['chat', 'comment', 'note', 'highlight', 'keyword', 'quote', 'plan', 'edit', 'ask', 'suggestion']
+// prompt: an ask by its new name (C301 (d)); ask still reads.
+const KINDS = ['chat', 'comment', 'note', 'highlight', 'keyword', 'quote', 'plan', 'edit', 'prompt', 'ask', 'suggestion']
 const FRAMEWORKS = ['challenge', 'reasoning', 'pushback', 'alts', 'uncertain']
 
 export const GROUPS = Object.freeze([
@@ -217,7 +218,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'compare', group: 'collection', example: 'compare:201a 201b', forms: ['compare:201a 201b', 'compare:218 231', 'compare:201a 201b meaning'],
     // meaning at the end asks a model how they differ (C290).
     takes: [[], [{ many: 'addresses' }], ['addresses', ['meaning']], ['addresses', 'addresses', ['meaning']]], on: [...TABLES, 'library', 'room'], stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.compare', message: 'Set two side by side and mark the words that differ: notes, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ' } }),
+    gloss: /*i18n*/ { id: 'verb.compare', message: 'Set two side by side and mark the words that differ: comments, highlights, quotes, or the last replies of two branches. Nothing is sent to an AI model. Add meaning to ask one how they differ' } }),
   v({ verb: 'name', group: 'collection', example: 'name:"Q2 evidence"', forms: ['name:"Q2 evidence"', 'name:207 "New title"', 'name:"Review desk" "Two screens"'],
     takes: [['text'], ['address', 'text'], ['text', 'text']], stage: 4, undoable: true,
     gloss: /*i18n*/ { id: 'verb.name', message: 'Name what the bar is pointed at: a room, a collection or a chat. With two names, rename a saved arrangement' } }),
@@ -274,9 +275,12 @@ export const VERBS = Object.freeze([
   // Editing in place
   v({ verb: 'tell', group: 'editing', example: 'tell:"Keep it under a page"', rest: true, takes: [['text']], on: ['room'], stage: 11, undoable: true,
     gloss: /*i18n*/ { id: 'verb.tell', message: 'Write a note the model reads with your next prompt' } }),
-  // ask: (C218 (a), option 2): Ctrl+Shift+K in a reply does the same.
-  v({ verb: 'ask', group: 'editing', example: 'ask:"Add the year it opened"', forms: ['ask:', 'ask:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 11,
-    gloss: /*i18n*/ { id: 'verb.ask', message: 'Ask about the selected words in a reply, in your own words. It goes with your next prompt' } }),
+  // Asks became prompts in the text (C301 (d)): prompt: writes one, as
+  // Ctrl+Alt+P does in a reply, and ask:, its older name, still does.
+  v({ verb: 'prompt', group: 'editing', example: 'prompt:"Add the year it opened"', forms: ['prompt:', 'prompt:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 15,
+    gloss: /*i18n*/ { id: 'verb.prompt', message: 'Write a prompt in the text, on the words selected in a reply. It goes with your next Enter' } }),
+  v({ verb: 'ask', group: 'editing', example: 'ask:"Add the year it opened"', forms: ['ask:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 11,
+    gloss: /*i18n*/ { id: 'verb.ask', message: 'An older name: ask: writes a prompt in the text, as prompt: does', comment: 'Commands stay English' } }),
   // strikethrough: (C225 (c)): Ctrl+Shift+X in a reply does the same. The
   // strike is made in the reply, not by the bar, so undo: alone does not
   // take it back; undo: with its number does, and Ctrl+Z in the reply.

@@ -1203,8 +1203,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 
 /* Prompts hidden: an ask's passage, its point and its marker while it
    waits. Its answer is a change, shown with the edits. */
-.ch-shell.hide-prompts :is(.p-pair-host, .p-edit) .p-text .pm-ask { text-decoration: none; }
-.ch-shell.hide-prompts :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-point, .pm-ask-marker:not(.answered)) { display: none; }
+.ch-shell.hide-prompts :is(.p-pair-host, .p-edit) .p-text .pm-ask { background: none; }
+.ch-shell.hide-prompts :is(.p-pair-host, .p-edit) .p-text :is(.pm-ask-point, .pm-ask-bracket, .pm-ask-marker:not(.answered)) { display: none; }
 
 /* Highlights hidden: their colour, which each carries on itself, goes. */
 .ch-shell.hide-highlights :is(.p-pair-host, .p-edit) .p-text .pm-hl { background-color: transparent !important; }

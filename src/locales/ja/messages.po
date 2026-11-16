@@ -979,23 +979,33 @@ msgstr "{next}としてもう一度尋ねる"
 msgid "chat.askedAs"
 msgstr "{language}で「{text}」と質問"
 
-#. The label of the box an ask is written in
+#. The label of the box a prompt in the text is written in
 #. js-lingui-explicit-id
 msgid "chat.askLabel"
-msgstr "依頼"
-
-#. Before an ask number in the text: ask 241
-#. js-lingui-explicit-id
-msgid "chat.askMarker"
-msgstr "依頼"
+msgstr "プロンプト"
 
 #. js-lingui-explicit-id
 msgid "chat.askPlaceholder"
-msgstr "自分の言葉で依頼：もっと短く、開業した年を加えて、など"
+msgstr "自分の言葉で：もっと短く、開業した年を加えて、など"
+
+#. Who suggests, when the model is not known
+#. js-lingui-explicit-id
+msgid "chat.askSomeone"
+msgstr "モデル"
+
+#. {name} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "chat.askSuggests"
+msgstr "{name}の提案"
 
 #. js-lingui-explicit-id
+msgid "chat.askTitle"
+msgstr "プロンプト{num}：カードを探す"
+
+#. Takes back the answer to a prompt in the text
+#. js-lingui-explicit-id
 msgid "chat.askUndo"
-msgstr "取り消す"
+msgstr "却下"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1378,7 +1388,7 @@ msgstr "回答はここだけ：その後、該当箇所が変わりました"
 
 #. js-lingui-explicit-id
 msgid "collection.askAsked"
-msgstr "{name}に依頼"
+msgstr "{name}に送信"
 
 #. js-lingui-explicit-id
 msgid "collection.askAtPoint"
@@ -1398,7 +1408,7 @@ msgstr "並べ替え"
 
 #. js-lingui-explicit-id
 msgid "collection.card"
-msgstr "{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} edit {編集{num}} ask {質問{num}} suggestion {提案{num}} other {{num}}}"
+msgstr "{kind, select, note {コメント{num}} term {ハイライト{num}} quote {引用{num}} highlight {ハイライト{num}} chat {チャット{num}} docket {プラン{num}} edit {編集{num}} ask {プロンプト{num}} suggestion {提案{num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -1711,7 +1721,7 @@ msgstr "すべて"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAsk"
-msgstr "依頼"
+msgstr "プロンプト"
 
 #. js-lingui-explicit-id
 msgid "collection.tabEdit"
@@ -2156,27 +2166,27 @@ msgstr "名前を付けてください：arrange:save \"レビュー用デスク
 
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
-msgstr "Enterで、返答で選択した言葉、またはカーソルの位置に、この依頼を残します。次のプロンプトと一緒に送られます"
+msgstr "Enterで、返答で選択した言葉、またはカーソルの位置に、このプロンプトを残します。次にEnterを押すと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "enter.askKept"
-msgstr "依頼として残しました。次のプロンプトと一緒に送られます"
+msgstr "テキスト内のプロンプトとして残しました。次にEnterを押すと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "enter.askLong"
-msgstr "依頼は{max}文字までです"
+msgstr "テキスト内のプロンプトは{max}文字までです"
 
 #. js-lingui-explicit-id
 msgid "enter.askNoReply"
-msgstr "先に返答をクリックするか、依頼する言葉を選択してから、もう一度 ask: を使ってください"
+msgstr "先に返答をクリックするか、対象の言葉を選択してから、もう一度 prompt: を使ってください"
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "依頼は返答に付けるものです。プロンプトでは、取り消し線を引くか上書きしてください"
+msgstr "テキスト内のプロンプトは返答に付けるものです。自分のプロンプトでは、取り消し線を引くか上書きしてください"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
-msgstr "Enterで、返答で選択した言葉、またはカーソルの位置に依頼欄を開きます"
+msgstr "Enterで、返答で選択した言葉、またはカーソルの位置にプロンプト欄を開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.attachFull"
@@ -2379,7 +2389,7 @@ msgstr "{num}はもう元の場所にないため、何も変わっていませ�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.changeNotThis"
-msgstr "{num}は編集か依頼です。専用のコマンドで操作します：hold:、undo:、accept:、reject:、jump:"
+msgstr "{num}は編集かテキスト内のプロンプトです。専用のコマンドで操作します：hold:、undo:、accept:、reject:、jump:"
 
 #. js-lingui-explicit-id
 msgid "enter.checkClean"
@@ -2776,12 +2786,12 @@ msgstr "まだ送信していないものは、単独の行で削除してくだ
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAsks"
-msgstr "{count, plural, other {Enterで依頼{nums}を取り下げます。undo: で元に戻せます}}"
+msgstr "{count, plural, other {Enterでプロンプト{nums}を取り下げます。undo: で元に戻せます}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteAskSent"
-msgstr "依頼{num}はモデルに送られたため、残ります。回答は accept: か reject: で確定します"
+msgstr "プロンプト{num}はモデルに送られたため、残ります。回答は accept: か reject: で確定します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4598,24 +4608,24 @@ msgstr "{language}版から。見つからなければ英語版から"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr "一緒に1回だけ伝えるもの：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}・{name}が読みます"
+msgstr "一緒に1回だけ伝えるもの：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}・{name}が読みます"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr "入力なし：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}だけを{name}に伝えます"
+msgstr "入力なし：{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}だけを{name}に伝えます"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnlyReader"
-msgstr "Enterで、{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}だけを{name}に送ります（約{tokens}トークン）・{source}はどれも読みません"
+msgstr "Enterで、{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}だけを{name}に送ります（約{tokens}トークン）・{source}はどれも読みません"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsToReader"
-msgstr "{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}は同時に{name}に{total, plural, other {送られます}}（約{tokens}トークン）・{source}はどれも読みません"
+msgstr "{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}は同時に{name}に{total, plural, other {送られます}}（約{tokens}トークン）・{source}はどれも読みません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr "{source}は{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {依頼#件}}を読みません。キーがあればモデルが読みます：api:"
+msgstr "{source}は{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}を読みません。キーがあればモデルが読みます：api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -5582,12 +5592,12 @@ msgstr "Enterで、新しいチャットの名前付けをオンにします。�
 
 #. js-lingui-explicit-id
 msgid "enter.settleAccept"
-msgstr "{count, plural, other {Enterで、依頼{nums}への回答を返答に残し、元の箇所を消します}}"
+msgstr "{count, plural, other {Enterで、プロンプト{nums}への回答を返答に残し、元の箇所を消します}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleCardOnly"
-msgstr "依頼{num}の箇所は依頼のあとに変わったため、回答はカードにだけあります。reject:{num} で破棄できます"
+msgstr "プロンプト{num}の箇所は書いたあとに変わったため、回答はカードにだけあります。reject:{num} で破棄できます"
 
 #. js-lingui-explicit-id
 msgid "enter.settleEditsLetGo"
@@ -5603,16 +5613,16 @@ msgstr "ここのチャットには、確認待ちの回答も提案も保留中
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
-msgstr "依頼{num}にはまだ回答がありません"
+msgstr "プロンプト{num}にはまだ回答がありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr "{num}は依頼でも提案でもありません。accept: と reject: は、依頼への回答か提案を確定するコマンドです"
+msgstr "{num}はテキスト内のプロンプトでも提案でもありません。accept: と reject: は、プロンプトへの回答か提案を確定するコマンドです"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
-msgstr "{count, plural, other {Enterで、依頼{nums}への回答を取り消し、元の箇所を残します}}"
+msgstr "{count, plural, other {Enterで、プロンプト{nums}への回答を取り消し、元の箇所を残します}}"
 
 #. state is accepted or rejected
 #. js-lingui-explicit-id
@@ -6217,12 +6227,12 @@ msgstr "{board}では、type: に highlight、quote、comment のいずれかを
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskAnswered"
-msgstr "依頼{num}には回答があります：accept:{num} で回答を残し、reject:{num} で取り消せます"
+msgstr "プロンプト{num}には回答があります：accept:{num} で回答を残し、reject:{num} で取り消せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAskUse"
-msgstr "送信待ちの依頼は delete:{num} で取り下げます"
+msgstr "送信待ちのプロンプトは delete:{num} で取り下げます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -7157,7 +7167,7 @@ msgstr "{count, plural, other {{names}はプレビュー版で、何を選んで
 
 #. js-lingui-explicit-id
 msgid "kind.ask"
-msgstr "質問"
+msgstr "プロンプト"
 
 #. js-lingui-explicit-id
 msgid "kind.chat"
@@ -7845,7 +7855,7 @@ msgstr "{kind, select, edits {編集} highlights {ハイライト} prompts {プ�
 
 #. js-lingui-explicit-id
 msgid "markupMenu.kindAbout"
-msgstr "{kind, select, edits {自分の編集と、提案された変更} highlights {マークした言葉} prompts {テキスト内の質問（待機中または回答済み）} other {言葉やメッセージ全体に付けた自分のコメント。送信されません}}"
+msgstr "{kind, select, edits {自分の編集と、提案された変更} highlights {マークした言葉} prompts {テキスト内の自分のプロンプト（待機中または回答済み）} other {言葉やメッセージ全体に付けた自分のコメント。送信されません}}"
 
 #. js-lingui-explicit-id
 msgid "markupMenu.mode"
@@ -8397,7 +8407,7 @@ msgstr "メモとして残す"
 
 #. js-lingui-explicit-id
 msgid "reflection.markAsks"
-msgstr "{count, plural, other {依頼#件}}"
+msgstr "{count, plural, other {テキスト内のプロンプト#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.marked"
@@ -8417,7 +8427,7 @@ msgstr "まだ何もマーキングしていません。"
 
 #. js-lingui-explicit-id
 msgid "reflection.markNotes"
-msgstr "{count, plural, other {メモ#件}}"
+msgstr "{count, plural, other {コメント#件}}"
 
 #. js-lingui-explicit-id
 msgid "reflection.markQuotes"
@@ -9746,9 +9756,10 @@ msgstr "削除せずに、しまっておく"
 msgid "verb.arrange"
 msgstr "ウインドウも含めた画面全体の配置を切り替える、または保存する。arrange:save は open:202 203 records spread arrange:save \"朝\" のように、レイアウトのコマンドを並べた行の最後にも書けます"
 
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "verb.ask"
-msgstr "返答で選択した言葉について、自分の言葉で依頼する。次のプロンプトと一緒に送られます"
+msgstr "以前の名前：ask: は prompt: と同じくテキスト内にプロンプトを書きます"
 
 #. js-lingui-explicit-id
 msgid "verb.attach"
@@ -9797,7 +9808,7 @@ msgstr "人のためのコメントを書く。送信されることはありま
 
 #. js-lingui-explicit-id
 msgid "verb.compare"
-msgstr "2つを並べて、違う語に印を付ける：メモ、ハイライト、引用、または2つのブランチの最後の返答。AIモデルには何も送信されません。meaning と書き足すと、意味の違いをモデルに尋ねます"
+msgstr "2つを並べて、違う語に印を付ける：コメント、ハイライト、引用、または2つのブランチの最後の返答。AIモデルには何も送信されません。meaning と書き足すと、意味の違いをモデルに尋ねます"
 
 #. js-lingui-explicit-id
 msgid "verb.continue"
@@ -9968,6 +9979,10 @@ msgstr "1つまたは複数のボードか、バーを別ウインドウに出�
 #. js-lingui-explicit-id
 msgid "verb.privacy"
 msgstr "プロンプトを送る前に、メールアドレス、電話番号、銀行口座番号、カード番号を仮の文字列に置き換える。人名も含めるか、何も置き換えないかも選べます"
+
+#. js-lingui-explicit-id
+msgid "verb.prompt"
+msgstr "返答で選択した言葉に、テキスト内のプロンプトを書く。次にEnterを押すと一緒に送られます"
 
 #. js-lingui-explicit-id
 msgid "verb.quote"

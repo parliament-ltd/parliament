@@ -254,6 +254,15 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
       ? 'The whole chart is selected: Backspace strikes it whole. Click into its title or numbers to change them.'
       : `A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
+  // An ask, now a prompt in the text (C218; C301 (d)): in a reply only.
+  const askHere = (state, view) => {
+    if (!onAsk) return false
+    if (!blk(state)) {
+      onNote?.('Prompts in the text are for replies. In your own prompt, strike or type over it.')
+      return true
+    }
+    return onAsk(view)
+  }
   const strike = (state, dispatch) => {
     const tr = strikeSelection(state)
     if (tr) dispatch(tr)
@@ -276,14 +285,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     'Shift-Tab': (state, dispatch) => moveCell(state, dispatch, 'prev'),
     // An ask (piece 4; C218 (a)): Ctrl+K stays the bar's. In a reply only:
     // asks are for replies, the spec says, and a prompt says so.
-    'Shift-Mod-k': (state, dispatch, view) => {
-      if (!onAsk) return false
-      if (!blk(state)) {
-        onNote?.('Asks are for replies. In your prompt, strike or type over it.')
-        return true
-      }
-      return onAsk(view)
-    },
+    'Shift-Mod-k': (state, dispatch, view) => askHere(state, view),
+    // A prompt in the text (C301 (d)): an ask by its new name, Ctrl+Alt+P as ruled.
+    'Mod-Alt-p': (state, dispatch, view) => askHere(state, view),
     // A comment on the selected words (C301 (c)), in a prompt or a reply, as
     // Google Docs has it. Never sent.
     'Mod-Alt-m': (state, dispatch, view) => (onComment ? onComment(view) : false),

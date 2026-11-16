@@ -71,7 +71,7 @@ const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan'
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
+const ACTS = Object.freeze(['name', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -375,7 +375,7 @@ function planViewStep(view, step, records = {}) {
 }
 
 // A tab's kind as type: names it, for clear:type on the Collection.
-const TAB_WORD = Object.freeze({ term: 'highlight', highlight: 'highlight', quote: 'quote', note: 'comment', edit: 'edit', ask: 'ask', suggestion: 'suggestion' })
+const TAB_WORD = Object.freeze({ term: 'highlight', highlight: 'highlight', quote: 'quote', note: 'comment', edit: 'edit', ask: 'prompt', suggestion: 'suggestion' })
 
 /**
  * One filter, sort:, type: or clear: on the Collection (C144 (d), (e);
@@ -1166,6 +1166,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       arrange: (a1, s1, sc) => planArrange(a1, s1, sc),
       // ask: (stage 11, piece 4; C218 (a)).
       ask: (a1, s1) => planAsk(s1),
+      // An ask by its new name (C301 (d)).
+      prompt: (a1, s1) => planAsk(s1),
       // strikethrough: and tell: (piece 7; C225 (c), (d)).
       strikethrough: planStrike,
       tell: (a1, s1, sc) => planTell(s1, sc),
