@@ -8,7 +8,7 @@
 import { EditorState } from 'prosemirror-state'
 import { schema } from './schema'
 import { fromBlocks, toBlocks } from './blocks'
-import { undoEdit } from './track'
+import { undoEdit, keepEdit } from './track'
 import { settleAsk, dropAsk } from './asks'
 import { editsIn, asksIn } from './edits'
 import { suggestionsIn } from './suggestions'
@@ -20,10 +20,11 @@ function carries(doc, how, id) {
   let found = false
   doc.descendants((node) => {
     if (found) return false
-    if (how === 'undoEdit' && node.attrs?.struck === id) found = true
+    const anEdit = how === 'undoEdit' || how === 'keepEdit'
+    if (anEdit && node.attrs?.struck === id) found = true
     if (node.type.name === 'ask_point' && node.attrs.ask === id) found = true
     for (const m of node.marks ?? []) {
-      if (how === 'undoEdit' ? (m.type.name === 'struck' || m.type.name === 'added') && m.attrs.edit === id : m.attrs?.ask === id) found = true
+      if (anEdit ? (m.type.name === 'struck' || m.type.name === 'added') && m.attrs.edit === id : m.attrs?.ask === id) found = true
     }
     return !found
   })
@@ -34,7 +35,8 @@ function carries(doc, how, id) {
  * The stored form after one change, with the edits and asks it now holds,
  * or null when the edit or ask is not in it.
  * @param {object[]} blocks the stored form
- * @param {'undoEdit'|'accept'|'undo'|'drop'} how
+ * @param {'undoEdit'|'keepEdit'|'accept'|'undo'|'drop'} how keepEdit: an edit
+ *   becomes the text, unmarked (your own text no model has read, C301 (f))
  * @param {string} id the edit's or ask's id (its marks carry it)
  * @returns {{ blocks: object[], edits: Map<string, object>, asks: Map<string, object> } | null}
  */
@@ -43,8 +45,9 @@ export function changeStored(blocks, how, id) {
   if (!doc || !id || !carries(doc, how, id)) return null
   const state = EditorState.create({ schema, doc })
   const tr = how === 'undoEdit' ? undoEdit(state, id)
-    : how === 'drop' ? dropAsk(state, id)
-      : settleAsk(state, id, how === 'accept' ? 'accept' : 'undo')
+    : how === 'keepEdit' ? keepEdit(state, id)
+      : how === 'drop' ? dropAsk(state, id)
+        : settleAsk(state, id, how === 'accept' ? 'accept' : 'undo')
   const after = state.apply(tr).doc
   return { blocks: toBlocks(after), edits: editsIn(after), asks: asksIn(after), suggestions: suggestionsIn(after) }
 }

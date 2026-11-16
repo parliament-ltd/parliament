@@ -962,6 +962,11 @@ msgstr "Parliamentに保存された{kind, select, note {コメント{num}} term
 msgid "chat.answeredFrom"
 msgstr "{source}からの回答"
 
+#. A reply that held only answers placed in the text (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.answeredInText"
+msgstr "{count, plural, other {{name}がテキスト内のプロンプト#件に、それぞれ書かれた場所で答えました}}"
+
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
 msgstr "受け入れる"
@@ -1169,6 +1174,11 @@ msgstr "どのチャットの横に引用しますか？"
 msgid "chat.searchedFor"
 msgstr "「{text}」を検索"
 
+#. A prompt with no words of its own (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.sentOnly"
+msgstr "{what, select, prompts {テキスト内のプロンプトを{name}に送りました} other {編集とテキスト内のプロンプトを{name}に送りました}}"
+
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
 msgstr "原文を表示"
@@ -1294,6 +1304,10 @@ msgstr "{by}が{language}に翻訳"
 #. js-lingui-explicit-id
 msgid "chat.translatedByBrowser"
 msgstr "このブラウザが{language}に翻訳"
+
+#. js-lingui-explicit-id
+msgid "chat.writingLabel"
+msgstr "あなたのテキスト"
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
@@ -4794,6 +4808,18 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, other {{n}. {name}、約#トークン、{cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOnly"
+msgstr "{count, plural, other {入力なし：Enterで#件に同時に尋ねます。それぞれ独立したブランチで、待っているものがそれぞれに伝わります}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyCheap"
+msgstr "{count, plural, other {入力なし：Enterで#件に同時に尋ねます。それぞれ独立したブランチで、待っているものがそれぞれに伝わります：送信は合計{cost}未満}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyTotal"
+msgstr "{count, plural, other {入力なし：Enterで#件に同時に尋ねます。それぞれ独立したブランチで、待っているものがそれぞれに伝わります：送信は合計{cost}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {Enterで、この1つのプロンプトを#件に順番に送ります。それぞれが独立したブランチになります。2件目以降は、条件を満たした場合にだけ実行します}}"
 
@@ -4808,6 +4834,10 @@ msgstr "{count, plural, other {Enterで、この1つのプロンプトを#件に
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}、キー不要、費用なし"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySourceWaits"
+msgstr "{source}は待っているものを何も読みません。プロンプトを入力するか、モデルだけに尋ねてください"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
@@ -4840,6 +4870,10 @@ msgstr "{count, plural, other {Enterで、この1つのプロンプトを#件に
 #. js-lingui-explicit-id
 msgid "enter.promptManyUnpriced"
 msgstr "{tokens, plural, other {{n}. {name}、約#トークン}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyWaits"
+msgstr "それぞれに{edits, plural, =0 {} other {編集#件}}{both, select, yes {と} other {}}{asks, plural, =0 {} other {テキスト内のプロンプト#件}}が伝わります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5030,6 +5064,18 @@ msgstr "ウェブを検索することがあります：最大{most}回、1回�
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
 msgstr "{whos}はウェブを検索できないため、{count, plural, other {検索なしで送ります}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingAlone"
+msgstr "あなたのテキストは、それだけで送られることはありません。Ctrl+Alt+Pでその中にプロンプトを書くか、ここに入力してください"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingGoes"
+msgstr "あなたのテキストも一緒に送られ、{name}が初めて読みます"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingSource"
+msgstr "{name}が読むのは入力した言葉だけで、あなたのテキストは読みません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -8735,6 +8781,10 @@ msgstr "このルームを表示できませんでした。チャットはその
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "名前のないルーム"
+
+#. js-lingui-explicit-id
+msgid "room.writeHere"
+msgstr "ここに書くか、バーにプロンプトを入力してください。"
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id

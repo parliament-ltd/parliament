@@ -962,6 +962,11 @@ msgstr ""
 msgid "chat.answeredFrom"
 msgstr ""
 
+#. A reply that held only answers placed in the text (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.answeredInText"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
 msgstr ""
@@ -1169,6 +1174,11 @@ msgstr ""
 msgid "chat.searchedFor"
 msgstr ""
 
+#. A prompt with no words of its own (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.sentOnly"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
 msgstr ""
@@ -1293,6 +1303,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.translatedByBrowser"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.writingLabel"
 msgstr ""
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
@@ -4794,6 +4808,18 @@ msgid "enter.promptManyModel"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyTotal"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr ""
 
@@ -4807,6 +4833,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySourceWaits"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4839,6 +4869,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyWaits"
 msgstr ""
 
 #. Commands stay English
@@ -5029,6 +5063,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingGoes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingSource"
 msgstr ""
 
 #. Commands stay English
@@ -8734,6 +8780,10 @@ msgstr ""
 #. A room with no name of its own (bar reference)
 #. js-lingui-explicit-id
 msgid "room.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.writeHere"
 msgstr ""
 
 #. A button that closes the map of screens

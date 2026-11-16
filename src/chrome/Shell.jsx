@@ -3,7 +3,9 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat, getPins, addPin, deleteMessage as dbDeleteMessage } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat, getPins, addPin, deleteMessage as dbDeleteMessage, addMessage } from '../lib/db'
+import { focusWhenDrawn } from '../editing/writeFocus'
+import { isDraft as writingIsDraft, writingOf } from '../lib/writing'
 import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
 import { TEMPLATES } from '../lib/seedTemplates'
 import { openSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arrangements'
@@ -11,7 +13,7 @@ import { savedOf } from '../lib/savedArrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor, planBeside } from '../shell/arrangement'
+import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, planWritten, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor, planBeside } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, nextAdvanced, showSteps, stepsShown, stepsMade, stepsKept, advancedNumbers, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -2408,6 +2410,30 @@ export default function Shell() {
   const replyNow = useRef(null) // what replies are in, for the send (C166)
   useEffect(() => { latest.current = { settings, locale: i18n.locale } })
 
+  // Your own text, first written in an empty room (C301 (f)): when you pause,
+  // its chat is made, numbered and titled from its first words here, with
+  // nothing sent, and the room shows it. Who answers and the frameworks
+  // chosen for the room go with it, as a first prompt would take them.
+  // typed: what was typed while the chat was being made, to go after it.
+  const startWriting = useCallback(async (board, { blocks, content, typed }) => {
+    if (creating.current || !String(content ?? '').trim()) return null
+    creating.current = true
+    try {
+      const chat = await createConversation({ title: titleFromPrompt(content), model: latest.current.settings?.defaultModel, answerer: typeof pendingNow.current === 'string' ? pendingNow.current : null, frameworks: pendingFwNow.current ?? null })
+      moveTell('', chat.id)
+      setPendingAnswerer(null)
+      setPendingFrameworks(null)
+      await assignDefaultRoom(chat.id, newChatTemplate(latest.current.settings?.newChatRoom))
+      const own = await addMessage({ conversationId: chat.id, role: 'user', content, writing: true, blocks })
+      focusWhenDrawn(own.id, typed)
+      const placed = planWritten(current.current, board, chat.id)
+      if (placed.next) await run(placed.next, null)
+      return chat.id
+    } finally {
+      creating.current = false
+    }
+  }, [createConversation, moveTell, run])
+
   // The chats as they stand on disk, for "the last room".
   useEffect(() => { loadConversations().catch(() => {}) }, [loadConversations])
 
@@ -3574,6 +3600,8 @@ export default function Shell() {
     model: (branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer).name,
     answerer: branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer,
     historyChars: about ? 0 : historyChars(along) + (includeHere && answerer.group !== 'source' ? includeHere.items.reduce((n, x) => n + (x.chars ?? 0), 0) : 0),
+    // Your own text in the room's chat, and whether a model has read it (C301 (f)).
+    writing: about ? null : (() => { const own = writingOf(kept); return own ? { draft: writingIsDraft(own, kept) } : null })(),
     // The privacy filter on a search, as it is set (C179).
     privacySearch: { on: (settings.privacyFilter ?? 'off') !== 'off' },
     // Answers from sources held for this prompt (C176).
@@ -3630,7 +3658,7 @@ export default function Shell() {
     features: { offered, web: webHere, canSearch: whosHere.some(canSearch), files: filesHere.map((f) => ({ id: f.id, name: f.name, size: f.size })) },
     // Ripple's checks are skipped in a room that sends only to this computer, when its helper is not on it.
     rippleHeld: Boolean(localHere && !localHere.helperLocal && rippleFacts),
-  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, keyInfo, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, joinedHere, readerHere, tellsHere, rippleFacts, reflecting, waitingBy])
+  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, keyInfo, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, joinedHere, readerHere, tellsHere, rippleFacts, reflecting, waitingBy, kept])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and
@@ -3818,7 +3846,9 @@ export default function Shell() {
     // A prompt to several at once (stage 8; C172): the chat here answers
     // with the first, each other is a new branch of its plan from the same
     // point, and all write at once. Every one must be able to answer.
-    if (text && !aboutNow && shown?.many?.length > 1) {
+    // With nothing typed, what waits in the text goes to each (C301 (f)).
+    const waitsHere = Boolean(chatId && (shown?.edits?.count || shown?.edits?.asks))
+    if ((text || waitsHere) && !aboutNow && shown?.many?.length > 1) {
       const held = heldManyNow.current
       const ids = held && held.room === (chatId ?? NEW_ROOM) ? held.ids : null
       if (!ids || ids.join('|') !== shown.many.map((w) => w.id).join('|')) return { refused: 'promptChanged' }
@@ -3847,7 +3877,8 @@ export default function Shell() {
         const last = before.length ? before[before.length - 1] : null
         for (const w of whos.slice(1)) {
           const opts = { title: base?.title ?? titleFromPrompt(text), model: w.group === 'model' ? w.id : base?.model, answerer: w.id, frameworks: fwIds }
-          const made = last ? await createBranch(id, last.id, opts) : await createConversation({ ...opts, parentId: id, room: base?.room ?? null })
+          // What waits in the text comes too, so each answers it (C301 (f), ruled 16 November).
+          const made = last ? await createBranch(id, last.id, { ...opts, waiting: true }) : await createConversation({ ...opts, parentId: id, room: base?.room ?? null })
           others.push(made.id)
         }
       } catch {
@@ -4399,7 +4430,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} onWrite={writeField} kept={chat && chat === roomId ? editsKeptHere : 0} alone={windowed || onlyBoard} onStartWriting={chat ? null : startWriting} />
     }
     if (board === 'almanac') {
       return (

@@ -72,6 +72,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   const [notice, setNotice] = useState(null) // a key of COPY.enter, or { message, values }
   const walk = useRef({ lines: [], index: -1, draft: '' })
   const sendingNow = useRef(false) // a prompt on its way from this bar
+  const fromText = useRef(null) // Ctrl+Enter in a room's text (C301 (f))
   const input = useRef(null)
   const reply = useRef(null) // the reply being edited, to return the caret to
   const hover = useRef(0)
@@ -322,6 +323,15 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     const failed = await out?.done
     if (failed) setNotice(failed)
   }
+
+  // Ctrl+Enter in a room's text does what Enter here would, on a prompt
+  // only, never a command (C301 (a), (f)).
+  useEffect(() => { fromText.current = () => { if (prompting) send() } })
+  useEffect(() => {
+    const on = () => fromText.current?.()
+    window.addEventListener('parliament-send-from-text', on)
+    return () => window.removeEventListener('parliament-send-from-text', on)
+  }, [])
 
   async function enter() {
     if (prompting) { await send(); return }

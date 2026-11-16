@@ -41,7 +41,8 @@ import { useChatEdits } from '../../stores/useChatEdits'
 import { settleAsk as dbSettleAsk, settleSuggestion as dbSettleSuggestion } from '../../lib/db'
 const NO_ASK_INFO = new Map()
 import { waiting as editWaits, tellsOf } from '../../editing/told'
-import { withoutAnswers } from '../../editing/answers'
+import { withoutAnswers, answersIn } from '../../editing/answers'
+import { isDraft, draftWords } from '../../lib/writing'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
 import { usePlanOf, waitingIn } from '../../stores/usePlanOf'
@@ -127,7 +128,7 @@ const editableReply = (m, streamingId) => m.role === 'assistant' && m.id !== str
 export default function MessagesRender() {
   // The conversation this board shows, told by the board (stage 3).
   const conversationId = useConversationId()
-  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation, saveEditedReply } = useRoomChat()
+  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation, saveEditedReply, keepDraftEdits } = useRoomChat()
   // The reply being written, read from the chat store, so only this list
   // redraws while it streams; the rest of the page does not (stage 3).
   const streamingContent = useStreamText(activeConversationId)
@@ -415,6 +416,15 @@ export default function MessagesRender() {
     }
     return (messageId) => byMessage.get(messageId) ?? NO_ASK_INFO
   }, [chatAsks])
+  // A prompt with no words of its own that carried prompts in the text, and
+  // to whom (C301 (f)); one that carried only edits says so as before.
+  const sentOf = useCallback((msg) => {
+    if (msg.role !== 'user' || msg.content || !msg.told) return null
+    const ask = [...chatAsks.values()].flat().find((r) => r.sent?.prompt === msg.id)
+    if (!ask) return null
+    const edits = [...chatEdits.values()].flat().some((r) => r.sent?.prompt === msg.id)
+    return { what: edits ? 'both' : 'prompts', name: modelFacts(ask.sent.to)?.name ?? ask.sent.to ?? '' }
+  }, [chatAsks, chatEdits])
   const settleAskOf = useCallback((messageId, askId, how) => {
     dbSettleAsk(`${messageId}:${askId}`, how === 'accept' ? 'accepted' : 'taken back').catch(() => {})
   }, [])
@@ -562,9 +572,15 @@ export default function MessagesRender() {
       comments: comments.get(msg.id) ?? null,
       onComment: keepComment,
       commentWords,
+      // Your own text, and a reply that was only answers in the text (C301 (f)).
+      writing: msg.writing === true,
+      answered: msg.role === 'assistant' && !msg.source && !isLatestAssistantStreaming && msg.content && !withoutAnswers(msg.content)
+        ? { count: answersIn(msg.content).size, name: modelFacts(msg.model)?.name ?? '' }
+        : null,
+      sent: sentOf(msg),
     }
   }, [
-    saveEditedReply, suggesting, closedEdits, heldEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
+    saveEditedReply, suggesting, closedEdits, heldEdits, toldToOf, sentOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
     comments, keepComment, commentWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
@@ -586,6 +602,8 @@ export default function MessagesRender() {
     const out = []
     for (let i = 0; i < items.length; i++) {
       const m = items[i]
+      // Your own text is a page of its own, never paired with a reply (C301 (f)).
+      if (!m.kind && m.writing === true) { out.push({ kind: 'writing', key: `writing-${m.id}`, id: m.id, message: m }); continue }
       const prompt = !m.kind && m.role === 'user' && typeof m.content === 'string' && stripAttachedFileBlocks(m.content).trim() !== ''
       if (!prompt) { out.push(m); continue }
       const next = items[i + 1]
@@ -656,6 +674,61 @@ export default function MessagesRender() {
     )
   }, [cardPropsOf, quotesByMessage, highlightsByMessage, comments, keepComment, commentWords, editedLineOf, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
 
+  // Your own text (C301 (f)): a page of its own, marked like any reply. Until
+  // a model has read it, it is a draft: in Editing what you type is simply
+  // the text, untracked, and its stored words follow it; a change made in
+  // Suggesting is held back, and the words a model would read leave it out.
+  const draftNow = useMemo(() => {
+    const own = messages.find((m) => m.writing === true)
+    return own ? isDraft(own, messages) : false
+  }, [messages])
+  const letGoIn = useCallback((messageId) => new Set([...chatEdits.values()].flat().filter((r) => r.messageId === messageId && !r.held && !r.sent).map((r) => r.edit)), [chatEdits])
+  // A change held back in your draft and then accepted goes into the text,
+  // unmarked, with nothing to tell (C301 (f), ruled 16 November).
+  const keptWas = useRef('')
+  useEffect(() => {
+    if (!draftNow || !keepDraftEdits) return
+    const own = messages.find((m) => m.writing === true)
+    const letGo = own ? [...letGoIn(own.id)] : []
+    const key = own ? `${own.id}:${letGo.join(',')}` : ''
+    if (!letGo.length || keptWas.current === key) return
+    keptWas.current = key
+    keepDraftEdits(activeConversationId, own.id, letGo).catch(() => { keptWas.current = '' })
+  }, [draftNow, messages, letGoIn, keepDraftEdits, activeConversationId])
+  const renderWriting = useCallback((item, idx) => {
+    const message = item.message
+    const sections = [{ part: 'writing', message, card: cardPropsOf(message, idx), quotes: quotesByMessage.get(message.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(message.id) ?? NO_QUOTES, comments: comments.get(message.id)?.words ?? NO_QUOTES }]
+    const onSave = (messageId, saved) => {
+      // In a draft, every change marked is held back unless it was let go.
+      const letGo = letGoIn(messageId)
+      const held = [...(saved.edits?.keys?.() ?? [])].map(String).filter((k) => !letGo.has(k))
+      return saveEditedReply(activeConversationId, messageId, { ...saved, held: suggesting, content: draftNow ? draftWords(saved.blocks, held) : null })
+    }
+    return (
+      <EditableMessages
+        key={item.key}
+        sections={sections}
+        terms={NO_QUOTES}
+        quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
+        clean={false}
+        untracked={draftNow && !suggesting}
+        onSave={onSave}
+        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.writingLabel) }}
+        closedEdits={closedEdits}
+        heldEdits={heldEdits}
+        askInfo={pairAsks(sections)}
+        onSettleAsk={settleAskOf}
+        askWords={askWords}
+        sugInfo={pairSugs(sections)}
+        onSettleSuggestion={settleSugOf}
+        sugWords={sugWords}
+        titleWords={titleWords}
+        onComment={keepComment}
+        commentWords={commentWords}
+      />
+    )
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, comments, keepComment, commentWords, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords, draftNow, letGoIn])
+
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {
     const chat = conversations.find((c) => c.id === chatId)
@@ -683,6 +756,7 @@ export default function MessagesRender() {
   // tabs of its own (again:, C177).
   function renderItem(item, idx) {
     if (item.kind === 'pair') return renderPair(item, idx)
+    if (item.kind === 'writing') return renderWriting(item, idx)
     return item.kind === 'slider'
       ? <BranchSlider key={item.key} item={item} line={activeConversationId} infoOf={infoOf} renderLine={renderItem} numberOf={numberOf} />
       : renderCard(item, idx)

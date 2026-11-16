@@ -962,6 +962,11 @@ msgstr "{kind, select, note {kommentar {num}, sparad i Parliament} term {markeri
 msgid "chat.answeredFrom"
 msgstr "Svar från {source}"
 
+#. A reply that held only answers placed in the text (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.answeredInText"
+msgstr "{count, plural, one {{name} besvarade # prompt i texten, där den ställdes} other {{name} besvarade # promptar i texten, där de ställdes}}"
+
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
 msgstr "godta"
@@ -1169,6 +1174,11 @@ msgstr "Vilken chatt ska citatet ligga bredvid?"
 msgid "chat.searchedFor"
 msgstr "Sökte efter ”{text}”"
 
+#. A prompt with no words of its own (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.sentOnly"
+msgstr "{what, select, prompts {Dina promptar i texten, skickade till {name}} other {Dina redigeringar och promptar i texten, skickade till {name}}}"
+
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
 msgstr "visa originalet"
@@ -1294,6 +1304,10 @@ msgstr "Översatt till {language} av {by}"
 #. js-lingui-explicit-id
 msgid "chat.translatedByBrowser"
 msgstr "Översatt till {language} av den här webbläsaren"
+
+#. js-lingui-explicit-id
+msgid "chat.writingLabel"
+msgstr "Din text"
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
@@ -4794,6 +4808,18 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, one {{n}. {name}, cirka # token, {cost}} other {{n}. {name}, cirka # tokens, {cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOnly"
+msgstr "{count, plural, other {Inget skrivet: Enter frågar # på en gång, var och en i en egen gren, och var och en får veta det som väntar}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyCheap"
+msgstr "{count, plural, other {Inget skrivet: Enter frågar # på en gång, var och en i en egen gren, och var och en får veta det som väntar: under {cost} sammanlagt att skicka}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyTotal"
+msgstr "{count, plural, other {Inget skrivet: Enter frågar # på en gång, var och en i en egen gren, och var och en får veta det som väntar: {cost} sammanlagt att skicka}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {Enter skickar den här prompten till #, en efter en, var och en i en egen gren. Var och en efter den första körs bara om dess villkor är uppfyllt}}"
 
@@ -4808,6 +4834,10 @@ msgstr "{count, plural, other {Enter skickar den här prompten till #, en efter 
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}, ingen nyckel och ingen kostnad"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySourceWaits"
+msgstr "{source} läser inget av det som väntar. Skriv en prompt, eller fråga bara modeller"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
@@ -4840,6 +4870,10 @@ msgstr "{count, plural, other {Enter skickar den här prompten till #, var och e
 #. js-lingui-explicit-id
 msgid "enter.promptManyUnpriced"
 msgstr "{tokens, plural, one {{n}. {name}, cirka # token} other {{n}. {name}, cirka # tokens}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyWaits"
+msgstr "Var och en får veta {edits, plural, =0 {} one {# redigering} other {# redigeringar}}{both, select, yes { och } other {}}{asks, plural, =0 {} one {# prompt i texten} other {# promptar i texten}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5030,6 +5064,18 @@ msgstr "Den kan söka på webben: högst {most} sökningar, cirka {cost} per sö
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
 msgstr "{whos} kan inte söka på webben, och {count, plural, one {får} other {får}} prompten utan webbsökning"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingAlone"
+msgstr "Din text skickas aldrig ensam. Ctrl+Alt+P skriver en prompt i den, eller skriv en här"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingGoes"
+msgstr "Din text följer med, första gången {name} läser den"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingSource"
+msgstr "{name} läser bara orden du skriver, aldrig din text"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -8735,6 +8781,10 @@ msgstr "Rummet kunde inte ritas upp. Chatten är kvar som den var."
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "namnlöst rum"
+
+#. js-lingui-explicit-id
+msgid "room.writeHere"
+msgstr "Skriv här, eller skriv en prompt i fältet."
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id

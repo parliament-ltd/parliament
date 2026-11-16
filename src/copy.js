@@ -943,6 +943,16 @@ export const COPY = {
     promptEditsGo: /*i18n*/ { id: 'enter.promptEditsGo', message: 'With it, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} · {name} reads them' },
     promptEditsWait: /*i18n*/ { id: 'enter.promptEditsWait', message: '{source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}. A model reads them once it has a key: api:', comment: 'Commands stay English' },
     promptEditsOnly: /*i18n*/ { id: 'enter.promptEditsOnly', message: 'Nothing typed: just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}, told to {name}' },
+    // Your own text in a room (C301 (f)).
+    promptWritingAlone: /*i18n*/ { id: 'enter.promptWritingAlone', message: 'Your text is never sent by itself. Ctrl+Alt+P writes a prompt in it, or type one here' },
+    promptWritingGoes: /*i18n*/ { id: 'enter.promptWritingGoes', message: 'Your text goes with it, the first time {name} reads it' },
+    promptWritingSource: /*i18n*/ { id: 'enter.promptWritingSource', message: '{name} reads only the words you type, never your text' },
+    // Nothing typed, several asked at once: what waits goes to each (C301 (f)).
+    promptManyOnly: /*i18n*/ { id: 'enter.promptManyOnly', message: '{count, plural, other {Nothing typed: Enter asks # at once, each in a branch of its own, each told what waits}}' },
+    promptManyOnlyTotal: /*i18n*/ { id: 'enter.promptManyOnlyTotal', message: '{count, plural, other {Nothing typed: Enter asks # at once, each in a branch of its own, each told what waits: {cost} in all to send}}' },
+    promptManyOnlyCheap: /*i18n*/ { id: 'enter.promptManyOnlyCheap', message: '{count, plural, other {Nothing typed: Enter asks # at once, each in a branch of its own, each told what waits: under {cost} in all to send}}' },
+    promptManyWaits: /*i18n*/ { id: 'enter.promptManyWaits', message: 'Each is told {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}' },
+    promptManySourceWaits: /*i18n*/ { id: 'enter.promptManySourceWaits', message: '{source} reads none of what waits. Type a prompt, or ask only models' },
     promptEditsToReader: /*i18n*/ { id: 'enter.promptEditsToReader', message: 'Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} {total, plural, one {goes} other {go}} to {name} at the same time, about {tokens} tokens · {source} reads none' },
     promptEditsOnlyReader: /*i18n*/ { id: 'enter.promptEditsOnlyReader', message: 'Enter sends just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} to {name}, about {tokens} tokens · {source} reads none' },
     // ask: (stage 11, piece 4; C218 (a)).
@@ -2003,6 +2013,8 @@ export const COPY = {
     unnamed: /*i18n*/ { id: 'room.unnamed', message: 'unnamed room', comment: 'A room with no name of its own (bar reference)' },
     newTitle: /*i18n*/ { id: 'room.newTitle', message: 'New room' },
     empty: /*i18n*/ { id: 'room.empty', message: 'An empty room. Its first prompt, written in the bar, starts its chat.' },
+    // An empty room is a page to write in (C301 (f)).
+    writeHere: /*i18n*/ { id: 'room.writeHere', message: 'Write here, or type a prompt in the bar.' },
     // Ripple's switch in a room's head (stage 12, piece 2; C231 (e)).
     rippleOff: /*i18n*/ { id: 'room.rippleOff', message: 'ripple: off' },
     rippleOn: /*i18n*/ { id: 'room.rippleOn', message: 'ripple: on' },
@@ -2935,6 +2947,12 @@ export const COPY = {
     sugAccept: /*i18n*/ { id: 'chat.sugAccept', message: 'accept' },
     sugReject: /*i18n*/ { id: 'chat.sugReject', message: 'reject' },
     toldOnly: /*i18n*/ { id: 'chat.toldOnly', message: 'Your edits, told to {name}', comment: 'A prompt that sent only the edits of the person (C216 (e))' },
+    // A send with nothing typed that carried prompts in the text, and a reply
+    // that was only their answers, placed where they were asked (C301 (f)).
+    sentOnly: /*i18n*/ { id: 'chat.sentOnly', message: '{what, select, prompts {Your prompts in the text, sent to {name}} other {Your edits and prompts in the text, sent to {name}}}', comment: 'A prompt with no words of its own (C301 (f))' },
+    answeredInText: /*i18n*/ { id: 'chat.answeredInText', message: '{count, plural, one {{name} answered # prompt in the text, where it was asked} other {{name} answered # prompts in the text, where they were asked}}', comment: 'A reply that held only answers placed in the text (C301 (f))' },
+    // Your own text in a room (C301 (f)).
+    writingLabel: /*i18n*/ { id: 'chat.writingLabel', message: 'Your text' },
     toldNote: /*i18n*/ { id: 'chat.toldNote', message: 'Your note, told once: {note}', comment: 'A tell: note the prompt carried, in the words of the person (C225 (d))' },
     pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote

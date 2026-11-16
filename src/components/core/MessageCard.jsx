@@ -101,6 +101,12 @@ export default function MessageCard({
   // Comments (C301 (c)): { words, whole }, those on words in it and those on
   // all of it; onComment keeps one written with Ctrl+Alt+M; commentWords.
   comments = null, onComment, commentWords,
+  // Your own text, written in the room (C301 (f)): drawn as a page, as a
+  // reply is, not as a prompt. answered: a reply that held only answers to
+  // prompts in the text, each placed where it was asked, with who wrote
+  // them: { count, name } (C301 (f)); sent: what a prompt with no words of
+  // its own carried, 'prompts' or 'both', and to whom.
+  writing = false, answered = null, sent = null,
 }) {
   const fixed = hostContent ? { contentEditable: false, suppressContentEditableWarning: true } : {}
   const { i18n } = useLingui()
@@ -213,7 +219,10 @@ export default function MessageCard({
 
   const renderContent = useMemo(() => {
     // A prompt that was only the person's edits, told (C216 (e)).
+    if (!displayContent && type === 'user' && sent?.name) return <p className="p-msg-empty">{i18n._(COPY.chat.sentOnly, { what: sent.what, name: sent.name })}</p>
     if (!displayContent && type === 'user' && toldTo) return <p className="p-msg-empty">{i18n._(COPY.chat.toldOnly, { name: toldTo })}</p>
+    // A reply that was only answers in the text: one line, not a card (C301 (f)).
+    if (!displayContent && type === 'assistant' && answered?.count) return <p className="p-msg-empty">{i18n._(COPY.chat.answeredInText, { count: answered.count, name: answered.name ?? '' })}</p>
     if (!displayContent) return null
 
     // A finished reply edited in place, a source's answer too, as plain text (stage 11).
@@ -385,7 +394,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, heldEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords, comments?.words, onComment, commentWords])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, heldEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords, titles, titleWords, comments?.words, onComment, commentWords, answered?.count, answered?.name, sent?.what, sent?.name])
 
   return (
     <motion.div
@@ -395,7 +404,7 @@ export default function MessageCard({
       initial={index !== undefined ? 'hidden' : false}
       animate={index !== undefined ? 'show' : { opacity: isGhostText ? 0.55 : 1 }}
       layout="position"
-      className={`p-msg ${type === 'user' ? 'p-msg-prompt' : 'p-msg-reply'}${isGhostText ? ' ghost' : ''}${source && type !== 'user' ? ' from-source' : ''} relative group`}
+      className={`p-msg ${writing ? 'p-msg-reply p-msg-writing' : type === 'user' ? 'p-msg-prompt' : 'p-msg-reply'}${isGhostText ? ' ghost' : ''}${source && type !== 'user' ? ' from-source' : ''} relative group`}
     >
       <div className="p-msg-box">
         {/* The old strip along the top: hidden for now (C280 (b); release.js). */}

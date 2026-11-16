@@ -962,6 +962,11 @@ msgstr "{kind, select, note {comment {num}} term {highlight {num}} quote {quote 
 msgid "chat.answeredFrom"
 msgstr "Answered from {source}"
 
+#. A reply that held only answers placed in the text (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.answeredInText"
+msgstr "{count, plural, one {{name} answered # prompt in the text, where it was asked} other {{name} answered # prompts in the text, where they were asked}}"
+
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
 msgstr "accept"
@@ -1169,6 +1174,11 @@ msgstr "Quote it beside which chat?"
 msgid "chat.searchedFor"
 msgstr "Searched for “{text}”"
 
+#. A prompt with no words of its own (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.sentOnly"
+msgstr "{what, select, prompts {Your prompts in the text, sent to {name}} other {Your edits and prompts in the text, sent to {name}}}"
+
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
 msgstr "show the original"
@@ -1294,6 +1304,10 @@ msgstr "Translated into {language} by {by}"
 #. js-lingui-explicit-id
 msgid "chat.translatedByBrowser"
 msgstr "Translated into {language} by this browser"
+
+#. js-lingui-explicit-id
+msgid "chat.writingLabel"
+msgstr "Your text"
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
@@ -4794,6 +4808,18 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, one {{n}. {name}, about # token, {cost}} other {{n}. {name}, about # tokens, {cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOnly"
+msgstr "{count, plural, other {Nothing typed: Enter asks # at once, each in a branch of its own, each told what waits}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyCheap"
+msgstr "{count, plural, other {Nothing typed: Enter asks # at once, each in a branch of its own, each told what waits: under {cost} in all to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyTotal"
+msgstr "{count, plural, other {Nothing typed: Enter asks # at once, each in a branch of its own, each told what waits: {cost} in all to send}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own. Each after the first runs only if its condition is met}}"
 
@@ -4808,6 +4834,10 @@ msgstr "{count, plural, other {Enter sends this one prompt to #, one after anoth
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}, no key and no cost"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySourceWaits"
+msgstr "{source} reads none of what waits. Type a prompt, or ask only models"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
@@ -4840,6 +4870,10 @@ msgstr "{count, plural, other {Enter sends this one prompt to #, each a branch o
 #. js-lingui-explicit-id
 msgid "enter.promptManyUnpriced"
 msgstr "{tokens, plural, one {{n}. {name}, about # token} other {{n}. {name}, about # tokens}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyWaits"
+msgstr "Each is told {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5030,6 +5064,18 @@ msgstr "It may search the web: up to {most} searches, about {cost} each, on top 
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
 msgstr "{whos} cannot search the web, and {count, plural, one {goes} other {go}} without it"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingAlone"
+msgstr "Your text is never sent by itself. Ctrl+Alt+P writes a prompt in it, or type one here"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingGoes"
+msgstr "Your text goes with it, the first time {name} reads it"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingSource"
+msgstr "{name} reads only the words you type, never your text"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -8735,6 +8781,10 @@ msgstr "This room could not be drawn. Its chat is kept as it was."
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "unnamed room"
+
+#. js-lingui-explicit-id
+msgid "room.writeHere"
+msgstr "Write here, or type a prompt in the bar."
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id

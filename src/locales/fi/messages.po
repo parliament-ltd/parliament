@@ -962,6 +962,11 @@ msgstr "{kind, select, note {kommentti {num}} term {korostus {num}} quote {laina
 msgid "chat.answeredFrom"
 msgstr "Vastaus lähteestä {source}"
 
+#. A reply that held only answers placed in the text (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.answeredInText"
+msgstr "{count, plural, one {{name} vastasi # kehotteeseen tekstissä, siinä missä se esitettiin} other {{name} vastasi # kehotteeseen tekstissä, siinä missä ne esitettiin}}"
+
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
 msgstr "hyväksy"
@@ -1169,6 +1174,11 @@ msgstr "Minkä keskustelun rinnalle lainataan?"
 msgid "chat.searchedFor"
 msgstr "Haettu: ”{text}”"
 
+#. A prompt with no words of its own (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.sentOnly"
+msgstr "{what, select, prompts {Kehotteesi tekstissä, lähetetty mallille {name}} other {Muokkauksesi ja kehotteesi tekstissä, lähetetty mallille {name}}}"
+
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
 msgstr "näytä alkuperäinen"
@@ -1294,6 +1304,10 @@ msgstr "Käännetty kielelle {language}, kääntäjä {by}"
 #. js-lingui-explicit-id
 msgid "chat.translatedByBrowser"
 msgstr "Tämä selain käänsi kielelle {language}"
+
+#. js-lingui-explicit-id
+msgid "chat.writingLabel"
+msgstr "Oma tekstisi"
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
@@ -4794,6 +4808,18 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, one {{n}. {name}, noin # tokeni, hinta {cost}} other {{n}. {name}, noin # tokenia, hinta {cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOnly"
+msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter kysyy # vastaanottajalta kerralla, kultakin omassa haarassaan, ja kukin saa tietää, mitä odottaa}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyCheap"
+msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter kysyy # vastaanottajalta kerralla, kultakin omassa haarassaan, ja kukin saa tietää, mitä odottaa: alle {cost} lähettää yhteensä}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyTotal"
+msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter kysyy # vastaanottajalta kerralla, kultakin omassa haarassaan, ja kukin saa tietää, mitä odottaa: {cost} lähettää yhteensä}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {Enter lähettää tämän yhden kehotteen # vastaanottajalle peräkkäin, kunkin vastauksen omaksi haarakseen. Ensimmäisen jälkeen kukin ajetaan vain, jos sen ehto täyttyy}}"
 
@@ -4808,6 +4834,10 @@ msgstr "{count, plural, other {Enter lähettää tämän yhden kehotteen # vasta
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}, ei avainta, ei kuluja"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySourceWaits"
+msgstr "{source} ei lue mitään odottavaa. Kirjoita kehote tai kysy vain malleilta"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
@@ -4840,6 +4870,10 @@ msgstr "{count, plural, other {Enter lähettää tämän yhden kehotteen # vasta
 #. js-lingui-explicit-id
 msgid "enter.promptManyUnpriced"
 msgstr "{tokens, plural, one {{n}. {name}, noin # tokeni} other {{n}. {name}, noin # tokenia}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyWaits"
+msgstr "Kukin saa tietää {edits, plural, =0 {} one {# muokkauksen} other {# muokkausta}}{both, select, yes { ja } other {}}{asks, plural, =0 {} one {# kehotteen tekstissä} other {# kehotetta tekstissä}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5030,6 +5064,18 @@ msgstr "Se voi hakea verkosta: enintään {most} hakua, kukin noin {cost}, token
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
 msgstr "{count, plural, one {{whos} ei voi hakea verkosta ja vastaa ilman sitä} other {{whos} eivät voi hakea verkosta ja vastaavat ilman sitä}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingAlone"
+msgstr "Omaa tekstiäsi ei koskaan lähetetä yksinään. Ctrl+Alt+P kirjoittaa siihen kehotteen, tai kirjoita kehote tähän"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingGoes"
+msgstr "Oma tekstisi lähtee mukaan, ensimmäistä kertaa kun {name} lukee sen"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingSource"
+msgstr "{name} lukee vain kirjoittamasi sanat, ei koskaan omaa tekstiäsi"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -8735,6 +8781,10 @@ msgstr "Tätä huonetta ei voitu piirtää. Sen keskustelu on tallessa ennallaan
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "nimetön huone"
+
+#. js-lingui-explicit-id
+msgid "room.writeHere"
+msgstr "Kirjoita tähän, tai kirjoita kehote palkkiin."
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id

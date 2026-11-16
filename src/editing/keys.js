@@ -245,7 +245,7 @@ function enter(ids) {
  * when the gap between a prompt and its reply is crossed (C214).
  * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onNote?: (text: string) => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void, now?: () => number }} opts
  */
-export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, onAsk, onComment, menuKey, menuText, log, now }) {
+export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, onAsk, onComment, onSend, menuKey, menuText, log, now }) {
   const blk = typeof blocks === 'function' ? blocks : () => blocks
   const whenBlocks = (command) => (state, dispatch, view) => (blk(state) ? command(state, dispatch, view) : true)
   const wholeBlock = (node) => onNote?.(node.type === schema.nodes.table
@@ -291,6 +291,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     // A comment on the selected words (C301 (c)), in a prompt or a reply, as
     // Google Docs has it. Never sent.
     'Mod-Alt-m': (state, dispatch, view) => (onComment ? onComment(view) : false),
+    // Ctrl+Enter in the text does what Enter in the bar would, the line
+    // under the bar having said what (C301 (a), (f)).
+    'Mod-Enter': () => (onSend ? (onSend(), true) : false),
   })
 
   const events = new Plugin({

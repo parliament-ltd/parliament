@@ -201,3 +201,4 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - The type: words stay as typed, in the English order: type: 可接 highlight、quote 或 note 之一
 - blockAbout.highlights (the passages you highlighted, each in its colour where you marked it) → 你在对话中高亮的文字，各以自己的颜色显示在你标记的位置. passage → 文字, as enter.jumpOpen's 一段文字; to highlight → 高亮 as a verb
 - The strip, 16 November: "Markup ▾", "Focus: off" and "Focus: on", "Import:" and "Tour:" capitalised as the boards are (Stefan: "capitalize the 'f' in focus and 'm' in markup"); the command words stay English. 隐藏面板 and 显示面板 on the birds, which fold the boards away. 空房间 for focus on an empty room, a page to write in.
+- Your own text (C301 (f)), written in a room and never sent by itself: 你的文本, not 草稿; the empty room says 在这里书写，或在输入栏中输入提示词。 A reply that was only answers in the text: {name} 在正文中回答了 # 条提示词，各在其提出的位置.

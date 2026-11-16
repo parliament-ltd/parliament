@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useRef, useCallback, useEffect } f
 import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, getSuggestionsOfChat, answerAsks, replyAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
 import { changeStored } from '../editing/storedChange'
 import { noteFor, waiting, tellNote } from '../editing/told'
+import { isDraft, writingOf, draftWords } from '../lib/writing'
 import { answersIn } from '../editing/answers'
 import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
@@ -354,7 +355,9 @@ export function ChatProvider({ children }) {
     const askRecords = await getAsksOfChat(conversationId).catch(() => [])
     // And changes accepted from a sweep, never told yet (stage 12, piece 3; C233 (a)).
     const sweepRecords = await getSuggestionsOfChat(conversationId).catch(() => [])
-    const note = noteFor(before, editRecords, { leaveOut: joinedFrom, asks: askRecords, sweeps: sweepRecords })
+    // With nothing typed, the model writes only its answers in the text (C301 (f)).
+    const typed = Boolean(String(userContent ?? '').trim())
+    const note = noteFor(before, editRecords, { leaveOut: joinedFrom, asks: askRecords, sweeps: sweepRecords, typed })
     // The tell: notes held for this chat go at the end of the same note (C225 (d)).
     const tellsHere = tellsRef.current[conversationId] ?? []
     const told = [note.text, tellNote(tellsHere)].filter(Boolean).join('\n\n')
@@ -390,6 +393,10 @@ export function ChatProvider({ children }) {
     if (joinedIds.length) markEditsSent(joinedIds, { into: userMsg.id, at: toldAt }).catch(() => {})
     if (note.askIds.length) markEditsSent(note.askIds, { to: model, at: toldAt, prompt: userMsg.id }, 'asks').catch(() => {})
     if (note.sweepIds.length) markEditsSent(note.sweepIds, { to: model, at: toldAt, prompt: userMsg.id }, 'suggestions').catch(() => {})
+    // Edits in your own text before any model read it went as its words,
+    // and are never told (C301 (f)).
+    const own = writingOf(before)
+    if (note.drafted?.length && own) markEditsSent(note.drafted, { into: own.id, at: toldAt }).catch(() => {})
 
     // 2. Create a placeholder assistant message marked incomplete
     const assistantMsg = await addMessage({
@@ -795,9 +802,13 @@ export function ChatProvider({ children }) {
   // write (stage 11, piece 1; C212). Its content, what the model wrote, stays.
   // A prompt is saved the same way, its edits marked as the prompt's (piece 2).
   // held: in Suggesting, a new edit starts held back (C301 (b)).
-  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', held = false }) => {
-    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, suggestions, part, held })
-    updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
+  // content: your own text's words while no model has read it (C301 (f));
+  // drawn here first, so a prompt sent at once carries them.
+  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', held = false, content = null }) => {
+    updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId
+      ? { ...m, blocks, ...(typeof content === 'string' && isDraft(m, prev) ? { content } : {}) }
+      : m)))
+    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, suggestions, part, held, content })
     // An edit or an ask starts a collection when there is none, as a first
     // highlight does (C300). An id only, never the words. Edits and asks
     // come as Maps.
@@ -813,6 +824,25 @@ export function ChatProvider({ children }) {
   const showStoredBlocks = useCallback((conversationId, messageId, blocks) => {
     updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
   }, [])
+
+  // Your own text no model has read (C301 (f), ruled 16 November): a change
+  // held back in Suggesting and then accepted goes into the text, unmarked,
+  // with nothing to tell. Its record is kept, marked gone into your text, so
+  // it is never told; the changes still held stay as they are.
+  const keepDraftEdits = useCallback(async (conversationId, messageId, edits) => {
+    const own = (hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)).find((m) => m.id === messageId)
+    if (!own || !Array.isArray(own.blocks) || !edits?.length) return
+    let blocks = own.blocks
+    let after = null
+    for (const edit of edits) {
+      const r = changeStored(blocks, 'keepEdit', edit)
+      if (r) { blocks = r.blocks; after = r }
+    }
+    if (!after) return
+    await markEditsSent(edits.map((e) => `${messageId}:${e}`), { into: messageId, at: new Date().toISOString() })
+    // The prompts in the text follow their words, as a save from the editor has them.
+    await saveEditedReply(conversationId, messageId, { blocks, edits: after.edits, asks: after.asks, held: true, content: draftWords(blocks, [...after.edits.keys()].map(String)) })
+  }, [saveEditedReply])
 
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
@@ -978,6 +1008,7 @@ export function ChatProvider({ children }) {
       keepTranslation,
       saveEditedReply,
       showStoredBlocks,
+      keepDraftEdits,
       tells,
       holdTell,
       tellsFor,

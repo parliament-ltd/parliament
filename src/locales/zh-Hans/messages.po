@@ -962,6 +962,11 @@ msgstr "{kind, select, note {批注 {num}} term {高亮 {num}} quote {摘录 {nu
 msgid "chat.answeredFrom"
 msgstr "回答来自 {source}"
 
+#. A reply that held only answers placed in the text (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.answeredInText"
+msgstr "{count, plural, other {{name} 在正文中回答了 # 条提示词，各在其提出的位置}}"
+
 #. js-lingui-explicit-id
 msgid "chat.askAccept"
 msgstr "接受"
@@ -1169,6 +1174,11 @@ msgstr "摘录到哪个对话旁边？"
 msgid "chat.searchedFor"
 msgstr "已搜索“{text}”"
 
+#. A prompt with no words of its own (C301 (f))
+#. js-lingui-explicit-id
+msgid "chat.sentOnly"
+msgstr "{what, select, prompts {你在正文中的提示词，已发给 {name}} other {你的编辑和正文中的提示词，已发给 {name}}}"
+
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
 msgstr "显示原文"
@@ -1294,6 +1304,10 @@ msgstr "由 {by} 译为{language}"
 #. js-lingui-explicit-id
 msgid "chat.translatedByBrowser"
 msgstr "由此浏览器译为{language}"
+
+#. js-lingui-explicit-id
+msgid "chat.writingLabel"
+msgstr "你的文本"
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
@@ -4794,6 +4808,18 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, other {{n}. {name}，约 # 个 token，{cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOnly"
+msgstr "{count, plural, other {未输入新内容：按 Enter 同时询问 # 个回答者，各在自己的分支中，每个都会被告知等待中的内容}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyCheap"
+msgstr "{count, plural, other {未输入新内容：按 Enter 同时询问 # 个回答者，各在自己的分支中，每个都会被告知等待中的内容：发送合计不到 {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOnlyTotal"
+msgstr "{count, plural, other {未输入新内容：按 Enter 同时询问 # 个回答者，各在自己的分支中，每个都会被告知等待中的内容：发送合计 {cost}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {按 Enter 将这一条提示词依次发给 # 个回答者，各成一个分支。从第二个起，每个都要满足自己的条件才会运行}}"
 
@@ -4808,6 +4834,10 @@ msgstr "{count, plural, other {按 Enter 将这一条提示词依次发给 # 个
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}，无需密钥，不产生费用"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySourceWaits"
+msgstr "{source} 不会读取任何等待中的内容。请输入一条提示词，或只询问模型"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
@@ -4840,6 +4870,10 @@ msgstr "{count, plural, other {按 Enter 将这一条提示词发给 # 个回答
 #. js-lingui-explicit-id
 msgid "enter.promptManyUnpriced"
 msgstr "{tokens, plural, other {{n}. {name}，约 # 个 token}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyWaits"
+msgstr "每个都会被告知{edits, plural, =0 {} other { # 处编辑}}{both, select, yes {和} other {}}{asks, plural, =0 {} other { # 条正文中的提示词}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5030,6 +5064,18 @@ msgstr "它可能会搜索网页：最多 {most} 次，每次约 {cost}，另计
 #. js-lingui-explicit-id
 msgid "enter.promptWebSome"
 msgstr "{whos} 无法搜索网页，{count, plural, other {会在不搜索的情况下回答}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingAlone"
+msgstr "你的文本从不单独发送。按 Ctrl+Alt+P 在其中写一条提示词，或在这里输入一条"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingGoes"
+msgstr "你的文本会一同发送，这是 {name} 第一次读到它"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWritingSource"
+msgstr "{name} 只读取你输入的文字，从不读取你的文本"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -8735,6 +8781,10 @@ msgstr "无法显示此房间。其中的对话原样保留。"
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "未命名房间"
+
+#. js-lingui-explicit-id
+msgid "room.writeHere"
+msgstr "在这里书写，或在输入栏中输入提示词。"
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id

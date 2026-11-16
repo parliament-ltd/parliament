@@ -391,6 +391,18 @@ export function planShowInRoom(a, chat) {
   return go2(next, 'showRoom')
 }
 
+/**
+ * Your own text's chat, made in an empty room (C301 (f)), shown in that room,
+ * the bar pointed at it. A room no longer on screen: as planRoom.
+ */
+export function planWritten(a, board, chat) {
+  if (!isRoom(board) || (!isOnPage(a, board) && !isPopped(a, board)) || chatIn(a, board)) return planRoom(a, chat)
+  const next = copy(a)
+  next.context[board] = chat
+  next.addressed = board
+  return go2(next, 'showRoom')
+}
+
 /** close: or close:<board>. Takes it off the screen, window included; nothing is lost. */
 export function planClose(a, board = a.addressed) {
   const entry = boardEntry(board)

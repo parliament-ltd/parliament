@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { EditorState } from 'prosemirror-state'
+import { EditorState, Selection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { Mark } from 'prosemirror-model'
 import '../../editing/editing.css'
@@ -25,6 +25,7 @@ import { heldPlugin, heldKey } from '../../editing/held'
 import { titlesPlugin } from '../../editing/titles'
 import MessageCard from './MessageCard'
 import { isReleased, onRelease } from '../../editing/across'
+import { takeFocus, wantsFocus } from '../../editing/writeFocus'
 
 // A prompt and its reply, edited in place as one (stage 11, piece 2; the
 // editing spec, "Editing prompts"; C214, ruled 26 October). One editor draws
@@ -93,7 +94,11 @@ const COMMENT_WORDS = { label: 'COMMENT', placeholder: '', keys: 'Ctrl+Alt+M', m
 // of a page it links to, and what it says it does, for a title (C287).
 // onComment({ messageId, passage, nth, text }): a comment kept on words by
 // Ctrl+Alt+M (C301 (c)); commentWords: its box's and the text's words.
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
+// untracked: your own text no model has read, in Editing: what you type is
+// simply the text, not an edit (C301 (f)).
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, untracked = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
+  const untrackedRef = useRef(untracked)
+  useEffect(() => { untrackedRef.current = untracked }, [untracked])
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -136,7 +141,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     clearTimeout(timer.current)
     timer.current = 0
     const v = view.current
-    if (!v) return
+    if (!v) return undefined
+    const going = []
     v.state.doc.forEach((sec) => {
       if (sec.type !== schema.nodes.section) return
       const id = sec.attrs.message
@@ -146,12 +152,21 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       if (savedKeys.current[id] === key) return
       savedKeys.current[id] = key
       const asks = new Map([...asksIn(sec)].map(([askId, a]) => [askId, { ...a, question: questions.current.get(askId) }]))
-      Promise.resolve(onSaveRef.current?.(id, { blocks, edits: editsIn(sec), asks, suggestions: suggestionsIn(sec), part: sec.attrs.part })).catch((err) => {
+      going.push(Promise.resolve(onSaveRef.current?.(id, { blocks, edits: editsIn(sec), asks, suggestions: suggestionsIn(sec), part: sec.attrs.part })).catch((err) => {
         savedKeys.current[id] = null
         setSaid(`Not saved: ${String(err?.message ?? err)}`)
-      })
+      }))
     })
+    return Promise.all(going)
   }, [])
+
+  // Ctrl+Enter in the text (C301 (a), (f)): saved first, then the bar does
+  // what its Enter would, once what was saved has reached the line.
+  const sendFromText = useCallback(() => {
+    clearTimeout(timer.current)
+    timer.current = 0
+    Promise.resolve(save()).finally(() => setTimeout(() => window.dispatchEvent(new CustomEvent('parliament-send-from-text')), 150))
+  }, [save])
 
   // The words of both still standing, to the bar as the next prompt (C214 (b)).
   // focus: the bar takes the cursor, after Backspace or Delete. Joined by
@@ -202,7 +217,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     savedKeys.current = {}
     doc.forEach((sec) => { savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
-      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), ...menuOptions, ...askOptions, ...commentOptions }),
+      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), onSend: () => sendFromText(), ...menuOptions, ...askOptions, ...commentOptions }),
       // Comments on words, after their passage (C301 (c)).
       commentsPlugin({ words: {
         get more() { return commentWordsRef.current.more },
@@ -276,11 +291,13 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       attributes: () => ({ class: `p-pair${cleanRef.current ? ' clean' : ''}`, 'aria-label': wordsRef.current?.label ?? '', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' }),
       dispatchTransaction(tr) {
         const before = v.state
+        // Your own text before any model read it, in Editing: simply the text (C301 (f)).
+        if (untrackedRef.current && tr.docChanged) tr.setMeta(SKIP, true)
         const joining = crosses(before.selection) && tr.docChanged && !tr.getMeta(SKIP)
         const out = track(before, tr, { ids, onError: (e) => console.error('[editing] a change was refused', e) })
         if (out.getMeta(REFUSED)) setSaid('That change could not be made here.')
         let next = before.apply(out)
-        if (!v.composing) {
+        if (!v.composing && !untrackedRef.current) {
           const marks = cursorMarks(next, ids)
           if (marks && !(next.storedMarks && Mark.sameSet(next.storedMarks, marks))) next = next.apply(next.tr.setStoredMarks(marks))
         }
@@ -319,6 +336,23 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       },
     })
     view.current = v
+    // Your text, just made from the empty room (C301 (f)): the caret at its
+    // end, and what was typed while its chat was being made.
+    const carriedFor = sectionsRef.current.map((s) => s.message.id).find((id) => wantsFocus(id))
+    if (carriedFor) {
+      setTimeout(() => {
+        // Taken only by the editor still drawn: in development React draws twice.
+        if (view.current !== v) return
+        const carried = takeFocus(carriedFor)
+        if (!carried) return
+        v.focus()
+        v.dispatch(v.state.tr.setSelection(Selection.atEnd(v.state.doc)))
+        carried.typed.split('\n').forEach((words, i) => {
+          if (i) v.dispatch(v.state.tr.split(v.state.selection.from, 1, [{ type: schema.nodes.paragraph, attrs: { id: ids.block() } }]).setMeta(SKIP, true))
+          if (words) v.dispatch(v.state.tr.insertText(words))
+        })
+      }, 0)
+    }
     return () => {
       if (timer.current) save()
       clearTimeout(joinTimer.current)

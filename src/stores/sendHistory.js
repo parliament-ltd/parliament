@@ -32,6 +32,10 @@ export const fromSource = (m) => Boolean(m?.source)
 // carries the chat on (open:203b summary, C175).
 export const SUMMARY_LEAD = 'This conversation carries on from a summary of an earlier part of it, written by a model:'
 
+// How your own text, written in a room, is introduced (C301 (f)): on the
+// person's side, never as a prompt, joined with the prompt that sends it.
+export const WRITING_LEAD = "The person's own text, which they wrote here and have not sent as a prompt:"
+
 /**
  * @param {Array<{ role: string, content: string, source?: object }>} messages oldest first
  * @returns {Array<{ role: 'user'|'assistant', content: string }>}
@@ -41,9 +45,11 @@ export function forModel(messages) {
   for (const m of messages) {
     // A prompt may be only the note of edits it carried (C216 (e)).
     if (!m || typeof m.content !== 'string' || (!m.content && !m.told) || fromSource(m)) continue
-    const role = m.summary ? 'user' : m.role
+    const role = m.summary || m.writing ? 'user' : m.role
     // A prompt goes with the note of edits it carried, where it was told (C216 (c)).
-    const content = m.summary ? `${SUMMARY_LEAD}\n\n<summary>\n${m.content}\n</summary>` : m.role === 'user' ? withTold(m) : m.content
+    const content = m.summary ? `${SUMMARY_LEAD}\n\n<summary>\n${m.content}\n</summary>`
+      : m.writing ? `${WRITING_LEAD}\n\n<writing>\n${m.content}\n</writing>`
+        : m.role === 'user' ? withTold(m) : m.content
     // An answer the person brought into this prompt goes with it, every
     // time the chat is sent, for the provider to send as data (C176).
     const included = m.role === 'user' && Array.isArray(m.included) && m.included.length

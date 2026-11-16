@@ -23,9 +23,17 @@ export const waiting = (record) => record && !record.sent && !record.held
  *   ones are asked (C218 (b))
  *   sweeps: the chat's suggestion records, whose accepted sweeps not yet told
  *   are told (stage 12, piece 3; C233 (a))
- * @returns {{ text: string, ids: string[], askIds: string[], sweepIds: string[] }}
+ *   typed: whether the person typed words with it; with none, the model is
+ *   told to write nothing beyond its answers in the text (C301 (f), ruled 16 November)
+ * @returns {{ text: string, ids: string[], askIds: string[], sweepIds: string[], drafted: string[] }}
+ *   drafted: edits in your own text that no model has read yet, which go as
+ *   its words and are never told (C301 (f))
  */
-export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sweeps = [] } = {}) {
+export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sweeps = [], typed = true } = {}) {
+  // Your own text no model has read yet: its edits are its words, not news (C301 (f)).
+  const read = (messages ?? []).some((m) => m?.role === 'assistant' && !m.source)
+  const drafts = new Set(read ? [] : (messages ?? []).filter((m) => m?.writing === true).map((m) => m.id))
+  const drafted = []
   const sweptBy = new Map()
   for (const s of sweeps ?? []) {
     if (!sweepWaits(s) || leaveOut.has(s.messageId)) continue
@@ -35,6 +43,7 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sw
   const byMessage = new Map()
   for (const r of records ?? []) {
     if (!waiting(r) || leaveOut.has(r.messageId)) continue
+    if (drafts.has(r.messageId)) { drafted.push(r.id); continue }
     if (!byMessage.has(r.messageId)) byMessage.set(r.messageId, [])
     byMessage.get(r.messageId).push(r)
   }
@@ -44,7 +53,7 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sw
     if (!asksBy.has(a.messageId)) asksBy.set(a.messageId, [])
     asksBy.get(a.messageId).push(a)
   }
-  if (!byMessage.size && !asksBy.size && !sweptBy.size) return { text: '', ids: [], askIds: [], sweepIds: [] }
+  if (!byMessage.size && !asksBy.size && !sweptBy.size) return { text: '', ids: [], askIds: [], sweepIds: [], drafted }
   const sweepParts = []
   const sweepIds = []
   const parts = []
@@ -55,15 +64,17 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sw
   let replies = 0
   let n = 0
   for (const m of messages ?? []) {
-    if (m?.role === 'user') prompts += 1
+    // Your own text is not a prompt, and is not counted as one (C301 (f)).
+    if (m?.role === 'user' && !m.writing) prompts += 1
     else if (m?.role === 'assistant') replies += 1
     const theirs = asksBy.get(m?.id)
     if (theirs?.length) {
       // Each ask with its number and passage, to be answered in a block of
       // its own, which Parliament puts in place (C218 (b)).
-      const where = m.role === 'user' ? `their prompt ${prompts}`
-        : m.source ? `an answer from ${m.source.name ?? m.source.id ?? 'a source'}, which you have not seen`
-          : `your reply ${replies}`
+      const where = m.writing ? 'their own text'
+        : m.role === 'user' ? `their prompt ${prompts}`
+          : m.source ? `an answer from ${m.source.name ?? m.source.id ?? 'a source'}, which you have not seen`
+            : `your reply ${replies}`
       const line = (a) => (a.point
         ? `- Ask ${a.num}, at the point after "${a.passage}": ${a.question}`
         : `- Ask ${a.num}, about "${a.passage}": ${a.question}`)
@@ -73,7 +84,7 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sw
       const asReply = sorted.filter((a) => a.reply === true)
       if (inText.length) {
         askParts.push([
-          `The person asks about ${where}, in their own words. Answer each ask in a block of its own, as plain text: [ask N] on a line, then your answer, which takes the place of the passage (or goes at the point), then [/ask]. Write the rest of your reply as usual.`,
+          `The person asks about ${where}, in their own words. Answer each ask in a block of its own, as plain text: [ask N] on a line, then your answer, which takes the place of the passage (or goes at the point), then [/ask]. ${typed ? 'Write the rest of your reply as usual.' : 'With nothing else asked, write nothing more.'}`,
           ...inText.map(line),
         ].join('\n'))
       }
@@ -119,11 +130,11 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sw
 ${wordsOf(toBlocks(doc))}
 """`)
     } else {
-      parts.push(noteForModel(doc, edits, { what: m.role === 'user' ? `their prompt ${prompts}` : `your reply ${replies}` }))
+      parts.push(noteForModel(doc, edits, { what: m.writing ? 'their own text, since you read it' : m.role === 'user' ? `their prompt ${prompts}` : `your reply ${replies}` }))
     }
     for (const r of mine) if (edits.some((e) => e.id === r.edit)) ids.push(r.id)
   }
-  return { text: [...parts, ...sweepParts, ...askParts].join('\n\n'), ids, askIds, sweepIds }
+  return { text: [...parts, ...sweepParts, ...askParts].join('\n\n'), ids, askIds, sweepIds, drafted }
 }
 
 /** Whether a sweep's change waits to be told: accepted, and not told yet (C233 (a)). */

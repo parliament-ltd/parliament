@@ -18,6 +18,7 @@ import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favorite
 import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED } from './docketModel'
 import { placeAnswer } from '../editing/answers'
 import { withoutSuggestions } from '../editing/blocks'
+import { readIt } from './writing'
 
 export const RECORDS_EVENT = 'parliament-records'
 
@@ -174,9 +175,14 @@ export async function createChat(db, conversation) {
  * and including it. One transaction, so no tab can see the chat without its
  * messages (found 15 October).
  */
-export async function createBranchChat(db, { sourceId, branchAtMessageId, title, model, answerer = null, frameworks = null, newId, now }) {
+export async function createBranchChat(db, { sourceId, branchAtMessageId, title, model, answerer = null, frameworks = null, waiting = false, newId, now }) {
   const v6 = isV6(db)
-  return write(db, ['conversations', 'messages', ...(v6 ? DOCKET_STORES : [])], async (tx) => {
+  // waiting: the edits and prompts in the text that wait in the copied
+  // messages come too, each a record of the branch's own with its own number,
+  // so a branch asked at the same moment answers them as well (C301 (f),
+  // ruled 16 November: what waits goes to each model asked at once).
+  const withWaiting = waiting && v6
+  return write(db, ['conversations', 'messages', ...(v6 ? DOCKET_STORES : []), ...(withWaiting ? ['edits', 'asks', 'counters'] : [])], async (tx) => {
     const convs = tx.objectStore('conversations')
     const msgStore = tx.objectStore('messages')
     const source = await convs.get(sourceId)
@@ -226,9 +232,34 @@ export async function createBranchChat(db, { sourceId, branchAtMessageId, title,
 
     let changes = []
     if (v6) ({ chat: branch, changes } = await fileInDocket(tx, branch, { parent: source, copiedMessages: copies, allParentMessages: all }))
+    if (withWaiting) changes = [...changes, ...await copyWaiting(tx, { sourceId, copies, branchId: branch.id, now })]
     await convs.put(branch)
     return { result: branch, changes: [{ kind: 'chat', op: 'created', id: branch.id, num: branch.num }, ...changes] }
   })
+}
+
+// What waits in the copied messages, copied into the branch (C301 (f)): an
+// edit not yet told or gone into a prompt, held back or not, and a prompt in
+// the text still open and not sent. Each copy keeps the mark's own id, which
+// the copied text still carries, takes the copied message's id and a number
+// of its own, and starts unsent.
+async function copyWaiting(tx, { sourceId, copies, branchId, now }) {
+  const byOriginal = new Map(copies.map((m) => [m.from, m.id]))
+  const changes = []
+  for (const [list, kind, waits] of [
+    ['edits', 'edit', (r) => !r.sent],
+    ['asks', 'ask', (r) => !r.sent && r.state === 'open'],
+  ]) {
+    const store = tx.objectStore(list)
+    const rows = (await store.index('conversationId').getAll(sourceId)).filter((r) => byOriginal.has(r.messageId) && waits(r))
+    for (const r of rows.sort((a, b) => (a.num ?? 0) - (b.num ?? 0))) {
+      const messageId = byOriginal.get(r.messageId)
+      const copy = { ...r, id: `${messageId}:${r.edit}`, num: await takeNum(tx), conversationId: branchId, messageId, sent: null, createdAt: now, updatedAt: now }
+      await store.put(copy)
+      changes.push({ kind, op: 'created', id: copy.id, num: copy.num })
+    }
+  }
+  return changes
 }
 
 /**
@@ -717,16 +748,22 @@ export async function markEditsSent(db, ids, sent, list = 'edits') {
  * @param {string} messageId
  * @param {{ blocks: object[], edits: Map<string|number, { struck: string, added: string, places: object[] }>, part?: 'reply'|'prompt', held?: boolean, now?: string }} saved
  *   held: a new edit starts held back, as in Suggesting (C301 (b)); one already kept keeps its own state
+ *   content: your own text's words as a model would read them now (C301 (f)),
+ *   kept only while no model has read it; after, its words stay as read
  * @returns {Promise<{ created: number, updated: number, removed: number }>}
  */
-export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', held = false, now = new Date().toISOString() }) {
+export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', held = false, content = null, now = new Date().toISOString() }) {
   if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
   return write(db, ['messages', 'conversations', 'edits', 'counters', ...(asks ? ['asks'] : []), ...(suggestions ? ['suggestions'] : [])], async (tx) => {
     const message = await tx.objectStore('messages').get(messageId)
     if (!message) throw new Error(`Message not found: ${messageId}`)
     const changes = [{ kind: 'message', op: 'updated', id: messageId }]
     const delta = blocksSize(blocks) - blocksSize(message.blocks)
-    await tx.objectStore('messages').put({ ...message, blocks })
+    // Your own text, while it is a draft, takes its words from what you type.
+    const words = typeof content === 'string' && message.writing === true
+      && !(await tx.objectStore('messages').index('conversationId').getAll(message.conversationId)).some(readIt)
+      ? { content } : {}
+    await tx.objectStore('messages').put({ ...message, blocks, ...words })
     if (delta) {
       const conv = await tx.objectStore('conversations').get(message.conversationId)
       if (conv) await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) + delta) })

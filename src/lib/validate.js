@@ -148,6 +148,8 @@ function validateMessage(item) {
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'
+  // Your own text, written in a room (C301 (f)): true, and only on your side.
+  if (item.writing != null && !(item.writing === true && item.role === 'user')) return 'message.writing invalid'
   return null
 }
 

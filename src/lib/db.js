@@ -420,6 +420,8 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
     model: options.model,
     answerer: options.answerer ?? null,
     frameworks: options.frameworks ?? null,
+    // What waits in the text comes too, when several are asked at once (C301 (f)).
+    waiting: options.waiting === true,
     newId: generateId,
     now: new Date().toISOString(),
   })
@@ -462,7 +464,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included, step, told }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included, step, told, writing, blocks }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -490,6 +492,10 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     ...(typeof step === 'string' && step ? { step } : {}),
     // What the model was told of the person's edits, with this prompt (stage 11, piece 3; C216 (c)).
     ...(typeof told === 'string' && told ? { told } : {}),
+    // Your own text, written in a room, never sent by itself (C301 (f)), and
+    // its form in the editor from the start.
+    ...(writing === true && role === 'user' ? { writing: true } : {}),
+    ...(Array.isArray(blocks) ? { blocks } : {}),
   }
   // Touches the chat's updatedAt and size in the same transaction.
   return addMessageRecord(db, message)

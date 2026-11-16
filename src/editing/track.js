@@ -431,6 +431,32 @@ export function undoEdit(state, id) {
   return tr
 }
 
+/**
+ * An edit kept as the text, the opposite of undoEdit: what it struck goes,
+ * its words stay unmarked. For your own text no model has read, where a
+ * change accepted from Suggesting simply becomes the text (C301 (f)).
+ */
+export function keepEdit(state, id) {
+  const tr = state.tr.setMeta(SKIP, true)
+  const gone = []
+  state.doc.descendants((node, pos) => {
+    if (node.isInline) {
+      for (const m of node.marks) {
+        if (m.type === STRUCK && m.attrs.edit === id) gone.push({ from: pos, to: pos + node.nodeSize })
+        if (m.type === ADDED && m.attrs.edit === id) tr.removeMark(pos, pos + node.nodeSize, m)
+      }
+      return false
+    }
+    if (node.attrs.struck === id) { gone.push({ from: pos, to: pos + node.nodeSize }); return false }
+    if (node.type.name === 'table_cell' && node.attrs.added === id) tr.setNodeMarkup(pos, null, { ...node.attrs, added: null })
+    if (node.type.name === 'chart' && node.attrs.kindEdit === id) tr.setNodeMarkup(pos, null, { ...node.attrs, kindEdit: null })
+    return true
+  })
+  // From the end back: marks and attributes moved nothing, so positions hold.
+  for (const r of gone.sort((a, b) => b.from - a.from)) tr.delete(r.from, r.to)
+  return tr
+}
+
 const KIND_NAME = { paragraph: 'paragraph', heading: 'heading', list_item: 'list item', quote: 'quote', code_block: 'code block', divider: 'divider', table: 'table', chart: 'chart' }
 
 /**

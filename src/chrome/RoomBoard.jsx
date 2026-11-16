@@ -15,6 +15,7 @@ import { AnnotationsProvider } from '../stores/AnnotationsContext'
 import { RoomHost } from '../lib/useViewportWidth'
 import { ROOM_EDGES, bandWidth, roomForm } from '../lib/roomForm'
 import { useBand } from './useNarrower'
+import WritePage from './WritePage'
 
 // A room as a board on the shell (refactor-plan.md, stage 4). The room is
 // drawn as today's chat page draws it: its chat is found, given the
@@ -92,7 +93,8 @@ function Card({ board, addressed, onAddress, title, aside, room, ripple, kept = 
  *   named, so it is read again; alone: no other board shares the screen
  *   with it (C279 (b))
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, systemFor = null, onWrite = null, kept = 0, small = false, alone = false }) {
+// onStartWriting(board, saved): an empty room's page, written in, makes its chat (C301 (f)).
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, systemFor = null, onWrite = null, kept = 0, small = false, alone = false, onStartWriting = null }) {
   const { i18n } = useLingui()
   const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
@@ -166,8 +168,10 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   if (!chatId) {
     return (
       <Card board={board} addressed={addressed} onAddress={onAddress} title={i18n._(COPY.room.newTitle)}>
-        {/* As tall as a room with a chat (C302 (e)). */}
-        <div className="ch-cbody ch-room-empty"><p className="ch-marg">{i18n._(COPY.room.empty)}</p></div>
+        {/* As tall as a room with a chat (C302 (e)); a page to write in (C301 (f)). */}
+        {onStartWriting
+          ? <WritePage onStart={(saved) => onStartWriting(board, saved)} />
+          : <div className="ch-cbody ch-room-empty"><p className="ch-marg">{i18n._(COPY.room.empty)}</p></div>}
       </Card>
     )
   }

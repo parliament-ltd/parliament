@@ -36,7 +36,9 @@ export const FIELDS = Object.freeze({
     // step: the planned step a run sent this message for (stage 10; C196 (j)).
     // blocks: a reply's editable form once it is edited in place (stage 11; C212 (b)).
     // told: what the model was told of the person's edits, with this prompt (C216 (c)).
-    'citations', 'from', 'group', 'summary', 'included', 'step', 'blocks', 'told'],
+    // writing: true for your own text written in a room, never sent by itself
+    // (C301 (f)); a backup without it reads as before.
+    'citations', 'from', 'group', 'summary', 'included', 'step', 'blocks', 'told', 'writing'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   // passage, nth: the words a comment is on, and which time they come in its

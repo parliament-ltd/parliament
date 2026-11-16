@@ -1530,6 +1530,28 @@ export function promptPreview(text, target = {}) {
     const head = { promptToMany: 'promptBranchesOnly', promptToManyTotal: 'promptBranchesOnlyTotal', promptToManyCheap: 'promptBranchesOnlyCheap' }[p.says.message] ?? 'promptBranchesOnly'
     return { ...p, editsOnly: true, says: { ...p.says, message: head, also: [...goingBranches.map(branchLine), ...(p.says.also ?? [])] } }
   }
+  // Your own text in the room (C301 (f)): never sent by itself, and the
+  // first time it goes, the line says so.
+  const own = target.writing ?? null
+  const ownLine = (who) => (own?.draft ? (toModel(who) ? { message: 'promptWritingGoes', values: { name: who?.name ?? '' } } : { message: 'promptWritingSource', values: { name: who?.name ?? target.source ?? '' } }) : null)
+  if (own && !edits && !told && !String(text ?? '').trim() && !target.streaming && !target.resend) {
+    return { ready: false, says: { message: 'promptWritingAlone' } }
+  }
+  // Nothing typed, several asked at once: what waits goes to each, each in a
+  // branch of its own that copies it (C301 (f), ruled 16 November).
+  if (edits && !String(text ?? '').trim() && !target.streaming && Array.isArray(target.many) && target.many.length > 1 && !Array.isArray(target.toMany)) {
+    if (target.many.some((w) => !toModel(w))) {
+      const source = target.many.find((w) => !toModel(w))
+      return { ready: false, says: { message: 'promptManySourceWaits', values: { source: source?.name ?? '' } } }
+    }
+    const p = manyPreview('·'.repeat(Math.max(1, edits.chars + (told?.chars ?? 0))), target)
+    if (!p.ready || !p.says) return p
+    const head = { promptMany: 'promptManyOnly', promptManyTotal: 'promptManyOnlyTotal', promptManyTotalCheap: 'promptManyOnlyCheap' }[p.says.message] ?? 'promptManyOnly'
+    const also = [{ message: 'promptManyWaits', values: what }]
+    const mine = ownLine(target.many[0])
+    if (mine) also.push(mine)
+    return { ...p, editsOnly: true, says: { ...p.says, message: head, also: [...also, ...(p.says.also ?? [])] } }
+  }
   if (edits && !String(text ?? '').trim() && !target.streaming && !(Array.isArray(target.many) && target.many.length > 1)) {
     // Enter on an empty field sends just the edits and asks (C216 (e)).
     const who = target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
@@ -1540,6 +1562,8 @@ export function promptPreview(text, target = {}) {
     const p = onePreview('·'.repeat(Math.max(1, edits.chars + (told?.chars ?? 0))), target)
     if (!p.ready || !p.says) return p
     const also = [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }]
+    const mine = ownLine(who)
+    if (mine) also.push(mine)
     if (told) also.push({ message: 'promptTellGo', values: { count: told.count, name: who.name ?? '' } })
     if (target.ripple && edits.count) also.push(rippleLine(target.ripple))
     if (target.rippleHeld && edits.count) also.push({ message: 'promptLocalRipple' })
@@ -1568,6 +1592,12 @@ export function promptPreview(text, target = {}) {
   // Only when a model answers here: a source's branch is not checked from (C228 (d)).
   if (target.ripple && edits?.count && !(Array.isArray(target.many) && target.many.length > 1) && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) lines.push(rippleLine(target.ripple))
   if (target.rippleHeld && edits?.count) lines.push({ message: 'promptLocalRipple' })
+  // Your own text going for the first time, or a source that reads none of it (C301 (f)).
+  if (own?.draft) {
+    const first = Array.isArray(target.many) && target.many.length > 1 ? target.many[0] : target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
+    const mine = ownLine(first)
+    if (mine) lines.push(mine)
+  }
   // Changes accepted from a sweep, told once to the model that answers (C233 (a)).
   const swept = target.edits?.sweeps ?? 0
   if (swept && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) {
