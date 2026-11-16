@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasks</title>
+<!--
+  C301 (g), proposed (16 November): the Plan board as a list of things to
+  do, a prompt to a model or a source being one kind of task, and your own
+  to-dos another. The board as PlanBoard.jsx draws it now (one list at one
+  run, lanes as headings, numbered rows); one change to what is stored,
+  shown in section 4. Values from src/styles/tokens.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --docket: #0E728D; --docket-tint: rgba(13, 148, 136, .12);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+
+  .strip { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 8px 16px; border: .5px solid var(--border); border-radius: 12px 12px 0 0; border-bottom-color: var(--border-2); background: var(--surface); font: 600 12.5px var(--sans); color: var(--ink-3); }
+  .strip img { width: 22px; height: auto; display: block; }
+  .strip .on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .strip .right { margin-inline-start: auto; display: flex; gap: 14px; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .strip + .card { border-radius: 0 0 16px 16px; border-top: none; }
+  .chead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .num { font: 400 var(--t-id) var(--mono); color: var(--ink-3); }
+  .chead .right { margin-inline-start: auto; }
+  .body { padding: 6px 22px 16px; }
+
+  .lane { padding: 10px 0 4px; border-top: .5px solid var(--border-2); }
+  .lane:first-child { border-top: none; }
+  .lane-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font: 400 12.5px var(--sans); }
+  .lane-head .addr { font: 600 11px var(--mono); color: var(--docket); }
+  .lane-head .name { font: 600 13px var(--sans); }
+  .lane-head .right { margin-inline-start: auto; }
+  .task { display: grid; grid-template-columns: 20px 18px 1fr auto; gap: 2px 8px; align-items: baseline; padding: 7px 0 6px; border-bottom: .5px solid var(--border-2); }
+  .task:last-child { border-bottom: none; }
+  .task .n { font: 400 var(--t-id) var(--mono); color: var(--ink-3); text-align: end; }
+  .task .words { font: 400 14px/1.5 var(--sans); }
+  .task .facts { grid-column: 3 / 5; display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  .task .state { font: 600 10.5px var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+  .task .state.done { color: var(--ai); }
+  .task .state.waits { color: var(--prompt); }
+  .task.mine .words { font-family: var(--serif); font-size: 15px; }
+  .task.ticked .words { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--soft); }
+  .lead { font: 600 10.5px var(--mono); color: var(--prompt); }
+  .box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+  .add { padding: 8px 0 2px 46px; }
+  .add a { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; }
+
+  .bar { margin: 14px 0 0; background: var(--subtle); border: .5px solid var(--border); border-radius: 14px; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; }
+  .bar .chip { padding: 2px 7px; border-radius: 9px; background: var(--ink); color: #fff; font: 600 9px var(--sans); letter-spacing: .06em; }
+  .bar .v { font: 400 14px var(--mono); }
+  .enter { margin: 7px 6px 0; }
+  .enter b { font-weight: 400; color: var(--ink); }
+
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  table.verbs { width: 100%; border-collapse: collapse; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; overflow: hidden; font: 400 13px/1.5 var(--sans); }
+  table.verbs th, table.verbs td { text-align: start; vertical-align: top; padding: 8px 12px; border-bottom: .5px solid var(--border-2); }
+  table.verbs th { font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  table.verbs tr:last-child td { border-bottom: none; }
+  table.verbs td:first-child { white-space: nowrap; }
+  pre { margin: 0; padding: 12px 14px; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; font: 400 12px/1.6 var(--mono); color: var(--ink-2); overflow-x: auto; white-space: pre-wrap; }
+  pre .add { color: var(--you); padding: 0; }
+  .pair { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 780px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair h3 { margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Tasks</h1>
+    <p>C301 (g), proposed. The Plan board becomes Tasks: a list of things to do, where a prompt to a model or a source is one kind of task, as every step is today, and your own to-do is another. A to-do is never sent: you tick it. A run that reaches one waits for you, and goes on when you tick it.</p>
+    <p>Everything a plan does now stays: lanes by letter (201a), runs, conditions, <code>run:</code>, <code>stop:</code>, <code>diff:</code>. One change to what is stored, in section 4. A timer, from C303, could be a third kind later.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The board</h2>
+    <p class="lede">The strip says Tasks: where it said Plan:. A list is numbered as a plan is (201), its lanes lettered (201a), each row a task. A prompt reads as now, with <span class="lead">p&gt;</span>, who answers and how it went; a to-do of yours has a box, and reads as your words.</p>
+    <div class="strip"><img src="parliament-birds.svg" alt=""><span>Room:</span><span>Collection:</span><span>Reflection:</span><span>Records:</span><span class="on">Tasks: 201</span><span>Import:</span><span>Tour:</span><span class="right"><span>Markup ▾</span><span>Focus: off</span></span></div>
+    <div class="card addressed">
+      <div class="chead"><h2>Grant application</h2><span class="num">201</span><span class="marg">run 1 of 1 · 2 lanes · 6 tasks, 2 yours</span><span class="marg right">waits for you</span></div>
+      <div class="body">
+        <div class="lane">
+          <div class="lane-head"><span class="addr">201a</span><span class="name">Draft</span><span class="marg">Sonnet 5.5 · chat 214</span><span class="marg right">waits for you at 2</span></div>
+          <div class="task"><span class="n">1</span><span class="lead">p&gt;</span><span class="words">Draft a one-page summary of the project from the notes</span><span class="state done">done</span><span class="facts marg"><span>Sonnet 5.5</span><span>about 2¢</span></span></div>
+          <div class="task mine"><span class="n">2</span><span class="box"></span><span class="words">Check the budget figures with Anna</span><span class="state waits">yours</span><span class="facts marg"><span>the run waits here</span><span>tick:201a 2</span></span></div>
+          <div class="task"><span class="n">3</span><span class="lead">p&gt;</span><span class="words">Tighten it to a page, keeping the figures as they now stand</span><span class="state">ready</span><span class="facts marg"><span>Sonnet 5.5</span><span>when 2 is done</span></span></div>
+          <div class="task mine"><span class="n">4</span><span class="box"></span><span class="words">Send it to the board by Friday</span><span class="state">yours</span><span class="facts marg"><span>after 3</span></span></div>
+          <div class="add marg"><a>new:todo 201a</a> · <a>new:step 201a</a></div>
+        </div>
+        <div class="lane">
+          <div class="lane-head"><span class="addr">201b</span><span class="name">Sources</span><span class="marg">Wikipedia · chat 215</span><span class="marg right">done</span></div>
+          <div class="task"><span class="n">1</span><span class="lead">p&gt;</span><span class="words">community land trust</span><span class="state done">done</span><span class="facts marg"><span>Wikipedia</span><span>no cost</span></span></div>
+          <div class="task mine ticked"><span class="n">2</span><span class="box on"></span><span class="words">Read the history section</span><span class="state done">done</span><span class="facts marg"><span>ticked 10:40</span></span></div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>A to-do's box ticks it, as <code>tick:201a 2</code> does, said under the bar and taken back by <code>undo:</code>. Its words are edited in place, as a ready prompt's are.</li>
+      <li>A list can be only to-dos: <code>new:tasks "Moving house"</code>, then <code>new:todo</code> for each. It runs nothing and costs nothing.</li>
+      <li>Records shows a list as it shows a plan now, with its tasks counted: "6 tasks, 2 yours, 1 waiting".</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · A run waits for you</h2>
+    <p class="lede">A run goes down each lane as now. At a to-do not yet ticked, that lane waits; the other lanes go on. Tick it and the lane goes on, its next task under its own condition, as now. A to-do already ticked is passed, and one after a failed prompt can carry "when it fails", to fix what went wrong.</p>
+    <div class="bar"><span class="chip">COMMAND</span><span class="v">run:</span></div>
+    <div class="enter marg"><b>Enter runs 2 prompts: 201a 1 to Sonnet 5.5, about 2¢, and 201b 1 to Wikipedia, no cost. 201a then waits for you at 2, "Check the budget figures with Anna"</b></div>
+    <ul class="notes">
+      <li>While a lane waits for you, the board's head and the lane say so, and so does the line under the bar when the board is addressed. Nothing is sent while it waits.</li>
+      <li>Ticked while this tab is open, the run goes on by itself. If the tab was closed, the lane waits as stopped work does now, and <code>run:</code> goes on from it.</li>
+      <li><code>stop:</code> stops a lane that waits for you, as any other; the to-do stays as it was.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · The words</h2>
+    <p class="lede">New commands for to-dos; today's plan commands stay, under the board's new name. The older names are still read.</p>
+    <table class="verbs">
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>tasks:</code></td><td>Brings the Tasks board beside what is here. <code>plan:</code> is still read.</td></tr>
+        <tr><td><code>new:tasks "Grant application"</code></td><td>A new list, numbered, with its first lane. <code>new:plan</code> is still read.</td></tr>
+        <tr><td><code>new:todo "Check the figures"</code></td><td>A to-do at the end of the lane the bar points at; <code>new:todo 201a "…"</code> names the lane.</td></tr>
+        <tr><td><code>tick:201a 2</code></td><td>Ticks a to-do; <code>tick:off 201a 2</code> unticks it. Refused on a prompt: it is done when its answer comes.</td></tr>
+        <tr><td><code>new:step</code>, <code>run:</code>, <code>stop:</code>, <code>hold:</code>, <code>move:</code>, <code>delete:</code>, <code>diff:</code></td><td>As now. <code>delete:201a 2</code> removes a to-do as it removes a step never sent.</td></tr>
+      </tbody>
+    </table>
+    <ul class="notes">
+      <li>In the copy, "plan" becomes "list" where it names the numbered thing, and "step" becomes "task" where it names a row; in all five languages, each glossary saying so. Stored kinds keep their names (docket, run), as notes stayed notes when they became comments.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · What is stored: shown before building</h2>
+    <p class="lede">A task is a step, as now. A to-do is a step with one new field, holding its words and when it was ticked; its prompt stays empty.</p>
+    <div class="pair">
+      <div>
+        <h3>A prompt, now</h3>
+<pre>{
+  id: "s-7c1e…",
+  status: "ready",
+  model: "claude-sonnet-5-5",
+  prompt: "Tighten it to a page…",
+  condition: null,
+  addedAt: "…"
+}</pre>
+      </div>
+      <div>
+        <h3>A to-do</h3>
+<pre>{
+  id: "s-9a40…",
+  status: "ready",
+  model: null,
+  prompt: "",
+<span class="add">  todo: { text: "Check the budget figures with Anna",
+          doneAt: null },</span>
+  condition: null,
+  addedAt: "…"
+}</pre>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><code>todo</code>: optional; its <code>text</code>, your words, up to 2,000 characters, and <code>doneAt</code>, when it was ticked, or null. Ticked, its status is done, as a prompt's is once answered.</li>
+      <li>Its <code>prompt</code> is empty on purpose: a run already passes over a step with no words, so an older Parliament restoring a newer backup, which drops <code>todo</code>, sees an empty step and never sends your to-do's words to anyone.</li>
+      <li>No migration: no record rewritten, no store, index or database version changed. A restore checks <code>todo</code>. Backups carry it from this version on; one made before reads as now.</li>
+      <li>A to-do lives in its lane of its run, copied forward by <code>new:run</code>, unticked, as steps are now.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>The names:</b> the board Tasks (<code>tasks:</code>), a numbered list (<code>new:tasks</code>), a row a task, lanes by letter as now; <code>plan:</code> and <code>new:plan</code> still read.</li>
+        <li><b>Two kinds now:</b> prompts, as every step is today, and your to-dos, ticked and never sent. A timer comes later, with C303.</li>
+        <li><b>A run waits for you</b> at a to-do not yet ticked, that lane only, and goes on when you tick it.</li>
+        <li><b>The stored change:</b> <code>todo</code> on a step, its prompt left empty, as section 4 shows.</li>
+        <li><b>The commands:</b> <code>new:todo</code> and <code>tick:</code>, with the box on the board.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
