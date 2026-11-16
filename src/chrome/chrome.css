@@ -990,7 +990,11 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 
 /* ── The globe (stage 9, piece 4; C184): marginalia that opens the languages. */
 .ch-shell button.ch-globe { padding: 0; border: none; background: none; cursor: pointer; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-align: start; }
-.ch-shell button.ch-globe:hover, .ch-shell button.ch-globe:focus-visible { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+/* No underline on hover, as Markup and Focus beside it have none (Stefan, 16
+   November: "when hovering over the language menu there is an underline");
+   keyboard focus is an ink outline. */
+.ch-shell button.ch-globe:hover, .ch-shell button.ch-globe:focus-visible { color: var(--ch-ink); }
+.ch-shell button.ch-globe:focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 2px; }
 /* The language in the welcome card's top corner (29 October). */
 .ch-wlang { position: absolute; top: 18px; inset-inline-end: 22px; z-index: 1; }
 
