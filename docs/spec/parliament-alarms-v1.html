@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alarms, v1</title>
+<!--
+  C303 (a), v1 (16 November): the timer Stefan asked for on 16 November ("an
+  alarm to let users remember to take breaks"), drawn as a board of alarms set
+  from the bar. Values from tokens.css; the board as the Tasks board draws its
+  rows (parliament-tasks-v4.html).
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-marg: 11.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .body { padding: 4px 22px 16px; }
+  .plus { display: grid; grid-template-columns: 18px auto; gap: 10px; align-items: baseline; padding: 9px 0 6px; font: 400 13.5px var(--sans); color: var(--ink-3); }
+  .plus .p { position: relative; top: 2px; width: 13px; height: 13px; border: 1px dashed var(--soft); border-radius: 3px; }
+  .plus .p::before, .plus .p::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; transform: translate(-50%, -50%); }
+  .plus .p::before { width: 7px; height: 1.2px; }
+  .plus .p::after { width: 1.2px; height: 7px; }
+  .row { display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 10px 0; border-bottom: .5px solid var(--border-2); }
+  .row:last-child { border-bottom: none; }
+  .row .t { font: 600 14px var(--sans); }
+  .row .facts { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .row.off .t { color: var(--ink-3); }
+  .row.rang .t { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--soft); }
+  .left { font: 400 15px var(--mono); color: var(--ink); white-space: nowrap; }
+  .row.off .left { color: var(--ink-3); }
+  .state { font: 600 10.5px var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--ai); white-space: nowrap; }
+  .sw { position: relative; top: 2px; width: 22px; height: 13px; border-radius: 7px; background: var(--ink); }
+  .sw::after { content: ""; position: absolute; top: 2px; left: 11px; width: 9px; height: 9px; border-radius: 50%; background: #fff; }
+  .sw.off { background: var(--soft); }
+  .sw.off::after { left: 2px; }
+  .chip { display: inline-flex; padding: 1px 8px; border-radius: 10px; background: var(--subtle); border: .5px solid var(--border); font: 400 12px var(--sans); color: var(--ink-2); white-space: nowrap; }
+  .l { font: 400 12.5px var(--mono); color: var(--ink-3); text-decoration: underline; text-decoration-color: var(--soft); text-underline-offset: 3px; }
+  .form { padding: 12px 14px; border: .5px solid var(--border); border-radius: 12px; background: var(--subtle); margin: 8px 0; }
+  .f { display: grid; grid-template-columns: 90px 1fr; gap: 6px 10px; align-items: baseline; padding: 5px 0; font: 400 13px var(--sans); }
+  .k { font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .03em; text-transform: uppercase; }
+  .in { border-bottom: .5px solid var(--soft); padding: 1px 0; min-height: 1.5em; }
+  .in.ph { color: var(--ink-3); font-style: italic; }
+  .pick { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .opt { padding: 1px 9px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 12px var(--sans); white-space: nowrap; }
+  .opt.on { border-color: var(--ink); color: var(--ink); }
+  .keep { display: inline-block; padding: 3px 12px; border-radius: 6px; background: var(--ink); color: #fff; font: 600 12.5px var(--sans); }
+  .bar { border-radius: 14px; padding: 9px 14px; background: rgb(var(--navy)); color: #fff; font: 400 13.5px var(--mono); }
+  .bar .m { display: inline-block; margin-inline-end: 10px; padding: 1px 7px; border-radius: 8px; background: rgba(255,255,255,.14); font: 600 9.5px var(--sans); letter-spacing: .06em; }
+  .under { margin: 5px 0 16px 14px; font: italic 400 12px/1.5 var(--serif); color: var(--marg); }
+  .band { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding: 10px 16px; border-radius: 12px; border: .5px solid var(--border); background: var(--surface); box-shadow: 0 6px 20px rgba(25,25,25,.08); }
+  .band b { font: 600 14px var(--sans); }
+  .band .acts { margin-inline-start: auto; display: inline-flex; gap: 12px; }
+  .tabt { display: inline-block; padding: 6px 12px; border: .5px solid var(--border); border-radius: 8px 8px 0 0; background: var(--surface); font: 400 12.5px var(--sans); }
+  .notice { max-width: 360px; padding: 12px 14px; border-radius: 10px; background: #2b2b2b; color: #f2f2f2; font: 400 13px/1.45 var(--sans); }
+  .notice .from { font-size: 11.5px; color: #bdbdbd; }
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  ul.notes { margin: 12px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 13px/1.6 var(--sans); max-width: 760px; }
+  ul.notes li + li { margin-top: 4px; }
+  pre { margin: 0; padding: 12px 14px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 12px/1.55 var(--mono); overflow-x: auto; }
+  .add { color: var(--ai); }
+  .asks ol { margin: 0; padding: 0 0 0 20px; font: 400 13.5px/1.6 var(--sans); max-width: 760px; }
+  .asks li + li { margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Alarms, v1</h1>
+    <p>The timer you asked for, as a board of alarms. Three kinds, each set from the bar or with the plus: a timer (<code>alarm:25m</code>), a time of day (<code>alarm:15:30</code>), and a break every so often while you work (<code>alarm:every 50m</code>). An alarm rings in Parliament's tab, and outside it if you allow that. Nothing leaves this computer.</p>
+    <p>A browser can only ring while a Parliament tab is open: there is no server to wake it, by design. The board says so where it matters.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The board</h2>
+    <p class="lede">Each alarm a row, the next to ring first: its name, when, and the time left, counting down while the board is on the screen. The switch turns one off without losing it.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Alarms</h2></div>
+      <div class="body">
+        <div class="plus"><span class="p"></span><span>Add an alarm</span></div>
+        <div class="row">
+          <span class="sw"></span><span class="t">Tea</span><span class="left">03:12</span>
+          <span class="facts marg">a 25-minute timer · rings at 14:37</span>
+        </div>
+        <div class="row">
+          <span class="sw"></span><span class="t">Take a break</span><span class="left">12:40</span>
+          <span class="facts marg">every 50 minutes while you work here · the time counts only while you use Parliament</span>
+        </div>
+        <div class="row">
+          <span class="sw"></span><span class="t">Call Anna</span><span class="left">1:05:00</span>
+          <span class="facts marg">at 15:30 today</span>
+        </div>
+        <div class="row off">
+          <span class="sw off"></span><span class="t">Stand up</span><span class="left">off</span>
+          <span class="facts marg">every 30 minutes while you work here</span>
+        </div>
+        <div class="row rang">
+          <span class="sw off"></span><span class="t">Proofread</span><span class="state">rang</span>
+          <span class="facts marg">at 14:02 · <span class="l">alarm:off 5</span> takes it off the board</span>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>Alarms are named by their place on the board, as <code>alarm:off 2</code> names the second. They are not numbered with what you make, and do not show in Records: they are about now, not something kept.</li>
+      <li>One that has rung stays, crossed out, until the next day or until you take it off, so you can see it rang while you were away.</li>
+      <li>The strip shows the next one while any is set: <b>Alarms: 03:12</b>.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · Adding one</h2>
+    <div class="two">
+      <div>
+        <span class="tag">With the plus</span>
+        <div class="form">
+          <div class="f"><span class="k">Name</span><span class="in">Take a break</span></div>
+          <div class="f"><span class="k">Kind</span><span class="pick"><span class="opt">In</span><span class="opt">At</span><span class="opt on">Every</span></span></div>
+          <div class="f"><span class="k">Every</span><span class="in">50 minutes</span></div>
+          <div class="f"><span class="k"></span><span class="marg">of work here: away ten minutes or more, and it starts over, as you took your break</span></div>
+          <div class="f"><span class="k"></span><span><span class="keep">Add the alarm</span></span></div>
+        </div>
+      </div>
+      <div>
+        <span class="tag">From the bar</span>
+        <div class="bar"><span class="m">COMMAND</span>&gt;alarm:25m tea</div>
+        <div class="under">Enter sets a 25-minute timer, "tea", ringing at 14:37</div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;alarm:15:30 "Call Anna"</div>
+        <div class="under">Enter sets "Call Anna" for 15:30 today, in 1 hour 5 minutes</div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;alarm:every 50m "Take a break"</div>
+        <div class="under">Enter reminds you to take a break after every 50 minutes of work here</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><code>alarm:</code> alone opens the board. <code>alarm:off 2</code> takes the second off; <code>alarm:off</code>, after a second Enter, every one. <code>alarm:5m 2</code> pushes the second five minutes later. <code>undo:</code> takes any of them back.</li>
+      <li>Times as people write them: <code>25m</code>, <code>1h30</code>, <code>90s</code>, <code>15:30</code>, <code>3:30pm</code>. A time already gone today is tomorrow's, and the line says so.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · When it rings</h2>
+    <p class="lede">Over the bar, wherever you are in Parliament, with a short chime made in the page (no sound file fetched). In Focus too: an alarm is the one thing that may interrupt it.</p>
+    <div class="band"><b>Tea</b><span class="marg">25 minutes are up, at 14:37</span><span class="acts"><span class="l">stop</span><span class="l">5 more minutes</span></span></div>
+    <div class="two" style="margin-top:18px">
+      <div>
+        <span class="tag">In another tab</span>
+        <div><span class="tabt">Tea · Parliament</span></div>
+        <p class="marg" style="margin:6px 0 0">The tab's title names the alarm until you come back.</p>
+      </div>
+      <div>
+        <span class="tag">Outside the page, if you allow it</span>
+        <div class="notice"><div class="from">www.parliament.ltd</div><b>Tea</b><br>25 minutes are up</div>
+        <p class="marg" style="margin:6px 0 0">The browser's own notice. Asked for the first time you set an alarm, never before; "no" is fine, and it rings in the tab as above.</p>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>With several Parliament tabs open, one rings; the others hear that it did by its id alone, as tabs tell each other now.</li>
+      <li>The chime can be turned off in Settings, or with <code>alarm:quiet</code>; the band and the title still show.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · What a browser allows, and how it is kept light</h2>
+    <ul class="notes">
+      <li><b>Only while a tab is open.</b> Closed, nothing rings: there is no server to wake the page, and no notice can be scheduled ahead. Opened again after the time, the alarm shows as rung, saying when.</li>
+      <li><b>Set by the clock, not counted.</b> A browser slows timers in a tab out of sight, so each alarm is the time it rings, checked again whenever the tab is seen. Out of sight, it rings on time or up to a minute late. A computer asleep rings when it wakes, and says how late.</li>
+      <li><b>One timer.</b> Only the next alarm waits; the board counts down once a second, and only while it is on the screen. The board's code loads the first time it opens.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · What is stored: shown before building</h2>
+    <p class="lede">One entry in the settings already kept on this device: no new store, no migration.</p>
+<pre>alarms: [
+  { id: "al-3f2…", name: "Take a break", kind: "every", minutes: 50, on: true, rang: null },
+  { id: "al-9c1…", name: "Call Anna", kind: "at", at: "2026-11-16T15:30:00", on: true, rang: null },
+  { id: "al-07d…", name: "Tea", kind: "in", minutes: 25, at: "2026-11-16T14:37:00", on: true, rang: null }
+]
+quietAlarms: false</pre>
+    <ul class="notes">
+      <li>Names are yours, kept as written, up to 200 characters, never sent anywhere. A restore checks each field.</li>
+      <li>Not in a backup: an alarm is about today on this computer. The breaks, which you would want back, could go in; to rule.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>The board and its three kinds:</b> a timer, a time of day, a break every so often while you work.</li>
+        <li><b>Breaks count work, not the clock:</b> away ten minutes or more and the count starts over.</li>
+        <li><b>Ringing:</b> a band over the bar with a chime, the tab's title, and the browser's notice if allowed, asked on the first alarm.</li>
+        <li><b>In Focus too,</b> and the chime turned off in Settings or with <code>alarm:quiet</code>.</li>
+        <li><b>The strip</b> shows the next one: "Alarms: 03:12".</li>
+        <li><b>Stored</b> as above, in the settings, on this device; breaks in a backup or not.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
