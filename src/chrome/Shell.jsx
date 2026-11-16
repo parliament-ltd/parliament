@@ -13,7 +13,7 @@ import { savedOf } from '../lib/savedArrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, planWritten, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor, planBeside } from '../shell/arrangement'
+import { shipped, windowShare, address, planOpen, planClose, planSpread, planPopBack, planPopBar, planRoom, planShowInRoom, planWritten, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, START, windowsOf, windowWith, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor, planBeside, pageFitOf, setPageFit } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, nextAdvanced, showSteps, stepsShown, stepsMade, stepsKept, advancedNumbers, carriesEdit } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -489,6 +489,23 @@ export default function Shell() {
   // time with the bar at the bottom; a narrow window two boards to a row.
   const size = useScreenSize()
   const [barLine, setBarLine] = useState(null) // what the main bar's line would do, for the map
+  // What fits on the page, measured from the window, for where a board
+  // brought in goes: beside while a column fits, under another while a
+  // column has room, then beside again (16 November; arrangement.js,
+  // pageFit). The heights are those the rooms' own measure leaves under the
+  // strip and above the bar. A phone shows one board at a time, as before.
+  const barAtForFit = arrangement.bar?.at ?? 'bottom'
+  useEffect(() => {
+    if (size === 'phone') { setPageFit(null); return undefined }
+    const measure = () => {
+      const pad = Math.min(32, Math.max(16, window.innerWidth * 0.04))
+      const chrome = barAtForFit === 'bottom' ? 216 : 146
+      setPageFit(pageFitOf({ width: window.innerWidth - 2 * pad, height: window.innerHeight - chrome }))
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [size, barAtForFit])
 
   // Leaving the page closes every window it opened.
   useEffect(() => {
@@ -4603,7 +4620,8 @@ export default function Shell() {
                 onKeyDown={(e) => onEdgeKey(i, e)}
               />
             )}
-            <div className="ch-col" style={{ '--share': shares[i] }}>
+            {/* Boards one above another share the page's height (16 November). */}
+            <div className="ch-col" data-stack={column.length > 1 ? column.length : undefined} style={{ '--share': shares[i], ...(column.length > 1 ? { '--stack': column.length } : {}) }}>
               {column.map((b) => drawBoard(b))}
             </div>
           </Fragment>

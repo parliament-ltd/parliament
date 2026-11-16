@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { BOARDS, boardEntry, boardByTitle, boardFor, wordFor, strip } from './boards'
 import { withoutWaiting, START,
   SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
@@ -8,6 +8,7 @@ import { withoutWaiting, START,
   planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
   planPopMany, planMoveTo, planMoveBeside, windowsOf, planSpread, windowShare, planBeside, firstScreen, settle, emptyRoom,
+  pageFitOf, setPageFit,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
 import { BOARD_NAMES } from '../commands/verbs'
@@ -295,6 +296,35 @@ describe('the Collection beside a room, on the first mark (C302 (a))', () => {
     const a = room()
     expect(planBeside(planBeside(a, 'collection'), 'collection')).toBeNull()
     expect(planBeside(keep(planFocus(a)), 'collection')).toBeNull()
+  })
+})
+
+describe('boards fill the page, beside and then under, before beside again (16 November)', () => {
+  afterEach(() => setPageFit(null))
+
+  it('counts what fits from the page\'s size', () => {
+    expect(pageFitOf({ width: 1856, height: 864 })).toEqual({ cols: 3, rows: 2 })
+    expect(pageFitOf({ width: 1216, height: 584 })).toEqual({ cols: 2, rows: 1 })
+    expect(pageFitOf({ width: 300, height: 100 })).toEqual({ cols: 1, rows: 1 })
+  })
+
+  it('opens beside while a column fits, under the emptiest column after, then beside once full', () => {
+    setPageFit({ cols: 2, rows: 2 })
+    let a = emptyRoom({ ...shipped('room'), id: SPACE })
+    a = keep(planOpen(a, 'collection'))
+    expect(a.columns).toEqual([['room'], ['collection']])
+    a = keep(planOpen(a, 'almanac'))
+    expect(a.columns).toEqual([['room'], ['collection', 'almanac']])
+    a = keep(planOpen(a, 'reflection'))
+    expect(a.columns).toEqual([['room', 'reflection'], ['collection', 'almanac']])
+    a = keep(planOpen(a, 'docket'))
+    expect(a.columns).toEqual([['room', 'reflection'], ['collection', 'almanac'], ['docket']])
+  })
+
+  it('opens beside as before when nothing is measured', () => {
+    let a = emptyRoom({ ...shipped('room'), id: SPACE })
+    a = keep(planOpen(keep(planOpen(a, 'collection')), 'almanac'))
+    expect(a.columns).toEqual([['room'], ['collection'], ['almanac']])
   })
 })
 

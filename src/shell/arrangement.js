@@ -258,15 +258,60 @@ function readdress(a, gone, oldColumn) {
 
 // ── The verbs ───────────────────────────────────────────
 
+// What fits on the page (Stefan, 16 November: "it'd be great for the site to
+// be aware of the size of the screen, see what fits, and opens to fill the
+// page first both horizontally and vertically, once full then
+// horizontally"). The shell measures the window and says how many columns
+// fit side by side at a readable width, and how many boards one above the
+// other at a usable height; a board brought in then goes beside while a
+// column fits, under another while a column has room, and once the page is
+// full, beside again, the page scrolling sideways as before rather than
+// squeezing the boards. Unset (a phone, a test), boards go beside as before.
+// Kept here, read when a board is placed, so every verb that brings one in
+// follows it without being told.
+let pageFit = null
+/** The least width a column fits at, and the least height a board is usable at, with the gap between. */
+export const COL_LEAST = 480
+export const TILE_LEAST = 320
+const GAP = 16
+
+/** How many columns and how many boards to a column fit in a page of this size, in CSS pixels. */
+export function pageFitOf({ width, height }) {
+  const cols = Math.max(1, Math.floor((Number(width) + GAP) / (COL_LEAST + GAP)) || 1)
+  const rows = Math.max(1, Math.floor((Number(height) + GAP) / (TILE_LEAST + GAP)) || 1)
+  return { cols, rows }
+}
+
+/** What fits on the page now, from the shell; null to place boards beside as before. */
+export function setPageFit(fit) {
+  pageFit = fit && Number.isFinite(fit.cols) && Number.isFinite(fit.rows) ? { cols: Math.max(1, fit.cols), rows: Math.max(1, fit.rows) } : null
+}
+
+// With the page's columns all there, the column a board can go under: the
+// one with fewest boards and room for another, the rightmost of those, so
+// the first board keeps its height longest. Never under the welcome card.
+function stackInto(columns, fit) {
+  if (!fit || columns.length < fit.cols) return -1
+  let best = -1
+  columns.forEach((c, i) => {
+    if (c.includes('welcome') || c.length >= fit.rows) return
+    if (best < 0 || c.length <= columns[best].length) best = i
+  })
+  return best
+}
+
 // Where a board brought into the space goes (changes `next` in place). The
 // welcome card takes the left. A room goes beside the welcome card when it
 // is there, else on the right. Other boards go on the right; beside the
 // welcome card they stack in one column, on the right of the card and the
-// chat (welcome spec §5).
+// chat (welcome spec §5). With what fits on the page known, a full row of
+// columns fills downward first (pageFit, above).
 function place(next, board) {
   // The birds give way to the first board opened (C282; C302 (d)).
   next.columns = next.columns.filter((c) => !c.includes(START))
   if (board === 'welcome') { next.columns.unshift([board]); return }
+  const under = stackInto(next.columns, pageFit)
+  if (under >= 0) { next.columns[under].push(board); return }
   const withWelcome = next.columns.some((c) => c.includes('welcome'))
   // Another room goes beside the room the prompt goes to (C175 (a)).
   const beside = isRoom(board) ? currentRoom(next) : null

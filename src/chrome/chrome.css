@@ -82,6 +82,14 @@
 .ch-shell .ch-stage.space:has(> .ch-col:only-child > .ch-card.room) { justify-content: center; }
 .ch-shell .ch-stage.space > .ch-col:only-child:has(> .ch-card.room) { flex: 0 1 820px; max-width: 820px; }
 .ch-stage.space > .ch-col { flex-grow: var(--share, 1); min-width: 180px; }
+/* Boards one above another in a column share the page's height (16
+   November): each is as tall as its share of what the strip and the bar
+   leave, scrolling inside with its head in sight, a room filling its share. */
+.ch-stage.space > .ch-col[data-stack] { --card-head: 40px; --tile: calc((100dvh - var(--room-chrome) + var(--card-head) - (var(--stack) - 1) * 16px) / var(--stack)); }
+.ch-stage.space > .ch-col[data-stack] > .ch-card { flex: none; height: max(200px, var(--tile)); min-height: 0; overflow: auto; }
+.ch-stage.space > .ch-col[data-stack] > .ch-card > .ch-chead { position: sticky; top: 0; z-index: 2; background: var(--ch-surface); }
+.ch-stage.space > .ch-col[data-stack] > .ch-card .ch-room,
+.ch-stage.space > .ch-col[data-stack] > .ch-card .ch-cbody.ch-room-empty { height: max(160px, calc(var(--tile) - var(--card-head))); }
 .ch-stage.space > .ch-col:has(> .ch-welcome) { min-width: 260px; }
 .ch-stage.space > .ch-col:has(> .ch-card.room) { min-width: 300px; }
 /* The edge between two columns: drag it to share their width, a double
