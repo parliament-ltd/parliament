@@ -196,7 +196,9 @@ export function fieldReducer(state, action) {
       return { ...state, focused: true, minimised: false, peek: false }
 
     case 'editReply':
-      return { ...state, editingReply: true, minimised: true, focused: false, peek: false }
+      // On a phone the field stays open, one row (fold: false; 17 November),
+      // so its microphone is a tap away while words are selected in the text.
+      return { ...state, editingReply: true, minimised: action.fold !== false, focused: false, peek: false }
     case 'doneEditing':
       return state.editingReply ? { ...state, editingReply: false, minimised: false, peek: false } : state
 

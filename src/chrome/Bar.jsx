@@ -234,11 +234,14 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   }, [doc, alsoDocs, onAway])
 
   // Editing a reply on a board folds the field; leaving it opens the field.
+  // On a phone it stays open, one row, its microphone in reach (17 November).
+  const phoneNow = useRef(phone)
+  useEffect(() => { phoneNow.current = phone })
   useEffect(() => {
     if (!doc) return undefined
     const onBoard = (el) => isTextField(el) && el !== input.current && Boolean(el.closest?.('.ch-stage'))
     function onFocusIn(e) {
-      if (onBoard(e.target)) { reply.current = e.target; dispatch({ type: 'editReply' }) }
+      if (onBoard(e.target)) { reply.current = e.target; dispatch({ type: 'editReply', fold: !phoneNow.current }) }
     }
     function onFocusOut(e) {
       if (e.target !== reply.current) return

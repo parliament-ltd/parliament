@@ -40,6 +40,14 @@ describe('the leaders', () => {
   })
 })
 
+describe('editing in the text on a phone (17 November)', () => {
+  it('leaves the field open, one row, and opens it again after', () => {
+    const s = fieldReducer(initialField('prompt'), { type: 'editReply', fold: false })
+    expect(s).toMatchObject({ editingReply: true, minimised: false, focused: false })
+    expect(act(s, 'doneEditing')).toMatchObject({ editingReply: false, minimised: false })
+  })
+})
+
 describe('a swipe to another mode (17 November)', () => {
   it('changes the mode and keeps what was typed in each', () => {
     let s = typing(room(), 'why is the sky blue')

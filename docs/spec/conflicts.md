@@ -5052,6 +5052,8 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **No ink ring:** the bar takes the boards' faint edge (`--ch-lift`) at rest and typed in, on a computer too; the pills and the plus a faint hairline. The caret shows where you are. This sets aside CLAUDE.md's "keyboard focus is ink" for the bar, at Stefan's word; elsewhere it stands.
   - **The command bar's microphone** sits at the end, where the ink pot is for a prompt, on a phone and a computer.
 - **Not tried:** a real phone's keyboard. Checked at 375 by 812 and 1280 by 820 in the app's browser. Nothing stored changes.
+- **Asked, 17 November:** when words are highlighted on a phone, the keyboard to come up for a prompt on them, or to change them? **Stefan:** "for mobile, let's have to edit, and then we keep the prompt bar for adding prompts, because it may be too difficult to trigger a prompt mid-text. or could they be in-line and then press the voice input within the prompt bar?"
+- **Built 17 November:** words highlighted in a text on a phone give it the caret, the selection kept as it was, so the phone raises its keyboard to change them. Typed prompts stay in the bar. While a text is being changed on a phone, the bar no longer folds into a circle: it stays one row above the keyboard, so its microphone is a tap away; with words selected, a prompt spoken there is written in the text on them (C305), and the ink pot sends it. On a computer the bar folds as before. Not tried on a real phone: whether a phone raises the keyboard when a page gives a text the caret right after a long press is the browser's to decide, and voice on most phones stays off (C305).
 
 ## Proposed CLAUDE.md rewrite
 
