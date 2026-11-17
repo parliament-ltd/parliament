@@ -22,6 +22,15 @@ export const COLUMNS = false
 // branch, quote and copy. CARD_HEAD = true draws it again.
 export const CARD_HEAD = false
 
+// A room's kind, the template it was made from ("Writing Studio"), waits
+// with the Lab (Stefan, 17 November: "let's hide the room type (e.g.,
+// Writing Studio) until the lab is released"). A room board's head shows
+// its number, its chat's title, and a name its owner gave it with name:.
+// The name stays stored; LAB = true shows the kind again.
+
+/** Whether a room board's head names its room: a name its owner gave it, or any with the Lab. */
+export const roomNameShown = (name, lab = LAB) => lab || Boolean(name?.own)
+
 /** The room people start in, the one template the Library offers meanwhile. */
 export const DEFAULT_TEMPLATE = 'writing-studio@1.0'
 

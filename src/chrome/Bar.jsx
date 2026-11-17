@@ -10,6 +10,7 @@ import { readField } from '../commands/parse'
 import { complete } from '../commands/registry'
 import { preview, promptPreview } from './preview'
 import { roomLabel } from './say'
+import { roomNameShown } from '../lib/release'
 import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
@@ -304,7 +305,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     ? (names.length ? i18n._(COPY.field.frameworkSome, { first: names[0], more: names.length - 1 }) : i18n._(COPY.field.frameworkNone))
     : null
   const room = prompt && !prompt.plan && !prompt.reflection && prompt.room !== undefined
-    ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about), trying: prompt.trying?.name ?? null }
+    // The room's kind waits with the Lab, here as on its board (17 November): "→ 211", or its own name.
+    ? { chat: prompt.chat ?? null, name: prompt.room && roomNameShown(prompt.roomName ?? null) ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about), trying: prompt.trying?.name ?? null }
     : undefined
 
   async function send() {

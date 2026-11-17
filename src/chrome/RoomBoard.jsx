@@ -8,6 +8,7 @@ import { assignDefaultRoom } from '../lib/migration'
 import { schemeName } from '../lib/schemes'
 import { roomName } from '../lib/roomNames'
 import { roomLabel } from './say'
+import { roomNameShown } from '../lib/release'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { ConversationScope } from '../stores/ConversationScope'
@@ -177,7 +178,8 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   }
 
   const title = chat?.num != null ? String(chat.num) : i18n._(COPY.boards.room)
-  const room = found.forId === chatId && found.mode ? roomLabel(i18n, named) : null
+  // Its kind ("Writing Studio") waits with the Lab; a name its owner gave it shows (17 November).
+  const room = found.forId === chatId && found.mode && roomNameShown(named) ? roomLabel(i18n, named) : null
   const card = (body) => <Card board={board} addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room} ripple={ripple} kept={kept}>{body}</Card>
 
   if (found.forId !== chatId) return card(null)

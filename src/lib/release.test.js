@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest'
-import { LAB, LAB_VERBS, DEFAULT_TEMPLATE, HIDDEN_TEMPLATES, WAITING_BOARDS, offered, boardOffered, shownInLibrary, newChatTemplate } from './release'
+import { LAB, LAB_VERBS, DEFAULT_TEMPLATE, HIDDEN_TEMPLATES, WAITING_BOARDS, offered, boardOffered, shownInLibrary, newChatTemplate, roomNameShown } from './release'
 import { TEMPLATES } from './seedTemplates'
 import { catalogueItems } from './catalogue'
 
 describe('what this release offers (C279 (a))', () => {
+  it('names a room on its board only by a name its owner gave it, until the Lab is back (17 November)', () => {
+    expect(roomNameShown({ template: 'writing-studio@1.0' })).toBe(false)
+    expect(roomNameShown(null)).toBe(false)
+    expect(roomNameShown({ own: 'Thesis' })).toBe(true)
+    expect(roomNameShown({ template: 'writing-studio@1.0' }, true)).toBe(true)
+  })
+
   it('waits with the Lab, and the default room is a template that exists', () => {
     expect(LAB).toBe(false)
     expect(TEMPLATES.some((t) => t.id === DEFAULT_TEMPLATE && t.scope === 'room')).toBe(true)
