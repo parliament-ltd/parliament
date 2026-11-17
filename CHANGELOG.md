@@ -3,6 +3,13 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.21.0, 17 November 2026
+
+- On a phone, the bar is a plus, your words, a microphone and the ink pot, which sends. Tap into a prompt and the frameworks and who answers show as pills under your words. Swipe the bar left or right for search, command and prompt, and a label above it says which.
+- The plus holds the boards, Import: and Tour:, Markup, Focus, the language and your alarms, so the boards have the whole screen. They stand one above another, the width of the phone: scroll between them, or use the arrows at the right edge, and the bar follows the board you see.
+- Voice in every mode, on a computer too, from the microphone beside the glyph. Speech is turned into words on your device, and nothing goes before Enter. A prompt spoken with words selected in a reply goes in the text on them. Where a browser would send your audio away, the microphone is faint, and a click says why.
+- A room's kind, such as Writing Studio, waits for the Lab: a room shows its number, its title, and a name you gave it with name:. The Records table leaves it out too.
+
 ## 0.20.0, 16 November 2026
 
 - Alarms: alarm:25m tea, alarm:15:30 "Call Anna", or alarm:every 50m "Take a break" for a break after so much work. When one rings, a band says so, with stop and 5 more minutes, and the strip counts down to the next. The Alarms board lists them, and alarm:quiet turns the chime off.
