@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.22.0, 17 November 2026
+
+- The bar stands a little above the page, open or folded into a circle, with a soft shadow and no dark ring when you type in it. Its grey words go when you tap or click into it, and an empty search reads "Search here".
+- On a phone the bar rises above the keyboard, the pills read "framework" and who answers by name alone, and the microphone sits at the end of the command bar. Highlighted words bring the keyboard up to change them, and the bar stays open while you do, so a prompt spoken there goes in the text on them.
+- A room's page draws no outline or tint on your own text, and "Write here or type a prompt in the bar." goes when you click into it.
+- Frameworks shape how the model responds, and you can add one of your own in their menu: a name, what it asks, and Add.
+- The ink pot drains under the pointer and fills again when it leaves.
+
 ## 0.21.0, 17 November 2026
 
 - On a phone, the bar is a plus, your words, a microphone and the ink pot, which sends. Tap into a prompt and the frameworks and who answers show as pills under your words. Swipe the bar left or right for search, command and prompt, and a label above it says which.
