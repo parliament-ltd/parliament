@@ -135,7 +135,7 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-shell.size-phone.on-welcome:not(.welcome-alone) { height: auto; min-height: 100dvh; overflow: visible; }
 .ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-col { overflow: visible; }
 .ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-foot { display: none; }
-.ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-dock.bottom { bottom: 0; padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+.ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-dock.bottom { bottom: var(--kb, 0px); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
 /* The board above and the one below, at the right edge, in navy; out of
    the way while the bar is typed in or a menu is open. */
 .ch-jump { position: fixed; inset-inline-end: 4px; bottom: calc(var(--phone-bar) + 18px + env(safe-area-inset-bottom, 0px)); z-index: 25; display: flex; flex-direction: column; gap: 6px; }
@@ -154,7 +154,7 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-dock.right .ch-dock-in { margin-inline: auto 0; }
 
 /* ── the field ── */
-.ch-field { position: relative; display: flex; align-items: center; height: var(--ch-field-h); width: 100%; border-radius: var(--ch-r-field); background: var(--ch-surface); overflow: hidden; box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10); }
+.ch-field { position: relative; display: flex; align-items: center; height: var(--ch-field-h); width: 100%; border-radius: var(--ch-r-field); background: var(--ch-surface); overflow: hidden; box-shadow: var(--ch-lift); }
 .ch-fillwrap { position: absolute; inset: 0; pointer-events: none; z-index: 0; clip-path: inset(0 100% 0 0); transition: clip-path var(--ch-dur-wipe) cubic-bezier(.4, 0, .2, 1); }
 .ch-fillwrap.on { clip-path: inset(0 0 0 0); }
 .ch-fill { position: absolute; inset: 0; }
@@ -168,7 +168,13 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
    draws a prompt's (.sfield input::placeholder), in the token sheet's ink-3,
    which replaced that grey to be read (Stefan, 29 October). */
 .ch-field.held input::placeholder { color: var(--ch-ink-3); opacity: 1; }
-.ch-field:focus-within { box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10), 0 0 0 1px var(--ch-focus-ink); }
+/* The bar takes the boards' faint edge, typed in or not, on a computer and
+   a phone: no ink ring (Stefan, 17 November: "can we use a style more
+   similar to the boards, the faint outline? ... please fix also for the
+   laptop version"). The caret shows where you are. Its grey words go when
+   it is clicked or tapped into; a held prompt's stay, standing for its words. */
+.ch-field:focus-within { box-shadow: var(--ch-lift); }
+.ch-field:not(.held) input:focus::placeholder { color: transparent; }
 .ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity var(--ch-dur-fade) ease, transform var(--ch-dur-fade) ease; pointer-events: none; }
 .ch-chip.on { opacity: 1; transform: none; }
 .ch-chip.search { background: var(--ch-paper); color: var(--ch-ink); border: 1px solid var(--ch-ink); padding: 2px 6px; }
@@ -193,7 +199,10 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-field.command .ch-mic, .ch-shell .ch-field.command .ch-mic:hover { color: rgba(255, 255, 255, .8); }
 .ch-shell .ch-field.command .ch-mic.on::before { box-shadow: 0 0 0 1.5px #fff; }
 .ch-field.with-mic input { padding-inline-end: 72px; }
-.ch-field.command.with-mic input { padding-inline-end: 72px; }
+/* Command has no glyph: its microphone takes the glyph's place at the end,
+   where the ink pot is for a prompt (Stefan, 17 November). */
+.ch-shell .ch-field.command .ch-mic { inset-inline-end: 5px; }
+.ch-field.command.with-mic input { padding-inline-end: 40px; }
 .ch-shell .ch-field.with-mic .ch-fmarg:not(.fw, .feat) { margin-inline-end: 72px; }
 .ch-shell .ch-field.min .ch-mic, .ch-shell .ch-field.min .ch-plus, .ch-shell .ch-field.min .ch-pills { display: none; }
 
@@ -211,6 +220,8 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-shell .ch-field.command .ch-plus { background: transparent; color: #fff; box-shadow: 0 0 0 .5px rgba(255, 255, 255, .55); }
 .ch-shell .ch-field.phone .ch-mic { position: relative; inset: auto; order: 3; flex: none; width: 34px; }
 .ch-field.phone .ch-gslot { position: relative; inset: auto; order: 4; flex: none; }
+.ch-field.phone.command:not(.min) .ch-gslot { display: none; }
+.ch-shell .ch-field.phone.command .ch-mic { width: 40px; }
 .ch-shell .ch-field.phone .ch-send { pointer-events: auto; }
 /* Folded while a reply is edited: the circle holds the glyph alone. */
 .ch-shell .ch-field.phone.min input { flex: 0 0 0; padding: 0; }
@@ -218,9 +229,14 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-field.phone.two input { order: 0; flex-basis: 100%; padding-inline: 14px; }
 .ch-field.phone.two .ch-plus { order: 1; }
 .ch-field.phone .ch-pills { order: 2; position: relative; z-index: 2; flex: 1 1 0; min-width: 0; display: flex; gap: 6px; padding-inline: 6px; overflow-x: auto; scrollbar-width: none; }
-.ch-shell .ch-field .ch-pill { flex: none; max-width: 62vw; padding: 4px 10px; border-radius: 999px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12.5px var(--ch-sans); color: var(--ch-ink-2); background: var(--ch-surface); box-shadow: 0 0 0 .5px rgba(25, 25, 25, .22); }
-.ch-shell .ch-field .ch-pill[aria-expanded="true"] { color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink); }
-.ch-shell.size-phone .ch-dock.bottom { padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+.ch-shell .ch-field .ch-pill { flex: none; max-width: 62vw; padding: 4px 10px; border-radius: 999px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12.5px var(--ch-sans); color: var(--ch-ink-2); background: var(--ch-surface); box-shadow: 0 0 0 .5px rgba(25, 25, 25, .12); }
+.ch-shell .ch-field .ch-pill[aria-expanded="true"] { color: var(--ch-ink); }
+/* On a phone, its plus and its pills take the boards' faint edge too. */
+.ch-shell .ch-field.phone .ch-plus:not(.on) { box-shadow: 0 0 0 .5px rgba(25, 25, 25, .12); }
+/* Above the phone's keyboard (17 November): browsers that shrink the page
+   for it need nothing; for the others, the bar rises by what the keyboard
+   covers (--kb, phoneBoards.js). */
+.ch-shell.size-phone .ch-dock.bottom { bottom: var(--kb, 0px); padding: 6px 8px calc(10px + env(safe-area-inset-bottom, 0px)); }
 .ch-shell.size-phone .ch-enter.hide { display: none; }
 /* Which bar a swipe goes to, above the field, in the colours of the modes' names. */
 .ch-frow { position: relative; }

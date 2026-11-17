@@ -81,6 +81,8 @@ export function usePhoneBoards({ on, stage, columns, addressed, onAddress }) {
     let t = 0
     const settle = () => {
       const { columns: cols, addressed: was, onAddress: point } = now.current
+      // Typing in the bar, the keyboard moves the page: the bar stays where it points.
+      if (document.activeElement?.closest?.('.ch-dock')) return
       const dock = document.querySelector('.ch-dock.bottom')
       const bottom = dock ? dock.getBoundingClientRect().top : window.innerHeight
       const cards = cardsIn(stage.current, cols).map(({ board, el }) => {
@@ -97,3 +99,35 @@ export function usePhoneBoards({ on, stage, columns, addressed, onAddress }) {
     return () => { window.removeEventListener('scroll', onScroll); window.clearTimeout(t) }
   }, [on, stage])
 }
+
+/**
+ * How much of the screen's foot a phone's keyboard covers, kept as --kb on
+ * the page, so the bar rises above it (17 November; Stefan: "the text
+ * input box gets covered by the keyboard"). A browser that shrinks the page
+ * for the keyboard (interactive-widget, in index.html) leaves it 0; one that
+ * only shrinks what is seen, as Safari does, gives the difference. Pinched
+ * in, it is 0, so zooming does not lift the bar.
+ * @param {boolean} on
+ */
+export function useKeyboardGap(on) {
+  useEffect(() => {
+    const vv = typeof window === 'undefined' ? null : window.visualViewport
+    const root = document.documentElement
+    if (!on || !vv) { root.style.removeProperty('--kb'); return undefined }
+    const measure = () => {
+      const gap = Math.abs(vv.scale - 1) > 0.01 ? 0 : keyboardGap(window.innerHeight, vv.height, vv.offsetTop)
+      root.style.setProperty('--kb', `${gap}px`)
+    }
+    measure()
+    vv.addEventListener('resize', measure)
+    vv.addEventListener('scroll', measure)
+    return () => {
+      vv.removeEventListener('resize', measure)
+      vv.removeEventListener('scroll', measure)
+      root.style.removeProperty('--kb')
+    }
+  }, [on])
+}
+
+/** What a keyboard covers, in whole pixels: the page's height less what is seen of it. Pure. */
+export const keyboardGap = (pageHeight, seenHeight, seenTop) => Math.max(0, Math.round(pageHeight - seenHeight - seenTop))

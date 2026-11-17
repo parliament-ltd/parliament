@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { boardInSight, besideOf } from './phoneBoards'
+import { boardInSight, besideOf, keyboardGap } from './phoneBoards'
 
 describe('the boards on a phone, one above another (17 November)', () => {
   const order = ['room', 'collection', 'almanac']
@@ -22,5 +22,12 @@ describe('the boards on a phone, one above another (17 November)', () => {
     expect(besideOf(order, 'almanac')).toEqual({ above: 'collection', below: null })
     // The bar at a board in a window of its own: the first board is below.
     expect(besideOf(order, 'settings')).toEqual({ above: null, below: 'room' })
+  })
+
+  it('lift the bar by what the keyboard covers, and no more', () => {
+    expect(keyboardGap(812, 812, 0)).toBe(0)
+    expect(keyboardGap(812, 476, 0)).toBe(336)
+    expect(keyboardGap(812, 476, 120)).toBe(216)
+    expect(keyboardGap(812, 900, 0)).toBe(0)
   })
 })

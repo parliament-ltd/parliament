@@ -55,7 +55,7 @@ import { promptFacts, promptNow } from '../lib/branchVerbs'
 import { checkSourceTexts } from '../lib/sourceCheck'
 import Bar from './Bar'
 import Strip from './Strip'
-import { usePhoneBoards } from './phoneBoards'
+import { usePhoneBoards, useKeyboardGap } from './phoneBoards'
 import { BoardArrows } from './BoardArrows'
 import Board from './Board'
 import { boardName, roomLabel, andList } from './say'
@@ -4654,6 +4654,8 @@ export default function Shell() {
   // in sight, and pointing it at another scrolls there (17 November).
   const phone = size === 'phone'
   usePhoneBoards({ on: phone, stage: stageRef, columns: arrangement.columns, addressed: arrangement.addressed, onAddress: focusBoard })
+  // The bar above the phone's keyboard, where the browser does not move it.
+  useKeyboardGap(phone)
   // On a phone the bar sits at the bottom, whatever bar: chose for wider screens (C261 (d)).
   // The welcome card keeps its field. The start card holds none: a bar kept
   // in the card docks at the foot, centred, outside it (C293; Stefan,

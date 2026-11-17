@@ -7235,10 +7235,20 @@ msgstr "Choose the frameworks for this chat (framework:)"
 msgid "field.frameworkNone"
 msgstr "framework: none"
 
+#. A pill in the prompt field on a phone: the first framework chosen, and how many more
+#. js-lingui-explicit-id
+msgid "field.frameworkPill"
+msgstr "{more, plural, =0 {{first}} other {{first} +#}}"
+
 #. The first framework on this chat, and how many more
 #. js-lingui-explicit-id
 msgid "field.frameworkSome"
 msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
+
+#. A pill in the prompt field on a phone, with no framework chosen; framework is the command word, kept English
+#. js-lingui-explicit-id
+msgid "field.frameworkWord"
+msgstr "framework"
 
 #. js-lingui-explicit-id
 msgid "field.held"
@@ -7253,6 +7263,11 @@ msgstr "Your edited prompt"
 msgid "field.listening"
 msgstr "listening"
 
+#. Grey text in the empty search field
+#. js-lingui-explicit-id
+msgid "field.searchHere"
+msgstr "Search here"
+
 #. The ink pot button in the bar on a phone, read by screen readers
 #. js-lingui-explicit-id
 msgid "field.send"
@@ -7266,11 +7281,6 @@ msgstr "Speak"
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {to all #}}"
-
-#. Grey text in the empty field on the welcome page. {leader} is >, the command leader
-#. js-lingui-explicit-id
-msgid "field.toBegin"
-msgstr "Type {leader} to begin"
 
 #. js-lingui-explicit-id
 msgid "field.toOne"

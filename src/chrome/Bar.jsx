@@ -9,7 +9,7 @@ import { restingMode } from '../shell/arrangement'
 import { readField } from '../commands/parse'
 import { complete } from '../commands/registry'
 import { preview, promptPreview } from './preview'
-import { roomLabel } from './say'
+import { roomLabel, andList } from './say'
 import { roomNameShown } from '../lib/release'
 import Field from './Field'
 import EnterLine from './EnterLine'
@@ -274,11 +274,16 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // With the Plan board addressed, a prompt is a step planned (C198): no one answers it.
   // With Reflection addressed, it is talk about the chat, not a prompt to it (C235 (f)).
   let marginalia = null
+  // On a phone the pill says who answers and nothing more: "Wikipedia",
+  // "Sonnet 5.5", the names of several ticked (Stefan, 17 November: "don't
+  // need 'answered by'"). Among branches, where the prompt goes, as here.
+  let pill = null
   if (prompt && !prompt.plan && !prompt.reflection && prompt.room !== undefined && prompt.keyed != null) {
     const who = prompt.answerer ?? (prompt.keyed ? { group: 'model', name: prompt.model } : { group: 'source', name: prompt.source })
     const to = prompt.toLabel
     // Among a prompt's branches, where it goes (C174): "to 201a · Sonnet 5.5".
-    marginalia = to && !(prompt.many?.length > 1 && !prompt.toMany)
+    const toBranch = to && !(prompt.many?.length > 1 && !prompt.toMany)
+    marginalia = toBranch
       ? (to.all ? i18n._(COPY.field.toAll, { count: to.count }) : to.count > 1 ? i18n._(COPY.field.toSome, { nums: to.chats.join(', ') }) : i18n._(COPY.field.toOne, { address: to.chats[0], name: to.name }))
       // Several ticked: "answered from multiple" for sources, "by" when a model is among them (29 October).
       : prompt.many?.length > 1
@@ -286,9 +291,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         : who.group === 'source'
           ? i18n._(COPY.field.answeredFrom, { source: who.name })
           : i18n._(COPY.field.answeredBy, { model: who.name })
+    const several = prompt.many?.length > 1 ? prompt.many.map((w) => w.name).filter(Boolean) : []
+    pill = toBranch ? marginalia : several.length > 1 ? andList(i18n, several) : who.name || marginalia
   }
   // The frameworks on this chat: "framework: none", or the first and how many more (C164).
   const names = prompt?.frameworkNames ?? []
+  // On a phone: "framework", or the first chosen and how many more (17 November).
+  const frameworksPill = marginalia ? (names.length ? i18n._(COPY.field.frameworkPill, { first: names[0], more: names.length - 1 }) : i18n._(COPY.field.frameworkWord)) : null
   // Features of input, in the field's marginalia (stage 13, piece 6; C248):
   // web search held for the next prompt, voice on this device only (C70),
   // and attaching files. Each only where the room offers it.
@@ -520,11 +529,14 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           folded={folded}
           win={win}
           // At rest on the welcome page, how to begin, in the field (C286 (h)).
-          hint={welcome && field.mode === 'search' ? i18n._(COPY.field.toBegin, { leader: '>' }) : null}
+          // Empty, the search field says what it is for (17 November), here and on a phone.
+          hint={field.mode === 'search' ? i18n._(COPY.field.searchHere) : null}
           marginalia={marginalia}
           onMarginalia={onPicker ? () => { setPlusOpen(false); onPicker() } : null}
           marginaliaOpen={Boolean(picker)}
           frameworks={frameworksMarg}
+          pill={pill}
+          frameworksPill={frameworksPill}
           features={features}
           onFrameworks={onFrameworkPicker ? () => { setPlusOpen(false); onFrameworkPicker() } : null}
           frameworksOpen={Boolean(frameworkPicker)}

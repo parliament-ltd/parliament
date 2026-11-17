@@ -5042,6 +5042,17 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **The helper text** shows only until the page has the caret, and reads "Write here or type a prompt in the bar." Swedish and Finnish lost their comma too; Japanese and Chinese keep their own punctuation.
 - **Not tried by eye:** the app's browser was hidden, so the rules were checked as written and as the page holds them, not seen. Nothing stored changes.
 
+**C307. The bar, tapped into** (brought by Stefan, 17 November, trying 0.21.0 on a phone).
+- **Asked:** on a phone, the bar's helper text gone when tapped into ("if they select the input it says 'Prompt'"); the bar covered by the keyboard "at least within Brave browser ... add some padding to the bottom"; the pills "'framework' and then the selected source e.g., 'Wikipedia', don't need 'answered by'"; no black outline on the pills or the bars, "a style more similar to the boards, the faint outline"; the command bar's microphone "further to the right where the inkpot is for prompt"; the search bar's help text "'Search here' and not 'Type > to begin' cause that will change to the command bar"; then "please fix also for the laptop version".
+- **Built 17 November:**
+  - **Grey words go when the bar is tapped or clicked into,** on a phone and a computer: the mode's name, "Search here". A held prompt's placeholder stays, since it stands for the held words.
+  - **"Search here"** in the empty search field, on a phone and a computer, in place of "Type > to begin" on the welcome page. This overrules the welcome spec's "> to begin" (welcome-spec-decisions.md, lines 28 and 201).
+  - **Above the keyboard:** the page now asks browsers built on Chrome, Brave among them, to shrink the page for the keyboard (`interactive-widget=resizes-content`), so the bar at its foot rises with it; where a browser only shrinks what is seen, as Safari does, the bar is lifted by what the keyboard covers (`useKeyboardGap`). A little more room under the field. While you type, the bar keeps pointing at the board it was on.
+  - **The pills** read "framework", or the first chosen and how many more ("Socratic +1"), and who answers by name alone: "Wikipedia", "Sonnet 5.5", several joined. Among branches, where the prompt goes, as before. "framework" stays English, the command word, as in the computer's field.
+  - **No ink ring:** the bar takes the boards' faint edge (`--ch-lift`) at rest and typed in, on a computer too; the pills and the plus a faint hairline. The caret shows where you are. This sets aside CLAUDE.md's "keyboard focus is ink" for the bar, at Stefan's word; elsewhere it stands.
+  - **The command bar's microphone** sits at the end, where the ink pot is for a prompt, on a phone and a computer.
+- **Not tried:** a real phone's keyboard. Checked at 375 by 812 and 1280 by 820 in the app's browser. Nothing stored changes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

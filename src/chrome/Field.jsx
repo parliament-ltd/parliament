@@ -54,7 +54,7 @@ function PlusMark() {
   )
 }
 
-const Field = forwardRef(function Field({ state, folded, win, hint = null, marginalia = null, onMarginalia = null, marginaliaOpen = false, frameworks = null, onFrameworks = null, frameworksOpen = false, features = [], ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave, phone = false, plus = null, voice = null, onSend = null, onSwipe = null }, ref) {
+const Field = forwardRef(function Field({ state, folded, win, hint = null, marginalia = null, onMarginalia = null, marginaliaOpen = false, frameworks = null, onFrameworks = null, frameworksOpen = false, features = [], ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave, phone = false, plus = null, voice = null, onSend = null, onSwipe = null, pill = null, frameworksPill = null }, ref) {
   const { i18n } = useLingui()
   const { mode } = state
   const held = showsHeld(state)
@@ -122,11 +122,11 @@ const Field = forwardRef(function Field({ state, folded, win, hint = null, margi
       {two && (
         <span className="ch-pills">
           {frameworks && onFrameworks && (
-            <button type="button" className="ch-pill" aria-expanded={frameworksOpen} title={i18n._(COPY.field.frameworkHelp)} onMouseDown={(e) => e.preventDefault()} onClick={onFrameworks}>{frameworks}</button>
+            <button type="button" className="ch-pill" aria-expanded={frameworksOpen} title={i18n._(COPY.field.frameworkHelp)} onMouseDown={(e) => e.preventDefault()} onClick={onFrameworks}>{frameworksPill ?? frameworks}</button>
           )}
           {onMarginalia
-            ? <button type="button" className="ch-pill" aria-expanded={marginaliaOpen} title={i18n._(COPY.field.answeredHelp)} onMouseDown={(e) => e.preventDefault()} onClick={onMarginalia}>{marginalia}</button>
-            : <span className="ch-pill">{marginalia}</span>}
+            ? <button type="button" className="ch-pill" aria-expanded={marginaliaOpen} title={i18n._(COPY.field.answeredHelp)} onMouseDown={(e) => e.preventDefault()} onClick={onMarginalia}>{pill ?? marginalia}</button>
+            : <span className="ch-pill">{pill ?? marginalia}</span>}
         </span>
       )}
       {/* Features of input: web search and files (stage 13, piece 6; C248); voice is the microphone. */}

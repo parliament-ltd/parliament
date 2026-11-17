@@ -2108,6 +2108,9 @@ export const COPY = {
     toAll: /*i18n*/ { id: 'field.toAll', message: '{count, plural, other {to all #}}' },
     frameworkNone: /*i18n*/ { id: 'field.frameworkNone', message: 'framework: none', comment: 'Marginalia in the prompt field; framework: is the command, kept English' },
     frameworkSome: /*i18n*/ { id: 'field.frameworkSome', message: '{more, plural, =0 {framework: {first}} other {framework: {first} +#}}', comment: 'The first framework on this chat, and how many more' },
+    // The pills on a phone (17 November): the frameworks, and who answers by name alone.
+    frameworkWord: /*i18n*/ { id: 'field.frameworkWord', message: 'framework', comment: 'A pill in the prompt field on a phone, with no framework chosen; framework is the command word, kept English' },
+    frameworkPill: /*i18n*/ { id: 'field.frameworkPill', message: '{more, plural, =0 {{first}} other {{first} +#}}', comment: 'A pill in the prompt field on a phone: the first framework chosen, and how many more' },
     frameworkHelp: /*i18n*/ { id: 'field.frameworkHelp', message: 'Choose the frameworks for this chat (framework:)' },
     // Features of input in the field (stage 13, piece 6; C248).
     webSearch: /*i18n*/ { id: 'field.webSearch', message: 'web search' },
@@ -2127,7 +2130,8 @@ export const COPY = {
     held: /*i18n*/ { id: 'field.held', message: 'With your next prompt' },
     answeredHelp: /*i18n*/ { id: 'field.answeredHelp', message: 'Choose who answers here (by:)', comment: 'Shown on hover over who answers, in the prompt field' },
     // A prompt edited in the chat, held in the field instead of its words (Stefan, 29 October).
-    toBegin: /*i18n*/ { id: 'field.toBegin', message: 'Type {leader} to begin', comment: 'Grey text in the empty field on the welcome page. {leader} is >, the command leader' },
+    // The search field's grey words when empty, on a phone and a computer (Stefan, 17 November: "'Search here' and not 'Type > to begin' cause that will change to the command bar").
+    searchHere: /*i18n*/ { id: 'field.searchHere', message: 'Search here', comment: 'Grey text in the empty search field' },
     heldPrompt: /*i18n*/ { id: 'field.heldPrompt', message: 'Your edited prompt', comment: 'Placeholder in the prompt field while it holds a prompt and reply edited in the chat; Enter sends their words' },
   },
 
