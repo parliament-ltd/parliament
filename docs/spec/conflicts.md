@@ -5063,6 +5063,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **The ink pot under the pointer,** in a prompt: the ink drains, sloshing, and fills again when the pointer leaves. A click there puts the caret in the field, as anywhere in it; it does not send on a computer.
   - **Depth:** the bar, open in all three modes or folded into a circle, has a crisp faint edge and a soft shadow under it (`--ch-raise`), in place of the boards' flatter edge (C307). The circle keeps its navy edge in command and its gold edge under the pointer (C50), over the shadow.
 - **Not tried by eye:** the app's browser was hidden; the shadow and the menu were checked by what the page holds, the drain not seen. Adding a framework was tried to the point of Add, not pressed, so nothing was stored.
+- **Released as `v0.22.0`, 17 November, with C306, C307 and C308** (Stefan: "Yes, release", to "Release these as 0.22.0 so you can try them on your phone?"; on `8d1285e`; the check passing, 1,714 tests; `parliament-0.22.0.tar.gz` `6518f271a77d40f6…`, `parliament-keys-0.22.0.tar.gz` `f95b5b3c0935b65c…`; `main` moved forward to it and pushed with the tag to GitHub and Bitbucket. The vault's files are byte for byte those of `v0.21.0`, so only the app is to publish.)
 
 ## Proposed CLAUDE.md rewrite
 
