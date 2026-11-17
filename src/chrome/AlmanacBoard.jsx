@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { roomLabel } from './say'
+import { roomNameShown } from '../lib/release'
 import { dayOf, agoOf } from './when'
 import { useBand } from './useNarrower'
 import { rowRange, seenPart } from './rowWindow'
@@ -20,6 +21,9 @@ import { rowRange, seenPart } from './rowWindow'
 // The columns are the ones the person keeps (cols:, C141), less what the
 // board's own width cannot fit: all of v30's at full width, fewer as it
 // narrows. The id and the title are always there (almanac spec §3).
+// A room's kind ("Writing studio") waits with the Lab, as on its board
+// (17 November, C305: "Yes, hide it"): the Room column names a room only
+// by a name its owner gave it, and is left out while no row shown has one.
 //
 // Only the rows in view, and about a screen either side, are drawn (C142);
 // the rest are blank space of the height they will take.
@@ -65,7 +69,7 @@ function Cell({ column, row }) {
       )
     }
     case 'room':
-      return <td className="c-room" dir="auto">{row.room ? roomLabel(i18n, row.room) : ''}</td>
+      return <td className="c-room" dir="auto">{row.room && roomNameShown(row.room) ? roomLabel(i18n, row.room) : ''}</td>
     case 'tags':
       return <td className="c-tags">{row.tags.map((t) => <span key={t} className="ch-tag" dir="auto">{t}</span>)}</td>
     case 'created':
@@ -187,7 +191,8 @@ function useRowWindow(rows) {
 export default function AlmanacBoard({ rows, filtered = null, columns: kept = null, saved = [], currentSaved = null, addressed, onAddress, onWrite, onClear, onOpenSaved, backup = null, onBackupLater }) {
   const { i18n } = useLingui()
   const [ref, band] = useBand([MEDIUM, WIDE])
-  const columns = COLUMNS[band].filter((c) => !kept || kept.includes(c))
+  const named = useMemo(() => (rows ?? []).some((r) => r.room && roomNameShown(r.room)), [rows])
+  const columns = COLUMNS[band].filter((c) => (!kept || kept.includes(c)) && (c !== 'room' || named))
   const open = (row) => onWrite(`>open:${row.num}`)
   const [body, range] = useRowWindow(rows)
 

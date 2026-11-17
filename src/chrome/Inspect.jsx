@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { roomLabel } from './say'
+import { roomNameShown } from '../lib/release'
 import { dayOf, agoOf } from './when'
 
 // inspect:<number>: one thing in detail, under the bar, wherever you are
@@ -17,7 +18,8 @@ export default function Inspect({ row, onPick = null }) {
   if (row.list) return <InspectList list={row} onPick={onPick} />
   const quoted = row.kind === 'term' || row.kind === 'quote'
   const facts = [
-    row.room ? roomLabel(i18n, row.room) : null,
+    // A room's kind waits with the Lab (C305): only a name its owner gave it.
+    row.room && roomNameShown(row.room) ? roomLabel(i18n, row.room) : null,
     row.kind === 'docket' ? i18n._(COPY.counts.branches, { count: row.branches }) : null,
     row.createdAt ? i18n._(COPY.inspect.created, { day: dayOf(i18n, row.createdAt) }) : null,
     row.activeAt ? i18n._(COPY.inspect.active, { ago: agoOf(i18n, row.activeAt) }) : null,

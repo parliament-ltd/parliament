@@ -5029,6 +5029,8 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Not tried:** a real phone. Tried at 375 by 812 in the app's own browser, with clicks for taps and the swipe sent as touch events; the pane was hidden, so checked by what the page holds rather than by pictures. Voice not heard: the app's browser has no speech on the device, so the faint microphone and its line were tried, and the selected-words path by its event, on room 211 (taken back with Ctrl+Z). Whether an iPhone keeps a selection when the bar is tapped is open.
 - **Stored data:** none.
 - **To rule:** the Records table's Room column; the swipe going round; the arrows' place; the bar following the board in sight; the line under the bar coming back for what it has to tell.
+- **Stefan, 17 November:** "Yes, hide it", to "Hide the room type in the Records table's Room column too?"
+- **Built 17 November: the Records table hides a room's kind.** Its Room column names a room only by a name its owner gave it, and is left out while no row shown has one; `inspect:` likewise. Searching by a room's kind still finds its chats. Behind the same switch (`roomNameShown`); nothing stored changes. Still to rule: the swipe going round, the arrows' place, the bar following the board in sight, the line under the bar coming back.
 
 ## Proposed CLAUDE.md rewrite
 
