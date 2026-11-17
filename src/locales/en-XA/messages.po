@@ -1703,12 +1703,9 @@ msgstr ""
 msgid "collection.legendBlueIs"
 msgstr ""
 
+#. Drawn as a model’s answer is: green, dotted (C304)
 #. js-lingui-explicit-id
 msgid "collection.legendGreen"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "collection.legendGreenIs"
 msgstr ""
 
 #. js-lingui-explicit-id

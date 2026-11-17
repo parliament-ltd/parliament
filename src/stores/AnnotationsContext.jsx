@@ -36,6 +36,7 @@ import {
   getPins,
   addNote as dbAddNote,
   updateNote as dbUpdateNote,
+  moveNote as dbMoveNote,
   deleteNote as dbDeleteNote,
   getHighlights,
   addHighlight as dbAddHighlight,
@@ -200,6 +201,23 @@ export function AnnotationsProvider({ children, conversationId = null }) {
       return null
     }
   }, [activeConversationId])
+
+  // A comment's words changed in the text: stored as they now are, so it is
+  // drawn there again (C304).
+  useEffect(() => {
+    const on = async (e) => {
+      const moves = Array.isArray(e.detail?.moves) ? e.detail.moves : []
+      for (const m of moves) {
+        if (typeof m?.id !== 'string' || typeof m.passage !== 'string' || !m.passage) continue
+        try {
+          await dbMoveNote(m.id, { passage: m.passage, nth: m.nth })
+          setChatNotes((prev) => prev.map((n) => (n.id === m.id ? { ...n, passage: m.passage, nth: m.nth } : n)))
+        } catch { /* kept as it was */ }
+      }
+    }
+    window.addEventListener('parliament-comments-moved', on)
+    return () => window.removeEventListener('parliament-comments-moved', on)
+  }, [])
 
   // ─── Highlights ──────────────────────────────────────────
 

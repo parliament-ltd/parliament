@@ -490,7 +490,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
           <div className="ch-col-legend ch-marg" tabIndex={0} data-calm={i18n._(C.coloursFold)}>
             <span><s>{i18n._(C.legendStruck)}</s> {i18n._(C.legendStruckIs)}</span>
             <span><ins className="l-you">{i18n._(C.legendBlue)}</ins> {i18n._(C.legendBlueIs)}</span>
-            <span><ins className="l-ai">{i18n._(C.legendGreen)}</ins> {i18n._(counts.suggestion ? C.legendSweepIs : C.legendGreenIs)}</span>
+            <span><ins className="l-ai">{i18n._(C.legendGreen)}</ins>{counts.suggestion ? <> {i18n._(C.legendSweepIs)}</> : null}</span>
             {counts.suggestion ? <span><ins className="l-rust">{i18n._(C.legendRust)}</ins> {i18n._(C.legendRustIs)}</span> : null}
           </div>
         ) : null}

@@ -104,9 +104,9 @@ export function commentDecorations(doc, shown = {}, open = new Set(), words = { 
           const start = at[i]
           const end = at[i + c.passage.length - 1] + 1
           const key = String(c.num ?? c.id)
-          decos.push(Decoration.inline(start, end, { nodeName: 'span', class: 'pm-cm-at', 'data-comment': key }))
+          decos.push(Decoration.inline(start, end, { nodeName: 'span', class: 'pm-cm-at', 'data-comment': key }, { comment: key, words: true }))
           const isOpen = open.has(key)
-          decos.push(Decoration.widget(end, widget(c, isOpen, words), { side: 1, key: `cm-${key}-${isOpen ? 1 : 0}-${c.text}`, ignoreSelection: true, marks: [] }))
+          decos.push(Decoration.widget(end, widget(c, isOpen, words), { side: 1, key: `cm-${key}-${isOpen ? 1 : 0}-${c.text}`, ignoreSelection: true, marks: [], comment: key }))
         }
         seen[k] += 1
         from = i + c.passage.length
@@ -115,6 +115,81 @@ export function commentDecorations(doc, shown = {}, open = new Set(), words = { 
     return false
   })
   return DecorationSet.create(doc, decos)
+}
+
+// Whether every letter left in a stretch is struck: a comment on it is gone.
+function allStruck(doc, from, to) {
+  let kept = false
+  doc.nodesBetween(from, to, (n) => {
+    if (n.isText && !n.marks.some((m) => m.type.name === 'struck')) kept = true
+    return !kept
+  })
+  return !kept
+}
+
+// The comments as mapped through a change: those whose words are all gone,
+// or all struck, are dropped, with their boxes.
+function carried(set, doc) {
+  const all = set.find()
+  const live = new Set(all.filter((d) => d.spec?.words && d.from < d.to && !allStruck(doc, d.from, d.to)).map((d) => d.spec.comment))
+  const kept = all.filter((d) => !d.spec?.comment || (live.has(d.spec.comment) && (!d.spec.words || d.from < d.to)))
+  return kept.length === all.length ? set : DecorationSet.create(doc, kept)
+}
+
+const WORDISH = /[\p{L}\p{N}]/u
+
+/**
+ * Where each comment on words is now, as drawn: its message, its words
+ * widened to whole words (a letter typed at the end stays in it), and which
+ * time those words come in its message. Stored back so the comment is drawn
+ * there again, after the page reloads too (C304).
+ * @returns {Array<{ key: string, message: string|null, passage: string, nth: number }>}
+ */
+export function anchorsOf(state) {
+  const set = commentsKey.getState(state)?.set
+  if (!set) return []
+  const doc = state.doc
+  const out = []
+  for (const d of set.find()) {
+    if (!d.spec?.words || d.from >= d.to) continue
+    const $from = doc.resolve(d.from)
+    let block = null
+    let blockPos = 0
+    let section = null
+    let sectionPos = 0
+    for (let depth = $from.depth; depth > 0; depth--) {
+      const n = $from.node(depth)
+      if (!block && n.isTextblock) { block = n; blockPos = $from.before(depth) }
+      if (n.type.name === 'section') { section = n; sectionPos = $from.before(depth) }
+    }
+    if (!block) continue
+    const { text, at } = wordsOf(block, blockPos + 1)
+    let i = at.indexOf(d.from)
+    let j = at.indexOf(d.to - 1)
+    if (i < 0 || j < 0) continue
+    while (i > 0 && WORDISH.test(text[i - 1])) i -= 1
+    while (j < text.length - 1 && WORDISH.test(text[j + 1])) j += 1
+    const passage = text.slice(i, j + 1)
+    const scope = section ?? doc
+    const base = section ? sectionPos + 1 : 0
+    let nth = 0
+    let found = false
+    scope.descendants((n, p) => {
+      if (found) return false
+      if (!n.isTextblock) return true
+      const w = wordsOf(n, base + p + 1)
+      for (let from = 0; ;) {
+        const k = indexOfWord(w.text, passage, from)
+        if (k === -1) break
+        if (w.at[k] === at[i]) { found = true; break }
+        nth += 1
+        from = k + passage.length
+      }
+      return false
+    })
+    if (found) out.push({ key: d.spec.comment, message: section?.attrs.message ?? null, passage, nth })
+  }
+  return out
 }
 
 /**
@@ -138,7 +213,11 @@ export function commentsPlugin({ words } = {}) {
         }
         if (next) return { shown: next, open: value.open, set: commentDecorations(state.doc, next, value.open, w) }
         if (!tr.docChanged) return value
-        return { ...value, set: commentDecorations(state.doc, value.shown, value.open, w) }
+        // Carried along as its words change, and gone only when all of them
+        // are (C304; Stefan, 16 November: "let's not delete the comment
+        // unless all letters are deleted"). Its new words are stored a moment
+        // later (anchorsOf), and it is drawn from them again.
+        return { ...value, set: carried(value.set.map(tr.mapping, tr.doc), tr.doc) }
       },
     },
     props: {

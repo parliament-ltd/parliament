@@ -1215,7 +1215,7 @@ msgstr "Select some words first, then {keys} writes a comment on them"
 
 #. js-lingui-explicit-id
 msgid "chat.commentPlaceholder"
-msgstr "For you and anyone you share it with. Never sent to a model"
+msgstr "Never shared with a model"
 
 #. js-lingui-explicit-id
 msgid "chat.commentTitle"
@@ -1701,15 +1701,12 @@ msgstr "blue"
 
 #. js-lingui-explicit-id
 msgid "collection.legendBlueIs"
-msgstr "yours, added"
+msgstr "added"
 
+#. Drawn as a model’s answer is: green, dotted (C304)
 #. js-lingui-explicit-id
 msgid "collection.legendGreen"
-msgstr "green, dotted"
-
-#. js-lingui-explicit-id
-msgid "collection.legendGreenIs"
-msgstr "an answer"
+msgstr "model answer"
 
 #. js-lingui-explicit-id
 msgid "collection.legendRust"
@@ -1725,11 +1722,11 @@ msgstr "struck"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
-msgstr "yours, removed"
+msgstr "removed"
 
 #. js-lingui-explicit-id
 msgid "collection.legendSweepIs"
-msgstr "an answer or a sweep"
+msgstr "or a sweep"
 
 #. js-lingui-explicit-id
 msgid "collection.letGo"

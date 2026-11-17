@@ -407,9 +407,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
           if (!box) return false
           event.preventDefault()
           const id = box.closest('[data-block]')?.getAttribute('data-block')
-          let at = null
-          view.state.doc.forEach((node, offset) => { if (node.attrs.id === id) at = { node, offset } })
-          if (at) view.dispatch(view.state.tr.setNodeMarkup(at.offset, null, { ...at.node.attrs, checked: !at.node.attrs.checked }).setMeta(SKIP, true))
+          // In a room the lines sit inside each message's section (C304: the
+          // box could not be ticked there).
+          const at = linesOf(view.state.doc).find((l) => l.node.attrs.id === id) ?? null
+          if (at) view.dispatch(view.state.tr.setNodeMarkup(at.pos, null, { ...at.node.attrs, checked: !at.node.attrs.checked }).setMeta(SKIP, true))
           return true
         },
       },

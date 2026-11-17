@@ -2536,11 +2536,10 @@ export const COPY = {
     // The legend folded while calm (stage 14, piece 2; C255 (a)).
     coloursFold: /*i18n*/ { id: 'collections.coloursFold', message: 'colours ▾' },
     legendStruck: /*i18n*/ { id: 'collection.legendStruck', message: 'struck' },
-    legendStruckIs: /*i18n*/ { id: 'collection.legendStruckIs', message: 'yours, removed' },
+    legendStruckIs: /*i18n*/ { id: 'collection.legendStruckIs', message: 'removed' },
     legendBlue: /*i18n*/ { id: 'collection.legendBlue', message: 'blue' },
-    legendBlueIs: /*i18n*/ { id: 'collection.legendBlueIs', message: 'yours, added' },
-    legendGreen: /*i18n*/ { id: 'collection.legendGreen', message: 'green, dotted' },
-    legendGreenIs: /*i18n*/ { id: 'collection.legendGreenIs', message: 'an answer' },
+    legendBlueIs: /*i18n*/ { id: 'collection.legendBlueIs', message: 'added' },
+    legendGreen: /*i18n*/ { id: 'collection.legendGreen', message: 'model answer', comment: 'Drawn as a model’s answer is: green, dotted (C304)' },
     // Suggestions (stage 12, piece 1; C228, C229).
     tabSuggestion: /*i18n*/ { id: 'collection.tabSuggestion', message: 'Suggestions' },
     sugFromRipple: /*i18n*/ { id: 'collection.sugFromRipple', message: 'the same as your edit {edit} in {branch}', comment: 'A Ripple suggestion carries an edit of the person to another branch' },
@@ -2563,7 +2562,7 @@ export const COPY = {
     reviewDone: /*i18n*/ { id: 'collection.reviewDone', message: 'Nothing waits for review' },
     legendRust: /*i18n*/ { id: 'collection.legendRust', message: 'rust, dashed' },
     legendRustIs: /*i18n*/ { id: 'collection.legendRustIs', message: 'Ripple’s suggestion' },
-    legendSweepIs: /*i18n*/ { id: 'collection.legendSweepIs', message: 'an answer or a sweep' },
+    legendSweepIs: /*i18n*/ { id: 'collection.legendSweepIs', message: 'or a sweep' },
     notHeldHere: /*i18n*/ { id: 'collection.notHeldHere', message: 'The chat in the room, {num}, is not in this collection' },
     yours: /*i18n*/ { id: 'collection.yours', message: 'your order' },
     source: /*i18n*/ { id: 'collection.source', message: 'source' },
@@ -3136,7 +3135,7 @@ export const COPY = {
     askPlaceholder: /*i18n*/ { id: 'chat.askPlaceholder', message: 'In your own words: make it shorter, or add the year it opened' },
     // Comments (C301 (c)): written with Ctrl+Alt+M on selected words, never sent.
     commentLabel: /*i18n*/ { id: 'chat.commentLabel', message: 'COMMENT', comment: 'The label of the box a comment is written in' },
-    commentPlaceholder: /*i18n*/ { id: 'chat.commentPlaceholder', message: 'For you and anyone you share it with. Never sent to a model' },
+    commentPlaceholder: /*i18n*/ { id: 'chat.commentPlaceholder', message: 'Never shared with a model' },
     commentMore: /*i18n*/ { id: 'chat.commentMore', message: 'more', comment: 'After the first line of a long comment in the text: shows the rest' },
     commentLess: /*i18n*/ { id: 'chat.commentLess', message: 'less', comment: 'After a long comment shown whole: back to its first line' },
     commentTitle: /*i18n*/ { id: 'chat.commentTitle', message: 'Comment {num}. It is never sent' },

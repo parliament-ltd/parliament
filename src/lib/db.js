@@ -638,6 +638,11 @@ export async function updateNote(id, text) {
   return updateNumbered(await initDB(), 'notes', id, { text })
 }
 
+/** A comment's words and which time they come, as they now are (C304). */
+export async function moveNote(id, { passage, nth }) {
+  return updateNumbered(await initDB(), 'notes', id, { passage: String(passage).slice(0, 2000), nth: Number.isInteger(nth) && nth >= 0 ? nth : 0 })
+}
+
 export async function deleteNote(id) {
   return removeNumbered(await initDB(), 'notes', id)
 }

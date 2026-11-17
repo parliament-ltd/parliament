@@ -569,7 +569,7 @@
 .ch-cbody.ch-room-empty { flex: none; height: max(var(--room-least), calc(100dvh - var(--room-chrome))); }
 /* And a page to write in (C301 (f)): a click anywhere in it puts the caret
    in your text, and an empty page says what it is for. */
-.ch-write-new { display: flex; flex-direction: column; overflow: auto; padding: 18px 22px; cursor: text; }
+.ch-write-new { display: flex; flex-direction: column; overflow: auto; padding: 18px; cursor: text; }
 .ch-write-new > .p-pair-host { flex: 1; display: flex; flex-direction: column; }
 .ch-write-new > .p-pair-host > div:first-child { flex: 1; display: flex; flex-direction: column; }
 .ch-write-new .p-pair { flex: 1; outline: none; }
@@ -751,8 +751,9 @@
 /* Piece 7 (C145): selecting cards, the four acts, quotes beneath a note,
    finding, compare:. Ink throughout: gold stays for the ignition and the
    minimised bar (C50). */
-.ch-shell .ch-mk-box { flex: none; width: 15px; height: 15px; margin-top: 3px; padding: 0; border: 1px solid var(--ch-soft); border-radius: 3px; font: 600 10px/13px var(--ch-sans); color: var(--ch-surface); text-align: center; }
-.ch-shell .ch-mk-box[aria-pressed="true"] { background: var(--ch-ink); border-color: var(--ch-ink); }
+/* As a button, it outranks the shell's plain buttons, which took its border away (C304). */
+.ch-shell .ch-mk-box, .ch-shell button.ch-mk-box { flex: none; width: 15px; height: 15px; margin-top: 3px; padding: 0; border: 1px solid var(--ch-soft); border-radius: 3px; font: 600 10px/13px var(--ch-sans); color: var(--ch-surface); text-align: center; }
+.ch-shell button.ch-mk-box[aria-pressed="true"] { background: var(--ch-ink); border-color: var(--ch-ink); }
 .ch-mk-box.none { border-color: transparent; }
 .ch-mk.sel { background: var(--ch-subtle); }
 .ch-shell .ch-mk-marg button.c-id { text-decoration: underline dotted; }
@@ -775,8 +776,8 @@
 .ch-mk-st { color: var(--ch-ink); }
 .ch-col-markup { margin-inline-start: auto; display: inline-flex; gap: 6px; align-items: baseline; }
 .ch-shell .ch-col-markup button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
-/* Under the tabs, centred, clear of the board's edge (C302 (c)). */
-.ch-col-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; padding: 6px 16px 2px; font-style: italic; }
+/* Under the tabs, aligned with the first of them (C302 (c); C304). */
+.ch-col-legend { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 4px 14px; padding: 6px 16px 2px; font-style: italic; }
 .ch-col-legend s { color: var(--ch-ink-3); }
 .ch-col-legend ins { text-decoration: none; }
 .ch-col-legend ins.l-you { color: var(--ch-you); text-decoration: underline; text-underline-offset: 2px; }
@@ -1499,3 +1500,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
   .ch-dict[data-half="same"] .ch-dc-means { display: none; }
 }
 .ch-pl-none .ch-dc-w { margin-inline-start: 6px; }
+
+/* Your own text, written in a room: as wide as the board, its sides as far
+   in as its top (Stefan, 16 November; C304). */
+.ch-shell .p-msg.p-msg-writing { max-width: none; }

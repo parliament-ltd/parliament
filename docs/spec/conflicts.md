@@ -4982,6 +4982,20 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **The text field within the board** to have side padding as its top padding.
 - **The Collection:** no boxes on its items to tick; "struck yours" aligned left with "All"; the legend's "yours, removed" to read "removed", "yours, added" "added", and "green, dotted" "model answer".
 - **A full page:** with the page full, a new board does not open (since the page fit, cefa6a6).
+- **Stefan, 16 November:** "Testing list first".
+- **Built 16 November:**
+  - **A comment kept while its words change.** It was found again by its words after every change, so one letter changed lost it. Now it is carried along with the text and gone only when all its letters are, or all are struck; its words as they now are, and which time they come, are stored a moment after typing stops, so it is drawn there after a reload too. Highlights still work as before, found by their words: to take up the same way if wanted.
+  - **The comment box** says "Never shared with a model".
+  - **A comment brings the Collection beside the room** each time it is not there; another mark still does so only the first time in a chat. Not in Focus.
+  - **The "/" checkbox ticks in a room.** The click looked for the line at the top of the text only, and a room's lines sit inside each message.
+  - **Your text in a room** has the same room at its sides as at its top, and a text of yours is as wide as the board.
+  - **The Collection's boxes show.** They were there and could be clicked, but a plainer rule for every button took their border away.
+  - **The legend** sits aligned with "All" and reads "struck removed · blue added · model answer" (with suggestions, "model answer or a sweep").
+  - **A full page opens the board anyway:** it went beside, past the right edge, unseen; the page now scrolls to it.
+- **Answered, to rule:**
+  - **Tab in text:** today Tab moves between a table's cells and otherwise leaves the text; nothing indents, and lists have no levels. Proposed: Tab and Shift+Tab move a line in and out, a list item becoming a sub-item, up to three levels, stored as a level on the line (a stored change, shown before building); Escape then Tab leaves the text, as now.
+  - **Aligning text:** none today, and Markdown, which models read, has none. Proposed: `align:center`, `align:right`, `align:left`, and Ctrl+Shift+E, R and L, on the lines selected, stored as an alignment on the line (a stored change, shown before building); a model reads the words as now.
+  - **"your order" and "date":** not the same, but close. "date" is newest first; "your order" is the order you set, headings and cards moved by hand, and otherwise oldest first. Proposed: "date" renamed "newest first", or taken away.
 
 ## Proposed CLAUDE.md rewrite
 

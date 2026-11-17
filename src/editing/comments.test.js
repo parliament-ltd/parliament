@@ -3,7 +3,7 @@ import { EditorState, TextSelection } from 'prosemirror-state'
 import { schema } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { createIds } from './track'
-import { commentDecorations, commentsPlugin, commentsKey, passageAt, saidOf } from './comments'
+import { commentDecorations, commentsPlugin, commentsKey, passageAt, saidOf, anchorsOf } from './comments'
 
 // Comments in the text (C301 (c)): over their words, the nth time those
 // words come in their own message, and the comment after them.
@@ -89,5 +89,40 @@ describe('what a selection is a comment on', () => {
     expect(tinted(doc, { sections: { [at.messageId]: [comment(at.passage, at.nth)] } })).toEqual(['Owls'])
     const tint = commentDecorations(doc, { sections: { r1: [comment(at.passage, at.nth)] } }).find().find((x) => x.from !== x.to)
     expect(tint.from).toBe(places[3])
+  })
+})
+
+describe('a comment as its words change (C304)', () => {
+  const start = () => {
+    const state = EditorState.create({ doc, plugins: [commentsPlugin()] })
+    return state.apply(state.tr.setMeta(commentsKey, { sections: { r1: [comment('hunt', 0)] } }))
+  }
+  const tintedIn = (state) => commentsKey.getState(state).set.find().filter((x) => x.spec?.words).map((x) => state.doc.textBetween(x.from, x.to))
+  const huntAt = (state) => {
+    let at = -1
+    state.doc.descendants((n, pos) => { if (at < 0 && n.isText && n.text.includes('hunt')) at = pos + n.text.indexOf('hunt') })
+    return at
+  }
+
+  it('keeps it while a letter changes, with its words as they now are', () => {
+    let state = start()
+    const at = huntAt(state)
+    expect(tintedIn(state)).toEqual(['hunt'])
+    // "hunt" to "haunt": one letter added inside.
+    state = state.apply(state.tr.insertText('a', at + 1))
+    expect(tintedIn(state)).toEqual(['haunt'])
+    expect(anchorsOf(state)).toEqual([{ key: '231', message: 'r1', passage: 'haunt', nth: 0 }])
+    // A letter typed at its end stays in its words.
+    state = state.apply(state.tr.insertText('s', at + 5))
+    expect(anchorsOf(state)[0].passage).toBe('haunts')
+  })
+
+  it('takes it away only when all its letters are gone, with its box', () => {
+    let state = start()
+    const at = huntAt(state)
+    state = state.apply(state.tr.delete(at, at + 3))
+    expect(tintedIn(state)).toEqual(['t'])
+    state = state.apply(state.tr.delete(at, at + 1))
+    expect(commentsKey.getState(state).set.find()).toEqual([])
   })
 })

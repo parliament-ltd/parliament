@@ -17,7 +17,7 @@ import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import { useBlockMenu } from './useBlockMenu'
 import { useAskBox } from './useAskBox'
 import { useCommentBox } from './useCommentBox'
-import { commentsPlugin, commentsKey } from '../../editing/comments'
+import { commentsPlugin, commentsKey, anchorsOf } from '../../editing/comments'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
@@ -107,6 +107,21 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   const idsRef = useRef(null)
   const savedKeys = useRef({})
   const timer = useRef(0)
+  // A comment's words as they are now, stored a moment after typing stops
+  // (C304): by a window event, its id with its words, within this page.
+  const movedTimer = useRef(0)
+  const tellMoved = () => {
+    const v = view.current
+    if (!v) return
+    let shown = {}
+    try { shown = JSON.parse(commentsRef.current).sections ?? {} } catch { shown = {} }
+    const moves = []
+    for (const a of anchorsOf(v.state)) {
+      const c = (shown[a.message] ?? []).find((x) => String(x.num ?? x.id) === a.key)
+      if (c && (c.passage !== a.passage || (c.nth ?? 0) !== a.nth)) moves.push({ id: c.id, passage: a.passage, nth: a.nth })
+    }
+    if (moves.length) window.dispatchEvent(new CustomEvent('parliament-comments-moved', { detail: { moves } }))
+  }
   const onSaveRef = useRef(onSave)
   const cleanRef = useRef(clean)
   const wordsRef = useRef(words)
@@ -306,6 +321,9 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
           setSaid('')
           clearTimeout(timer.current)
           timer.current = setTimeout(save, SAVE_AFTER_MS)
+          // Comments whose words changed keep them: told to be stored (C304).
+          clearTimeout(movedTimer.current)
+          movedTimer.current = setTimeout(tellMoved, SAVE_AFTER_MS)
         }
         // Struck or typed over from the prompt into the reply: joined (C214
         // (a)). By a key, at once, to the bar; by typing, when it pauses.
@@ -408,6 +426,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
 
   // Each card's comments on words, drawn again only when they change (C301 (c)).
   const commentsNow = JSON.stringify({ sections: Object.fromEntries(sections.map((s) => [s.message.id, s.comments ?? []])) })
+  const commentsRef = useRef(commentsNow)
+  useEffect(() => { commentsRef.current = commentsNow })
   useEffect(() => {
     if (commentsNow === commentsWas.current || !view.current) return
     commentsWas.current = commentsNow

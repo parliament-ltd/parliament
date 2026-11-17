@@ -334,6 +334,21 @@ export default function Shell() {
   // drawn straight from the pointer; the space keeps the shares once it is
   // let go. A double click puts both back; the arrow keys move it.
   const stageRef = useRef(null)
+  // A board opened on a full page goes beside, past the right edge (page
+  // fit, cefa6a6): the stage scrolls to the board the bar points at, so it
+  // is seen (C304: "if the page is full now, it seems that new boards don't
+  // open").
+  const addressedNow = arrangement.addressed
+  const columnsNow = arrangement.columns.length
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage || !addressedNow) return
+    const card = stage.querySelector('.ch-card.addressed')
+    if (!card) return
+    const s = stage.getBoundingClientRect()
+    const c = card.getBoundingClientRect()
+    if (c.left < s.left || c.right > s.right) card.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
+  }, [addressedNow, columnsNow])
   const stretch = useRef(null)
   const [stretching, setStretching] = useState(false)
 
@@ -806,8 +821,9 @@ export default function Shell() {
       const chatId = e.detail?.chatId
       if (typeof chatId !== 'string' || !db.current) return
       const num = Number.isInteger(e.detail?.num) ? e.detail.num : null
-      const first = !broughtFor.current.has(chatId) && Array.isArray(rowsNow.current)
-        && !rowsNow.current.some((r) => r.chatId === chatId && FIRST_MARKS.has(r.kind) && r.num !== num)
+      // A comment, each time; another mark, the first in a chat (C304).
+      const first = e.type === 'parliament-commented' || (!broughtFor.current.has(chatId) && Array.isArray(rowsNow.current)
+        && !rowsNow.current.some((r) => r.chatId === chatId && FIRST_MARKS.has(r.kind) && r.num !== num))
       if (first) broughtFor.current.add(chatId)
       const kept = await readCollections(db.current).catch(() => null)
       const row = (rowsNow.current ?? []).find((r) => r.kind === 'chat' && r.chatId === chatId)
