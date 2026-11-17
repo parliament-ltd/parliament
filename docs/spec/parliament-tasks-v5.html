@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasks, v5</title>
+<!--
+  C309 (17 November): v4 made simpler, after Stefan's note ("let's think
+  about how Asana shows tasks"). A task is added by typing on its own row,
+  beside an empty box; a Model pill opens the rest; no labels on the left;
+  everything written is edited where it stands, with no "change"; the kinds
+  are three pills, none of them on meaning the task is yours; the flow is a
+  switch; Save. v1 to v4 kept. Values from tokens.css and v4.
+  Section 1 works: click into it. Its script writes only with textContent.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --docket: #0E728D; --docket-tint: rgba(13, 148, 136, .10); --rust: #A8471F;
+    --raise: 0 0 0 1px rgba(25, 25, 25, .07), 0 1px 2px rgba(40, 36, 28, .06), 0 4px 14px rgba(40, 36, 28, .08);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-marg: 11.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  a.l, .l { color: var(--marg); text-decoration: underline; text-underline-offset: 2px; font: 400 12.5px var(--mono); }
+  button { font: inherit; color: inherit; }
+
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: visible; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); border-radius: 16px 0 0 16px; }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .body { padding: 4px 22px 16px; }
+
+  /* The box: empty and dashed on the row that adds, as the plus box was. */
+  .box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--soft); border-radius: 3px; position: relative; top: 2px; background: var(--surface); flex: none; }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .box.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 3px; height: 7px; border: solid #fff; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+  .box.ghost { border-style: dashed; }
+
+  /* Rows: the box's column, then the words. */
+  .row3 { display: grid; grid-template-columns: 18px 1fr auto; gap: 2px 10px; align-items: baseline; }
+  .task { padding: 10px 0; border-bottom: .5px solid var(--border-2); }
+  .task .t { font: 600 14px var(--sans); }
+  .task .facts { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+  .task.done .t { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--soft); }
+  .state { font: 600 10.5px var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--ai); white-space: nowrap; }
+
+  /* Text you can write in, where it stands: no box, no outline. A faint
+     line under it on hover, the caret when clicked, the grey words gone. */
+  .in, input.in, textarea.in { display: block; width: 100%; margin: 0; padding: 1px 0; border: 0; border-bottom: .5px solid transparent; border-radius: 0; background: transparent; color: var(--ink); outline: none; resize: none; }
+  .in:hover { border-bottom-color: var(--border); }
+  .in:focus { border-bottom-color: var(--border); }
+  .in::placeholder { color: var(--ink-3); font-weight: 400; }
+  .in:focus::placeholder { color: transparent; }
+  .in.name { font: 600 14px var(--sans); }
+  .in.name::placeholder { font: 400 13.5px var(--sans); }
+  .in.title { font: 400 20px/1.3 var(--serif); }
+  .in.desc { font: 400 14px/1.5 var(--serif); color: var(--ink-2); }
+  .in.desc::placeholder { font-style: italic; }
+  .in.cmd { font: 400 13px var(--mono); }
+  .in.cmd::placeholder { font: 400 13px var(--mono); }
+  .ph { color: var(--ink-3); }
+  .ph.it { font: italic 400 14px var(--serif); }
+  .caret { display: inline-block; width: 1px; height: 1.05em; margin-inline-start: 1px; background: var(--ink); vertical-align: -2px; animation: blink 1.06s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .faintline { border-bottom: .5px solid var(--border); }
+
+  /* Pills. Off: faint words, no edge until the pointer is on them. On: the
+     board's tint. Nothing drawn in black (C307). */
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 1px 9px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 12px var(--sans); color: var(--ink-2); white-space: nowrap; cursor: pointer; line-height: 1.5; }
+  .pill:hover { border-color: var(--soft); }
+  .pill.ghost { border-style: dashed; border-color: var(--soft); color: var(--ink-3); background: transparent; }
+  .pill.ghost:hover { color: var(--ink); }
+  .pill.kind { border-color: transparent; background: transparent; color: var(--ink-3); }
+  .pill.kind:hover { border-color: var(--border); color: var(--ink-2); }
+  .pill.kind.on { background: var(--docket-tint); color: var(--ink); }
+  .pill.as { border-style: dashed; border-color: var(--soft); background: transparent; color: var(--ink-3); }
+  .pill .v { font-size: 9px; color: var(--ink-3); }
+  .pill .x { color: var(--ink-3); cursor: pointer; }
+  .chip { display: inline-flex; align-items: baseline; gap: 5px; padding: 1px 8px; border-radius: 10px; background: var(--docket-tint); font: 400 12px var(--sans); color: var(--ink-2); white-space: nowrap; }
+  .chip.faint { background: transparent; border: .5px dashed var(--soft); color: var(--ink-3); }
+  .sep { width: 1px; height: 14px; background: var(--border); margin: 0 2px; }
+  .cmdw { font: 400 13px var(--mono); color: var(--ink); }
+
+  /* The switch, as Alarms and Settings draw theirs; the words either side,
+     the one in force in ink. */
+  .flow { display: inline-flex; align-items: center; gap: 7px; font: 400 12.5px var(--sans); color: var(--ink-3); user-select: none; }
+  .flow .w { cursor: pointer; }
+  .flow .w.on { color: var(--ink); }
+  .sw { position: relative; width: 22px; height: 13px; padding: 0; border: 0; border-radius: 7px; background: var(--soft); cursor: pointer; flex: none; }
+  .sw span { position: absolute; top: 2px; left: 2px; width: 9px; height: 9px; border-radius: 50%; background: #fff; transition: left .16s ease; }
+  .sw.on span { left: 11px; }
+  .sw.both { background: var(--ink-3); }
+  .flow.ran { opacity: .55; }
+  .flow.ran .sw, .flow.ran .w { cursor: default; }
+  /* B: a sliding thumb, raised as the bar is. */
+  .slide { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 9px; background: var(--subtle); box-shadow: inset 0 0 0 .5px var(--border); font: 400 12.5px var(--sans); }
+  .slide span { position: relative; z-index: 1; padding: 1px 11px; text-align: center; color: var(--ink-3); white-space: nowrap; }
+  .slide span.on { color: var(--ink); }
+  .slide::before { content: ""; position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); border-radius: 7px; background: var(--surface); box-shadow: var(--raise); transition: transform .18s ease; }
+  .slide.right::before { transform: translateX(100%); }
+
+  .save { padding: 3px 14px; border: 0; border-radius: 8px; background: var(--ink); color: #fff; font: 600 12.5px var(--sans); cursor: pointer; }
+  .save:disabled { opacity: .35; cursor: default; }
+  .cancel { padding: 0; border: 0; background: none; font: 400 12.5px var(--sans); color: var(--ink-3); cursor: pointer; }
+  .acts { display: inline-flex; gap: 12px; align-items: center; margin-inline-start: auto; }
+
+  /* The row that adds. */
+  .add { padding: 8px 0 8px; border-bottom: .5px solid var(--border-2); }
+  .add .more, .sub .more { grid-column: 2 / 4; display: flex; flex-direction: column; gap: 8px; padding: 2px 0 4px; }
+  .add .foot, .more .foot { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  #model { visibility: hidden; opacity: 0; transition: opacity .12s ease; }
+  .add:focus-within #model, .add.typed #model { visibility: visible; opacity: 1; }
+  .add.open #model { display: none; }
+  .bar-line { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  .bad { color: var(--rust); }
+
+  .menu { position: absolute; z-index: 5; top: calc(100% + 4px); inset-inline-start: 0; min-width: 220px; padding: 6px 0; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); box-shadow: var(--raise); font: 400 13px var(--sans); }
+  .menu button { display: block; width: 100%; padding: 3px 12px; border: 0; background: none; text-align: start; cursor: pointer; }
+  .menu button:hover { background: var(--subtle); }
+  .menu .grp { padding: 6px 12px 2px; font: 600 10.5px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .anchor { position: relative; display: inline-flex; }
+  .find { width: 190px; padding: 1px 0; border: 0; border-bottom: .5px solid var(--border); background: transparent; font: 400 12.5px var(--sans); outline: none; }
+  .find::placeholder { color: var(--ink-3); }
+
+  /* An open task. */
+  .main { padding: 10px 0 4px 28px; border-bottom: .5px solid var(--border-2); }
+  .main .head { margin-inline-start: -28px; }
+  .main .head .rest { grid-column: 2 / 4; display: flex; flex-direction: column; gap: 6px; }
+  .sub { padding: 8px 0 7px; border-bottom: .5px solid var(--border-2); }
+  .sub .who { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+  .sub .in.name { font: 600 14px var(--sans); }
+  .sub .del { color: var(--ink-3); font: 400 14px var(--sans); }
+  .sub.here { background: linear-gradient(90deg, transparent, var(--subtle) 6%, var(--subtle) 94%, transparent); }
+  .answer { grid-column: 2 / 4; margin-top: 4px; padding: 6px 10px; border-inline-start: 2px solid var(--ai); background: var(--subtle); border-radius: 0 8px 8px 0; font: 400 13.5px/1.5 var(--serif); color: var(--ink-2); }
+  .answer .by { font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .run { display: inline-flex; align-items: center; gap: 6px; padding: 2px 11px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); box-shadow: var(--raise); font: 400 12px var(--sans); color: var(--ink); cursor: pointer; }
+  .run svg { width: 9px; height: 9px; }
+  .runs1 { padding: 8px 0 2px; font: 400 12.5px var(--sans); color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+  .grip { color: var(--soft); font: 400 12px var(--sans); letter-spacing: -1px; cursor: grab; }
+
+  .frames { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 780px) { .frames { grid-template-columns: 1fr 1fr; } }
+  .frame { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 10px 16px 12px; }
+  .tag { display: block; margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .ideas { counter-reset: idea; display: grid; gap: 12px; }
+  .idea { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+  .idea h3 { margin: 0 0 4px; font: 600 13px var(--sans); }
+  .idea h3::before { counter-increment: idea; content: counter(idea, lower-alpha) ". "; color: var(--ink-3); }
+  .idea p { margin: 0 0 8px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .idea .mini { padding: 6px 12px; border: .5px dashed var(--border); border-radius: 10px; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Tasks, v5</h1>
+    <p>v4 made simpler. A task is added by typing on its own row, beside an empty box, as a to-do list does. Click in and the grey words go; a <b>Model</b> pill appears at the end of the row. Press Enter and the task is yours, done. Pick the pill and the rest opens under the name: a description, the three kinds, who answers, rooms, the flow, and <b>Save</b>.</p>
+    <p>No labels on the left: each field says what it is by its grey words until you write in it. Nothing has a "change" link: a name, a description, a sub-task's words are written where they stand, and pills open their lists where they are. "None" and "Kind" are gone: with no kind on, the task is yours.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · Try it</h2>
+    <p class="lede">This one works. Click "Add a task", type, then press Enter, or pick Model first. Pick a kind twice to turn it off. Escape leaves it.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Tasks</h2></div>
+      <div class="body">
+        <div class="add row3" id="add">
+          <span class="box ghost"></span>
+          <input class="in name" id="name" placeholder="Add a task" maxlength="200" autocomplete="off" spellcheck="false" aria-label="Add a task">
+          <button type="button" class="pill ghost" id="model">Model</button>
+          <div class="more" id="more" hidden>
+            <textarea class="in desc" id="desc" rows="1" placeholder="Description" aria-label="Description"></textarea>
+            <div id="cmdwrap" hidden>
+              <input class="in cmd" id="cmd" placeholder="compare:204 199" spellcheck="false" aria-label="Command">
+              <div class="bar-line" id="cmdline">A run puts it in the bar, and waits for your Enter.</div>
+            </div>
+            <div class="pills">
+              <span class="pills" role="radiogroup" aria-label="What it is">
+                <button type="button" class="pill kind" data-k="prompt" role="radio" aria-checked="false">Prompt</button>
+                <button type="button" class="pill kind" data-k="search" role="radio" aria-checked="false">Search</button>
+                <button type="button" class="pill kind" data-k="command" role="radio" aria-checked="false">Command</button>
+              </span>
+              <span class="sep" id="sep1"></span>
+              <span class="anchor" id="whoA">
+                <button type="button" class="pill" id="who"><span id="whoName">Sonnet 5.5</span><span class="v">▾</span></button>
+                <span class="menu" id="whoMenu" hidden></span>
+              </span>
+              <span id="roomsA" class="pills">
+                <span id="chips" class="pills"></span>
+                <span class="anchor">
+                  <button type="button" class="pill ghost" id="addRoom">+ room</button>
+                  <input class="find" id="find" placeholder="a room, by number or name" hidden autocomplete="off">
+                  <span class="menu" id="roomMenu" hidden></span>
+                </span>
+              </span>
+            </div>
+            <div class="foot">
+              <span class="flow" id="flow">
+                <span class="w on" data-f="oneByOne">One by one</span>
+                <button type="button" class="sw" id="sw" role="switch" aria-checked="false" aria-label="All at once"><span></span></button>
+                <span class="w" data-f="together">All at once</span>
+              </span>
+              <span class="acts">
+                <button type="button" class="save" id="save" disabled>Save</button>
+                <button type="button" class="cancel" id="cancel">Cancel</button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div id="list">
+          <div class="task row3"><span class="box"></span><span class="t">Moving house</span><span></span><span class="facts marg">5 sub-tasks</span></div>
+          <div class="task row3 done"><span class="box on"></span><span class="t">Water tower history</span><span class="state">done</span><span class="facts"><span class="chip">search</span><span class="chip">Wikipedia</span><span class="chip">201a</span></span></div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>The Model pill shows while the caret is in the row, or once it holds words. It is optional: Enter alone saves a task of yours, and the caret stays on the row for the next one.</li>
+      <li>Model opens the rest with Prompt on and the model new chats use, since that is why it was picked. A kind picked again turns off; with none on, the task is yours, and who answers and rooms go.</li>
+      <li>Rooms show only for a prompt or a search, since only an answer goes somewhere. The flow shows always; it matters once a task has sub-tasks.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · Adding, step by step</h2>
+    <p class="lede">The same row, drawn still, for the record.</p>
+    <div class="frames">
+      <div class="frame">
+        <span class="tag">At rest</span>
+        <div class="row3"><span class="box ghost"></span><span class="ph" style="font-size:13.5px">Add a task</span><span></span></div>
+      </div>
+      <div class="frame">
+        <span class="tag">Clicked: the caret, the grey words gone, the pill</span>
+        <div class="row3"><span class="box ghost"></span><span class="faintline"><span class="caret"></span></span><span class="pill ghost">Model</span></div>
+      </div>
+      <div class="frame">
+        <span class="tag">Model picked</span>
+        <div class="row3">
+          <span class="box ghost"></span><span class="faintline" style="font:600 14px var(--sans)">Grant application</span><span></span>
+          <div class="more" style="grid-column:2/4;display:flex;flex-direction:column;gap:8px;padding-top:4px">
+            <span class="faintline"><span class="caret"></span></span>
+            <div class="pills"><span class="pill kind on">Prompt</span><span class="pill kind">Search</span><span class="pill kind">Command</span><span class="sep"></span><span class="pill">Sonnet 5.5 <span class="v">▾</span></span><span class="chip">room 204 <span class="x">×</span></span><span class="pill ghost">+ room</span></div>
+            <div class="foot" style="display:flex;align-items:center;gap:14px"><span class="flow"><span class="w on">One by one</span><span class="sw both"><span></span></span><span class="w">All at once</span></span><span class="acts"><span class="save">Save</span><span class="cancel">Cancel</span></span></div>
+          </div>
+        </div>
+        <p class="marg" style="margin:8px 0 0">The second line's grey word is "Description", gone here because the caret is in it.</p>
+      </div>
+      <div class="frame">
+        <span class="tag">Command picked</span>
+        <div class="row3">
+          <span class="box ghost"></span><span style="font:600 14px var(--sans)">Compare the drafts</span><span></span>
+          <div style="grid-column:2/4;display:flex;flex-direction:column;gap:8px;padding-top:4px">
+            <span class="ph it">Description</span>
+            <span class="cmdw faintline">compare:207a 207b<span class="caret"></span></span>
+            <span class="bar-line">compare: sets the last replies of 207a and 207b side by side and marks the words that differ. Nothing is sent</span>
+            <div class="pills"><span class="pill kind">Prompt</span><span class="pill kind">Search</span><span class="pill kind on">Command</span></div>
+            <div class="foot" style="display:flex;align-items:center;gap:14px"><span class="flow"><span class="w on">One by one</span><span class="sw both"><span></span></span><span class="w">All at once</span></span><span class="acts"><span class="save">Save</span><span class="cancel">Cancel</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>A command is checked as it is written, with the line the bar would show; one the bar would refuse cannot be saved, and its line says why, in rust.</li>
+      <li>From the bar, as now: <code>new:task "Grant application"</code>, <code>new:subtask 207 "Compare the drafts"</code>.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · A task open, written in place</h2>
+    <p class="lede">The open task is laid out as the row that added it, so what you set is what you see. Click the name or the description and write; it is kept when you leave it or press Enter, and Escape puts it back. The pills open their lists where they are. The sub-task you are in opens its pills; the others rest.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Tasks</h2></div>
+      <div class="body">
+        <div class="add row3"><span class="box ghost"></span><span class="ph" style="font-size:13.5px">Add a task</span><span></span></div>
+        <div class="main">
+          <div class="head row3">
+            <span class="box"></span>
+            <input class="in title" value="Grant application" aria-label="Name">
+            <span></span>
+            <div class="rest">
+              <textarea class="in desc" rows="1" aria-label="Description">The two-year grant for the land trust, to the board by Friday</textarea>
+              <div class="pills">
+                <span class="pill kind on">Prompt</span><span class="pill kind">Search</span><span class="pill kind">Command</span>
+                <span class="sep"></span>
+                <span class="pill">Sonnet 5.5 <span class="v">▾</span></span>
+                <span class="chip">room 204 <span class="x">×</span></span><span class="pill ghost">+ room</span>
+              </div>
+              <div class="foot" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px">
+                <span class="flow"><span class="w on">One by one</span><span class="sw both"><span></span></span><span class="w">All at once</span></span>
+                <span class="marg">1 of 5 done</span>
+                <span class="acts"><span class="run"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1.2v7.6L8.6 5z" fill="currentColor"/></svg>Run</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sub row3">
+            <span class="box on"></span><span class="in name" style="color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--soft)">Draft the summary</span><span class="state">done</span>
+            <div class="who"><span class="chip">prompt</span><span class="chip faint">Sonnet 5.5, as the task</span><span class="chip">room 204</span></div>
+            <div class="answer"><span class="by">Sonnet 5.5, room 204:</span> The Fernwood Community Land Trust asks the board for a two-year grant of 48,000 to … <span class="l">open:204</span></div>
+          </div>
+          <div class="sub row3 here">
+            <span class="box"></span><span class="in name faintline">Find last year's figures<span class="caret"></span></span><span class="del">×</span>
+            <div class="more">
+              <span class="in desc">land trust grants 2025</span>
+              <div class="pills">
+                <span class="pill kind">Prompt</span><span class="pill kind on">Search</span><span class="pill kind">Command</span>
+                <span class="sep"></span>
+                <span class="pill">OpenAlex <span class="v">▾</span></span>
+                <span class="pill as">as the task <span class="v">▾</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="sub row3">
+            <span class="box"></span><span class="in name">Check the figures</span><span></span>
+            <span class="in desc" style="grid-column:2/4">Go through the budget with Anna</span>
+          </div>
+          <div class="sub row3">
+            <span class="box"></span><span class="in name">Compare the two drafts</span><span></span>
+            <div class="who"><span class="chip">command</span><span class="cmdw">compare:207a 207b</span></div>
+          </div>
+          <div class="sub row3">
+            <span class="box"></span><span class="in name">Tighten to a page</span><span></span>
+            <span class="in desc" style="grid-column:2/4">Keep the figures as they now stand</span>
+            <div class="who"><span class="chip">prompt</span><span class="chip">Opus 5.5</span><span class="chip">room 204</span></div>
+          </div>
+          <div class="sub row3" style="border-bottom:none"><span class="box ghost"></span><span class="ph" style="font-size:13.5px">Add a sub-task</span><span></span></div>
+
+          <div class="runs1"><span>Run 2</span><span class="marg">today 10:12 · waits at "Check the figures"</span><span class="l">open:run 1</span></div>
+        </div>
+        <div class="task row3"><span class="box"></span><span class="t">Moving house</span><span></span><span class="facts marg">5 sub-tasks</span></div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>A sub-task's second line takes its words: a description for one of yours, the prompt for a prompt (its name is sent when it is empty), what to search for, or the command line. Its grey words say which.</li>
+      <li>A sub-task starts with its task's kind and who answers, drawn faint, "as the task", and follows the task until changed. Its room: as the task, a room, or a branch of this task, in the dashed pill's list.</li>
+      <li>A sub-task sent, or done, is read only, as now; × deletes one not yet sent, as <code>delete:207a 2</code> does.</li>
+      <li>The flow switch goes faint once the task has run, since it can change only until then.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · The flow switch</h2>
+    <p class="lede">In place of the black block. A is the switch Alarms and Settings already use, between its two words, the one in force in ink. B slides a raised thumb between them, as the bar stands above the page. Suggested: A, since it is the site's switch already.</p>
+    <div class="frames">
+      <div class="frame">
+        <span class="tag">A · the site's switch</span>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">
+          <span class="flow"><span class="w on">One by one</span><span class="sw both"><span></span></span><span class="w">All at once</span></span>
+          <span class="flow"><span class="w">One by one</span><span class="sw both on"><span></span></span><span class="w on">All at once</span></span>
+          <span class="flow ran"><span class="w on">One by one</span><span class="sw both"><span></span></span><span class="w">All at once</span><span class="marg" style="margin-inline-start:4px">set once it has run</span></span>
+        </div>
+      </div>
+      <div class="frame">
+        <span class="tag">B · a sliding thumb</span>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">
+          <span><span class="slide"><span class="on">One by one</span><span>All at once</span></span></span>
+          <span><span class="slide right"><span>One by one</span><span class="on">All at once</span></span></span>
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>In A the track is one grey in both places, as neither side is "off": the knob says which. Clicking either word moves it there.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · Other ways to make it quicker</h2>
+    <p class="lede">You asked for more. Each can be taken or left on its own.</p>
+    <div class="ideas">
+      <div class="idea">
+        <h3>Enter keeps you typing</h3>
+        <p>Enter saves the row and leaves the caret on a fresh one, so a list is typed as fast as you think it. On the open task, Enter in "Add a sub-task" does the same, each new sub-task starting as its task.</p>
+      </div>
+      <div class="idea">
+        <h3>Paste a list, get sub-tasks</h3>
+        <p>Paste five lines into "Add a sub-task" and it offers five sub-tasks, one per line, each yours and named by its line. Pasted text is never read as a command: a line starting with &gt; is a name like any other.</p>
+        <div class="mini"><span class="marg">5 lines pasted · Enter adds them as 5 sub-tasks, Escape keeps them as one name</span></div>
+      </div>
+      <div class="idea">
+        <h3>A Run button</h3>
+        <p>Drawn in section 3. A task with something to send shows Run in place of the small run:207 link. It puts <code>run:207</code> in the bar, whose line says what goes and what it costs, and Enter runs it, as now: the board still never sends by itself.</p>
+      </div>
+      <div class="idea">
+        <h3>Drag to reorder</h3>
+        <p>One by one, the order is the order they run in. A grip on hover moves a sub-task up or down; Alt and the arrow keys do it from the keyboard. Nothing new is stored: sub-tasks are already kept in order.</p>
+        <div class="mini row3" style="grid-template-columns:18px 18px 1fr"><span class="grip">⋮⋮</span><span class="box"></span><span style="font:600 14px var(--sans)">Check the figures</span></div>
+      </div>
+      <div class="idea">
+        <h3>Every change taken back by undo:</h3>
+        <p>Found while drawing: today a tick, a new task or a deleted sub-task is said under the bar and taken back by <code>undo:</code>, but a name, a description or a model changed on the board is kept with neither. Written in place, each change would be said and taken back the same way.</p>
+      </div>
+      <div class="idea">
+        <h3>Runs on one line</h3>
+        <p>Drawn in section 3. The latest run on one line under the task, with where it waits; earlier runs behind <code>open:run 1</code>. The "Runs" heading and its list go until there is more than one to show.</p>
+      </div>
+      <div class="idea">
+        <h3>An empty board says nothing</h3>
+        <p>With "Add a task" a field you can type in, "No tasks yet" and the line under it have nothing left to say. The board would show the row alone; <code>new:task</code> stays in the reference.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · What is stored</h2>
+    <p class="lede">Nothing changes. The fields are v4's: a task's <code>title</code>, <code>description</code>, <code>model</code>, <code>rooms</code>, <code>flow</code> and <code>doneAt</code>; a sub-task's <code>title</code>, its words, <code>model</code>, <code>command</code> and <code>into</code>. A task with no kind on is one with no model and no command, as "None" was. Reordering moves sub-tasks within the order already kept. No migration; every backup reads as before.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2>7 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>The row that adds:</b> an empty box and a field, "Add a task" gone when clicked; Enter saves a task of yours.</li>
+        <li><b>The Model pill:</b> shown while the caret is in the row; it opens the description, the kinds, who answers, rooms, the flow and Save, with Prompt on. It also leads to Search and Command, which have no model; "Model" as you named it, or another word such as "More"?</li>
+        <li><b>No labels, no "change":</b> grey words name each field; names, descriptions and words written where they stand, kept on leaving, Escape putting them back.</li>
+        <li><b>Three kinds:</b> Prompt, Search, Command; picked again to turn off; none on means yours. "None" and "Kind" go.</li>
+        <li><b>The flow switch:</b> A or B.</li>
+        <li><b>Save,</b> with Cancel kept faint beside it, since a phone has no Escape.</li>
+        <li><b>Section 5:</b> which of a to g to build with it.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id)
+  const add = $('add'), name = $('name'), more = $('more'), desc = $('desc'), save = $('save')
+  const MODELS = { prompt: ['Sonnet 5.5', 'Opus 5.5', 'Haiku 5.5'], search: ['Wikipedia', 'Hacker News', 'OpenAlex'] }
+  const ROOMS = [['204', 'First, the budget'], ['199', 'Grant draft, October'], ['211', 'barn owl']]
+  let kind = null, who = { prompt: MODELS.prompt[0], search: MODELS.search[0] }, rooms = [], flow = 'oneByOne'
+
+  const draw = () => {
+    add.classList.toggle('typed', name.value.trim() !== '')
+    add.classList.toggle('open', !more.hidden)
+    document.querySelectorAll('.pill.kind[data-k]').forEach((b) => {
+      const on = b.dataset.k === kind
+      b.classList.toggle('on', on)
+      b.setAttribute('aria-checked', on ? 'true' : 'false')
+    })
+    const asks = kind === 'prompt' || kind === 'search'
+    $('whoA').hidden = !asks
+    $('sep1').hidden = !asks
+    $('roomsA').hidden = !asks
+    $('whoName').textContent = asks ? who[kind] : ''
+    $('cmdwrap').hidden = kind !== 'command'
+    const chips = $('chips')
+    chips.replaceChildren(...rooms.map((num) => {
+      const c = document.createElement('span')
+      c.className = 'chip'
+      c.textContent = 'room ' + num + ' '
+      const x = document.createElement('span')
+      x.className = 'x'
+      x.textContent = '×'
+      x.addEventListener('click', () => { rooms = rooms.filter((r) => r !== num); draw() })
+      c.append(x)
+      return c
+    }))
+    $('sw').classList.toggle('on', flow === 'together')
+    $('sw').classList.add('both')
+    $('sw').setAttribute('aria-checked', flow === 'together' ? 'true' : 'false')
+    document.querySelectorAll('#flow .w').forEach((w) => w.classList.toggle('on', w.dataset.f === flow))
+    const line = $('cmd').value.trim()
+    const refused = kind === 'command' && (!line || !/^[a-z]+:/.test(line))
+    $('cmdline').textContent = kind === 'command' && line && refused
+      ? 'The bar would not run this: a command starts with its word and a colon, as compare: does'
+      : 'A run puts it in the bar, and waits for your Enter.'
+    $('cmdline').classList.toggle('bad', Boolean(kind === 'command' && line && refused))
+    save.disabled = name.value.trim() === '' || refused
+  }
+  const reset = () => {
+    name.value = ''; desc.value = ''; $('cmd').value = ''
+    kind = null; rooms = []; flow = 'oneByOne'
+    more.hidden = true
+    $('whoMenu').hidden = true; $('roomMenu').hidden = true; $('find').hidden = true; $('addRoom').hidden = false
+    draw()
+  }
+  const keep = () => {
+    const title = name.value.trim()
+    if (!title || save.disabled) return
+    const row = document.createElement('div')
+    row.className = 'task row3'
+    const box = document.createElement('span'); box.className = 'box'
+    const t = document.createElement('span'); t.className = 't'; t.textContent = title
+    const facts = document.createElement('span'); facts.className = 'facts'
+    const chip = (words) => { const c = document.createElement('span'); c.className = 'chip'; c.textContent = words; facts.append(c) }
+    if (kind) chip(kind)
+    if (kind === 'prompt' || kind === 'search') { chip(who[kind]); rooms.forEach((r) => chip('room ' + r)) }
+    if (kind === 'command' && $('cmd').value.trim()) chip($('cmd').value.trim())
+    if (!kind) { facts.className = 'facts marg'; facts.textContent = desc.value.trim() }
+    row.append(box, t, document.createElement('span'), facts)
+    $('list').prepend(row)
+    reset()
+    name.focus()
+  }
+
+  name.addEventListener('input', draw)
+  name.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); keep() } })
+  desc.addEventListener('input', () => { desc.style.height = 'auto'; desc.style.height = desc.scrollHeight + 'px' })
+  $('cmd').addEventListener('input', draw)
+  $('cmd').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); keep() } })
+  add.addEventListener('keydown', (e) => { if (e.key === 'Escape') { reset(); document.activeElement.blur() } })
+  $('model').addEventListener('mousedown', (e) => e.preventDefault())
+  $('model').addEventListener('click', () => { more.hidden = false; kind = 'prompt'; draw(); desc.focus() })
+  document.querySelectorAll('.pill.kind[data-k]').forEach((b) => b.addEventListener('click', () => {
+    kind = kind === b.dataset.k ? null : b.dataset.k
+    $('whoMenu').hidden = true
+    draw()
+    if (kind === 'command') $('cmd').focus()
+  }))
+  $('who').addEventListener('click', () => {
+    const menu = $('whoMenu')
+    if (!menu.hidden) { menu.hidden = true; return }
+    const head = document.createElement('div')
+    head.className = 'grp'
+    head.textContent = kind === 'search' ? 'Sources' : 'Models'
+    menu.replaceChildren(head, ...MODELS[kind].map((m) => {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.textContent = m
+      b.addEventListener('click', () => { who[kind] = m; menu.hidden = true; draw() })
+      return b
+    }))
+    menu.hidden = false
+  })
+  $('addRoom').addEventListener('click', () => { $('addRoom').hidden = true; $('find').hidden = false; $('find').focus(); listRooms() })
+  const listRooms = () => {
+    const q = $('find').value.trim().toLowerCase()
+    const found = ROOMS.filter(([n, t]) => !rooms.includes(n) && (n.startsWith(q) || t.toLowerCase().includes(q)))
+    const menu = $('roomMenu')
+    menu.replaceChildren(...found.map(([n, t]) => {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.textContent = n + ' · ' + t
+      b.addEventListener('mousedown', (e) => e.preventDefault())
+      b.addEventListener('click', () => { rooms.push(n); $('find').value = ''; $('find').hidden = true; $('addRoom').hidden = false; menu.hidden = true; draw() })
+      return b
+    }))
+    menu.hidden = found.length === 0
+  }
+  $('find').addEventListener('input', listRooms)
+  $('find').addEventListener('blur', () => { $('find').hidden = true; $('addRoom').hidden = false; $('roomMenu').hidden = true })
+  $('sw').addEventListener('click', () => { flow = flow === 'together' ? 'oneByOne' : 'together'; draw() })
+  document.querySelectorAll('#flow .w').forEach((w) => w.addEventListener('click', () => { flow = w.dataset.f; draw() }))
+  save.addEventListener('click', keep)
+  $('cancel').addEventListener('click', reset)
+  draw()
+})()
+</script>
+</body>
+</html>
