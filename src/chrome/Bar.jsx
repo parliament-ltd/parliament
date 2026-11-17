@@ -626,7 +626,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} onClose={() => closeMenu('picker', true)} />
           : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} onSwitch={onSwitchAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} onClose={() => closeMenu('picker', true)} />
       )}
-      {menu === 'frameworks' && <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} onClose={() => closeMenu('frameworks', true)} />}
+      {menu === 'frameworks' && <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} onAdd={frameworkPicker.onAdd ?? null} onClose={() => closeMenu('frameworks', true)} />}
       {menu === 'languages' && (languagePicker.at
         // From the globe: right under it, in the corner it sits in (30 October).
         ? createPortal(

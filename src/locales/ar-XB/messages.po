@@ -7351,17 +7351,31 @@ msgstr ""
 msgid "framework.uncertain"
 msgstr ""
 
+#. A framework of your own: the field for its instruction
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addAsks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addButton"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addHere"
+msgstr ""
+
+#. A framework of your own: the field for its name
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addName"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "frameworkPicker.builtIn"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "frameworkPicker.foot"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "frameworkPicker.noneYet"
 msgstr ""
 
 #. The heading of the frameworks menu, drawn in capitals

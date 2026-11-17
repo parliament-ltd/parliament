@@ -24,6 +24,12 @@
   text-align: start;
 }
 .ch-shell *, .ch-shell *::before, .ch-shell *::after { box-sizing: border-box; }
+/* The bar stands a little above the page, open or folded into a circle: a
+   crisp faint edge and a soft shadow under it (Stefan, 17 November: "could
+   we add a little bit of depth perception / height by adding some subtle
+   shadow to it? ... same goes for the command and search and prompt bar
+   normally"). */
+.ch-shell { --ch-raise: 0 0 0 1px rgba(25, 25, 25, .07), 0 1px 2px rgba(40, 36, 28, .06), 0 4px 14px rgba(40, 36, 28, .08); --ch-raise-under: 0 1px 2px rgba(40, 36, 28, .08), 0 4px 14px rgba(40, 36, 28, .10); }
 /* The chrome's own resets stop at a room, which draws itself (C64). */
 .ch-shell button:not(.ch-room *) { font: inherit; color: inherit; background: none; border: none; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
 .ch-shell :focus-visible:not(.ch-room *) { outline: var(--ch-focus); outline-offset: 2px; border-radius: 3px; }
@@ -154,7 +160,7 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-dock.right .ch-dock-in { margin-inline: auto 0; }
 
 /* ── the field ── */
-.ch-field { position: relative; display: flex; align-items: center; height: var(--ch-field-h); width: 100%; border-radius: var(--ch-r-field); background: var(--ch-surface); overflow: hidden; box-shadow: var(--ch-lift); }
+.ch-field { position: relative; display: flex; align-items: center; height: var(--ch-field-h); width: 100%; border-radius: var(--ch-r-field); background: var(--ch-surface); overflow: hidden; box-shadow: var(--ch-raise); }
 .ch-fillwrap { position: absolute; inset: 0; pointer-events: none; z-index: 0; clip-path: inset(0 100% 0 0); transition: clip-path var(--ch-dur-wipe) cubic-bezier(.4, 0, .2, 1); }
 .ch-fillwrap.on { clip-path: inset(0 0 0 0); }
 .ch-fill { position: absolute; inset: 0; }
@@ -173,7 +179,7 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
    similar to the boards, the faint outline? ... please fix also for the
    laptop version"). The caret shows where you are. Its grey words go when
    it is clicked or tapped into; a held prompt's stay, standing for its words. */
-.ch-field:focus-within { box-shadow: var(--ch-lift); }
+.ch-field:focus-within { box-shadow: var(--ch-raise); }
 .ch-field:not(.held) input:focus::placeholder { color: transparent; }
 .ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity var(--ch-dur-fade) ease, transform var(--ch-dur-fade) ease; pointer-events: none; }
 .ch-chip.on { opacity: 1; transform: none; }
@@ -181,6 +187,15 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-chip.command { background: rgb(var(--ch-navy-2)); color: #fff; }
 .ch-chip.prompt { background: var(--ch-ink); color: var(--ch-paper); }
 .ch-gslot { position: absolute; inset-inline-end: 0; top: 0; z-index: 2; width: 40px; height: 40px; pointer-events: none; }
+/* The ink pot under the pointer: the ink drains, sloshing, and the pot fills
+   again when the pointer leaves (Stefan, 17 November). Only in a prompt; a
+   click there puts the caret in the field, as anywhere in it. */
+.ch-field.prompt:not(.min) .ch-gslot { pointer-events: auto; cursor: text; }
+.ch-field.phone.prompt .ch-send { cursor: pointer; }
+.pq:not(.is-stopped) .pq-lvl { transition: transform .9s cubic-bezier(.3, .6, .4, 1); }
+.ch-gslot:hover .pq:not(.is-writing, .is-stopped) .pq-lvl { transform: translateY(3.6px); transition: transform 1.6s cubic-bezier(.45, 0, .55, 1); }
+.ch-gslot:hover .pq:not(.is-stopped) .pq-surf { animation-play-state: running; }
+@media (prefers-reduced-motion: reduce) { .pq:not(.is-stopped) .pq-lvl, .ch-gslot:hover .pq .pq-lvl { transition: none; } }
 .ch-glyph { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--ch-ink); opacity: 0; transition: opacity var(--ch-dur-fade) ease; }
 .ch-glyph.on { opacity: 1; }
 .ch-glyph.mag { width: 15px; height: 15px; }
@@ -502,6 +517,17 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 /* Sources under quiet labels by the kind of question they answer. */
 .ch-menu-sub { padding-block: 5px 1px; padding-inline: 26px 6px; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
 .ch-menu-note { margin: 0; padding: 4px 6px; font: italic 400 var(--ch-t-marg)/1.4 var(--ch-serif); color: var(--ch-marg); }
+/* A framework of your own, added in the menu (C308): its name, what it
+   asks, and Add, in the boards' faint edge. */
+.ch-fw-add { display: grid; gap: 6px; padding: 4px 6px 2px; }
+.ch-fw-add .ch-menu-note { padding: 0; }
+.ch-shell .ch-fw-add input { width: 100%; padding: 6px 9px; border: 0; border-radius: var(--ch-r-md); background: var(--ch-surface); box-shadow: var(--ch-lift), 0 0 0 .5px rgba(25, 25, 25, .12); font: 400 13px var(--ch-sans); color: var(--ch-ink); }
+.ch-shell .ch-fw-add input:focus-visible { outline: none; box-shadow: var(--ch-lift), 0 0 0 .5px rgba(25, 25, 25, .3); }
+.ch-fw-add input::placeholder { color: var(--ch-ink-3); }
+.ch-fw-add input:focus::placeholder { color: transparent; }
+.ch-shell .ch-fw-add button { justify-self: start; padding: 4px 14px; border-radius: 999px; box-shadow: 0 0 0 .5px rgba(25, 25, 25, .2); font: 500 12.5px var(--ch-sans); color: var(--ch-ink); }
+.ch-shell .ch-fw-add button:disabled { opacity: .4; cursor: default; }
+.ch-shell.size-phone .ch-fw-add input { font-size: 16px; }
 /* One after another (C201): when each after the first runs, under its row
    and in its wash; a click changes it. */
 .ch-shell .ch-ref .ch-menu-when { margin-top: -2px; padding-top: 0; color: var(--ch-marg); background: var(--ch-wash); border-start-start-radius: 0; border-start-end-radius: 0; }
@@ -542,9 +568,10 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 .ch-field.min { width: var(--ch-field-h); border-radius: 50%; cursor: pointer; }
 .ch-field.min input, .ch-field.min .ch-chip.on { opacity: 0; pointer-events: none; }
 .ch-field input { transition: opacity var(--ch-dur-fade); }
-.ch-field.min.command { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .9); }
+.ch-shell .ch-field.min { box-shadow: var(--ch-raise); }
+.ch-shell .ch-field.min.command { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .9), var(--ch-raise-under); }
 /* The circle's edge turns gold on hover: the only gold at rest (C50). */
-.ch-field.min:hover { box-shadow: 0 0 0 1px var(--ch-gold-deep); }
+.ch-shell .ch-field.min:hover { box-shadow: 0 0 0 1px var(--ch-gold-deep), var(--ch-raise-under); }
 .ch-fold-button { position: absolute; inset: 0; z-index: 5; border-radius: 50%; }
 .ch-shell .ch-fold-button:focus-visible { outline: var(--ch-focus); outline-offset: -3px; border-radius: 50%; }
 /* The command mark: as the field folds, the chevron leaves the place of the

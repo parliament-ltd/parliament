@@ -4,6 +4,15 @@
 /** The words at a menu's foot, one sentence after another: what it does, its keys, that Escape closes it. */
 export const footOf = (...parts) => parts.filter(Boolean).join(' ')
 
+/** Words for a command, in quotes the words do not hold ("…", then “…”, then «…»): null when no pair fits. */
+export function quotedForCommand(text) {
+  const words = String(text ?? '').trim()
+  for (const [open, close] of [['"', '"'], ['“', '”'], ['«', '»']]) {
+    if (!words.includes(close)) return `${open}${words}${close}`
+  }
+  return null
+}
+
 /**
  * Who answers, in the menu's groups: the picker's rows (answererRows in
  * net/answerers.js) grouped as the ? reference groups its commands. Each

@@ -158,7 +158,8 @@ const Field = forwardRef(function Field({ state, folded, win, hint = null, margi
           </button>
         )
         : (
-          <div className="ch-gslot" aria-hidden="true">
+          // In a prompt the pot takes the pointer, to drain under it (chrome.css); a click there puts the caret in the field.
+          <div className="ch-gslot" aria-hidden="true" onMouseDown={mode === 'prompt' && !folded ? (e) => { e.preventDefault(); if (ref && typeof ref === 'object') ref.current?.focus() } : undefined}>
             <Magnifier on={mode === 'search'} />
             <Quill on={mode === 'prompt'} ink={ink} inkKey={inkKey} />
           </div>

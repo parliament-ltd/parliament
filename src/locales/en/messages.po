@@ -7351,18 +7351,32 @@ msgstr "Show reasoning"
 msgid "framework.uncertain"
 msgstr "Flag uncertainty"
 
+#. A framework of your own: the field for its instruction
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addAsks"
+msgstr "What it asks, such as: keep each answer short"
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addButton"
+msgstr "Add"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addHere"
+msgstr "Add your own framework here, or type new:framework \"name\" \"what it asks\" in the command bar."
+
+#. A framework of your own: the field for its name
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addName"
+msgstr "Name"
+
 #. js-lingui-explicit-id
 msgid "frameworkPicker.builtIn"
 msgstr "Built in"
 
 #. js-lingui-explicit-id
 msgid "frameworkPicker.foot"
-msgstr "They go with every prompt in this chat, in the order ticked, until turned off."
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "frameworkPicker.noneYet"
-msgstr "None of your own yet. new:framework \"name\" \"what it asks\" writes one."
+msgstr "Frameworks shape how the model responds in this chat, in the order ticked, until turned off."
 
 #. The heading of the frameworks menu, drawn in capitals
 #. js-lingui-explicit-id

@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { answererRows } from '../net/answerers'
-import { answerGroups, answerFacts, footOf } from './menus'
+import { answerGroups, answerFacts, footOf, quotedForCommand } from './menus'
+import { preview } from './preview'
+import { shipped } from '../shell/arrangement'
 
 // The menus under the bar, drawn as the ? reference is (29 October).
 
@@ -98,5 +100,17 @@ describe('the facts on a row of who answers', () => {
 describe('a menu’s foot', () => {
   it('says one sentence after another, leaving out any it does not have', () => {
     expect(footOf('Marks compare.', null, 'A click ticks it.', '', 'Escape closes this')).toBe('Marks compare. A click ticks it. Escape closes this')
+  })
+})
+
+describe('a framework of your own, added in the menu (C308)', () => {
+  it('quotes its words in quotes they do not hold, so the command reads them whole', () => {
+    expect(quotedForCommand(' Editor ')).toBe('"Editor"')
+    expect(quotedForCommand('Say "maybe" less')).toBe('“Say "maybe" less”')
+    expect(quotedForCommand('a"b”c')).toBe('«a"b”c»')
+    expect(quotedForCommand('a"b”c»d')).toBeNull()
+    const line = `>new:framework ${quotedForCommand('Editor')} ${quotedForCommand('Say "maybe" less')}`
+    const p = preview(line, { mode: 'command', arrangement: shipped('almanac'), screens: { frameworks: { list: [] } } })
+    expect(p.act).toMatchObject({ kind: 'ownFramework', name: 'Editor', instruction: 'Say "maybe" less' })
   })
 })

@@ -7351,18 +7351,32 @@ msgstr "推論を示す"
 msgid "framework.uncertain"
 msgstr "不確かさを示す"
 
+#. A framework of your own: the field for its instruction
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addAsks"
+msgstr "求めること（例：回答はいつも短く）"
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addButton"
+msgstr "追加"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addHere"
+msgstr "ここで自分の方針を追加するか、コマンドバーに new:framework \"名前\" \"求めること\" と入力してください。"
+
+#. A framework of your own: the field for its name
+#. js-lingui-explicit-id
+msgid "frameworkPicker.addName"
+msgstr "名前"
+
 #. js-lingui-explicit-id
 msgid "frameworkPicker.builtIn"
 msgstr "組み込み"
 
 #. js-lingui-explicit-id
 msgid "frameworkPicker.foot"
-msgstr "オフにするまで、チェックした順に、このチャットのすべてのプロンプトと一緒に送られます。"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "frameworkPicker.noneYet"
-msgstr "自分の方針はまだありません。new:framework \"名前\" \"指示の内容\" で作れます。"
+msgstr "方針は、このチャットでのモデルの応答の仕方を形づくります。チェックした順に、オフにするまで適用されます。"
 
 #. The heading of the frameworks menu, drawn in capitals
 #. js-lingui-explicit-id

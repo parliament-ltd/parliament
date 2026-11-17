@@ -2853,9 +2853,14 @@ export const COPY = {
     title: /*i18n*/ { id: 'frameworkPicker.title', message: 'Frameworks', comment: 'The heading of the frameworks menu, drawn in capitals' },
     builtIn: /*i18n*/ { id: 'frameworkPicker.builtIn', message: 'Built in' },
     yours: /*i18n*/ { id: 'frameworkPicker.yours', message: 'Yours' },
-    noneYet: /*i18n*/ { id: 'frameworkPicker.noneYet', message: 'None of your own yet. new:framework "name" "what it asks" writes one.', comment: 'Commands stay English' },
+    // A framework of your own, added in the menu (C308; Stefan, 17 November).
+    addHere: /*i18n*/ { id: 'frameworkPicker.addHere', message: 'Add your own framework here, or type new:framework "name" "what it asks" in the command bar.', comment: 'Commands stay English' },
+    addName: /*i18n*/ { id: 'frameworkPicker.addName', message: 'Name', comment: 'A framework of your own: the field for its name' },
+    addAsks: /*i18n*/ { id: 'frameworkPicker.addAsks', message: 'What it asks, such as: keep each answer short', comment: 'A framework of your own: the field for its instruction' },
+    addButton: /*i18n*/ { id: 'frameworkPicker.addButton', message: 'Add' },
     unnamed: /*i18n*/ { id: 'frameworkPicker.unnamed', message: 'unnamed', comment: 'A framework of your own with no name, as a persona could be' },
-    foot: /*i18n*/ { id: 'frameworkPicker.foot', message: 'They go with every prompt in this chat, in the order ticked, until turned off.' },
+    // Stefan, 17 November: "instead of 'they go with every prompt' let's say something like 'Frameworks shape how the model responds.'"
+    foot: /*i18n*/ { id: 'frameworkPicker.foot', message: 'Frameworks shape how the model responds in this chat, in the order ticked, until turned off.' },
   },
 
   // Sources in the picker by the kind of question they answer.
