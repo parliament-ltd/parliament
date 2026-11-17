@@ -122,6 +122,8 @@ Type a command in the bar after `>`. The line under the bar says what Enter will
 | `accept:244` | Accept a suggestion | `accept:244`, `accept:all` | Rooms, Tasks, Reflection, Collection | yes |
 | `reject:244` | Turn down a suggestion | `reject:244`, `reject:all` | Rooms, Tasks, Reflection, Collection | yes |
 | `hold:242` | Keep a branch or an edit from going until you say | `hold:242`, `hold:201c`, `hold:off 242` | Rooms, Tasks, Reflection, Collection | yes |
+| `align:center` | Put the lines in hand at the centre, the right, or the left again | `align:center`, `align:right`, `align:left` | everywhere | no |
+| `indent:` | Move the lines in hand one step in, or out with indent:off | `indent:`, `indent:off` | everywhere | no |
 | `tick:207 2` | Tick a task or a sub-task done, or untick it | `tick:207 2`, `tick:207`, `tick:off 207 2`, `tick:201a 2` | everywhere | yes |
 | `markup:` | Markup: markup: opens the menu. markup:on and markup:off show or hide every mark in the text, or one kind, as markup:off highlights. markup:suggesting keeps what you type held back until you accept it, and markup:editing makes it the text | `markup:`, `markup:off`, `markup:on prompts`, `markup:suggesting` | everywhere | yes |
 | `by:haiku` | Choose who answers in this chat: a model, or a source with no tokens | `by:`, `by:haiku`, `by:mistral small`, `by:wikipedia` | everywhere | yes |

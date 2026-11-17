@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { startAsk, newAskId } from '../../editing/asks'
 import { strikeSelection, struckIdsIn } from '../../editing/keys'
+import { alignLines, shiftLines } from '../../editing/layout'
 
 // The ASK box of a reply edited in place (stage 11, piece 4; the editing
 // spec, "Asks"; C218): opened with Ctrl+Shift+K on the selected words, or at
@@ -126,12 +127,26 @@ export function useAskBox(viewRef, onKept, words, canAsk) {
     document.addEventListener('focusin', onFocus)
     window.addEventListener('parliament-ask', onBarAsk)
     window.addEventListener('parliament-strike', onBarStrike)
+    // align: and indent: (C304): the lines of the text last in hand.
+    const onLay = (e) => {
+      const detail = e.detail
+      if (!detail || detail.taken || lastFocused !== token) return
+      const v = viewRef.current
+      if (!v || !v.dom.isConnected) return
+      if (!v.editable) { detail.taken = 'layNotNow'; return }
+      const out = detail.align ? alignLines(v.state, detail.align === 'left' ? null : detail.align) : shiftLines(v.state, detail.by)
+      if (out) v.dispatch(out.tr)
+      detail.taken = true
+      detail.count = out?.count ?? 0
+    }
+    window.addEventListener('parliament-lay', onLay)
     window.addEventListener('parliament-look-up', onLookUp)
     window.addEventListener('parliament-replace-word', onReplace)
     return () => {
       document.removeEventListener('focusin', onFocus)
       window.removeEventListener('parliament-ask', onBarAsk)
       window.removeEventListener('parliament-strike', onBarStrike)
+      window.removeEventListener('parliament-lay', onLay)
       window.removeEventListener('parliament-look-up', onLookUp)
       window.removeEventListener('parliament-replace-word', onReplace)
       if (lookedUp?.token === token) lookedUp = null

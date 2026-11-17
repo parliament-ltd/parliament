@@ -63,6 +63,19 @@ export function planLookUp(step, half = 'meanings') {
   return { says: { message: half === 'same' ? 'lookUpSame' : 'lookUp', values: { word, board: 'dictionary' } }, act: { kind: 'lookUp', half, word } }
 }
 
+/** align:center, align:right, align:left (C304): the lines in hand. */
+export function planAlign(step) {
+  const word = step.match?.values?.[0]?.value
+  if (!['center', 'right', 'left'].includes(word)) return { says: { message: 'alignHow' }, act: null }
+  return { says: { message: 'alignGo', values: { align: word } }, act: { kind: 'lay', align: word } }
+}
+
+/** indent: and indent:off (C304): the lines in hand, one step in or out. */
+export function planIndent(step) {
+  const off = step.match?.values?.[0]?.value === 'off'
+  return { says: { message: off ? 'indentOffGo' : 'indentGo' }, act: { kind: 'lay', by: off ? -1 : 1 } }
+}
+
 const SUM_SAYS = { divideByZero: 'calcDivide', bracket: 'calcBracket', char: 'calcChar', power: 'calcPower', empty: 'calcHow', number: 'calcSyntax', syntax: 'calcSyntax', end: 'calcSyntax' }
 
 /** calc:48000*2/12, worked out on the line under the bar as it is typed (§4). */

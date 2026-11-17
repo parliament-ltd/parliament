@@ -1382,6 +1382,14 @@ export const COPY = {
     runTogether: /*i18n*/ { id: 'enter.runTogether', message: 'All at once: each prompt goes into a chat of its own, then the commands' },
     taskLineWaits: /*i18n*/ { id: 'enter.taskLineWaits', message: 'Task {num} waits for this command, “{title}”: Enter runs it and the task goes on. Or tick it on the board' },
     taskChanged: /*i18n*/ { id: 'enter.taskChanged', message: 'Task {num} is changed' },
+    // How lines sit (C304, ruled 16 November).
+    alignHow: /*i18n*/ { id: 'enter.alignHow', message: 'align: takes center, right or left: align:center', comment: 'Commands stay English' },
+    alignGo: /*i18n*/ { id: 'enter.alignGo', message: '{align, select, center {Enter centres the lines selected, or the line with the caret, in the text last in hand} right {Enter puts the lines selected, or the line with the caret, at the right} other {Enter puts the lines selected, or the line with the caret, back at the left}}' },
+    indentGo: /*i18n*/ { id: 'enter.indentGo', message: 'Enter moves the lines selected, or the line with the caret, one step in' },
+    indentOffGo: /*i18n*/ { id: 'enter.indentOffGo', message: 'Enter moves the lines selected, or the line with the caret, one step out' },
+    layDone: /*i18n*/ { id: 'enter.layDone', message: '{count, plural, =0 {Nothing moved: the lines are there already} one {One line moved. Ctrl+Z in the text takes it back} other {# lines moved. Ctrl+Z in the text takes them back}}' },
+    layNoText: /*i18n*/ { id: 'enter.layNoText', message: 'Put the caret in a text first, or select its lines' },
+    layNotNow: /*i18n*/ { id: 'enter.layNotNow', message: 'That text cannot be changed now' },
     // Alarms, the dictionary and sums (C303, ruled 16 November).
     alarmOpen: /*i18n*/ { id: 'enter.alarmOpen', message: 'Enter opens {board}' },
     alarmQuiet: /*i18n*/ { id: 'enter.alarmQuiet', message: 'Enter turns the alarms’ chime off. The band and the tab’s title still show' },

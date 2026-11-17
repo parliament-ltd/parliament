@@ -2367,6 +2367,15 @@ msgid "enter.alarmSetDone"
 msgstr "{every, select, yes {The break is set: the first at {at}, if you work until then} other {The alarm is set, ringing at {at}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.alignGo"
+msgstr "{align, select, center {Enter centres the lines selected, or the line with the caret, in the text last in hand} right {Enter puts the lines selected, or the line with the caret, at the right} other {Enter puts the lines selected, or the line with the caret, back at the left}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alignHow"
+msgstr "align: takes center, right or left: align:center"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} runs on a line of its own, so it is plain what goes for good"
 
@@ -3875,6 +3884,14 @@ msgid "enter.includeSome"
 msgstr "{count, plural, other {Enter brings # answers, from {sources}, into your next prompt}}"
 
 #. js-lingui-explicit-id
+msgid "enter.indentGo"
+msgstr "Enter moves the lines selected, or the line with the caret, one step in"
+
+#. js-lingui-explicit-id
+msgid "enter.indentOffGo"
+msgstr "Enter moves the lines selected, or the line with the caret, one step out"
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr "No collection is called {name}"
 
@@ -4061,6 +4078,18 @@ msgstr "Enter puts the page in {language}, and your replies and searches follow 
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} is not built yet"
+
+#. js-lingui-explicit-id
+msgid "enter.layDone"
+msgstr "{count, plural, =0 {Nothing moved: the lines are there already} one {One line moved. Ctrl+Z in the text takes it back} other {# lines moved. Ctrl+Z in the text takes them back}}"
+
+#. js-lingui-explicit-id
+msgid "enter.layNoText"
+msgstr "Put the caret in a text first, or select its lines"
+
+#. js-lingui-explicit-id
+msgid "enter.layNotNow"
+msgstr "That text cannot be changed now"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
@@ -10747,6 +10776,10 @@ msgid "verb.alarm"
 msgstr "Set an alarm or a break after so much work, push one later, take one off, or show them"
 
 #. js-lingui-explicit-id
+msgid "verb.align"
+msgstr "Put the lines in hand at the centre, the right, or the left again"
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "Have a prompt in the text answered in the reply itself, or in the text after its passage"
 
@@ -10908,6 +10941,11 @@ msgstr "Show what is in a collection, or was made in a room"
 #. js-lingui-explicit-id
 msgid "verb.include"
 msgstr "Bring an answer from a source into your next prompt, sent as material marked as data"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "verb.indent"
+msgstr "Move the lines in hand one step in, or out with indent:off"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"

@@ -26,6 +26,11 @@ import { Slice, Fragment } from 'prosemirror-model'
 import { schema, STRUCK, ADDED, SUGGEST_OUT, SUGGEST_IN, isWholeBlock } from './schema'
 import { SKIP, INTENT } from './track'
 import { historyPlugin, undo, redo } from './history'
+import { shiftLines, alignLines, outdentAtStart } from './layout'
+
+// Escape, then Tab, leaves the text (C304): the views where Escape was the
+// last key pressed.
+const escaped = new WeakSet()
 
 // A block taken whole: a chart or divider, or a table selected as one (C222).
 const isBlockAtom = (sel) => sel instanceof NodeSelection && sel.node.isBlock && isWholeBlock(sel.node)
@@ -226,13 +231,20 @@ function enter(ids) {
       return true
     }
     if (block.type === schema.nodes.list_item && block.content.size === 0) {
-      dispatch(state.tr.setBlockType($from.before(), $from.after(), schema.nodes.paragraph, { id: block.attrs.id }).setMeta(SKIP, true))
+      // An empty sub-item steps out before it stops being a list (C304).
+      if (block.attrs.indent > 0) {
+        dispatch(state.tr.setNodeMarkup($from.before(), null, { ...block.attrs, indent: block.attrs.indent - 1 }).setMeta(SKIP, true))
+        return true
+      }
+      dispatch(state.tr.setBlockType($from.before(), $from.after(), schema.nodes.paragraph, { id: block.attrs.id, align: block.attrs.align ?? null }).setMeta(SKIP, true))
       return true
     }
     const atEnd = $from.parentOffset === block.content.size
     const type = block.type === schema.nodes.list_item ? block.type : atEnd ? schema.nodes.paragraph : block.type
-    const attrs = type === schema.nodes.list_item ? { id: ids.block(), kind: block.attrs.kind, checked: false }
-      : type === schema.nodes.heading ? { id: ids.block(), level: block.attrs.level } : { id: ids.block() }
+    // The new line keeps its line's place (C304).
+    const place = { indent: block.attrs.indent ?? 0, align: block.attrs.align ?? null }
+    const attrs = type === schema.nodes.list_item ? { id: ids.block(), ...place, kind: block.attrs.kind, checked: false }
+      : type === schema.nodes.heading ? { id: ids.block(), ...place, level: block.attrs.level } : { id: ids.block(), ...place }
     dispatch(state.tr.split($from.pos, 1, [{ type, attrs }]).setMeta(SKIP, true).scrollIntoView())
     return true
   }
@@ -271,7 +283,8 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
   const keys = keymap({
     Enter: whenBlocks(enter(ids)),
     'Shift-Enter': whenBlocks(enter(ids)),
-    Backspace: backspace(blk, onJoin),
+    // At the start of a line moved in: one step out first (C304).
+    Backspace: (state, dispatch, view) => outdentAtStart(state, dispatch) || backspace(blk, onJoin)(state, dispatch, view),
     Delete: del(onJoin),
     'Mod-z': undo,
     'Mod-y': redo,
@@ -280,9 +293,28 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     'Mod-i': nothing,
     'Mod-u': nothing,
     'Shift-Mod-x': strike,
-    // Between a table's cells (C222 (a)); outside a table, Tab leaves the reply as usual.
-    Tab: (state, dispatch) => moveCell(state, dispatch, 'next'),
-    'Shift-Tab': (state, dispatch) => moveCell(state, dispatch, 'prev'),
+    // Between a table's cells (C222 (a)). Elsewhere, Tab and Shift+Tab move
+    // the lines in and out, up to three steps (C304); Escape, then Tab,
+    // leaves the text, so a keyboard alone still moves on.
+    Escape: (state, dispatch, view) => { if (view) escaped.add(view); return false },
+    Tab: (state, dispatch, view) => {
+      if (view && escaped.has(view)) { escaped.delete(view); return false }
+      if (moveCell(state, dispatch, 'next')) return true
+      const out = shiftLines(state, 1)
+      if (out && dispatch) dispatch(out.tr)
+      return true
+    },
+    'Shift-Tab': (state, dispatch, view) => {
+      if (view && escaped.has(view)) { escaped.delete(view); return false }
+      if (moveCell(state, dispatch, 'prev')) return true
+      const out = shiftLines(state, -1)
+      if (out && dispatch) dispatch(out.tr)
+      return true
+    },
+    // The centre, the right, and the left again (C304).
+    'Shift-Mod-e': (state, dispatch) => { const out = alignLines(state, 'center'); if (out && dispatch) dispatch(out.tr); return true },
+    'Shift-Mod-r': (state, dispatch) => { const out = alignLines(state, 'right'); if (out && dispatch) dispatch(out.tr); return true },
+    'Shift-Mod-l': (state, dispatch) => { const out = alignLines(state, null); if (out && dispatch) dispatch(out.tr); return true },
     // An ask (piece 4; C218 (a)): Ctrl+K stays the bar's. In a reply only:
     // asks are for replies, the spec says, and a prompt says so.
     'Shift-Mod-k': (state, dispatch, view) => askHere(state, view),
@@ -306,6 +338,7 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     props: {
       handleKeyDown(view, event) {
         log?.(`keydown ${event.key}${event.isComposing ? ' (composing)' : ''}`)
+        if (event.key !== 'Escape' && event.key !== 'Tab' && event.key !== 'Shift') escaped.delete(view)
         // An input method's first key comes as 229 ("Process"), before it
         // starts composing: the moment to strike a selection it will replace.
         if ((event.keyCode === 229 || event.key === 'Process') && !view.composing) strikeBeforeComposing(view)
@@ -729,7 +762,7 @@ export function setBlock(state, choice, ids) {
     }
     state.doc.nodesBetween(sel.from, sel.to, (node, pos) => {
       if (!node.isTextblock) return true
-      tr.setBlockType(pos + 1, pos + 1, type, { id: node.attrs.id, ...(choice.attrs ?? {}) })
+      tr.setBlockType(pos + 1, pos + 1, type, { id: node.attrs.id, indent: node.attrs.indent ?? 0, align: node.attrs.align ?? null, ...(choice.attrs ?? {}) })
       return false
     })
     return tr
@@ -745,7 +778,7 @@ export function setBlock(state, choice, ids) {
     }
     return tr
   }
-  tr.setBlockType($from.before(), $from.after(), schema.nodes[choice.type], { id: block.attrs.id, ...(choice.attrs ?? {}) })
+  tr.setBlockType($from.before(), $from.after(), schema.nodes[choice.type], { id: block.attrs.id, indent: block.attrs.indent ?? 0, align: block.attrs.align ?? null, ...(choice.attrs ?? {}) })
   return tr
 }
 

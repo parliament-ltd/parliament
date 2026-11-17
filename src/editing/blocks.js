@@ -23,6 +23,7 @@
 // file): only known types and fields are taken, every value is made the kind
 // it should be, and links keep only web and mail addresses.
 
+import { layOf } from './layout'
 import { schema, safeHref, STRUCK, ADDED, ASK, ANSWER, REPLACED, SUGGEST_OUT, SUGGEST_IN } from './schema'
 import { chartParts, KINDS as CHART_KINDS } from './charts'
 
@@ -108,6 +109,9 @@ export function toBlocks(doc) {
       b.tableId = node.lastChild.attrs.id
       b.rows = rowsOf(node.lastChild)
     }
+    // How the line sits (C304): left out when it is the usual.
+    if (node.attrs.indent > 0) b.indent = node.attrs.indent
+    if (node.attrs.align) b.align = node.attrs.align
     if (node.attrs.struck != null) b.struck = node.attrs.struck
     out.push(b)
   })
@@ -189,7 +193,7 @@ export function wordsOf(blocks) {
     if (b.type === 'chart') continue
     const text = wordsIn(b.text)
     if (b.type === 'heading') lines.push(`${'#'.repeat([1, 2, 3].includes(b.level) ? b.level : 1)} ${text}`)
-    else if (b.type === 'list') lines.push(`${b.kind === 'number' ? `${++number}.` : b.kind === 'check' ? (b.checked ? '- [x]' : '- [ ]') : '-'} ${text}`)
+    else if (b.type === 'list') lines.push(`${' '.repeat(([1, 2, 3].includes(b.indent) ? b.indent : 0) * (b.kind === 'number' ? 3 : 2))}${b.kind === 'number' ? `${++number}.` : b.kind === 'check' ? (b.checked ? '- [x]' : '- [ ]') : '-'} ${text}`)
     else if (b.type === 'quote') lines.push(`> ${text}`)
     else if (b.type === 'code') lines.push(`\`\`\`\n${text}\n\`\`\``)
     else lines.push(text)
@@ -223,6 +227,8 @@ export function fromBlocks(blocks, nextBlockId) {
       attrs.kind = KINDS.includes(b.kind) ? b.kind : 'bullet'
       attrs.checked = b.checked === true
     }
+    // How the line sits (C304): another value is dropped, the words kept.
+    if (name === 'paragraph' || name === 'heading' || name === 'list_item' || name === 'quote') Object.assign(attrs, layOf(b))
     if (name === 'divider' || name === 'table' || name === 'chart') attrs.struck = struck
     if (name === 'chart') attrs.data = typeof b.data === 'string' ? b.data : ''
     const freshId = (v) => {

@@ -155,3 +155,15 @@
 .p-edit-menu button { display: block; width: 100%; text-align: start; padding: 5px 8px; border-radius: 5px; font-size: 13px; }
 .p-edit-menu button.on { background: var(--ch-wash); }
 .p-edit-menu .foot { padding: 6px 8px 2px; border-top: 1px solid var(--ch-border); margin-top: 4px; font-size: 11.5px; font-style: italic; color: var(--ch-marg); }
+
+/* How a line sits (C304, ruled 16 November; parliament-indent-align-v1.html):
+   a step in, up to three, and the centre or the right. Logical sides, so
+   right-to-left text moves in from the right. */
+.p-text [data-indent="1"] { margin-inline-start: 1.75em; }
+.p-text [data-indent="2"] { margin-inline-start: 3.5em; }
+.p-text [data-indent="3"] { margin-inline-start: 5.25em; }
+.p-text .pm-bullet[data-indent="1"]::before { content: "◦"; }
+.p-text .pm-bullet[data-indent="2"]::before { content: "▪"; font-size: .8em; }
+.p-text .pm-bullet[data-indent="3"]::before { content: "-"; }
+.p-text [data-align="center"] { text-align: center; }
+.p-text [data-align="right"] { text-align: right; }

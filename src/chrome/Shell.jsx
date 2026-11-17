@@ -1519,6 +1519,15 @@ export default function Shell() {
       remember(body)
       return { done: true, says: { message: what.quiet ? 'alarmQuietDone' : 'alarmQuietOffDone' } }
     }
+    // align: and indent: (C304): the text last in hand moves its lines, as
+    // strikethrough: strikes; Ctrl+Z there takes it back.
+    if (what.kind === 'lay') {
+      const detail = { taken: false, count: 0, ...(what.align ? { align: what.align } : { by: what.by }) }
+      window.dispatchEvent(new CustomEvent('parliament-lay', { detail }))
+      if (detail.taken !== true) return typeof detail.taken === 'string' ? detail.taken : 'layNoText'
+      remember(body)
+      return { done: true, says: { message: 'layDone', values: { count: detail.count } } }
+    }
     // calc: (C303 (c)): worked out as it was typed; Enter keeps it in the bar's history.
     if (what.kind === 'calc') {
       remember(body)

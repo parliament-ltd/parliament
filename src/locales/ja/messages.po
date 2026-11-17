@@ -2367,6 +2367,15 @@ msgid "enter.alarmSetDone"
 msgstr "{every, select, yes {休憩を設定しました：それまで作業を続ければ、最初のお知らせは{at}です} other {アラームを設定しました。{at}に鳴ります}}"
 
 #. js-lingui-explicit-id
+msgid "enter.alignGo"
+msgstr "{align, select, center {Enterで、最後に使っていたテキストの選択した行（またはカーソルのある行）を中央に揃えます} right {Enterで、選択した行（またはカーソルのある行）を右に揃えます} other {Enterで、選択した行（またはカーソルのある行）を左に戻します}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alignHow"
+msgstr "align: には center、right、left のいずれかを指定します：align:center"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} は単独の行で実行します。何が完全に消えるかをはっきりさせるためです"
 
@@ -3875,6 +3884,14 @@ msgid "enter.includeSome"
 msgstr "{count, plural, other {Enterで、{sources}からの回答#件を次のプロンプトに取り込みます}}"
 
 #. js-lingui-explicit-id
+msgid "enter.indentGo"
+msgstr "Enterで、選択した行（またはカーソルのある行）を1段下げます"
+
+#. js-lingui-explicit-id
+msgid "enter.indentOffGo"
+msgstr "Enterで、選択した行（またはカーソルのある行）を1段戻します"
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr "{name}というコレクションはありません"
 
@@ -4061,6 +4078,18 @@ msgstr "Enterでページを{language}にします。返答と検索もこれに
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} はまだ準備中です"
+
+#. js-lingui-explicit-id
+msgid "enter.layDone"
+msgstr "{count, plural, =0 {行はすでにその位置にあるため、何も動きませんでした} other {#行を動かしました。テキスト内でCtrl+Zを押すと元に戻せます}}"
+
+#. js-lingui-explicit-id
+msgid "enter.layNoText"
+msgstr "先にテキストにカーソルを置くか、行を選択してください"
+
+#. js-lingui-explicit-id
+msgid "enter.layNotNow"
+msgstr "このテキストは今は変更できません"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
@@ -10747,6 +10776,10 @@ msgid "verb.alarm"
 msgstr "アラームや、一定時間作業したあとの休憩を設定する。遅らせたり、外したり、一覧を表示したりもできます"
 
 #. js-lingui-explicit-id
+msgid "verb.align"
+msgstr "手元の行を中央や右に揃える、または左に戻す"
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "テキスト内のプロンプトに、返答そのものの中で答えてもらうか、テキスト内の箇所のあとに答えてもらう"
 
@@ -10908,6 +10941,11 @@ msgstr "コレクションの中身、またはルームで作ったものを表
 #. js-lingui-explicit-id
 msgid "verb.include"
 msgstr "情報源からの回答を、データと明示した資料として次のプロンプトに取り込む"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "verb.indent"
+msgstr "手元の行を1段下げる（indent:offで戻す）"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"

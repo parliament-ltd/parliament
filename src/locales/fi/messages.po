@@ -2367,6 +2367,15 @@ msgid "enter.alarmSetDone"
 msgstr "{every, select, yes {Tauko on asetettu: ensimmäinen klo {at}, jos työskentelet siihen asti} other {Hälytys on asetettu ja soi klo {at}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.alignGo"
+msgstr "{align, select, center {Enter keskittää valitut rivit tai kohdistimen rivin viimeksi käsitellyssä tekstissä} right {Enter siirtää valitut rivit tai kohdistimen rivin oikeaan reunaan} other {Enter palauttaa valitut rivit tai kohdistimen rivin vasempaan reunaan}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alignHow"
+msgstr "align: ottaa arvon center, right tai left: align:center"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} ajetaan omalla rivillään, jotta on selvää, mikä poistuu pysyvästi"
 
@@ -3875,6 +3884,14 @@ msgid "enter.includeSome"
 msgstr "{count, plural, other {Enter tuo seuraavaan kehotteeseesi # vastausta lähteistä {sources}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.indentGo"
+msgstr "Enter siirtää valittuja rivejä tai kohdistimen riviä askeleen sisään"
+
+#. js-lingui-explicit-id
+msgid "enter.indentOffGo"
+msgstr "Enter siirtää valittuja rivejä tai kohdistimen riviä askeleen ulos"
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr "Kokoelmaa {name} ei ole"
 
@@ -4061,6 +4078,18 @@ msgstr "Enter vaihtaa sivun kieleksi {language}, ja vastauksesi ja hakusi seuraa
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} ei ole vielä valmis"
+
+#. js-lingui-explicit-id
+msgid "enter.layDone"
+msgstr "{count, plural, =0 {Mikään ei siirtynyt: rivit ovat jo paikallaan} one {Yksi rivi siirtyi. Ctrl+Z tekstissä peruu sen} other {# riviä siirtyi. Ctrl+Z tekstissä peruu ne}}"
+
+#. js-lingui-explicit-id
+msgid "enter.layNoText"
+msgstr "Vie kohdistin ensin tekstiin tai valitse sen rivit"
+
+#. js-lingui-explicit-id
+msgid "enter.layNotNow"
+msgstr "Tätä tekstiä ei voi nyt muuttaa"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
@@ -10747,6 +10776,10 @@ msgid "verb.alarm"
 msgstr "Aseta hälytys tai tauko tietyn työajan jälkeen, siirrä hälytystä myöhemmäksi, poista hälytys tai näytä hälytykset"
 
 #. js-lingui-explicit-id
+msgid "verb.align"
+msgstr "Keskitä käsillä olevat rivit, siirrä ne oikealle tai palauta vasemmalle"
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "Anna tekstissä olevaan kehotteeseen vastata itse vastauksessa tai tekstissä tekstikohdan jälkeen"
 
@@ -10908,6 +10941,11 @@ msgstr "Näytä, mitä kokoelmassa on tai mitä huoneessa on tehty"
 #. js-lingui-explicit-id
 msgid "verb.include"
 msgstr "Tuo lähteen vastaus seuraavaan kehotteeseesi, dataksi merkittynä aineistona"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "verb.indent"
+msgstr "Siirrä käsillä olevia rivejä askel sisään, tai ulos komennolla indent:off"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"

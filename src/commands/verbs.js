@@ -318,6 +318,12 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.reject', message: 'Turn down a suggestion' } }),
   v({ verb: 'hold', group: 'editing', example: 'hold:242', forms: ['hold:242', 'hold:201c', 'hold:off 242'], takes: [['addresses'], [['off'], { opt: 'addresses' }]], on: EDITING, stage: 10, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.hold', message: 'Keep a branch or an edit from going until you say' } }),
+  // How lines sit (C304, ruled 16 November): on the text last in hand, as
+  // strikethrough: is; Ctrl+Z in the text takes it back.
+  v({ verb: 'align', group: 'editing', example: 'align:center', forms: ['align:center', 'align:right', 'align:left'], takes: [[['center', 'right', 'left']]], stage: 15, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.align', message: 'Put the lines in hand at the centre, the right, or the left again' } }),
+  v({ verb: 'indent', group: 'editing', example: 'indent:', forms: ['indent:', 'indent:off'], takes: [[], [['off']]], stage: 15, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.indent', message: 'Move the lines in hand one step in, or out with indent:off', comment: 'Commands stay English' } }),
   // A to-do of yours ticked or not (C301 (g)); done: is the Lab's.
   // A task, or one of its sub-tasks, ticked (v4).
   v({ verb: 'tick', group: 'editing', example: 'tick:207 2', forms: ['tick:207 2', 'tick:207', 'tick:off 207 2', 'tick:201a 2'], takes: [['address', 'number'], ['address'], [['off'], 'address', 'number'], [['off'], 'address']], stage: 15, undoable: true, click: 'apply',

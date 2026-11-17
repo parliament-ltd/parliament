@@ -2367,6 +2367,15 @@ msgid "enter.alarmSetDone"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.alignGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alignHow"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr ""
 
@@ -3875,6 +3884,14 @@ msgid "enter.includeSome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.indentGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.indentOffGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr ""
 
@@ -4060,6 +4077,18 @@ msgstr ""
 #. While the new shell is behind its flag
 #. js-lingui-explicit-id
 msgid "enter.later"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layNoText"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layNotNow"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -10747,6 +10776,10 @@ msgid "verb.alarm"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.align"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr ""
 
@@ -10907,6 +10940,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.include"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "verb.indent"
 msgstr ""
 
 #. js-lingui-explicit-id

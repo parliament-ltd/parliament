@@ -19,8 +19,21 @@ import { safeUrl } from '../lib/safeUrl'
 
 const id = { id: { default: null } }
 const struck = { struck: { default: null } }
-const blockAttr = (node) => ({ 'data-block': node.attrs.id })
+const blockAttr = (node) => ({ 'data-block': node.attrs.id, ...layAttr(node) })
 const readId = (dom) => ({ id: dom.getAttribute('data-block') })
+// How a line sits (C304, ruled 16 November): a step in, 1 to 3, and the
+// centre or the right. Drawn as data-indent and data-align.
+const lay = { indent: { default: 0 }, align: { default: null } }
+function layAttr(node) {
+  const a = node.attrs
+  return { ...(a.indent > 0 ? { 'data-indent': String(a.indent) } : {}), ...(a.align ? { 'data-align': a.align } : {}) }
+}
+const readLay = (dom) => {
+  const indent = Number(dom.getAttribute('data-indent'))
+  const align = dom.getAttribute('data-align')
+  return { indent: [1, 2, 3].includes(indent) ? indent : 0, align: align === 'center' || align === 'right' ? align : null }
+}
+const readLaid = (dom) => ({ ...readId(dom), ...readLay(dom) })
 // An edit's id as it was written on the page: a number in tests, else a short id.
 const readEdit = (dom) => {
   const v = dom.getAttribute('data-edit') ?? ''
@@ -58,22 +71,22 @@ export const schema = new Schema({
     // there, to write in (Stefan's try of piece 1, 26 October). Never stored
     // while empty; an ordinary line once something is typed in it.
     paragraph: {
-      group: 'block', content: 'inline*', attrs: { ...id, gap: { default: false } },
+      group: 'block', content: 'inline*', attrs: { ...id, ...lay, gap: { default: false } },
       toDOM: (n) => ['p', n.attrs.gap ? { ...blockAttr(n), class: 'pm-gap' } : blockAttr(n), 0],
-      parseDOM: [{ tag: 'p', getAttrs: (dom) => ({ ...readId(dom), gap: dom.classList.contains('pm-gap') }) }],
+      parseDOM: [{ tag: 'p', getAttrs: (dom) => ({ ...readLaid(dom), gap: dom.classList.contains('pm-gap') }) }],
     },
     heading: {
       // anchor: the heading's place among the reply's own headings, for the
       // ids the table of contents finds them by (toc@1.0, msg-<id>-h-<n>).
-      group: 'block', content: 'inline*', attrs: { ...id, level: { default: 1 }, anchor: { default: null } }, defining: true,
+      group: 'block', content: 'inline*', attrs: { ...id, ...lay, level: { default: 1 }, anchor: { default: null } }, defining: true,
       // Levels 1 to 3 of a reply sit under the page's own headings.
       toDOM: (n) => [`h${n.attrs.level + 2}`, { ...blockAttr(n), class: `pm-h${n.attrs.level}`, ...(n.attrs.anchor ? { id: n.attrs.anchor } : {}) }, 0],
-      parseDOM: [3, 4, 5].map((h) => ({ tag: `h${h}`, getAttrs: (dom) => ({ ...readId(dom), level: h - 2, anchor: dom.getAttribute('id') }) })),
+      parseDOM: [3, 4, 5].map((h) => ({ tag: `h${h}`, getAttrs: (dom) => ({ ...readLaid(dom), level: h - 2, anchor: dom.getAttribute('id') }) })),
     },
     // Bulleted, numbered and checklist items are blocks of their own, so
     // Enter, Backspace and / treat them like any other line.
     list_item: {
-      group: 'block', content: 'inline*', attrs: { ...id, kind: { default: 'bullet' }, checked: { default: false } }, defining: true,
+      group: 'block', content: 'inline*', attrs: { ...id, ...lay, kind: { default: 'bullet' }, checked: { default: false } }, defining: true,
       toDOM: (n) => ['div', { ...blockAttr(n), class: `pm-li pm-${n.attrs.kind}`, 'data-checked': n.attrs.checked ? 'true' : 'false' },
         ...(n.attrs.kind === 'check'
           ? [['span', { class: 'pm-box', contenteditable: 'false', role: 'checkbox', 'aria-checked': n.attrs.checked ? 'true' : 'false', 'aria-label': 'Done' }]]
@@ -81,13 +94,13 @@ export const schema = new Schema({
         ['span', { class: 'pm-lt' }, 0]],
       parseDOM: [{
         tag: 'div.pm-li', contentElement: 'span.pm-lt',
-        getAttrs: (dom) => ({ ...readId(dom), kind: ['bullet', 'number', 'check'].find((k) => dom.classList.contains(`pm-${k}`)) ?? 'bullet', checked: dom.getAttribute('data-checked') === 'true' }),
+        getAttrs: (dom) => ({ ...readLaid(dom), kind: ['bullet', 'number', 'check'].find((k) => dom.classList.contains(`pm-${k}`)) ?? 'bullet', checked: dom.getAttribute('data-checked') === 'true' }),
       }],
     },
     quote: {
-      group: 'block', content: 'inline*', attrs: { ...id }, defining: true,
+      group: 'block', content: 'inline*', attrs: { ...id, ...lay }, defining: true,
       toDOM: (n) => ['blockquote', blockAttr(n), ['p', 0]],
-      parseDOM: [{ tag: 'blockquote', contentElement: 'p', getAttrs: readId }],
+      parseDOM: [{ tag: 'blockquote', contentElement: 'p', getAttrs: readLaid }],
     },
     code_block: {
       group: 'block', content: 'text*', marks: 'struck added', code: true, attrs: { ...id }, defining: true,

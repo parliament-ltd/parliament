@@ -41,7 +41,7 @@ import { planReflect, reflectTalkPreview } from '../lib/reflection'
 import { LAB, boardOffered } from '../lib/release'
 import { LETTERS, letterOf, newestLetter } from './letters'
 import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate, planLocal } from '../lib/lab'
-import { planAlarm, planLookUp, planCalc } from '../lib/helperVerbs'
+import { planAlarm, planLookUp, planCalc, planAlign, planIndent } from '../lib/helperVerbs'
 import { planNewPlan, planNewTask, planNewSub, planNewStep, planTick, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -72,7 +72,7 @@ const BRINGS = Object.freeze(['records', 'collection', 'room', 'library', 'plan'
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['alarm', 'dictionary', 'thesaurus', 'calc', 'name', 'tick', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'answers', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
+const ACTS = Object.freeze(['align', 'indent', 'alarm', 'dictionary', 'thesaurus', 'calc', 'name', 'tick', 'tour', 'letter', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'comment', 'prompt', 'answers', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'quote', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange', 'install'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -1225,6 +1225,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       dictionary: (a1, s1) => planLookUp(s1, 'meanings'),
       thesaurus: (a1, s1) => planLookUp(s1, 'same'),
       calc: (a1, s1, sc) => planCalc(s1, sc),
+      // How lines sit (C304).
+      align: (a1, s1) => planAlign(s1),
+      indent: (a1, s1) => planIndent(s1),
       // run: and stop: (stage 10, piece 3; C200).
       run: (a1, s1, sc) => planRun(s1, sc),
       stop: (a1, s1, sc) => planStop(s1, sc, a1.addressed),

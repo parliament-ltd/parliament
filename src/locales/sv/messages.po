@@ -2367,6 +2367,15 @@ msgid "enter.alarmSetDone"
 msgstr "{every, select, yes {Pausen är planerad: den första klockan {at}, om du arbetar till dess} other {Alarmet är ställt och ringer {at}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.alignGo"
+msgstr "{align, select, center {Enter centrerar de markerade raderna, eller raden med markören, i texten du arbetade i senast} right {Enter lägger de markerade raderna, eller raden med markören, till höger} other {Enter lägger de markerade raderna, eller raden med markören, tillbaka till vänster}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alignHow"
+msgstr "align: tar center, right eller left: align:center"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} körs på en egen rad, så att det är tydligt vad som försvinner för gott"
 
@@ -3875,6 +3884,14 @@ msgid "enter.includeSome"
 msgstr "{count, plural, other {Enter tar med # svar, från {sources}, i din nästa prompt}}"
 
 #. js-lingui-explicit-id
+msgid "enter.indentGo"
+msgstr "Enter flyttar de markerade raderna, eller raden med markören, ett steg in"
+
+#. js-lingui-explicit-id
+msgid "enter.indentOffGo"
+msgstr "Enter flyttar de markerade raderna, eller raden med markören, ett steg ut"
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr "Ingen samling heter {name}"
 
@@ -4061,6 +4078,18 @@ msgstr "Enter visar sidan på {language}, och dina svar och sökningar följer m
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} finns inte än"
+
+#. js-lingui-explicit-id
+msgid "enter.layDone"
+msgstr "{count, plural, =0 {Inget flyttades: raderna står redan där} one {En rad flyttades. Ctrl+Z i texten ångrar det} other {# rader flyttades. Ctrl+Z i texten ångrar det}}"
+
+#. js-lingui-explicit-id
+msgid "enter.layNoText"
+msgstr "Sätt markören i en text först, eller markera dess rader"
+
+#. js-lingui-explicit-id
+msgid "enter.layNotNow"
+msgstr "Den texten kan inte ändras nu"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
@@ -10747,6 +10776,10 @@ msgid "verb.alarm"
 msgstr "Ställ ett alarm, eller en paus efter en viss tids arbete, skjut upp ett, ta bort ett, eller visa dem"
 
 #. js-lingui-explicit-id
+msgid "verb.align"
+msgstr "Lägg raderna i texten mitt på, till höger eller tillbaka till vänster"
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "Låt en prompt i texten besvaras i själva svaret, eller i texten efter textavsnittet"
 
@@ -10908,6 +10941,11 @@ msgstr "Visa vad som finns i en samling, eller skapades i ett rum"
 #. js-lingui-explicit-id
 msgid "verb.include"
 msgstr "Ta med ett svar från en källa i din nästa prompt, skickat som material märkt som data"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "verb.indent"
+msgstr "Flytta raderna i texten ett steg in, eller ut med indent:off"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"

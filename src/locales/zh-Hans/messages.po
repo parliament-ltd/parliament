@@ -2367,6 +2367,15 @@ msgid "enter.alarmSetDone"
 msgstr "{every, select, yes {休息提醒已设定：如果你一直工作，第一次会在 {at} 响起} other {闹钟已设定，将在 {at} 响起}}"
 
 #. js-lingui-explicit-id
+msgid "enter.alignGo"
+msgstr "{align, select, center {按 Enter 将最近所用文本中选中的行（或光标所在行）居中} right {按 Enter 将选中的行（或光标所在行）靠右} other {按 Enter 将选中的行（或光标所在行）恢复靠左}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.alignHow"
+msgstr "align: 后接 center、right 或 left：align:center"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} 需单独占一行运行，这样哪些内容会被永久删除一目了然"
 
@@ -3875,6 +3884,14 @@ msgid "enter.includeSome"
 msgstr "{count, plural, other {按 Enter 将来自 {sources} 的 # 个回答带入你的下一条提示词}}"
 
 #. js-lingui-explicit-id
+msgid "enter.indentGo"
+msgstr "按 Enter 将选中的行（或光标所在行）缩进一级"
+
+#. js-lingui-explicit-id
+msgid "enter.indentOffGo"
+msgstr "按 Enter 将选中的行（或光标所在行）减少一级缩进"
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr "没有名为“{name}”的合集"
 
@@ -4061,6 +4078,18 @@ msgstr "按 Enter 将页面切换为{language}，回复和搜索也随之使用�
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} 尚未实现"
+
+#. js-lingui-explicit-id
+msgid "enter.layDone"
+msgstr "{count, plural, =0 {没有移动：这些行已在该位置} other {已移动 # 行。在文本中按 Ctrl+Z 可撤销}}"
+
+#. js-lingui-explicit-id
+msgid "enter.layNoText"
+msgstr "请先把光标放进一段文本，或选中其中的行"
+
+#. js-lingui-explicit-id
+msgid "enter.layNotNow"
+msgstr "这段文本现在不能更改"
 
 #. js-lingui-explicit-id
 msgid "enter.layoutGo"
@@ -10747,6 +10776,10 @@ msgid "verb.alarm"
 msgstr "设定闹钟，或工作一段时间后的休息提醒；也可推迟、移除闹钟，或显示全部闹钟"
 
 #. js-lingui-explicit-id
+msgid "verb.align"
+msgstr "将手头的行居中、靠右或恢复靠左"
+
+#. js-lingui-explicit-id
 msgid "verb.answers"
 msgstr "让正文中的提示词在回复本身中回答，或在正文中原文之后回答"
 
@@ -10908,6 +10941,11 @@ msgstr "显示合集中的内容，或在某个房间中创建的内容"
 #. js-lingui-explicit-id
 msgid "verb.include"
 msgstr "将来源的回答带入你的下一条提示词，作为标注为数据的材料发送"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "verb.indent"
+msgstr "将手头的行缩进一级，用 indent:off 减少缩进"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"
