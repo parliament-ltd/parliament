@@ -9,157 +9,157 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "alarms.add"
-msgstr ""
+msgstr "アラームを追加"
 
 #. js-lingui-explicit-id
 msgid "alarms.addPlus"
-msgstr ""
+msgstr "アラームを追加"
 
 #. js-lingui-explicit-id
 msgid "alarms.atHint"
-msgstr ""
+msgstr "15:30 や 3:30pm のような時刻"
 
 #. js-lingui-explicit-id
 msgid "alarms.bandAt"
-msgstr ""
+msgstr "{at}になりました"
 
 #. js-lingui-explicit-id
 msgid "alarms.bandBreak"
-msgstr ""
+msgstr "{at}、休憩の時間です"
 
 #. js-lingui-explicit-id
 msgid "alarms.bandIn"
-msgstr ""
+msgstr "{at}、{unit, select, s {{amount}秒が経ちました} other {{amount, plural, other {#分が経ちました}}}}"
 
 #. js-lingui-explicit-id
 msgid "alarms.everyHow"
-msgstr ""
+msgstr "ここで作業した時間で数えます：10分以上離れると、休憩を取ったものとして最初から数え直します"
 
 #. js-lingui-explicit-id
 msgid "alarms.factsAt"
-msgstr ""
+msgstr "{at}に鳴ります"
 
 #. js-lingui-explicit-id
 msgid "alarms.factsEvery"
-msgstr ""
+msgstr "ここでの作業{minutes, plural, other {#分}}ごと"
 
 #. js-lingui-explicit-id
 msgid "alarms.factsIn"
-msgstr ""
+msgstr "{unit, select, s {{amount}秒} other {{amount, plural, other {#分}}}}のタイマー・{at}に鳴ります"
 
 #. js-lingui-explicit-id
 msgid "alarms.fieldAt"
-msgstr ""
+msgstr "時刻"
 
 #. js-lingui-explicit-id
 msgid "alarms.fieldEvery"
-msgstr ""
+msgstr "間隔"
 
 #. js-lingui-explicit-id
 msgid "alarms.fieldIn"
-msgstr ""
+msgstr "あと"
 
 #. js-lingui-explicit-id
 msgid "alarms.fieldKind"
-msgstr ""
+msgstr "種類"
 
 #. js-lingui-explicit-id
 msgid "alarms.fieldName"
-msgstr ""
+msgstr "名前"
 
 #. js-lingui-explicit-id
 msgid "alarms.fiveMore"
-msgstr ""
+msgstr "あと5分"
 
 #. Rings at a time of day
 #. js-lingui-explicit-id
 msgid "alarms.kindAt"
-msgstr ""
+msgstr "時刻"
 
 #. A break after so much work
 #. js-lingui-explicit-id
 msgid "alarms.kindEvery"
-msgstr ""
+msgstr "休憩"
 
 #. A timer: rings in so long
 #. js-lingui-explicit-id
 msgid "alarms.kindIn"
-msgstr ""
+msgstr "タイマー"
 
 #. js-lingui-explicit-id
 msgid "alarms.minutesHint"
-msgstr ""
+msgstr "分、または 1h30 や 90s のような長さ"
 
 #. js-lingui-explicit-id
 msgid "alarms.namePlaceholder"
-msgstr ""
+msgstr "任意"
 
 #. js-lingui-explicit-id
 msgid "alarms.none"
-msgstr ""
+msgstr "アラームはありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "alarms.noneHow"
-msgstr ""
+msgstr "＋で追加するか、バーに alarm:25m tea と入力します"
 
 #. js-lingui-explicit-id
 msgid "alarms.noticeAt"
-msgstr ""
+msgstr "設定した時刻になりました"
 
 #. js-lingui-explicit-id
 msgid "alarms.noticeBreak"
-msgstr ""
+msgstr "休憩の時間です"
 
 #. js-lingui-explicit-id
 msgid "alarms.noticeIn"
-msgstr ""
+msgstr "{unit, select, s {{amount}秒が経ちました} other {{amount, plural, other {#分が経ちました}}}}"
 
 #. js-lingui-explicit-id
 msgid "alarms.off"
-msgstr ""
+msgstr "オフ"
 
 #. js-lingui-explicit-id
 msgid "alarms.onlyOpen"
-msgstr ""
+msgstr "アラームが鳴るのは、Parliamentをタブで開いている間だけです"
 
 #. js-lingui-explicit-id
 msgid "alarms.rang"
-msgstr ""
+msgstr "鳴りました"
 
 #. js-lingui-explicit-id
 msgid "alarms.rangAt"
-msgstr ""
+msgstr "{at}に鳴りました"
 
 #. js-lingui-explicit-id
 msgid "alarms.rangMissed"
-msgstr ""
+msgstr "{at}に鳴りました（Parliamentを閉じていた間）"
 
 #. js-lingui-explicit-id
 msgid "alarms.stop"
-msgstr ""
+msgstr "止める"
 
 #. The strip’s label, written as the boards are
 #. js-lingui-explicit-id
 msgid "alarms.strip"
-msgstr ""
+msgstr "Alarms:"
 
 #. js-lingui-explicit-id
 msgid "alarms.switch"
-msgstr ""
+msgstr "「{name}」のオンとオフを切り替える"
 
 #. The tab’s title while an alarm rings out of sight
 #. js-lingui-explicit-id
 msgid "alarms.tabTitle"
-msgstr ""
+msgstr "{name}・Parliament"
 
 #. js-lingui-explicit-id
 msgid "alarms.takeOff"
-msgstr ""
+msgstr "アラーム{n}をボードから外す"
 
 #. js-lingui-explicit-id
 msgid "alarms.unnamed"
-msgstr ""
+msgstr "アラーム"
 
 #. js-lingui-explicit-id
 msgid "almanac.backupAtRisk"
@@ -868,7 +868,7 @@ msgstr "切り詰める長さ"
 #. Timers, times of day and breaks, set from the bar (C303 (a))
 #. js-lingui-explicit-id
 msgid "board.alarms"
-msgstr ""
+msgstr "アラーム"
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -898,7 +898,7 @@ msgstr "コマンドメニュー"
 #. What a word means, and the words that mean the same (C303 (b))
 #. js-lingui-explicit-id
 msgid "board.dictionary"
-msgstr ""
+msgstr "辞書"
 
 #. Prompts and to-dos set out in branches, to run and to tick (C131; C301 (g))
 #. js-lingui-explicit-id
@@ -1215,7 +1215,7 @@ msgstr "先に言葉を選択してから{keys}を押すと、そこにコメン
 
 #. js-lingui-explicit-id
 msgid "chat.commentPlaceholder"
-msgstr "自分と、共有する相手のためのもの。モデルには送信されません"
+msgstr "モデルと共有されることはありません"
 
 #. js-lingui-explicit-id
 msgid "chat.commentTitle"
@@ -1701,15 +1701,12 @@ msgstr "青"
 
 #. js-lingui-explicit-id
 msgid "collection.legendBlueIs"
-msgstr "自分が追加"
+msgstr "追加"
 
+#. Drawn as a model’s answer is: green, dotted (C304)
 #. js-lingui-explicit-id
 msgid "collection.legendGreen"
-msgstr "緑の点線"
-
-#. js-lingui-explicit-id
-msgid "collection.legendGreenIs"
-msgstr "回答"
+msgstr "モデルの回答"
 
 #. js-lingui-explicit-id
 msgid "collection.legendRust"
@@ -1725,11 +1722,11 @@ msgstr "取り消し線"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
-msgstr "自分が削除"
+msgstr "削除"
 
 #. js-lingui-explicit-id
 msgid "collection.legendSweepIs"
-msgstr "回答または照合"
+msgstr "または照合"
 
 #. js-lingui-explicit-id
 msgid "collection.letGo"
@@ -2114,77 +2111,77 @@ msgstr "{count, plural, other {サブタスク#件}}"
 
 #. js-lingui-explicit-id
 msgid "dictionary.adjective"
-msgstr ""
+msgstr "形容詞"
 
 #. js-lingui-explicit-id
 msgid "dictionary.adverb"
-msgstr ""
+msgstr "副詞"
 
 #. js-lingui-explicit-id
 msgid "dictionary.didYouMean"
-msgstr ""
+msgstr "もしかして"
 
 #. js-lingui-explicit-id
 msgid "dictionary.fromText"
-msgstr ""
+msgstr "テキストから：クリックした言葉が、編集として「{word}」と置き換わります"
 
 #. js-lingui-explicit-id
 msgid "dictionary.lookHelp"
-msgstr ""
+msgstr "「{word}」を調べる"
 
 #. js-lingui-explicit-id
 msgid "dictionary.looking"
-msgstr ""
+msgstr "「{word}」を調べています"
 
 #. js-lingui-explicit-id
 msgid "dictionary.meanings"
-msgstr ""
+msgstr "意味"
 
 #. js-lingui-explicit-id
 msgid "dictionary.missing"
-msgstr ""
+msgstr "このParliamentには単語リストが含まれていません"
 
 #. js-lingui-explicit-id
 msgid "dictionary.none"
-msgstr ""
+msgstr "調べた言葉はまだありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "dictionary.noneHow"
-msgstr ""
+msgstr "バーに dictionary:reluctant と入力すると、言葉を調べられます。Ctrl+Alt+Lで、テキストで選択した言葉を調べます"
 
 #. js-lingui-explicit-id
 msgid "dictionary.noSame"
-msgstr ""
+msgstr "ここには、同じ意味のほかの言葉はありません"
 
 #. js-lingui-explicit-id
 msgid "dictionary.notFound"
-msgstr ""
+msgstr "単語リストに「{word}」はありません"
 
 #. js-lingui-explicit-id
 msgid "dictionary.noun"
-msgstr ""
+msgstr "名詞"
 
 #. js-lingui-explicit-id
 msgid "dictionary.opposite"
-msgstr ""
+msgstr "反対の意味"
 
 #. js-lingui-explicit-id
 msgid "dictionary.putHelp"
-msgstr ""
+msgstr "「{was}」を「{word}」に置き換える"
 
 #. js-lingui-explicit-id
 msgid "dictionary.same"
-msgstr ""
+msgstr "同じ意味"
 
 #. The word lists’ name and licence, as they give them
 #. js-lingui-explicit-id
 msgid "dictionary.source"
-msgstr ""
+msgstr "{source} ({licence})の単語を、Parliamentに同梱しています。今のところ英語のみです。何も送信されません。"
 
 #. js-lingui-explicit-id
 msgid "dictionary.verb"
-msgstr ""
+msgstr "動詞"
 
 #. js-lingui-explicit-id
 msgid "enter.addAllThere"
@@ -2293,81 +2290,81 @@ msgstr "Enterで、{address}の隣に{next}を作り、「{prompt}」をもう�
 
 #. js-lingui-explicit-id
 msgid "enter.alarmAt"
-msgstr ""
+msgstr "Enterで、{tomorrow, select, yes {明日} other {今日}}の{at}に{named, select, yes {アラーム「{name}」を設定します} other {アラームを設定します}}（あと{hours, plural, =0 {} other {#時間}}{minutes, plural, other {#分}}）"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmEvery"
-msgstr ""
+msgstr "Enterで、ここでの作業{minutes, plural, other {#分}}ごとに{named, select, yes {「{name}」とお知らせします} other {休憩を取るようお知らせします}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.alarmEveryHow"
-msgstr ""
+msgstr "every には1分以上の長さを指定します：alarm:every 50m"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.alarmHow"
-msgstr ""
+msgstr "alarm: には長さ、時刻、または every を指定します：alarm:25m tea、alarm:15:30 lunch、alarm:every 50m"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmIn"
-msgstr ""
+msgstr "Enterで、{at}に鳴る{unit, select, s {{amount}秒} other {{amount, plural, other {#分}}}}のタイマー{named, select, yes {「{name}」} other {}}を設定します"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmLater"
-msgstr ""
+msgstr "Enterで、{named, select, yes {アラーム{n}「{name}」} other {アラーム{n}}}を{unit, select, s {{amount}秒} other {{amount, plural, other {#分}}}}遅らせて、{at}に鳴らします"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmMany"
-msgstr ""
+msgstr "アラームは{most}件までです。先に1件外してください"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.alarmNone"
-msgstr ""
+msgstr "ボードにアラーム{n}はありません。alarm: で一覧を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmNoneAll"
-msgstr ""
+msgstr "外せるアラームはありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.alarmOff"
-msgstr ""
+msgstr "{named, select, yes {Enterで、アラーム{n}「{name}」をボードから外します} other {Enterで、アラーム{n}をボードから外します}}。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.alarmOffAll"
-msgstr ""
+msgstr "{count, plural, =1 {Enter、もう一度Enterで、ボードにある1件のアラームを外します} other {Enter、もう一度Enterで、ボードにあるアラーム#件をすべて外します}}。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.alarmOffDone"
-msgstr ""
+msgstr "{count, plural, other {アラーム#件をボードから外しました}}。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmOpen"
-msgstr ""
+msgstr "Enterで{board}を開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmQuiet"
-msgstr ""
+msgstr "Enterで、アラーム音をオフにします。鳴ったときは、これまでどおりバナーとタブのタイトルに表示されます"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmQuietDone"
-msgstr ""
+msgstr "アラーム音はオフです"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmQuietOff"
-msgstr ""
+msgstr "Enterで、アラーム音をオンに戻します"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmQuietOffDone"
-msgstr ""
+msgstr "アラーム音はオンです"
 
 #. js-lingui-explicit-id
 msgid "enter.alarmSetDone"
-msgstr ""
+msgstr "{every, select, yes {休憩を設定しました：それまで作業を続ければ、最初のお知らせは{at}です} other {アラームを設定しました。{at}に鳴ります}}"
 
 #. js-lingui-explicit-id
 msgid "enter.aloneErase"
@@ -2756,38 +2753,38 @@ msgstr "{word} は{names}のいずれかを指します。{example} のように
 #. The answer to a sum, rounded
 #. js-lingui-explicit-id
 msgid "enter.calcAbout"
-msgstr ""
+msgstr "≈ {result}（丸めた値）"
 
 #. js-lingui-explicit-id
 msgid "enter.calcBracket"
-msgstr ""
+msgstr "閉じていない括弧か、対応する開き括弧のない閉じ括弧があります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calcChar"
-msgstr ""
+msgstr "calc: で使えるのは、数字と + − × ÷ ^ %、括弧だけです"
 
 #. js-lingui-explicit-id
 msgid "enter.calcDivide"
-msgstr ""
+msgstr "0で割ることはできません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.calcHow"
-msgstr ""
+msgstr "calc: には計算式を指定します：calc:48000*2/12"
 
 #. The answer to a sum written in the bar
 #. js-lingui-explicit-id
 msgid "enter.calcIs"
-msgstr ""
+msgstr "= {result}"
 
 #. js-lingui-explicit-id
 msgid "enter.calcPower"
-msgstr ""
+msgstr "累乗の指数は、100までの整数に限られます"
 
 #. js-lingui-explicit-id
 msgid "enter.calcSyntax"
-msgstr ""
+msgstr "その計算式は読み取れません"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -4145,33 +4142,33 @@ msgstr "local: には on か off を指定します"
 
 #. js-lingui-explicit-id
 msgid "enter.lookUp"
-msgstr ""
+msgstr "Enterで、{board}ボードで「{word}」を調べます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.lookUpHow"
-msgstr ""
+msgstr "dictionary: には言葉を指定します。何も付けなければ、テキストで選択した言葉を調べます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.lookUpNothing"
-msgstr ""
+msgstr "先にテキストで言葉を選択してください。Ctrl+Alt+Lか、dictionary: だけで調べられます"
 
 #. js-lingui-explicit-id
 msgid "enter.lookUpSame"
-msgstr ""
+msgstr "Enterで、「{word}」と同じ意味の言葉を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.lookUpSameSelection"
-msgstr ""
+msgstr "Enterで、テキストで選択した言葉と同じ意味の言葉を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.lookUpSelection"
-msgstr ""
+msgstr "Enterで、テキストで選択した言葉を調べます"
 
 #. js-lingui-explicit-id
 msgid "enter.lookUpTooLong"
-msgstr ""
+msgstr "調べるときは、1語か数語だけを選択してください"
 
 #. js-lingui-explicit-id
 msgid "enter.manyFailed"
@@ -5598,15 +5595,15 @@ msgstr "{verb} は {now} に変わりました。Enterで入力欄に書き込�
 
 #. js-lingui-explicit-id
 msgid "enter.replacedWord"
-msgstr ""
+msgstr "編集として「{word}」に置き換えました"
 
 #. js-lingui-explicit-id
 msgid "enter.replaceGone"
-msgstr ""
+msgstr "その後テキストが変わったため、言葉は置き換えていません。もう一度選択してください"
 
 #. js-lingui-explicit-id
 msgid "enter.replaceNotNow"
-msgstr ""
+msgstr "そのテキストは今は変更できません"
 
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
@@ -6411,7 +6408,7 @@ msgstr "要約を書いています"
 
 #. js-lingui-explicit-id
 msgid "enter.sumSelected"
-msgstr ""
+msgstr "{count}個の数値を選択中：合計{sum}・平均{average}"
 
 #. js-lingui-explicit-id
 msgid "enter.swapBoards"
@@ -10747,7 +10744,7 @@ msgstr "編集したプロンプトから、新しいブランチとしてもう
 
 #. js-lingui-explicit-id
 msgid "verb.alarm"
-msgstr ""
+msgstr "アラームや、一定時間作業したあとの休憩を設定する。遅らせたり、外したり、一覧を表示したりもできます"
 
 #. js-lingui-explicit-id
 msgid "verb.answers"
@@ -10789,7 +10786,7 @@ msgstr "このチャットで答えるものを選ぶ：モデル、またはト
 
 #. js-lingui-explicit-id
 msgid "verb.calc"
-msgstr ""
+msgstr "計算して、バーの下の行に答えを表示する"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10846,7 +10843,7 @@ msgstr "ルームを何向けに作るかを指定する"
 
 #. js-lingui-explicit-id
 msgid "verb.dictionary"
-msgstr ""
+msgstr "言葉の意味と、同じ意味の言葉を調べる。何も付けなければ、テキストで選択した言葉を調べます"
 
 #. js-lingui-explicit-id
 msgid "verb.diff"
@@ -11121,7 +11118,7 @@ msgstr "ルームの色と書体を選ぶ"
 
 #. js-lingui-explicit-id
 msgid "verb.thesaurus"
-msgstr ""
+msgstr "ある言葉と同じ意味の言葉を、その意味と並べて表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.thinking"

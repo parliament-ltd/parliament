@@ -426,3 +426,13 @@ The 658 lines added since 24 October (the Lab, editing in place, asks, Ripple an
 - **tasks.noneHow:** the example title is in Japanese (new:task "助成金の申請"), following the 23 October ruling. "The plus" is written as ＋ (＋で追加するか).
 - **tasks.ifYouLike:** 任意 (optional), the usual placeholder for a field you can leave empty. 必要なら would be closer to "if you like".
 - **Not in this batch:** enter.promptBranchSourceWaits still says リストで{address}のチェックを外す. "The list" there looks like the picker list, not a plan, so I left it alone.
+
+## Alarms, the Dictionary and sums, drafted 16 November 2026 (C303, C304)
+
+- **alarms.strip:** kept as Alarms:, since the strip's other labels stay English in Japanese (Focus: オフ, Markup, Import:, Tour:). アラーム： would match the board's name, if the strip should read in Japanese.
+- **alarms.kindIn, kindAt, kindEvery:** タイマー, 時刻, 休憩, naming the kinds, since the English prepositions have no one-word Japanese. The field beside them is あと, 時刻, 間隔, so it reads あと 25 分 and 間隔 50 分. Worth seeing on screen.
+- **alarms.noneHow, enter.alarmHow:** alarm:25m tea and alarm:15:30 lunch kept as typed, as asked. The 23 October ruling translates quoted names only, and these are not quoted; お茶 and 昼食 would read better if the ruling should cover them.
+- **"your text"** (enter.lookUpSelection, enter.lookUpSameSelection, enter.lookUpHow, verb.dictionary, dictionary.fromText): テキスト, not あなたのテキスト, because a word can be selected in a reply as well as in your own text (C303 (b)).
+- **chat.commentPlaceholder:** モデルと共有されることはありません follows the new "shared". The old line said モデルには送信されません, as chat.commentTitle still says 送信されることはありません; that is the shorter choice if the two should match.
+- **enter.calcAbout:** ≈ {result}（丸めた値）. I did not check how the sum is rounded; 四捨五入 would be more exact if it rounds half up to a fixed place.
+- **collection.legendStruckIs, legendBlueIs:** 削除 and 追加, the old lines without 自分が (挿入 is the alternative to 追加, as word processors say it). 削除 is also the delete: word, which should not confuse here, beside the struck sample.

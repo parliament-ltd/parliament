@@ -410,3 +410,16 @@ Each: id, the English, the draft, and why I was unsure.
 - enter.runLines: "# commands of yours" is "# av dina kommandon". "for your Enter" is "på att du trycker på Enter" here, in enter.taskWaitsLine and in tasks.commandWaits, as leader.prompt has it.
 - enter.runTogether: "Alla samtidigt: varje prompt går till en egen chatt, sedan kommandona" keeps the English's clipped ending.
 - tasks.noneHow: "the plus" is "pluset", as enter.colsNow ("ett plus"); the example is new:task "bidragsansökan", translated as other free-text examples are, with straight quotes since it is typed.
+
+## Alarms, Dictionary and sums, drafted 16 November 2026 (C303)
+
+- alarms.noneHow, enter.alarmHow: the examples stay English as the brief asked (alarm:25m tea), where the conventions above translate free-text examples (name:"Tornugglor"); "tea" would be "te". dictionary:reluctant stays English, since the word lists are English.
+- alarms.strip: "Alarmen:" matches the board's name. "Alarm:" is shorter and what a phone clock would show.
+- alarms.kindIn, kindAt, kindEvery: nouns, "Timer", "Klockslag", "Paus", where the English repeats "In", "At", "Every" from the fields. "Om" alone on a button reads as "About". The fields keep "Om", "Klockan", "Varje".
+- alarms.everyHow, alarms.factsEvery, enter.alarmEvery: "of work here" is "som du arbetar här". "varje 50 minuter" is everyday Swedish; the careful "var 50:e minut" cannot take its number from #. everyHow says what "as you took your break" means: "är du borta tio minuter eller mer börjar det om, för då har du tagit din paus".
+- enter.alarmSetDone: "Pausen är planerad", since "inställd" also means cancelled.
+- enter.alarmOffAll, enter.alarmOffDone: "undo: tar tillbaka dem" for one alarm too, as the English says "them" in both. A plural would fix it, but adds ICU the English does not have.
+- verb.calc, enter.calcHow, enter.calcSyntax: "sum" is "uträkning", since "summa" is only the total of an addition; enter.sumSelected keeps "summa" for the total.
+- enter.calcPower: "exponent", plainer than "potens", which names the whole expression.
+- collection.legendGreen: "modellsvar", one word and no article, as the English; with legendSweepIs it reads "modellsvar eller en granskning".
+- dictionary.opposite: "Motsatsord", which covers one or several; "Motsats" is closer to the English.

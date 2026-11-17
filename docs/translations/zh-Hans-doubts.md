@@ -456,3 +456,18 @@ Also redrafted: **verb.markup**, from 显示带标注的回复，或不带标注
 - tasks.fieldWords: Words (the text of a sub-task of your own) is 内容; 文字 was the alternative.
 - tasks.doneOf: "{done} of {count} done" is 已完成 {done} 项，共 {count} 项, as run 1 of 2 is 第 1 次运行，共 2 次. 已完成 {done}/{count} would be shorter in the margin.
 - tasks.noneHow: the example task name inside the ASCII quotes is 基金申请 ("grant application"), translated as the person's own words.
+
+## Alarms, the Dictionary and sums, drafted 16 November 2026 (C303)
+
+- alarms.noneHow, enter.alarmHow: the example names tea and lunch stay English, as the brief asked for the commands verbatim. They are the person's own words and the code takes any text as a name, so by the 23 October ruling they could be alarm:25m 茶 and alarm:15:30 午饭. dictionary:reluctant has to stay: the word lists are English.
+- alarms.strip: 闹钟：, written as a board name, as the comment asks. On the same strip Focus: off and Markup stay English, because they are command words; if this label should read as a command word too, it would stay Alarms:.
+- alarms.kindIn, alarms.kindAt, alarms.kindEvery: In, At and Every are prepositions that run on into the field; Chinese names the kinds instead (倒计时, 定时, 休息). 定时 can also mean "on a timer"; 时刻 would be plainer for At.
+- alarms.fieldEvery, alarms.everyHow: Chinese puts "of work here" before the number, so the field reads 每工作 [50] 分钟 and the line under it starts afresh: 指在这里工作的时间：….
+- alarms.bandIn, alarms.bandBreak: the ring time comes first ({at}，该休息了), as Chinese puts the time before the event. 现在是 {at} for bandAt, as the English says.
+- alarms.fiveMore: 再等 5 分钟 ("wait 5 more minutes"). 推迟 5 分钟 would be plainer; 稍后提醒, the phone snooze word, loses the 5.
+- enter.alarmAt: {at} moved out of the named select so the day comes before the time (今天 15:30); "in 1 hour 20 minutes" is 即 1 小时 20 分钟后.
+- enter.sumSelected: 求和 and 平均值, as spreadsheets label the status bar; 合计 and 平均 would read more as prose.
+- dictionary.didYouMean: 你是不是要找, as search engines ask it, with no colon, since the words follow as buttons.
+- dictionary.source: ({licence}) keeps half-width brackets around the Latin name, as asked; full-width （） would match the rest of the line.
+- collection.legendStruckIs, collection.legendBlueIs, collection.legendGreen, collection.legendSweepIs: the legend reads 删除线 删去的 · 蓝色 添加的 · 模型的回答 或扫查. The space before 或扫查 comes from the code joining two entries. 已删去 and 已添加 would read more as labels.
+- chat.commentPlaceholder: 分享给 for "shared with"; 发送给 ("sent to"), as chat.commentTitle has 绝不会被发送, was the other choice.

@@ -404,3 +404,14 @@ The 23 lines above (doubt 41), enter.settleSugDone as a select, verb.markup, and
 - **tasks.fieldWords, tasks.fieldSearch, tasks.keep**: "Teksti" (not "Sanat", which reads like lyrics), "Hakusanat", and "Tallenna" for Keep (it saves the changed fields).
 - **tasks.add, tasks.addPlus**: both "Lisää tehtävä" (and both sub-task ones "Lisää alitehtävä"); Finnish has no article to tell the button from the plus.
 - **tasks.noneHow**: the example name is translated, new:task "apurahahakemus", as arrange:save examples are.
+
+## Alarms, Dictionary and sums, drafted 16 November 2026 (C303)
+
+- **board.alarms**: "Hälytykset". It can read as an alert (a fire alarm), though Windows' Finnish clock app uses it. "Muistutukset" (reminders) would suit the breaks better but not the timers.
+- **alarms.kindIn, kindAt, kindEvery, fieldIn, fieldAt, fieldEvery**: the English In, At, Every (kind and field label alike) became nouns: kinds Ajastin, Kellonaika, Tauko; fields Kesto, Kello, Työjakso. The row then reads "Työjakso 50 minuuttia … täällä tehtyä työtä: …", which only works while alarms.everyHow sits right under the field, as it does now.
+- **alarms.atHint, alarms.minutesHint**: "esimerkiksi 15.30" (the 3:30pm example dropped: Finnish uses the 24-hour clock) and "1 h 30 min tai 90 s". Both parse in the board's field (alarms.js drops spaces and takes 15.30), but if the board ever stops dropping spaces, "1 h 30 min" will fail.
+- **enter.alarmHow, alarms.noneHow**: the names in the examples stay English (alarm:25m tea, alarm:15:30 lunch), as asked. Earlier batches translated names inside commands (arrange:save "aamu", new:task "apurahahakemus"); "tee" and "lounas" would follow that.
+- **enter.alarmEvery**: "Enter reminds you, “{name}”," became "Enter muistuttaa sinua tauosta ”{name}”" (reminds you of the break "{name}"), since Finnish cannot hang the name between commas after "muistuttaa".
+- **enter.alarmOffAll, enter.alarmOffDone**: "undo: tuo ne takaisin" (them) also in the one-alarm branch, as the English has "them" outside the plural.
+- **dictionary.fromText, putHelp**: "sanan ”{word}” tilalle" assumes one word; a selection of a few words would still read "sanan".
+- **chat.commentPlaceholder**: "Ei koskaan jaeta mallille". The old line said "lähetetä" (sent); the English moved from sent to shared, so the verb moved too.

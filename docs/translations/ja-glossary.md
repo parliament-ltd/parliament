@@ -190,3 +190,16 @@ The 658 lines added since 24 October, drafted for the Japanese beta.
 - The strip, 16 November: "Markup ▾", "Focus: オフ" and "Focus: オン", "Import:" and "Tour:" capitalised as the boards are (Stefan: "capitalize the 'f' in focus and 'm' in markup"); the command words stay English. ボードを隠す and ボードを表示 on the birds, which fold the boards away. 空のルーム for focus on an empty room, a page to write in.
 - Your own text (C301 (f)), written in a room and never sent by itself: あなたのテキスト, not 下書き; the empty room says ここに書くか、バーにプロンプトを入力してください。 A reply that was only answers in the text: {name}がテキスト内のプロンプト#件に、それぞれ書かれた場所で答えました.
 - Tasks (C301 (g), 16 November; Stefan: "Yes, build tasks"): the Plan board is タスク; a to-do of yours 自分のやること; tick: チェックを付ける, ticked チェック済み, untick チェックを外す. A branch stays ブランチ; the commands stay English. v4 (16 November, "Yes, build it"): a plan, the numbered thing, is now タスク (タスク{num}, counted タスク#件), no longer リスト; a step is サブタスク (サブタスク{index}, {address}のサブタスク{index}, counted サブタスク#件, as ブランチ#件 beside it, where the old lines had #タスク). The kinds of a sub-task: None なし, Prompt プロンプト, Search 検索, Command コマンド (the small labels the same). The flow: Flow 進め方 (not 順序, since all at once has no order), All at once すべて同時に (as picker.together), One by one 1つずつ; the lower-case forms are the same. As the task (a sub-task's model) タスクと同じ, as ブランチと同じ; {done} of {count} done {done}/{count}完了.
+
+## Alarms, the Dictionary and sums (16 November 2026, C303; the legend and comment box, C304)
+
+- Alarms (the board) → アラーム; Dictionary (the board) → 辞書, plain nouns as the other boards are (Apple's Clock and Dictionary say アラーム and 辞書). On the {board} board → {board}ボード, as before.
+- an alarm → アラーム, counted 件 (アラーム#件); alarm {n} → アラーム{n}, its name after it in 「」 (アラーム2「tea」). The strip's "Alarms:" stays English, as Focus: and Markup do there.
+- the three kinds: In (a timer) → タイマー, At (a time of day) → 時刻, Every (a break) → 休憩; the field labels: In → あと (あと 25 分), At → 時刻, Every → 間隔. A length → 長さ.
+- of work here → ここでの作業 (ここでの作業50分ごと); a break → 休憩; time for a break → 休憩の時間です.
+- ring, rang → 鳴る, 鳴りました; is up (a timer) → 経ちました; push later → 遅らせる; 5 more minutes → あと5分; stop → 止める; take off the board → ボードから外す.
+- the chime → アラーム音; the band over the bar → バナー; the tab's title → タブのタイトル.
+- look up → 調べる; meanings → 意味; same meaning → 同じ意味; opposite → 反対の意味; Noun, Verb, Adjective, Adverb → 名詞, 動詞, 形容詞, 副詞 (they describe the English words); the word lists → 単語リスト; Did you mean → もしかして, as search pages write it.
+- a word looked up or selected → 言葉 (counted 語); the word selected in your text → テキストで選択した言葉, not あなたのテキスト, since a reply counts too; takes its place, as an edit → 編集として置き換わる, 置き換える.
+- a sum (calc:) → 計算式; figures → 数値, counted 個 ({count}個の数値を選択中); sum, average → 合計, 平均; rounded → 丸めた値; bracket → 括弧; power → 累乗.
+- The Collection's legend (C304): removed → 削除, added → 追加 (自分が dropped with "yours"), model answer → モデルの回答, or a sweep → または照合. The comment box: モデルと共有されることはありません.

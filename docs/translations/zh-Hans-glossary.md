@@ -203,3 +203,18 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - The strip, 16 November: "Markup ▾", "Focus: off" and "Focus: on", "Import:" and "Tour:" capitalised as the boards are (Stefan: "capitalize the 'f' in focus and 'm' in markup"); the command words stay English. 隐藏面板 and 显示面板 on the birds, which fold the boards away. 空房间 for focus on an empty room, a page to write in.
 - Your own text (C301 (f)), written in a room and never sent by itself: 你的文本, not 草稿; the empty room says 在这里书写，或在输入栏中输入提示词。 A reply that was only answers in the text: {name} 在正文中回答了 # 条提示词，各在其提出的位置.
 - Tasks (C301 (g), 16 November; Stefan: "Yes, build tasks"): the Plan board is 任务; a to-do of yours 你自己的待办; tick: 勾选, ticked 已勾选, untick 取消勾选. A branch stays 分支; the commands stay English. v4 (16 November, "Yes, build it"): a plan, the numbered thing, is now 任务 (任务 207, # 个任务), so 列表 is gone; a step is 子任务 (第 N 项子任务, # 项子任务), and the lines that said 这一步 or 每一步 now say 这项子任务 and 每项子任务. The kinds of a sub-task: None 无, Prompt 提示词, Search 搜索, Command 命令. The flow (流程): All at once 同时进行, One by one 依次进行, as the picker has them. A sub-task's model left to its task → 跟随任务, as 跟随分支. `=1` in enter.runLines, whose other case adds 逐条.
+
+## Alarms, the Dictionary and sums (16 November 2026, C303)
+- Alarms (board.alarms) → 闹钟, as Chinese clock apps name the tab of alarms; the strip's "Alarms:" → 闹钟：, written as a board name. One alarm → 闹钟; alarm 3 → 闹钟 3 (hard choice: 提醒 is the Reminders app, 提醒事项; 计时器 would name only the timers)
+- the kinds: In (a timer) → 倒计时; At (a time of day) → 定时; Every (a break) → 休息. The fields: 时长, 时间, 每工作. a length → 时长; a time of day → 时刻
+- ring → 响起: rings at {at} → {at} 响起; rang → 已响起; rang at {at} → 已于 {at} 响起
+- a break, the break reminder → 休息, 休息提醒; time for a break → 该休息了; every 50 minutes of work here → 在这里每工作 50 分钟
+- the band (an alarm ringing over the bar) → 横幅; the chime → 提示音; the tab's title → 标签页标题
+- stop → 停止; 5 more minutes → 再等 5 分钟; ring later → 推迟; take off the board → 从面板上移除, as tasks.roomOff has 移除; off (a row switched off) → 已关闭, a state, not the verb
+- Dictionary (board.dictionary) → 词典 (not 字典, which looks up characters; Apple's mainland Dictionary app is 词典); look up → 查询, as macOS has 查询“…”; the word lists → 词表
+- Meanings → 释义; Same meaning (the tab and the heading) → 同义词; Opposite → 反义词; the kinds of an English word: 名词, 动词, 形容词, 副词
+- the word selected in your text → 你在文本中选中的词 (文本, not 你的文本, which names your own text, C301 (f); the selection can be in a reply being edited). A clicked word takes its place as an edit → 替换…，作为一处编辑, as enter.strikeGo; is in place → 已换上
+- sums: a sum (what calc: reads) → 算式; figures → 数字; selected figures → 数值; sum · average (of a selection) → 求和 · 平均值, as mainland spreadsheets label the status bar; rounded → 四舍五入 (the code rounds half up); bracket → 括号; a power → 乘方, its exponent 指数; nought → 零
+- The Collection legend (C304): removed → 删去的, added → 添加的 (你 dropped, as "yours" was); the green dotted sample "model answer" → 模型的回答, then 或扫查. The comment box: Never shared with a model → 绝不会分享给模型
+- Commands and their example words stay as typed: alarm:25m tea, alarm:15:30 lunch, alarm:every 50m, dictionary:reluctant, calc:48000*2/12
+- Plurals collapse to other; `=1` in enter.alarmOffAll and enter.alarmOffDone, whose one case says 这个闹钟 and 闹钟已…; enter.alarmAt keeps `=0` for the hours
