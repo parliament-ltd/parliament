@@ -11,6 +11,8 @@
 //   o  its opposites, at most OPPOSITES
 //   w  the word as written, where that is not its lower case ("Paris")
 // Shortened from the release, as its licence (CC BY 4.0) allows with credit.
+// Its notice, which must go with every copy, is written beside the pieces as
+// LICENSE.txt (NOTICE below), so it ships with the site and the release.
 
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
@@ -23,6 +25,70 @@ const OPPOSITES = 6
 // A piece larger than this is split by the first three letters.
 const PIECE_MOST = 120_000
 const EDITION = '2025'
+
+// The notice that goes with the word lists. The two licence texts are as
+// Open English WordNet gives them (LICENSE.md and WNDB_License.txt in
+// github.com/globalwordnet/english-wordnet), word for word.
+const NOTICE = `Parliament's word lists, in this folder, are shortened from Open English
+WordNet ${EDITION} (https://en-word.net/,
+https://github.com/globalwordnet/english-wordnet).
+
+Changed by Parliament: each word keeps at most ${MEANINGS} meanings, an example
+for the first ${EXAMPLES}, ${SAME} words that mean the same and ${OPPOSITES} opposites, and
+the lists are split into small files by their first letters. Made by
+scripts/words.mjs in Parliament's repository.
+
+This resource is derived from Princeton WordNet under the WordNet License and
+further developed under the Creative Commons Attribution 4.0 International
+License. You may share and adapt this resource providing attribution is given
+to both Princeton WordNet and the Open English Wordnet team.
+
+=======================================================================
+
+Open English WordNet License
+
+Copyright (c) 2019-present, The Open English WordNet Team.
+
+This work is licensed under a Creative Commons Attribution 4.0
+International License. To view a copy of this license, visit
+
+http://creativecommons.org/licenses/by/4.0/
+
+=======================================================================
+
+WordNet License
+
+This software and database is being provided to you, the LICENSEE, by
+the Open English Wordnet team under the Creative Commons Attribution 4.0
+International License (CC-BY 4.0).
+
+Open English Wordnet 2023 Copyright 2023 by the Open English Wordnet team.
+
+Permission to use, copy, modify and distribute this software and
+database and its documentation for any purpose and without fee or
+royalty is hereby granted, provided that you agree to comply with
+the following copyright notice and statements, including the disclaimer,
+and that the same appear on ALL copies of the software, database and
+documentation, including modifications that you make for internal
+use or for distribution.
+
+WordNet 3.1 Copyright 2011 by Princeton University.  All rights reserved.
+
+THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND PRINCETON
+UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON
+UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF MERCHANT-
+ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE
+OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT
+INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR
+OTHER RIGHTS.
+
+The name of Princeton University or Princeton may not be used in
+advertising or publicity pertaining to distribution of the software
+and/or database.  Title to copyright in this software, database and
+any associated documentation shall at all times remain with
+Princeton University and LICENSEE agrees to preserve same.
+`
 
 const from = process.argv[2]
 if (!from) { console.error('node scripts/words.mjs <folder with the unpacked JSON release>'); process.exit(1) }
@@ -121,4 +187,5 @@ for (const name of names) {
 }
 const index = { edition: EDITION, source: 'Open English WordNet', licence: 'CC BY 4.0', url: 'https://en-word.net/', pieces: names }
 writeFileSync(join(out, 'index.json'), JSON.stringify(index) + '\n')
+writeFileSync(join(out, 'LICENSE.txt'), NOTICE)
 console.log(`${[...entries.keys()].length} words read, ${names.length} pieces written to ${out}, ${(bytes / 1e6).toFixed(1)} MB in all, the largest ${Math.max(...names.map((n) => Buffer.byteLength(JSON.stringify(pieces.get(n))))) / 1e3} kB`)

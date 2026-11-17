@@ -93,3 +93,7 @@ node scripts/policy-trial.mjs   # both builds under the real headers, on 4173 an
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
+
+The Dictionary board's word lists (`public/words/en/`) are shortened from
+Open English WordNet, under CC BY 4.0 and the WordNet License. Their notice
+is in [public/words/en/LICENSE.txt](public/words/en/LICENSE.txt).

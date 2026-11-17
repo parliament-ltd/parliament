@@ -3,6 +3,16 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.20.0, 16 November 2026
+
+- Alarms: alarm:25m tea, alarm:15:30 "Call Anna", or alarm:every 50m "Take a break" for a break after so much work. When one rings, a band says so, with stop and 5 more minutes, and the strip counts down to the next. The Alarms board lists them, and alarm:quiet turns the chime off.
+- A dictionary: dictionary:reluctant, or Ctrl+Alt+L (⌘⌥L on a Mac) on a word in your text, shows what it means and the words that mean the same, and a click puts one in its place as an edit. thesaurus: does the same. The word lists come with Parliament, in English for now, and nothing is sent.
+- Sums: calc:48000*2/12 works one out under the bar, and figures selected in your text show their sum and average.
+- Tab and Shift+Tab move a line in and out, up to three steps, and a list's item becomes a sub-item. Ctrl+Shift+E, R and L (⌘⇧E, R and L on a Mac) put lines at the centre, the right and the left, and align: and indent: do the same from the bar. Escape, then Tab, leaves the text.
+- Comments and highlights stay on their words as you change them, and go only when all their letters do.
+- The Collection: its boxes show, its legend reads removed, added and model answer, its "date" order is "newest first", and a comment brings it beside the room.
+- The "/" menu's checkbox ticks in a room, and with the page full, a new board opens and the page scrolls to it.
+
 ## 0.19.0, 16 November 2026
 
 - Tasks: the Tasks board lists every task, each with a box to tick. Add one with the plus, or new:task "…" in the bar. A task has a name, a description if you like, a kind (yours, a prompt, a search or a command), a model, rooms and a flow: one by one, or all at once.
