@@ -6238,13 +6238,8 @@ msgstr "On a phone the bar stays at the bottom. bar:top works on a wider screen"
 
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.smallFocus"
-msgstr "On a phone one board shows at a time, so focus: is not needed"
-
-#. Commands stay English
-#. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr "pop: works on a wider screen. On a phone one board shows at a time"
+msgstr "pop: works on a wider screen. On a phone the boards stand one above another"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6990,6 +6985,18 @@ msgstr "Enter takes {tag} off {nums}"
 msgid "enter.untagAll"
 msgstr "{count, plural, one {Enter takes {tag} off the one thing that carries it} other {Enter takes {tag} off all # things that carry it}}"
 
+#. js-lingui-explicit-id
+msgid "enter.voiceBlocked"
+msgstr "The microphone is not allowed for this page. The browser’s settings for this site can allow it"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceOff"
+msgstr "Voice is off in this browser: it can only turn speech into words by sending your audio to its maker"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceStopped"
+msgstr "Voice stopped before it heard anything. Try the microphone again"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
@@ -7246,6 +7253,16 @@ msgstr "Your edited prompt"
 msgid "field.listening"
 msgstr "listening"
 
+#. The ink pot button in the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.send"
+msgstr "Send"
+
+#. The microphone button in the bar, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.speak"
+msgstr "Speak"
+
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {to all #}}"
@@ -7264,20 +7281,12 @@ msgid "field.toSome"
 msgstr "to {nums}"
 
 #. js-lingui-explicit-id
-msgid "field.voice"
-msgstr "voice"
-
-#. js-lingui-explicit-id
 msgid "field.voiceDownload"
 msgstr "Set up voice: your browser downloads a language pack once, then speech stays on this device."
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr "Speak your prompt. It is turned into words on this device; no audio leaves it."
-
-#. js-lingui-explicit-id
-msgid "field.voiceOff"
-msgstr "voice off"
+msgstr "Speak instead of typing. It is turned into words on this device; no audio leaves it, and nothing goes before Enter."
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
@@ -9093,6 +9102,36 @@ msgid "plan.yours"
 msgstr "yours"
 
 #. js-lingui-explicit-id
+msgid "plus.boards"
+msgstr "Boards"
+
+#. js-lingui-explicit-id
+msgid "plus.foot"
+msgstr "Swipe the bar left or right for search, command and prompt"
+
+#. Beside the board the bar acts on
+#. js-lingui-explicit-id
+msgid "plus.here"
+msgstr "the bar points here"
+
+#. js-lingui-explicit-id
+msgid "plus.language"
+msgstr "Language"
+
+#. The plus button at the start of the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "plus.open"
+msgstr "Menu"
+
+#. js-lingui-explicit-id
+msgid "plus.page"
+msgstr "This page"
+
+#. js-lingui-explicit-id
+msgid "plus.title"
+msgstr "Menu"
+
+#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, one {a card number} other {# card numbers}}"
 
@@ -10229,6 +10268,10 @@ msgid "shell.barWindow"
 msgstr "Parliament"
 
 #. js-lingui-explicit-id
+msgid "shell.boardDown"
+msgstr "The board below: {board}"
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "This board is drawn in a later stage."
 
@@ -10239,6 +10282,10 @@ msgstr "Hide the boards"
 #. js-lingui-explicit-id
 msgid "shell.boardsShow"
 msgstr "Show the boards"
+
+#. js-lingui-explicit-id
+msgid "shell.boardUp"
+msgstr "The board above: {board}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -11300,11 +11347,6 @@ msgstr "Now, let’s {command}"
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "Stef"
-
-#. In the foot of the welcome page, beside "Created with Claude Code"
-#. js-lingui-explicit-id
-msgid "welcome.small"
-msgstr "Built for computer, phone later"
 
 #. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id

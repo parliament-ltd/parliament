@@ -6238,13 +6238,8 @@ msgstr "在手机上，输入栏固定在底部。bar:top 可在更宽的屏幕�
 
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.smallFocus"
-msgstr "在手机上一次只显示一个面板，因此不需要 focus:"
-
-#. Commands stay English
-#. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr "pop: 可在更宽的屏幕上使用。在手机上一次只显示一个面板"
+msgstr "pop: 可在更宽的屏幕上使用。在手机上，面板上下排列"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6990,6 +6985,18 @@ msgstr "按 Enter 去掉 {nums} 上的标签“{tag}”"
 msgid "enter.untagAll"
 msgstr "{count, plural, =1 {按 Enter 去掉标签“{tag}”，只有一项带有它} other {按 Enter 去掉全部 # 项内容上的标签“{tag}”}}"
 
+#. js-lingui-explicit-id
+msgid "enter.voiceBlocked"
+msgstr "此页面不允许使用麦克风。可在浏览器的网站设置中允许"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceOff"
+msgstr "此浏览器中的语音已关闭：它只能把你的音频发送给浏览器开发商，才能将语音转为文字"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceStopped"
+msgstr "语音在听到任何内容之前就停止了。请再试一次麦克风"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
@@ -7246,6 +7253,16 @@ msgstr "你编辑过的提示词"
 msgid "field.listening"
 msgstr "正在聆听"
 
+#. The ink pot button in the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.send"
+msgstr "发送"
+
+#. The microphone button in the bar, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.speak"
+msgstr "说话"
+
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {发给全部 # 个}}"
@@ -7264,20 +7281,12 @@ msgid "field.toSome"
 msgstr "发给 {nums}"
 
 #. js-lingui-explicit-id
-msgid "field.voice"
-msgstr "语音"
-
-#. js-lingui-explicit-id
 msgid "field.voiceDownload"
 msgstr "设置语音：浏览器会下载一次语言包，之后语音只留在本设备上。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr "说出你的提示词。语音会在本设备上转为文字，不会有任何音频离开本设备。"
-
-#. js-lingui-explicit-id
-msgid "field.voiceOff"
-msgstr "语音已关闭"
+msgstr "用说话代替打字。语音会在本设备上转为文字，不会有任何音频离开本设备，按 Enter 之前也不会发送任何内容。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
@@ -9093,6 +9102,36 @@ msgid "plan.yours"
 msgstr "你的"
 
 #. js-lingui-explicit-id
+msgid "plus.boards"
+msgstr "面板"
+
+#. js-lingui-explicit-id
+msgid "plus.foot"
+msgstr "向左或向右滑动输入栏，可在搜索、命令和提示词之间切换"
+
+#. Beside the board the bar acts on
+#. js-lingui-explicit-id
+msgid "plus.here"
+msgstr "输入栏指向此处"
+
+#. js-lingui-explicit-id
+msgid "plus.language"
+msgstr "语言"
+
+#. The plus button at the start of the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "plus.open"
+msgstr "菜单"
+
+#. js-lingui-explicit-id
+msgid "plus.page"
+msgstr "此页面"
+
+#. js-lingui-explicit-id
+msgid "plus.title"
+msgstr "菜单"
+
+#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, other {# 个银行卡号}}"
 
@@ -10229,6 +10268,10 @@ msgid "shell.barWindow"
 msgstr "Parliament"
 
 #. js-lingui-explicit-id
+msgid "shell.boardDown"
+msgstr "下方的面板：{board}"
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "此面板将在后续阶段实现。"
 
@@ -10239,6 +10282,10 @@ msgstr "隐藏面板"
 #. js-lingui-explicit-id
 msgid "shell.boardsShow"
 msgstr "显示面板"
+
+#. js-lingui-explicit-id
+msgid "shell.boardUp"
+msgstr "上方的面板：{board}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -11300,11 +11347,6 @@ msgstr "现在，来试试 {command}"
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "Stef"
-
-#. In the foot of the welcome page, beside "Created with Claude Code"
-#. js-lingui-explicit-id
-msgid "welcome.small"
-msgstr "目前为电脑设计，手机版稍后推出"
 
 #. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id

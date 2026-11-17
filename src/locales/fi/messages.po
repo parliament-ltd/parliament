@@ -6238,13 +6238,8 @@ msgstr "Puhelimessa palkki pysyy alhaalla. bar:top toimii leveämmällä näytö
 
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.smallFocus"
-msgstr "Puhelimessa näkyy yksi taulu kerrallaan, joten focus: ei ole tarpeen"
-
-#. Commands stay English
-#. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr "pop: toimii leveämmällä näytöllä. Puhelimessa näkyy yksi taulu kerrallaan"
+msgstr "pop: toimii leveämmällä näytöllä. Puhelimessa taulut ovat allekkain"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6990,6 +6985,18 @@ msgstr "Enter poistaa tunnisteen {tag}: {nums}"
 msgid "enter.untagAll"
 msgstr "{count, plural, one {Enter poistaa tunnisteen {tag} ainoasta kohteesta, jolla se on} other {Enter poistaa tunnisteen {tag} kaikista # kohteesta, joilla se on}}"
 
+#. js-lingui-explicit-id
+msgid "enter.voiceBlocked"
+msgstr "Mikrofoni ei ole sallittu tällä sivulla. Selaimen sivustoasetuksista sen voi sallia"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceOff"
+msgstr "Puhe on pois päältä tässä selaimessa: se pystyy muuttamaan puheen sanoiksi vain lähettämällä äänesi valmistajalleen"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceStopped"
+msgstr "Puhe pysähtyi ennen kuin se kuuli mitään. Kokeile mikrofonia uudelleen"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
@@ -7246,6 +7253,16 @@ msgstr "Muokattu kehotteesi"
 msgid "field.listening"
 msgstr "kuuntelee"
 
+#. The ink pot button in the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.send"
+msgstr "Lähetä"
+
+#. The microphone button in the bar, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.speak"
+msgstr "Puhu"
+
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {kaikkiin #}}"
@@ -7264,20 +7281,12 @@ msgid "field.toSome"
 msgstr "haaroihin {nums}"
 
 #. js-lingui-explicit-id
-msgid "field.voice"
-msgstr "puhe"
-
-#. js-lingui-explicit-id
 msgid "field.voiceDownload"
 msgstr "Ota puhe käyttöön: selaimesi lataa kielipaketin kerran, minkä jälkeen puhe pysyy tällä laitteella."
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr "Sano kehotteesi ääneen. Se muutetaan sanoiksi tällä laitteella; ääntä ei lähde laitteelta."
-
-#. js-lingui-explicit-id
-msgid "field.voiceOff"
-msgstr "puhe pois"
+msgstr "Puhu kirjoittamisen sijaan. Puhe muutetaan sanoiksi tällä laitteella; ääntä ei lähde laitteelta, eikä mitään lähetetä ennen Enteriä."
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
@@ -9093,6 +9102,36 @@ msgid "plan.yours"
 msgstr "sinun"
 
 #. js-lingui-explicit-id
+msgid "plus.boards"
+msgstr "Taulut"
+
+#. js-lingui-explicit-id
+msgid "plus.foot"
+msgstr "Pyyhkäise palkkia vasemmalle tai oikealle: haku, komento ja kehote"
+
+#. Beside the board the bar acts on
+#. js-lingui-explicit-id
+msgid "plus.here"
+msgstr "palkki osoittaa tähän"
+
+#. js-lingui-explicit-id
+msgid "plus.language"
+msgstr "Kieli"
+
+#. The plus button at the start of the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "plus.open"
+msgstr "Valikko"
+
+#. js-lingui-explicit-id
+msgid "plus.page"
+msgstr "Tämä sivu"
+
+#. js-lingui-explicit-id
+msgid "plus.title"
+msgstr "Valikko"
+
+#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, one {korttinumero} other {# korttinumeroa}}"
 
@@ -10229,6 +10268,10 @@ msgid "shell.barWindow"
 msgstr "Parliament"
 
 #. js-lingui-explicit-id
+msgid "shell.boardDown"
+msgstr "Alapuolella oleva taulu: {board}"
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "Tämä taulu piirretään myöhemmässä vaiheessa."
 
@@ -10239,6 +10282,10 @@ msgstr "Piilota taulut"
 #. js-lingui-explicit-id
 msgid "shell.boardsShow"
 msgstr "Näytä taulut"
+
+#. js-lingui-explicit-id
+msgid "shell.boardUp"
+msgstr "Yläpuolella oleva taulu: {board}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -11300,11 +11347,6 @@ msgstr "Nyt keskitytään: {command}"
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "Stef"
-
-#. In the foot of the welcome page, beside "Created with Claude Code"
-#. js-lingui-explicit-id
-msgid "welcome.small"
-msgstr "Tehty tietokoneelle, puhelin myöhemmin"
 
 #. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id

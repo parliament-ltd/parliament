@@ -40,6 +40,26 @@ describe('the leaders', () => {
   })
 })
 
+describe('a swipe to another mode (17 November)', () => {
+  it('changes the mode and keeps what was typed in each', () => {
+    let s = typing(room(), 'why is the sky blue')
+    s = fieldReducer(s, { type: 'mode', to: 'command' })
+    expect(fieldValue(s)).toBe('>')
+    s = typing(s, '>open:201')
+    s = fieldReducer(s, { type: 'mode', to: 'prompt' })
+    expect(fieldValue(s)).toBe('why is the sky blue')
+    expect(fieldReducer(s, { type: 'mode', to: 'command' }).text.command).toBe('open:201')
+  })
+
+  it('leaves a held prompt held, and ignores a mode that is not one', () => {
+    const held = fieldReducer(room(), { type: 'draft', value: 'Shorter, please' })
+    const away = fieldReducer(held, { type: 'mode', to: 'search' })
+    expect(showsHeld(away)).toBe(false)
+    expect(showsHeld(fieldReducer(away, { type: 'mode', to: 'prompt' }))).toBe(true)
+    expect(fieldReducer(held, { type: 'mode', to: 'nothing' })).toBe(held)
+  })
+})
+
 describe('what was typed stays with its mode (C44)', () => {
   it('so typing > again brings back an unfinished command', () => {
     let s = typing(almanac(), 'water', '>water')

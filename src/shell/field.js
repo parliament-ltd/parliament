@@ -139,6 +139,11 @@ export function fieldReducer(state, action) {
       if (state.mode !== state.resting) return { ...state, mode: state.resting }
       return { ...state, focused: false, peek: false, minimised: state.editingReply }
 
+    case 'mode':
+      // Another mode, by a swipe across the bar on a phone (17 November):
+      // what was typed in each mode stays with it, as with a leader.
+      return MODES.includes(action.to) && action.to !== state.mode ? { ...state, mode: action.to, peek: false } : state
+
     case 'recall':
       // A line brought back from the history with the arrow keys.
       return { ...state, mode: 'command', text: { ...state.text, command: String(action.value ?? '') } }

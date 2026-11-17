@@ -27,6 +27,10 @@ import SendList from './SendList'
 import { step as stepBranch } from '../stores/branchView'
 import { useVoiceInput } from '../hooks/useVoiceInput'
 import { formatSize } from '../lib/fileUpload'
+import { spokenInto } from '../shell/spoken'
+import { MODES } from '../shell/field'
+import { lookup } from '../commands/registry'
+import PlusMenu from './PlusMenu'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. There is only ever one (C280, replacing C6's bar in every window):
@@ -64,7 +68,10 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, sendList = null, onSeeList = null, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true }) {
+// How far a swipe across the field goes before it changes the mode, in pixels.
+const SWIPE_GO = 48
+
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, sendList = null, onSeeList = null, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true, phone = false, plus = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -114,6 +121,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // A delete undo cannot take back waits for a second Enter on the same
   // line (C199): the line the first Enter armed.
   const [armed, setArmed] = useState(null)
+  // The plus menu on a phone (17 November), open or not.
+  const [plusOpen, setPlusOpen] = useState(false)
+  // The mode a swipe across the field goes to, named above the bar while
+  // the swipe is held and for a moment after (Stefan, 17 November: "a toast
+  // message above the bar stating which bar it is").
+  const [toast, setToast] = useState(null) // { mode, held }
+  const toastTimer = useRef(0)
 
   // The field's mode, for the welcome page's first step.
   useEffect(() => { onMode?.(field.mode) }, [field.mode, onMode])
@@ -154,9 +168,10 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // them, as before. Escape closes one, from the field or from a row.
   const root = useRef(null)
   const under = !reference && !inspect && !compare && !keyPanel && !backupPanel
-  const menu = reference ? 'reference' : !under ? null : picker ? 'picker' : frameworkPicker ? 'frameworks' : languagePicker ? 'languages' : markupMenu ? 'markup' : null
+  const menu = reference ? 'reference' : !under ? null : plusOpen && plus ? 'plus' : picker ? 'picker' : frameworkPicker ? 'frameworks' : languagePicker ? 'languages' : markupMenu ? 'markup' : null
   const closeMenu = (which, refocus = false) => {
     if (which === 'reference') setReference(null)
+    else if (which === 'plus') setPlusOpen(false)
     else if (which === 'picker') onPickerClose?.()
     else if (which === 'frameworks') onFrameworkPickerClose?.()
     else if (which === 'languages') onLanguagePickerClose?.()
@@ -278,26 +293,64 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // web search held for the next prompt, voice on this device only (C70),
   // and attaching files. Each only where the room offers it.
   const feats = prompt?.features ?? null
+  // Voice in every mode, on a computer and a phone (17 November; C70): the
+  // microphone beside the glyph, where any room or board is. What is heard
+  // goes into the field in the mode it is in (spoken.js); nothing runs or
+  // goes before Enter. A prompt spoken while words are selected in a reply,
+  // with nothing typed, is written in the text on them, as Ctrl+Alt+P and
+  // prompt: write one (Stefan: "highlight some text in a passage, and then
+  // from the prompt bar do the speech input"), and goes with the next Enter
+  // or the ink pot. wordsHeld: words were selected in a reply when the field
+  // was opened or the microphone pressed; typing forgets it.
+  const wordsHeld = useRef(false)
+  const noteWords = (keep = false) => {
+    const sel = (doc ?? document).getSelection?.()
+    const at = sel && !sel.isCollapsed ? sel.anchorNode : null
+    const inReply = Boolean((at?.nodeType === 1 ? at : at?.parentElement)?.closest?.('.ch-stage .p-msg'))
+    if (inReply || !keep) wordsHeld.current = inReply
+  }
   const voice = useVoiceInput({
     lang: typeof navigator === 'undefined' ? 'en-US' : navigator.language || 'en-US',
     onTranscript: (said, isFinal) => {
-      if (!isFinal || !said || field.mode !== 'prompt') return
+      if (!isFinal || !said) return
+      const mode = field.mode
+      if (mode === 'prompt' && wordsHeld.current && !showsHeld(field) && !(field.text.prompt ?? '').trim()) {
+        const detail = { question: said.trim(), words: true, taken: false }
+        window.dispatchEvent(new CustomEvent('parliament-ask', { detail }))
+        if (detail.taken === true) { wordsHeld.current = false; setNotice('askKept'); return }
+      }
       // Spoken over a held prompt: what is said takes its place.
-      if (showsHeld(field)) onDropDraft?.()
-      const now = showsHeld(field) ? '' : field.text.prompt ?? ''
-      dispatch({ type: 'input', value: now ? `${now.replace(/s+$/, '')} ${said}` : said })
+      const over = mode === 'prompt' && showsHeld(field)
+      if (over) onDropDraft?.()
+      const now = over ? '' : field.text[mode] ?? ''
+      const next = spokenInto(mode, now, said, { isVerb: (w) => lookup(w) != null })
+      if (next !== now) dispatch({ type: 'input', value: mode === 'command' ? `>${next}` : next })
     },
   })
+  // The browser said no to the microphone, or to its language pack: said under the bar.
+  const voiceError = voice.error
+  useEffect(() => {
+    if (!voiceError) return
+    setNotice({ message: voiceError === 'not-allowed' || voiceError === 'service-not-allowed' ? 'voiceBlocked' : 'voiceStopped' })
+  }, [voiceError])
+  const offVoice = !voice.isSupported
+  const voiceAct = voice.status === 'checking' ? null : {
+    status: voice.status,
+    listening: voice.isListening,
+    off: offVoice,
+    title: i18n._(offVoice ? COPY.field.voiceOffHelp : voice.status === 'available' ? COPY.field.voiceHelp : COPY.field.voiceDownload),
+    onClick: () => {
+      if (offVoice) { setNotice('voiceOff'); return }
+      if (voice.isListening) { voice.stop(); return }
+      setNotice(null)
+      noteWords(true)
+      voice.start()
+    },
+  }
+  // Web search and files: in the field on a computer, in the plus menu on a phone.
   const features = []
   if (marginalia && feats && featureActs) {
     if (feats.offered?.webSearch && feats.canSearch) features.push({ key: 'web', words: i18n._(COPY.field.webSearch), on: feats.web, title: i18n._(COPY.field.webHelp), onClick: featureActs.onWeb })
-    if (feats.offered?.voice) {
-      if (voice.isSupported) {
-        features.push({ key: 'voice', words: i18n._(voice.isListening ? COPY.field.listening : COPY.field.voice), on: voice.isListening, title: i18n._(voice.status === 'available' ? COPY.field.voiceHelp : COPY.field.voiceDownload), onClick: () => (voice.isListening ? voice.stop() : voice.start()) })
-      } else if (voice.status !== 'checking') {
-        features.push({ key: 'voice', words: i18n._(COPY.field.voiceOff), off: true, title: i18n._(COPY.field.voiceOffHelp) })
-      }
-    }
     if (feats.offered?.files) features.push({ key: 'attach', words: i18n._(COPY.field.attach), on: (feats.files?.length ?? 0) > 0, title: i18n._(COPY.field.attachHelp), onClick: featureActs.onAttach })
   }
   const heldFiles = marginalia && feats?.files?.length ? feats.files : []
@@ -374,6 +427,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (compare) { onCompareClose?.(); return }
       if (keyPanel) { onKeysClose?.(); return }
       if (backupPanel) { onBackupDone?.(null); return }
+      if (plusOpen) { setPlusOpen(false); return }
       if (picker) { onPickerClose?.(); return }
       if (frameworkPicker) { onFrameworkPickerClose?.(); return }
       if (languagePicker) { onLanguagePickerClose?.(); return }
@@ -430,6 +484,26 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     input.current?.focus()
   }
 
+  // A swipe across the field on a phone (17 November): to the left, the next
+  // of search, command and prompt; to the right, the one before; round from
+  // either end. Mirrored where the page reads right to left. Held, the bar
+  // it would go to is named above the field; let go short, nothing changes.
+  function onSwipe({ dx, done }) {
+    const rtl = (root.current?.closest?.('[dir]')?.getAttribute('dir') ?? document.documentElement.dir) === 'rtl'
+    const step = (dx < 0 ? 1 : -1) * (rtl ? -1 : 1)
+    const to = MODES[(MODES.indexOf(field.mode) + step + MODES.length) % MODES.length]
+    const far = Math.abs(dx) >= SWIPE_GO
+    win.clearTimeout(toastTimer.current)
+    if (!done) { setToast({ mode: far ? to : field.mode, held: true }); return }
+    if (!far) { setToast(null); return }
+    dispatch({ type: 'mode', to })
+    setNotice(null)
+    setPlusOpen(false)
+    setToast({ mode: to, held: false })
+    toastTimer.current = win.setTimeout(() => setToast(null), 900)
+  }
+  useEffect(() => () => win.clearTimeout(toastTimer.current), [win])
+
   return (
     <div className={className} ref={root}>
       <div className="ch-dock-in">
@@ -438,6 +512,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           <SendList rows={sendList.rows} words={Boolean(field.text.prompt?.trim())} onBranch={sendList.onBranch} onItem={sendList.onItem} onAnswers={sendList.onAnswers} onFold={sendList.onFold} />
         )}
         <div className="ch-frow">
+        {/* Which bar a swipe goes to, above the field (17 November). */}
+        {toast && !folded && <div className={`ch-ftoast ${toast.mode}${toast.held ? ' held' : ''}`} role="status">{i18n._(COPY.modes[toast.mode])}</div>}
         <Field
           ref={input}
           state={field}
@@ -446,20 +522,26 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           // At rest on the welcome page, how to begin, in the field (C286 (h)).
           hint={welcome && field.mode === 'search' ? i18n._(COPY.field.toBegin, { leader: '>' }) : null}
           marginalia={marginalia}
-          onMarginalia={onPicker}
+          onMarginalia={onPicker ? () => { setPlusOpen(false); onPicker() } : null}
           marginaliaOpen={Boolean(picker)}
           frameworks={frameworksMarg}
           features={features}
-          onFrameworks={onFrameworkPicker}
+          onFrameworks={onFrameworkPicker ? () => { setPlusOpen(false); onFrameworkPicker() } : null}
           frameworksOpen={Boolean(frameworkPicker)}
+          phone={phone}
+          plus={phone && plus ? { open: menu === 'plus', onToggle: () => setPlusOpen((o) => !o) } : null}
+          voice={voiceAct}
+          onSend={phone ? () => { if (prompting) send() } : null}
+          onSwipe={phone ? onSwipe : null}
           ink={prompt?.room !== undefined ? prompt?.ink ?? null : null}
           inkKey={prompt?.room ?? null}
-          onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
+          onOpen={() => { noteWords(); dispatch({ type: 'open' }); input.current?.focus() }}
           onHover={() => { if (field.minimised || field.peek) hoverAfter(140, 'hover') }}
           onLeave={() => { if (field.minimised || field.peek) hoverAfter(600, 'leave') }}
           onInput={(v) => {
             walk.current = { lines, index: -1, draft: '' }
             setNotice(null)
+            wordsHeld.current = false // typed: what is said next goes in the field
             setArmed(null) // any typing asks for both Enters again (C199)
             // The key panel closes when the line turns to another command.
             if (keyPanel && !/^>\s*api:/i.test(v)) onKeysClose?.()
@@ -486,7 +568,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             ))}
           </div>
         )}
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} see={onSeeList && field.mode === 'prompt' ? onSeeList : null} />
+        {/* On a phone, the line under the field only when it has something to tell (17 November). */}
+        <EnterLine hidden={folded || (phone && !notice)} only={phone} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} see={onSeeList && field.mode === 'prompt' ? onSeeList : null} />
         {/* Extra screen detected (C259 (g)): once, under the field. */}
         {note && !folded && (
           <p className="ch-snote ch-marg">
@@ -520,6 +603,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         )}
       </div>
       {/* The ? reference and the menus: as wide as the stage, not the bar (C279 (f); 29 October). */}
+      {/* The plus menu on a phone (17 November): the boards, the page's own switches, and the prompt's web search and files. */}
+      {menu === 'plus' && <PlusMenu {...plus} features={features} onClose={() => closeMenu('plus')} />}
       {menu === 'reference' && <Reference board={board} topic={reference.topic} all={reference.all} onPick={pick} onClose={() => closeMenu('reference', true)} />}
       {menu === 'picker' && (
         picker.kind === 'reply'

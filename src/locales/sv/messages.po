@@ -6238,13 +6238,8 @@ msgstr "På en mobil stannar fältet längst ned. bar:top fungerar på en bredar
 
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.smallFocus"
-msgstr "På en mobil visas en tavla i taget, så focus: behövs inte"
-
-#. Commands stay English
-#. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr "pop: fungerar på en bredare skärm. På en mobil visas en tavla i taget"
+msgstr "pop: fungerar på en bredare skärm. På en mobil står tavlorna under varandra"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6990,6 +6985,18 @@ msgstr "Enter tar bort {tag} från {nums}"
 msgid "enter.untagAll"
 msgstr "{count, plural, one {Enter tar bort {tag} från den enda sak som har den} other {Enter tar bort {tag} från alla # saker som har den}}"
 
+#. js-lingui-explicit-id
+msgid "enter.voiceBlocked"
+msgstr "Mikrofonen är inte tillåten för den här sidan. Webbläsarens inställningar för webbplatsen kan tillåta den"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceOff"
+msgstr "Röst är avstängd i den här webbläsaren: den kan bara göra om tal till text genom att skicka ditt ljud till sin tillverkare"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceStopped"
+msgstr "Rösten stängdes av innan den hörde något. Försök med mikrofonen igen"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
@@ -7246,6 +7253,16 @@ msgstr "Din redigerade prompt"
 msgid "field.listening"
 msgstr "lyssnar"
 
+#. The ink pot button in the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.send"
+msgstr "Skicka"
+
+#. The microphone button in the bar, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.speak"
+msgstr "Tala"
+
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {till alla #}}"
@@ -7264,20 +7281,12 @@ msgid "field.toSome"
 msgstr "till {nums}"
 
 #. js-lingui-explicit-id
-msgid "field.voice"
-msgstr "röst"
-
-#. js-lingui-explicit-id
 msgid "field.voiceDownload"
 msgstr "Ställ in röst: webbläsaren laddar ned ett språkpaket en gång, sedan stannar talet på den här enheten."
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr "Tala in din prompt. Den blir till text på den här enheten; inget ljud lämnar den."
-
-#. js-lingui-explicit-id
-msgid "field.voiceOff"
-msgstr "röst av"
+msgstr "Tala i stället för att skriva. Det blir till text på den här enheten; inget ljud lämnar den, och inget skickas före Enter."
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
@@ -9093,6 +9102,36 @@ msgid "plan.yours"
 msgstr "din"
 
 #. js-lingui-explicit-id
+msgid "plus.boards"
+msgstr "Tavlor"
+
+#. js-lingui-explicit-id
+msgid "plus.foot"
+msgstr "Svep fältet åt vänster eller höger för sök, kommando och prompt"
+
+#. Beside the board the bar acts on
+#. js-lingui-explicit-id
+msgid "plus.here"
+msgstr "fältet pekar hit"
+
+#. js-lingui-explicit-id
+msgid "plus.language"
+msgstr "Språk"
+
+#. The plus button at the start of the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "plus.open"
+msgstr "Meny"
+
+#. js-lingui-explicit-id
+msgid "plus.page"
+msgstr "Den här sidan"
+
+#. js-lingui-explicit-id
+msgid "plus.title"
+msgstr "Meny"
+
+#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, one {ett kortnummer} other {# kortnummer}}"
 
@@ -10229,6 +10268,10 @@ msgid "shell.barWindow"
 msgstr "Parliament"
 
 #. js-lingui-explicit-id
+msgid "shell.boardDown"
+msgstr "Tavlan nedanför: {board}"
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "Den här tavlan ritas i ett senare skede."
 
@@ -10239,6 +10282,10 @@ msgstr "Dölj tavlorna"
 #. js-lingui-explicit-id
 msgid "shell.boardsShow"
 msgstr "Visa tavlorna"
+
+#. js-lingui-explicit-id
+msgid "shell.boardUp"
+msgstr "Tavlan ovanför: {board}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -11300,11 +11347,6 @@ msgstr "Nu kör vi {command}"
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "Stef"
-
-#. In the foot of the welcome page, beside "Created with Claude Code"
-#. js-lingui-explicit-id
-msgid "welcome.small"
-msgstr "Byggt för dator, mobil kommer senare"
 
 #. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id

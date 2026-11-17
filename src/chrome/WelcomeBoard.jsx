@@ -246,13 +246,11 @@ export function StartBoard({ addressed, onAddress, onWrite }) {
   )
 }
 
-/** The page's foot, outside the card (W §9; C123). */
+/** The page's foot, outside the card (W §9; C123). "Built for computer, phone later" went with the phone's own bar and menu (17 November; C261 (g)). */
 export function WelcomeFoot() {
   const { i18n } = useLingui()
   return (
     <footer className="ch-foot ch-marg">
-      <span>{i18n._(COPY.welcome.small)}</span>
-      <span className="sep" aria-hidden="true">·</span>
       <span>{i18n._(COPY.welcome.footMade)}</span>
       <span className="sep" aria-hidden="true">·</span>
       {/* The source, public since 28 October. */}

@@ -794,10 +794,13 @@ export const COPY = {
     arrangeGoFocus: /*i18n*/ { id: 'enter.arrangeGoFocus', message: "Enter switches to {name}, ending focus. undo: brings back the screen as it is", comment: 'Commands stay English' },
     arrangeForget: /*i18n*/ { id: 'enter.arrangeForget', message: "Enter forgets the arrangement {name}. undo: brings it back", comment: 'Commands stay English' },
     // Small screens (piece 5; C261 (b), (d), (e)).
-    smallPop: /*i18n*/ { id: 'enter.smallPop', message: "pop: works on a wider screen. On a phone one board shows at a time", comment: 'Commands stay English' },
-    smallFocus: /*i18n*/ { id: 'enter.smallFocus', message: "On a phone one board shows at a time, so focus: is not needed", comment: 'Commands stay English' },
+    smallPop: /*i18n*/ { id: 'enter.smallPop', message: "pop: works on a wider screen. On a phone the boards stand one above another", comment: 'Commands stay English' },
     smallBar: /*i18n*/ { id: 'enter.smallBar', message: "On a phone the bar stays at the bottom. bar:top works on a wider screen", comment: 'Commands stay English' },
     smallWidth: /*i18n*/ { id: 'enter.smallWidth', message: "width: works on a wider window", comment: 'Commands stay English' },
+    // The microphone (17 November; C70).
+    voiceOff: /*i18n*/ { id: 'enter.voiceOff', message: 'Voice is off in this browser: it can only turn speech into words by sending your audio to its maker' },
+    voiceBlocked: /*i18n*/ { id: 'enter.voiceBlocked', message: 'The microphone is not allowed for this page. The browser’s settings for this site can allow it' },
+    voiceStopped: /*i18n*/ { id: 'enter.voiceStopped', message: 'Voice stopped before it heard anything. Try the microphone again' },
     // The screens map (piece 4; C259 (b), (d), (h)).
     arrangeMap: /*i18n*/ { id: 'enter.arrangeMap', message: "Enter keeps this view open. pop:collection display 2 puts a board on the other screen", comment: 'Commands stay English' },
     arrangeMapOne: /*i18n*/ { id: 'enter.arrangeMapOne', message: "Enter keeps this view open. Escape goes back" },
@@ -2111,11 +2114,13 @@ export const COPY = {
     webHelp: /*i18n*/ { id: 'field.webHelp', message: 'Let the model search the web for your next prompt only (web:)', comment: 'Commands stay English' },
     attach: /*i18n*/ { id: 'field.attach', message: 'attach' },
     attachHelp: /*i18n*/ { id: 'field.attachHelp', message: 'Attach files to your next prompt (attach:)', comment: 'Commands stay English' },
-    voice: /*i18n*/ { id: 'field.voice', message: 'voice' },
     listening: /*i18n*/ { id: 'field.listening', message: 'listening' },
-    voiceHelp: /*i18n*/ { id: 'field.voiceHelp', message: 'Speak your prompt. It is turned into words on this device; no audio leaves it.' },
+    // The microphone, in every mode (17 November).
+    speak: /*i18n*/ { id: 'field.speak', message: 'Speak', comment: 'The microphone button in the bar, read by screen readers' },
+    voiceHelp: /*i18n*/ { id: 'field.voiceHelp', message: 'Speak instead of typing. It is turned into words on this device; no audio leaves it, and nothing goes before Enter.' },
+    // The ink pot on a phone, which sends the prompt (17 November).
+    send: /*i18n*/ { id: 'field.send', message: 'Send', comment: 'The ink pot button in the bar on a phone, read by screen readers' },
     voiceDownload: /*i18n*/ { id: 'field.voiceDownload', message: 'Set up voice: your browser downloads a language pack once, then speech stays on this device.' },
-    voiceOff: /*i18n*/ { id: 'field.voiceOff', message: 'voice off' },
     voiceOffHelp: /*i18n*/ { id: 'field.voiceOffHelp', message: 'This browser cannot turn speech into words on this device. Here voice would mean sending your audio to the browser’s maker, so it stays off.' },
     fileKind: /*i18n*/ { id: 'field.fileKind', message: 'this kind of file is not taken. Try an image, a PDF, or a text or code file' },
     fileDrop: /*i18n*/ { id: 'field.fileDrop', message: 'Take {name} out' },
@@ -2202,7 +2207,6 @@ export const COPY = {
     now: /*i18n*/ { id: 'welcome.now', message: 'Now, let’s {command}', comment: '{command} is focus:, which stays English' },
     // On narrow or touch-only screens only (W §12.4).
     // In the page's foot with the other marginalia, on every screen (29 October).
-    small: /*i18n*/ { id: 'welcome.small', message: 'Built for computer, phone later', comment: 'In the foot of the welcome page, beside "Created with Claude Code"' },
     // Where the browser has not agreed to keep Parliament's data (C94). Names no browser.
     keepNot: /*i18n*/ { id: 'welcome.keepNot', message: 'This browser may clear what you make here' },
     keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask it to keep the data' },
@@ -3068,8 +3072,22 @@ export const COPY = {
     extraGo: /*i18n*/ { id: 'screensMap.extraGo', message: "arrange across screens" },
   },
 
+  // The plus menu on a phone (17 November): what the strip holds on a wider screen.
+  plus: {
+    open: /*i18n*/ { id: 'plus.open', message: 'Menu', comment: 'The plus button at the start of the bar on a phone, read by screen readers' },
+    title: /*i18n*/ { id: 'plus.title', message: 'Menu' },
+    boards: /*i18n*/ { id: 'plus.boards', message: 'Boards' },
+    page: /*i18n*/ { id: 'plus.page', message: 'This page' },
+    language: /*i18n*/ { id: 'plus.language', message: 'Language' },
+    here: /*i18n*/ { id: 'plus.here', message: 'the bar points here', comment: 'Beside the board the bar acts on' },
+    foot: /*i18n*/ { id: 'plus.foot', message: 'Swipe the bar left or right for search, command and prompt' },
+  },
+
   shell: {
     field: /*i18n*/ { id: 'shell.field', message: 'Search, command or prompt', comment: 'The name of the field, read by screen readers' },
+    // The arrows at the right edge on a phone, between boards one above another (17 November).
+    boardUp: /*i18n*/ { id: 'shell.boardUp', message: 'The board above: {board}' },
+    boardDown: /*i18n*/ { id: 'shell.boardDown', message: 'The board below: {board}' },
     strip: /*i18n*/ { id: 'shell.strip', message: 'Boards', comment: 'The name of the board strip, read by screen readers' },
     // Focus at the end of the strip (stage 14, piece 1; C253).
     focusOff: /*i18n*/ { id: 'shell.focusOff', message: 'Focus: off', comment: 'Focus is the command word, kept English, capitalised as the boards are' },

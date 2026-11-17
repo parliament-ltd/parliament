@@ -6238,13 +6238,8 @@ msgstr "スマートフォンでは、バーは下に固定されます。bar:to
 
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.smallFocus"
-msgstr "スマートフォンでは一度に1つのボードしか表示されないため、focus: は必要ありません"
-
-#. Commands stay English
-#. js-lingui-explicit-id
 msgid "enter.smallPop"
-msgstr "pop: は、もっと幅の広い画面で使えます。スマートフォンでは一度に1つのボードを表示します"
+msgstr "pop: は、もっと幅の広い画面で使えます。スマートフォンではボードが縦に並びます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6990,6 +6985,18 @@ msgstr "Enterで{nums}から{tag}タグを外します"
 msgid "enter.untagAll"
 msgstr "{count, plural, =1 {Enterで、{tag}タグが付いている1件からタグを外します} other {Enterで、{tag}タグが付いている#件すべてからタグを外します}}"
 
+#. js-lingui-explicit-id
+msgid "enter.voiceBlocked"
+msgstr "このページではマイクが許可されていません。ブラウザのサイト設定で許可できます"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceOff"
+msgstr "このブラウザでは音声入力はオフです。音声を文字に変換するには、音声をブラウザの開発元に送るしかないためです"
+
+#. js-lingui-explicit-id
+msgid "enter.voiceStopped"
+msgstr "何も聞き取れないまま音声入力が止まりました。もう一度マイクを押してください"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
@@ -7246,6 +7253,16 @@ msgstr "編集したプロンプト"
 msgid "field.listening"
 msgstr "聞き取り中"
 
+#. The ink pot button in the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.send"
+msgstr "送信"
+
+#. The microphone button in the bar, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.speak"
+msgstr "話す"
+
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {#件すべてへ}}"
@@ -7264,20 +7281,12 @@ msgid "field.toSome"
 msgstr "{nums}へ"
 
 #. js-lingui-explicit-id
-msgid "field.voice"
-msgstr "音声"
-
-#. js-lingui-explicit-id
 msgid "field.voiceDownload"
 msgstr "音声入力を設定します：ブラウザが言語パックを一度だけダウンロードし、その後は音声がこのデバイスの外に出ません。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr "プロンプトを話して入力します。このデバイス上で文字に変換され、音声が外に出ることはありません。"
-
-#. js-lingui-explicit-id
-msgid "field.voiceOff"
-msgstr "音声オフ"
+msgstr "入力する代わりに話せます。このデバイス上で文字に変換され、音声が外に出ることはありません。Enter を押すまで何も送られません。"
 
 #. js-lingui-explicit-id
 msgid "field.voiceOffHelp"
@@ -9093,6 +9102,36 @@ msgid "plan.yours"
 msgstr "自分の"
 
 #. js-lingui-explicit-id
+msgid "plus.boards"
+msgstr "ボード"
+
+#. js-lingui-explicit-id
+msgid "plus.foot"
+msgstr "バーを左右にスワイプすると、検索・コマンド・プロンプトを切り替えられます"
+
+#. Beside the board the bar acts on
+#. js-lingui-explicit-id
+msgid "plus.here"
+msgstr "バーの操作対象"
+
+#. js-lingui-explicit-id
+msgid "plus.language"
+msgstr "言語"
+
+#. The plus button at the start of the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "plus.open"
+msgstr "メニュー"
+
+#. js-lingui-explicit-id
+msgid "plus.page"
+msgstr "このページ"
+
+#. js-lingui-explicit-id
+msgid "plus.title"
+msgstr "メニュー"
+
+#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr "{count, plural, other {カード番号#件}}"
 
@@ -10229,6 +10268,10 @@ msgid "shell.barWindow"
 msgstr "Parliament"
 
 #. js-lingui-explicit-id
+msgid "shell.boardDown"
+msgstr "下のボード：{board}"
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "このボードは、後の段階で作ります。"
 
@@ -10239,6 +10282,10 @@ msgstr "ボードを隠す"
 #. js-lingui-explicit-id
 msgid "shell.boardsShow"
 msgstr "ボードを表示"
+
+#. js-lingui-explicit-id
+msgid "shell.boardUp"
+msgstr "上のボード：{board}"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id
@@ -11300,11 +11347,6 @@ msgstr "では、{command} で集中しましょう"
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "Stef"
-
-#. In the foot of the welcome page, beside "Created with Claude Code"
-#. js-lingui-explicit-id
-msgid "welcome.small"
-msgstr "コンピュータ向け。スマートフォンはこれから"
 
 #. {first} is > and {second} is ?, which stay as they are
 #. js-lingui-explicit-id

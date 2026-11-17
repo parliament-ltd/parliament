@@ -55,6 +55,8 @@ import { promptFacts, promptNow } from '../lib/branchVerbs'
 import { checkSourceTexts } from '../lib/sourceCheck'
 import Bar from './Bar'
 import Strip from './Strip'
+import { usePhoneBoards } from './phoneBoards'
+import { BoardArrows } from './BoardArrows'
 import Board from './Board'
 import { boardName, roomLabel, andList } from './say'
 import RoomBoard from './RoomBoard'
@@ -4648,6 +4650,10 @@ export default function Shell() {
   }
 
   const focusBoard = (board) => { if (board !== current.current.addressed) commit(address(current.current, board)) }
+  // On a phone the boards stand one above another, the bar follows the one
+  // in sight, and pointing it at another scrolls there (17 November).
+  const phone = size === 'phone'
+  usePhoneBoards({ on: phone, stage: stageRef, columns: arrangement.columns, addressed: arrangement.addressed, onAddress: focusBoard })
   // On a phone the bar sits at the bottom, whatever bar: chose for wider screens (C261 (d)).
   // The welcome card keeps its field. The start card holds none: a bar kept
   // in the card docks at the foot, centred, outside it (C293; Stefan,
@@ -4919,18 +4925,25 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone && globe ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${hiddenClasses(markupShow)}`}>
-      {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
+    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${welcomeAlone ? ' welcome-alone' : ''}${welcomeAlone && globe && !phone ? ' corner' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${hiddenClasses(markupShow)}`}>
+      {/* On a phone the plus menu in the bar holds what the strip holds, the language too, so the boards have the whole height (17 November). */}
       {/* The language sits in the header (1 November): at the strip's end, or alone in the top corner while the welcome page or start card is all there is. */}
-      {!welcomeAlone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} markup={{ open: markupPicking, onOpen: openMarkupFrom }} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe}
+      {!welcomeAlone && !phone && <Strip arrangement={stripArrangement} onPick={pickBoard} onRun={runClicked} markup={{ open: markupPicking, onOpen: openMarkupFrom }} phone={size === 'phone' ? { rooms: stripRooms } : null} globe={globe}
         alarm={alarmsHere.next ? <StripAlarm alarm={alarmsHere.next} onOpen={() => runClicked('alarm:')} /> : null} />}
       <AlarmBand ringing={alarmsHere.ringing} at={bar.at === 'top' ? 'top' : 'bottom'} onStop={alarmsHere.stop} onLater={(id) => { alarmsHere.fiveMore(id) }} />
-      {welcomeAlone && globe && <div className="ch-headcorner">{globe}</div>}
+      {welcomeAlone && globe && !phone && <div className="ch-headcorner">{globe}</div>}
+      {/* The board above and the one below, at the right edge (17 November). */}
+      {phone && !mapShown && (
+        <BoardArrows order={arrangement.columns.flat()} addressed={arrangement.addressed} onGo={focusBoard}
+          nameOf={(b) => (isRoom(b) ? [i18n._(COPY.boards.oneRoom), stripRooms.find((r) => r.board === b)?.num].filter((x) => x != null).join(' ') : boardName(i18n, b))} />
+      )}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} onAway={onAway} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} alsoDocs={otherDocs} onAway={onAway} className={`ch-dock ${bar.at} ${bar.side}`} write={write}
+          phone={phone}
+          plus={phone ? { arrangement: stripArrangement, rooms: stripRooms, onPick: pickBoard, onRun: runClicked, onMarkup: () => openMarkupFrom(null), onLanguage: globe ? () => openLanguagesFrom(null) : null, alarm: alarmsHere.next ?? null, focusOn: Boolean(arrangement.focus) } : null} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}

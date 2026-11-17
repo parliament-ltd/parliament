@@ -15,14 +15,14 @@ stage 3). This list says where each feature is known to be present.
 | LibreWolf | Gecko | Stefan uses it (C94). Deletes site data on close; fingerprint resistance on | Not yet |
 | Zen | Gecko | Stefan uses it (C94). Firefox's privacy settings | Not yet |
 | Safari | WebKit | Not a concern for now (Windows) | Waits |
-| Phones | | "Built for a computer for now" (stage 5) | Later |
+| Phones | | The boards one above another, the plus menu, a swipe between the bar's modes (17 November) | Tried at a phone's size in the app's browser |
 
 ## What differs
 
 | Feature | Chromium | Firefox, LibreWolf, Zen |
 |---|---|---|
 | Always-on-top window (`pop:command`) | Yes | No: an ordinary window, and the Enter line says so |
-| Voice on the device (C70) | Chrome on desktop | No: the microphone stays hidden |
+| Voice on the device (C70) | Chrome on desktop | No: the microphone is faint, and a click says why (17 November) |
 | Keeping storage when asked (C88) | Decided by the browser, silently | The browser asks the person |
 | Site data kept after closing | Yes | Yes in Firefox and Zen; **deleted in LibreWolf** unless the site is allowed |
 | Reported language | The person's | LibreWolf: always US English |

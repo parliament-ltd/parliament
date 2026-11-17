@@ -26,8 +26,7 @@ describe('commands that do not fit a small screen (C261 (b), (d), (e))', () => {
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
   }
   it('says so on a phone, and changes nothing', () => {
-    expect(line('>pop:library', 'phone')).toMatchObject({ text: 'pop: works on a wider screen. On a phone one board shows at a time', next: null })
-    expect(line('>focus:', 'phone').text).toBe('On a phone one board shows at a time, so focus: is not needed')
+    expect(line('>pop:library', 'phone')).toMatchObject({ text: 'pop: works on a wider screen. On a phone the boards stand one above another', next: null })
     expect(line('>bar:top', 'phone').text).toBe('On a phone the bar stays at the bottom. bar:top works on a wider screen')
     expect(line('>width:library 40%', 'narrow').text).toBe('width: works on a wider window')
   })
@@ -37,5 +36,7 @@ describe('commands that do not fit a small screen (C261 (b), (d), (e))', () => {
     expect(smallRefusal([{ verb: 'pop', match: { values: [{ value: 'library' }] } }], 'narrow')).toBeNull()
     expect(smallRefusal([{ verb: 'width', match: { values: [] } }], 'wide')).toBeNull()
     expect(line('>open:settings', 'phone').next).toBeTruthy()
+    // focus: fits a phone, its boards one above another (17 November).
+    expect(smallRefusal([{ verb: 'focus', match: { values: [] } }], 'phone')).toBeNull()
   })
 })

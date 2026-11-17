@@ -6238,11 +6238,6 @@ msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
-msgid "enter.smallFocus"
-msgstr ""
-
-#. Commands stay English
-#. js-lingui-explicit-id
 msgid "enter.smallPop"
 msgstr ""
 
@@ -6990,6 +6985,18 @@ msgstr ""
 msgid "enter.untagAll"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.voiceBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.voiceOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.voiceStopped"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.webAlready"
@@ -7246,6 +7253,16 @@ msgstr ""
 msgid "field.listening"
 msgstr ""
 
+#. The ink pot button in the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.send"
+msgstr ""
+
+#. The microphone button in the bar, read by screen readers
+#. js-lingui-explicit-id
+msgid "field.speak"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr ""
@@ -7264,19 +7281,11 @@ msgid "field.toSome"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "field.voice"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "field.voiceDownload"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "field.voiceHelp"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "field.voiceOff"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -9093,6 +9102,36 @@ msgid "plan.yours"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "plus.boards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plus.foot"
+msgstr ""
+
+#. Beside the board the bar acts on
+#. js-lingui-explicit-id
+msgid "plus.here"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plus.language"
+msgstr ""
+
+#. The plus button at the start of the bar on a phone, read by screen readers
+#. js-lingui-explicit-id
+msgid "plus.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plus.page"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plus.title"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "privacy.card"
 msgstr ""
 
@@ -10229,6 +10268,10 @@ msgid "shell.barWindow"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "shell.boardDown"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr ""
 
@@ -10238,6 +10281,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.boardsShow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.boardUp"
 msgstr ""
 
 #. Read aloud for the stretchable edge between two boards
@@ -11299,11 +11346,6 @@ msgstr ""
 #. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
-msgstr ""
-
-#. In the foot of the welcome page, beside "Created with Claude Code"
-#. js-lingui-explicit-id
-msgid "welcome.small"
 msgstr ""
 
 #. {first} is > and {second} is ?, which stay as they are

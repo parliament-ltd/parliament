@@ -72,6 +72,8 @@ export function useAskBox(viewRef, onKept, words, canAsk) {
       if (!detail || detail.taken || lastFocused !== token) return
       const v = viewRef.current
       if (!v || !v.dom.isConnected) return
+      // A prompt spoken in the bar (17 November) is written here only on words selected.
+      if (detail.words && v.state.selection.empty) return
       if (canRef.current && !canRef.current(v.state)) { detail.taken = 'askNotPrompt'; return }
       detail.taken = true
       if (detail.question) keepAt(v, v.state.selection, detail.question)

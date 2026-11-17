@@ -30,7 +30,8 @@ export function useScreenSize() {
 
 /**
  * What a command that does not fit this screen says instead (C261 (b), (d),
- * (e)), or null when it fits.
+ * (e)), or null when it fits. focus: fits a phone, its boards standing one
+ * above another (17 November).
  * @param {{ verb: string, match?: { values?: object[] } }[]} steps
  * @param {'phone'|'narrow'|'wide'|undefined} size
  */
@@ -40,7 +41,6 @@ export function smallRefusal(steps, size) {
     if (s.verb === 'width') return { message: 'smallWidth' }
     if (size !== 'phone') continue
     if (s.verb === 'pop' && s.match?.values?.[0]?.value !== 'back') return { message: 'smallPop' }
-    if (s.verb === 'focus') return { message: 'smallFocus' }
     if (s.verb === 'bar' && s.match?.values?.[0]?.value === 'top') return { message: 'smallBar' }
   }
   return null

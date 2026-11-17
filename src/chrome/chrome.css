@@ -115,21 +115,34 @@
 .ch-shell.size-narrow .ch-stage.space { flex-wrap: wrap; align-content: flex-start; overflow-x: visible; }
 .ch-shell.size-narrow .ch-stage.space > .ch-edge { display: none; }
 .ch-shell.size-narrow .ch-stage.space > .ch-col { flex: 1 1 calc(50% - 8px); min-width: calc(50% - 8px); }
-/* A phone: the board the bar points at, alone and full width; the others
-   stay open, out of sight. With the bar at a window, the first board. */
-.ch-shell.size-phone .ch-stage.space { overflow-x: visible; padding-inline: 10px; }
+/* A phone (17 November; phoneBoards.js): no strip, its words in the bar's
+   plus menu, and the boards one above another, each the width of the
+   screen and as tall as the screen above the bar, scrolling inside with
+   its head in sight. The page comes to rest on a board's top. The columns'
+   own widths and the centring for a room alone wait for a wider screen. */
+.ch-shell.size-phone { --phone-top: 8px; --phone-bar: 64px; --phone-board: calc(100dvh - var(--phone-top) - var(--phone-bar) - env(safe-area-inset-bottom, 0px)); }
+html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
+.ch-shell.size-phone .ch-stage.space { flex-direction: column; gap: 10px; overflow-x: visible; padding: var(--phone-top) 6px calc(var(--phone-bar) + 10px + env(safe-area-inset-bottom, 0px)); }
 .ch-shell.size-phone .ch-stage.space > .ch-edge { display: none; }
-.ch-shell.size-phone .ch-stage.space > .ch-col { flex: 1 1 auto; min-width: 0; }
-.ch-shell.size-phone .ch-stage.space:has(.ch-card.addressed) > .ch-col:not(:has(> .ch-card.addressed)),
-.ch-shell.size-phone .ch-stage.space:has(.ch-card.addressed) > .ch-col > :not(.addressed),
-.ch-shell.size-phone .ch-stage.space:not(:has(.ch-card.addressed)) > .ch-col:not(:first-of-type) { display: none; }
+.ch-shell.size-phone .ch-stage.space > .ch-col { flex: none !important; width: 100%; max-width: none !important; min-width: 0; gap: 10px; }
+.ch-shell.size-phone .ch-stage.space > .ch-col > .ch-card { flex: none; height: var(--phone-board); min-height: 0; overflow: auto; scroll-snap-align: start; scroll-margin-top: var(--phone-top); }
+.ch-shell.size-phone .ch-stage.space > .ch-col > .ch-card > .ch-chead { position: sticky; top: 0; z-index: 2; background: var(--ch-surface); }
+.ch-shell.size-phone .ch-stage.space > .ch-col > .ch-card .ch-room,
+.ch-shell.size-phone .ch-stage.space > .ch-col > .ch-card .ch-cbody.ch-room-empty { height: calc(var(--phone-board) - 41px); }
 .ch-shell.size-phone .ch-card.addressed::before { display: none; }
-/* The strip: one line that scrolls sideways. */
-.ch-shell.size-phone .ch-strip { flex-wrap: nowrap; overflow-x: auto; gap: 6px 18px; padding-inline: 12px; scrollbar-width: none; }
-.ch-shell.size-phone .ch-strip > *, .ch-shell.size-phone .ch-sboards > * { flex: none; white-space: nowrap; }
-.ch-shell.size-phone .ch-sboards { display: contents; }
-/* The board on screen: a navy underline, the others open in ink. */
-.ch-shell.size-phone .ch-strip .ch-btitle[aria-current] { color: var(--ch-ink); text-decoration: underline; text-decoration-color: rgb(var(--ch-navy)); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+/* The welcome page among other boards scrolls with them; its foot waits
+   for the welcome page alone. */
+.ch-shell.size-phone.on-welcome:not(.welcome-alone) { height: auto; min-height: 100dvh; overflow: visible; }
+.ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-col { overflow: visible; }
+.ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-foot { display: none; }
+.ch-shell.size-phone.on-welcome:not(.welcome-alone) .ch-dock.bottom { bottom: 0; padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+/* The board above and the one below, at the right edge, in navy; out of
+   the way while the bar is typed in or a menu is open. */
+.ch-jump { position: fixed; inset-inline-end: 4px; bottom: calc(var(--phone-bar) + 18px + env(safe-area-inset-bottom, 0px)); z-index: 25; display: flex; flex-direction: column; gap: 6px; }
+.ch-shell nav.ch-jump button { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: rgb(var(--ch-navy)); background: color-mix(in srgb, var(--ch-paper) 92%, transparent); box-shadow: 0 1px 3px rgba(40, 36, 28, .12), 0 0 0 .5px rgba(22, 38, 70, .2); }
+.ch-shell nav.ch-jump button:disabled { opacity: .3; cursor: default; }
+.ch-jump svg { width: 16px; height: 16px; }
+.ch-shell:has(.ch-field:focus-within) .ch-jump, .ch-shell:has(.ch-dock .ch-ref) .ch-jump { display: none; }
 
 /* ── the dock: where the bar sits ── */
 .ch-dock { position: sticky; z-index: 30; padding: 12px 16px 6px; background: var(--ch-paper); }
@@ -166,6 +179,60 @@
 .ch-glyph.on { opacity: 1; }
 .ch-glyph.mag { width: 15px; height: 15px; }
 .ch-glyph.quill { width: 21px; height: 21px; }
+/* The microphone, before the glyph in every mode (17 November; C70):
+   faint where the browser cannot keep speech on the device, ink while it
+   listens, a ring round it. */
+.ch-shell .ch-field .ch-mic { position: absolute; top: 0; inset-inline-end: 38px; z-index: 3; width: 30px; height: 40px; display: grid; place-items: center; color: var(--ch-ink-3); }
+.ch-mic svg { width: 15px; height: 15px; }
+.ch-shell .ch-field .ch-mic:hover { color: var(--ch-ink); }
+.ch-shell .ch-field .ch-mic.on { color: var(--ch-ink); }
+.ch-shell .ch-field .ch-mic.on::before { content: ""; position: absolute; width: 26px; height: 26px; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--ch-ink); animation: ch-listen 1.4s ease-in-out infinite; }
+@keyframes ch-listen { 50% { box-shadow: 0 0 0 1.5px rgba(25, 25, 25, .25); } }
+@media (prefers-reduced-motion: reduce) { .ch-shell .ch-mic.on::before { animation: none; } }
+.ch-shell .ch-field .ch-mic.off { opacity: .45; }
+.ch-field.command .ch-mic, .ch-shell .ch-field.command .ch-mic:hover { color: rgba(255, 255, 255, .8); }
+.ch-shell .ch-field.command .ch-mic.on::before { box-shadow: 0 0 0 1.5px #fff; }
+.ch-field.with-mic input { padding-inline-end: 72px; }
+.ch-field.command.with-mic input { padding-inline-end: 72px; }
+.ch-shell .ch-field.with-mic .ch-fmarg:not(.fw, .feat) { margin-inline-end: 72px; }
+.ch-shell .ch-field.min .ch-mic, .ch-shell .ch-field.min .ch-plus, .ch-shell .ch-field.min .ch-pills { display: none; }
+
+/* ── the bar on a phone (17 November) ──
+   One row: the plus, the words, the microphone and the ink pot, which
+   sends. Tapped into a prompt, two: the words, and under them the plus,
+   the frameworks and who answers as pills, the microphone and the pot.
+   The field takes swipes across it (pan-y), so a swipe changes the mode
+   rather than moving the page. Its words are 16px, so no phone zooms in. */
+.ch-field.phone { height: auto; min-height: var(--ch-field-h); flex-wrap: wrap; touch-action: pan-y; }
+.ch-field.phone input, .ch-field.phone.command input, .ch-field.phone.prompt input, .ch-field.phone.with-mic input { order: 1; flex: 1 1 0; height: var(--ch-field-h); padding: 0 4px; font-size: 16px; }
+.ch-shell .ch-field .ch-plus { order: 0; position: relative; z-index: 3; flex: none; width: 30px; height: 30px; margin-inline: 5px 2px; border-radius: 50%; display: grid; place-items: center; color: var(--ch-ink); background: var(--ch-surface); box-shadow: 0 0 0 .5px rgba(25, 25, 25, .28); }
+.ch-plus svg { width: 15px; height: 15px; }
+.ch-shell .ch-field .ch-plus.on { background: var(--ch-ink); color: var(--ch-paper); }
+.ch-shell .ch-field.command .ch-plus { background: transparent; color: #fff; box-shadow: 0 0 0 .5px rgba(255, 255, 255, .55); }
+.ch-shell .ch-field.phone .ch-mic { position: relative; inset: auto; order: 3; flex: none; width: 34px; }
+.ch-field.phone .ch-gslot { position: relative; inset: auto; order: 4; flex: none; }
+.ch-shell .ch-field.phone .ch-send { pointer-events: auto; }
+/* Folded while a reply is edited: the circle holds the glyph alone. */
+.ch-shell .ch-field.phone.min input { flex: 0 0 0; padding: 0; }
+.ch-field.phone.two { border-radius: 18px; padding-bottom: 3px; }
+.ch-field.phone.two input { order: 0; flex-basis: 100%; padding-inline: 14px; }
+.ch-field.phone.two .ch-plus { order: 1; }
+.ch-field.phone .ch-pills { order: 2; position: relative; z-index: 2; flex: 1 1 0; min-width: 0; display: flex; gap: 6px; padding-inline: 6px; overflow-x: auto; scrollbar-width: none; }
+.ch-shell .ch-field .ch-pill { flex: none; max-width: 62vw; padding: 4px 10px; border-radius: 999px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12.5px var(--ch-sans); color: var(--ch-ink-2); background: var(--ch-surface); box-shadow: 0 0 0 .5px rgba(25, 25, 25, .22); }
+.ch-shell .ch-field .ch-pill[aria-expanded="true"] { color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink); }
+.ch-shell.size-phone .ch-dock.bottom { padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+.ch-shell.size-phone .ch-enter.hide { display: none; }
+/* Which bar a swipe goes to, above the field, in the colours of the modes' names. */
+.ch-frow { position: relative; }
+.ch-ftoast { position: absolute; bottom: calc(100% + 10px); left: 50%; z-index: 6; transform: translateX(-50%); padding: 5px 14px; border-radius: 999px; font: 600 12.5px var(--ch-sans); white-space: nowrap; pointer-events: none; box-shadow: 0 6px 18px rgba(40, 36, 28, .16); animation: ch-toast-in .14s ease; }
+.ch-ftoast.search { background: var(--ch-paper); color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink), 0 6px 18px rgba(40, 36, 28, .16); }
+.ch-ftoast.command { background: rgb(var(--ch-navy-2)); color: #fff; }
+.ch-ftoast.prompt { background: var(--ch-ink); color: var(--ch-paper); }
+@keyframes ch-toast-in { from { opacity: 0; transform: translate(-50%, 4px); } }
+@media (prefers-reduced-motion: reduce) { .ch-ftoast { animation: none; } }
+/* The plus menu's birds and the board the bar points at. */
+.ch-plusbirds { display: inline-block; width: 18px; height: 15px; margin-inline-end: 8px; vertical-align: -2px; color: var(--ch-ink); }
+.ch-plus-here { margin-inline-start: 6px; font-style: italic; color: var(--ch-ink-3); }
 
 /* ── the Enter line: one reserved row that never pushes anything down ── */
 .ch-enter { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; min-height: 19px; padding: 6px 13px 0; font: italic 400 11px/1.6 var(--ch-serif); color: var(--ch-marg); }
