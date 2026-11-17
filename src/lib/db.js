@@ -598,6 +598,12 @@ export async function getHighlights(conversationId) {
   return db.getAllFromIndex('highlights', 'conversationId', conversationId)
 }
 
+// A highlight's words changed in the text: its words and which time they
+// come in the message, as they now are (C304).
+export async function moveHighlight(id, { text, nth }) {
+  return updateNumbered(await initDB(), 'highlights', id, { text: String(text).slice(0, 2000), nth: Number.isInteger(nth) && nth >= 0 ? nth : 0 })
+}
+
 export async function deleteHighlight(id) {
   return removeNumbered(await initDB(), 'highlights', id)
 }

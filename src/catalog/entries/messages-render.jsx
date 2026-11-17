@@ -312,7 +312,7 @@ export default function MessagesRender() {
     for (const hl of highlights) {
       if (!hl.messageId || !hl.text) continue
       if (!out.has(hl.messageId)) out.set(hl.messageId, [])
-      out.get(hl.messageId).push({ text: hl.text, nth: Number.isInteger(hl.nth) ? hl.nth : 0, bg: HIGHLIGHT_COLORS.find((c) => c.color === hl.color)?.bg || 'rgba(184,160,112,0.18)' })
+      out.get(hl.messageId).push({ id: hl.id, text: hl.text, nth: Number.isInteger(hl.nth) ? hl.nth : 0, bg: HIGHLIGHT_COLORS.find((c) => c.color === hl.color)?.bg || 'rgba(184,160,112,0.18)' })
     }
     return out
   }, [highlights])

@@ -41,6 +41,7 @@ import {
   getHighlights,
   addHighlight as dbAddHighlight,
   deleteHighlight as dbDeleteHighlight,
+  moveHighlight as dbMoveHighlight,
 } from '../lib/db'
 import { useChat } from './ChatContext'
 import { useMessages } from './chatHooks'
@@ -217,6 +218,23 @@ export function AnnotationsProvider({ children, conversationId = null }) {
     }
     window.addEventListener('parliament-comments-moved', on)
     return () => window.removeEventListener('parliament-comments-moved', on)
+  }, [])
+
+  // A highlight's words changed in the text: stored as they now are, so it
+  // is drawn there again (C304).
+  useEffect(() => {
+    const on = async (e) => {
+      const moves = Array.isArray(e.detail?.moves) ? e.detail.moves : []
+      for (const m of moves) {
+        if (typeof m?.id !== 'string' || typeof m.text !== 'string' || !m.text) continue
+        try {
+          await dbMoveHighlight(m.id, { text: m.text, nth: m.nth })
+          setHighlights((prev) => prev.map((h) => (h.id === m.id ? { ...h, text: m.text, nth: m.nth } : h)))
+        } catch { /* kept as it was */ }
+      }
+    }
+    window.addEventListener('parliament-highlights-moved', on)
+    return () => window.removeEventListener('parliament-highlights-moved', on)
   }, [])
 
   // ─── Highlights ──────────────────────────────────────────

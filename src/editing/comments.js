@@ -12,7 +12,7 @@ import { Plugin, PluginKey } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 import { indexOfWord } from '../lib/textUtils'
 import { firstLineOf } from '../lib/comments'
-import { wordsOf } from './shown'
+import { wordsOf, allStruck, anchorAt } from './shown'
 import { schema } from './schema'
 
 export const commentsKey = new PluginKey('replyComments')
@@ -117,16 +117,6 @@ export function commentDecorations(doc, shown = {}, open = new Set(), words = { 
   return DecorationSet.create(doc, decos)
 }
 
-// Whether every letter left in a stretch is struck: a comment on it is gone.
-function allStruck(doc, from, to) {
-  let kept = false
-  doc.nodesBetween(from, to, (n) => {
-    if (n.isText && !n.marks.some((m) => m.type.name === 'struck')) kept = true
-    return !kept
-  })
-  return !kept
-}
-
 // The comments as mapped through a change: those whose words are all gone,
 // or all struck, are dropped, with their boxes.
 function carried(set, doc) {
@@ -135,8 +125,6 @@ function carried(set, doc) {
   const kept = all.filter((d) => !d.spec?.comment || (live.has(d.spec.comment) && (!d.spec.words || d.from < d.to)))
   return kept.length === all.length ? set : DecorationSet.create(doc, kept)
 }
-
-const WORDISH = /[\p{L}\p{N}]/u
 
 /**
  * Where each comment on words is now, as drawn: its message, its words
@@ -148,46 +136,11 @@ const WORDISH = /[\p{L}\p{N}]/u
 export function anchorsOf(state) {
   const set = commentsKey.getState(state)?.set
   if (!set) return []
-  const doc = state.doc
   const out = []
   for (const d of set.find()) {
-    if (!d.spec?.words || d.from >= d.to) continue
-    const $from = doc.resolve(d.from)
-    let block = null
-    let blockPos = 0
-    let section = null
-    let sectionPos = 0
-    for (let depth = $from.depth; depth > 0; depth--) {
-      const n = $from.node(depth)
-      if (!block && n.isTextblock) { block = n; blockPos = $from.before(depth) }
-      if (n.type.name === 'section') { section = n; sectionPos = $from.before(depth) }
-    }
-    if (!block) continue
-    const { text, at } = wordsOf(block, blockPos + 1)
-    let i = at.indexOf(d.from)
-    let j = at.indexOf(d.to - 1)
-    if (i < 0 || j < 0) continue
-    while (i > 0 && WORDISH.test(text[i - 1])) i -= 1
-    while (j < text.length - 1 && WORDISH.test(text[j + 1])) j += 1
-    const passage = text.slice(i, j + 1)
-    const scope = section ?? doc
-    const base = section ? sectionPos + 1 : 0
-    let nth = 0
-    let found = false
-    scope.descendants((n, p) => {
-      if (found) return false
-      if (!n.isTextblock) return true
-      const w = wordsOf(n, base + p + 1)
-      for (let from = 0; ;) {
-        const k = indexOfWord(w.text, passage, from)
-        if (k === -1) break
-        if (w.at[k] === at[i]) { found = true; break }
-        nth += 1
-        from = k + passage.length
-      }
-      return false
-    })
-    if (found) out.push({ key: d.spec.comment, message: section?.attrs.message ?? null, passage, nth })
+    if (!d.spec?.words) continue
+    const a = anchorAt(state.doc, d.from, d.to)
+    if (a) out.push({ key: d.spec.comment, ...a })
   }
   return out
 }

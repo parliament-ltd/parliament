@@ -10,7 +10,7 @@ import { fromBlocks, toBlocks, wordsOf } from '../../editing/blocks'
 import { editsIn } from '../../editing/edits'
 import { track, createEditIds, cursorMarks, REFUSED, SKIP, INTENT } from '../../editing/track'
 import { editingPlugins, announcePlugin } from '../../editing/keys'
-import { shownPlugin, shownKey } from '../../editing/shown'
+import { shownPlugin, shownKey, lightsOf } from '../../editing/shown'
 import { chartView } from '../../editing/chartView'
 import { withoutAnswers } from '../../editing/answers'
 import { stripAttachedFileBlocks } from '../../lib/fileUpload'
@@ -107,8 +107,9 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   const idsRef = useRef(null)
   const savedKeys = useRef({})
   const timer = useRef(0)
-  // A comment's words as they are now, stored a moment after typing stops
-  // (C304): by a window event, its id with its words, within this page.
+  // A comment's or a highlight's words as they are now, stored a moment
+  // after typing stops (C304): by a window event, its id with its words,
+  // within this page.
   const movedTimer = useRef(0)
   const tellMoved = () => {
     const v = view.current
@@ -121,6 +122,14 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       if (c && (c.passage !== a.passage || (c.nth ?? 0) !== a.nth)) moves.push({ id: c.id, passage: a.passage, nth: a.nth })
     }
     if (moves.length) window.dispatchEvent(new CustomEvent('parliament-comments-moved', { detail: { moves } }))
+    let lit = {}
+    try { lit = JSON.parse(shownRef.current).sections ?? {} } catch { lit = {} }
+    const lightMoves = []
+    for (const a of lightsOf(v.state)) {
+      const h = (lit[a.message]?.highlights ?? []).find((x) => x.id === a.key)
+      if (h && (h.text !== a.text || (h.nth ?? 0) !== a.nth)) lightMoves.push({ id: h.id, text: a.text, nth: a.nth })
+    }
+    if (lightMoves.length) window.dispatchEvent(new CustomEvent('parliament-highlights-moved', { detail: { moves: lightMoves } }))
   }
   const onSaveRef = useRef(onSave)
   const cleanRef = useRef(clean)
@@ -418,6 +427,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     }])),
   }
   const shownKeyNow = JSON.stringify(shown)
+  const shownRef = useRef(shownKeyNow)
+  useEffect(() => { shownRef.current = shownKeyNow })
   useEffect(() => {
     if (shownKeyNow === shownWas.current || !view.current) return
     shownWas.current = shownKeyNow
