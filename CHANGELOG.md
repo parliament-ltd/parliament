@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.23.0, 17 November 2026
+
+- Tasks are simpler. "Add a task" is a field to type in: Enter saves the task and leaves the next row ready. Its Model pill opens the rest: a description, Prompt, Search or Command, who answers, rooms, one by one or all at once, and Save.
+- An open task is written where it stands: its name, its description and its sub-tasks' words, kept when you leave them and put back by Escape. Every change on the board is said under the bar and taken back by undo:.
+- A pasted list becomes sub-tasks, one a line. Sub-tasks move by their grip, or Alt and the arrows. Run puts run: in the bar for your Enter, and the latest run sits on one line.
+- On a phone, a board swiped to the left closes, and undo: brings it back. A menu puts the keyboard away and dims the page behind it: a tap outside closes it, and a tap on the bar brings the keyboard back.
+- The microphone is easier to see: dark on search and prompt, white on command, and a little larger. On a phone the bar stays above the keyboard on the welcome page too.
+
 ## 0.22.0, 17 November 2026
 
 - The bar stands a little above the page, open or folded into a circle, with a soft shadow and no dark ring when you type in it. Its grey words go when you tap or click into it, and an empty search reads "Search here".
