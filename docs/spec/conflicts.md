@@ -5031,6 +5031,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **To rule:** the Records table's Room column; the swipe going round; the arrows' place; the bar following the board in sight; the line under the bar coming back for what it has to tell.
 - **Stefan, 17 November:** "Yes, hide it", to "Hide the room type in the Records table's Room column too?"
 - **Built 17 November: the Records table hides a room's kind.** Its Room column names a room only by a name its owner gave it, and is left out while no row shown has one; `inspect:` likewise. Searching by a room's kind still finds its chats. Behind the same switch (`roomNameShown`); nothing stored changes. Still to rule: the swipe going round, the arrows' place, the bar following the board in sight, the line under the bar coming back.
+- **Released as `v0.21.0`, 17 November** (Stefan: "Yes, release", to "Release 0.21.0 so you can try it on your phone?"; on `e6c61e4`; the check passing, 1,711 tests; `parliament-0.21.0.tar.gz` `95792980c8dbab2c…`, `parliament-keys-0.21.0.tar.gz` `631d975d743eea22…`; `main` moved forward to it and pushed with the tag to GitHub and Bitbucket. The vault's files are byte for byte those of `v0.20.0`, so only the app is to publish.)
 
 ## Proposed CLAUDE.md rewrite
 
