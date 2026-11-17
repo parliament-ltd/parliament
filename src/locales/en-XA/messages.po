@@ -1622,10 +1622,6 @@ msgid "collection.count"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "collection.date"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "collection.dropAsk"
 msgstr ""
 
@@ -1736,6 +1732,10 @@ msgstr ""
 msgid "collection.line"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "collection.newest"
+msgstr ""
+
 #. new:collection stays English
 #. js-lingui-explicit-id
 msgid "collection.none"
@@ -1752,6 +1752,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.oldest"
 msgstr ""
 
 #. open: stays English

@@ -1622,10 +1622,6 @@ msgid "collection.count"
 msgstr "{count, plural, =0 {nothing} one {# card} other {# cards}}"
 
 #. js-lingui-explicit-id
-msgid "collection.date"
-msgstr "date"
-
-#. js-lingui-explicit-id
 msgid "collection.dropAsk"
 msgstr "drop"
 
@@ -1736,6 +1732,10 @@ msgstr "let it go"
 msgid "collection.line"
 msgstr "Collections"
 
+#. js-lingui-explicit-id
+msgid "collection.newest"
+msgstr "newest first"
+
 #. new:collection stays English
 #. js-lingui-explicit-id
 msgid "collection.none"
@@ -1753,6 +1753,10 @@ msgstr "Nothing here matches the search and filters. clear:filters removes them.
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "The chat in the room, {num}, is not in this collection"
+
+#. js-lingui-explicit-id
+msgid "collection.oldest"
+msgstr "oldest first"
 
 #. open: stays English
 #. js-lingui-explicit-id

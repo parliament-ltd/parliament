@@ -40,7 +40,7 @@ const TABS = [
   ['all', COPY.collections.tabAll], ['edit', COPY.collections.tabEdit], ['ask', COPY.collections.tabAsk], ['suggestion', COPY.collections.tabSuggestion], ['highlight', COPY.collections.tabHighlight], ['term', COPY.collections.tabTerm],
   ['quote', COPY.collections.tabQuote], ['note', COPY.collections.tabNote], ['message', COPY.collections.tabMessage],
 ]
-const ORDERS = [['yours', COPY.collections.yours], ['source', COPY.collections.source], ['date', COPY.collections.date]]
+const ORDERS = [['yours', COPY.collections.yours], ['source', COPY.collections.source], ['date', COPY.collections.newest]]
 // Commands, which stay English.
 const ADD = (num) => `add:${num}`
 const RM = (num) => `rm:${num}`
@@ -48,10 +48,11 @@ const QUOTED = new Set(['term', 'quote', 'highlight', 'message'])
 
 /**
  * The order of the cards, in a drop-down at the right of the tabs (C302 (b);
- * Stefan, 15 November): your order, by source, or by date. A click picks one
- * and closes it; Escape or a click outside closes it.
+ * Stefan, 15 November): your order, by source, or newest first (C304). A
+ * click picks one and closes it; Escape or a click outside closes it.
+ * sort:oldest in the bar turns the last around, and the button says so.
  */
-function SortMenu({ sort, onSort }) {
+function SortMenu({ sort, asc = false, onSort }) {
   const { i18n } = useLingui()
   const [open, setOpen] = useState(false)
   const box = useRef(null)
@@ -62,17 +63,18 @@ function SortMenu({ sort, onSort }) {
     return () => document.removeEventListener('pointerdown', away, true)
   }, [open])
   const now = ORDERS.find(([k]) => k === sort) ?? ORDERS[0]
+  const oldest = now[0] === 'date' && asc === true
   return (
     <div className="ch-col-sort" ref={box}>
       <button type="button" className="ch-col-sort-open" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)}>
-        {i18n._(COPY.collections.sortBy)} <b>{i18n._(now[1])}</b> ▾
+        {i18n._(COPY.collections.sortBy)} <b>{i18n._(oldest ? COPY.collections.oldest : now[1])}</b> ▾
       </button>
       {open && (
         <div className="ch-col-sort-menu">
           <MenuPanel title={i18n._(COPY.collections.sortBy)} foot={i18n._(COPY.collections.sortFoot)} onClose={() => setOpen(false)}>
             <MenuGroup>
               {ORDERS.map(([k, word]) => (
-                <MenuRow key={k} round on={now[0] === k} label={i18n._(word)} onClick={() => { onSort(k); setOpen(false) }} />
+                <MenuRow key={k} round on={now[0] === k && !oldest} label={i18n._(word)} onClick={() => { onSort(k); setOpen(false) }} />
               ))}
             </MenuGroup>
           </MenuPanel>
@@ -483,7 +485,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
               </button>
             ))}
           </div>
-          <SortMenu sort={view.sort} onSort={(k) => onView({ sort: k, asc: false })} />
+          <SortMenu sort={view.sort} asc={view.asc} onSort={(k) => onView({ sort: k, asc: false })} />
         </div>
         {filtered && <InForce search={filtered.search} line={filtered.line} count={shownCount} onClear={onClear} shown={C.shown} />}
         {changed && !clean ? (

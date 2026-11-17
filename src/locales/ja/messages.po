@@ -1622,10 +1622,6 @@ msgid "collection.count"
 msgstr "{count, plural, =0 {なし} other {カード#枚}}"
 
 #. js-lingui-explicit-id
-msgid "collection.date"
-msgstr "日付"
-
-#. js-lingui-explicit-id
 msgid "collection.dropAsk"
 msgstr "取り下げる"
 
@@ -1736,6 +1732,10 @@ msgstr "保留を解除"
 msgid "collection.line"
 msgstr "コレクション"
 
+#. js-lingui-explicit-id
+msgid "collection.newest"
+msgstr "新しい順"
+
 #. new:collection stays English
 #. js-lingui-explicit-id
 msgid "collection.none"
@@ -1753,6 +1753,10 @@ msgstr "ここには、検索とフィルタに一致するものはありませ
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "ルームのチャット{num}は、このコレクションに入っていません"
+
+#. js-lingui-explicit-id
+msgid "collection.oldest"
+msgstr "古い順"
 
 #. open: stays English
 #. js-lingui-explicit-id

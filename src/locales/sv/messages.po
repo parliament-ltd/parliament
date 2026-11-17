@@ -1622,10 +1622,6 @@ msgid "collection.count"
 msgstr "{count, plural, =0 {inget} one {# kort} other {# kort}}"
 
 #. js-lingui-explicit-id
-msgid "collection.date"
-msgstr "datum"
-
-#. js-lingui-explicit-id
 msgid "collection.dropAsk"
 msgstr "ta bort"
 
@@ -1736,6 +1732,10 @@ msgstr "släpp den"
 msgid "collection.line"
 msgstr "Samlingar"
 
+#. js-lingui-explicit-id
+msgid "collection.newest"
+msgstr "nyaste först"
+
 #. new:collection stays English
 #. js-lingui-explicit-id
 msgid "collection.none"
@@ -1753,6 +1753,10 @@ msgstr "Inget här matchar sökningen och filtren. clear:filters tar bort dem."
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "Chatten i rummet, {num}, finns inte i den här samlingen"
+
+#. js-lingui-explicit-id
+msgid "collection.oldest"
+msgstr "äldsta först"
 
 #. open: stays English
 #. js-lingui-explicit-id

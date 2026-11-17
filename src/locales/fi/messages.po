@@ -1622,10 +1622,6 @@ msgid "collection.count"
 msgstr "{count, plural, =0 {ei mitään} one {# kortti} other {# korttia}}"
 
 #. js-lingui-explicit-id
-msgid "collection.date"
-msgstr "päiväys"
-
-#. js-lingui-explicit-id
 msgid "collection.dropAsk"
 msgstr "poista"
 
@@ -1736,6 +1732,10 @@ msgstr "vapauta"
 msgid "collection.line"
 msgstr "Kokoelmat"
 
+#. js-lingui-explicit-id
+msgid "collection.newest"
+msgstr "uusimmat ensin"
+
 #. new:collection stays English
 #. js-lingui-explicit-id
 msgid "collection.none"
@@ -1753,6 +1753,10 @@ msgstr "Täällä ei ole osumia tällä haulla ja näillä suodattimilla. clear:
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "Huoneen keskustelu {num} ei ole tässä kokoelmassa"
+
+#. js-lingui-explicit-id
+msgid "collection.oldest"
+msgstr "vanhimmat ensin"
 
 #. open: stays English
 #. js-lingui-explicit-id

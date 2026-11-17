@@ -2574,7 +2574,9 @@ export const COPY = {
     notHeldHere: /*i18n*/ { id: 'collection.notHeldHere', message: 'The chat in the room, {num}, is not in this collection' },
     yours: /*i18n*/ { id: 'collection.yours', message: 'your order' },
     source: /*i18n*/ { id: 'collection.source', message: 'source' },
-    date: /*i18n*/ { id: 'collection.date', message: 'date' },
+    // The order by date, by what it shows (C304; Stefan, 16 November: "Rename it"); oldest first only by sort:oldest.
+    newest: /*i18n*/ { id: 'collection.newest', message: 'newest first' },
+    oldest: /*i18n*/ { id: 'collection.oldest', message: 'oldest first' },
     none: /*i18n*/ { id: 'collection.none', message: 'No collection yet. new:collection makes one.', comment: 'new:collection stays English' },
     empty: /*i18n*/ { id: 'collection.empty', message: 'Nothing here yet. add:207 puts something in, or pick a chat from the list above.', comment: 'add: stays English' },
     emptyHeld: /*i18n*/ { id: 'collection.emptyHeld', message: 'What it holds has no comments, highlights or quotes yet. They show here as they are made.' },

@@ -1622,10 +1622,6 @@ msgid "collection.count"
 msgstr "{count, plural, =0 {没有卡片} other {# 张卡片}}"
 
 #. js-lingui-explicit-id
-msgid "collection.date"
-msgstr "日期"
-
-#. js-lingui-explicit-id
 msgid "collection.dropAsk"
 msgstr "去掉"
 
@@ -1736,6 +1732,10 @@ msgstr "取消搁置"
 msgid "collection.line"
 msgstr "合集"
 
+#. js-lingui-explicit-id
+msgid "collection.newest"
+msgstr "最新在前"
+
 #. new:collection stays English
 #. js-lingui-explicit-id
 msgid "collection.none"
@@ -1753,6 +1753,10 @@ msgstr "这里没有与搜索和筛选条件匹配的内容。clear:filters 可�
 #. js-lingui-explicit-id
 msgid "collection.notHeldHere"
 msgstr "房间中的对话 {num} 不在此合集中"
+
+#. js-lingui-explicit-id
+msgid "collection.oldest"
+msgstr "最早在前"
 
 #. open: stays English
 #. js-lingui-explicit-id
