@@ -179,6 +179,50 @@ describe('a task in the database', () => {
     await expect(R.changeTask(db, { docketId, set: { flow: 'oneByOne' }, now: at() })).rejects.toMatchObject({ code: 'ran' })
     await expect(R.changeTask(db, { docketId, set: { description: 'Still fine' }, now: at() })).resolves.toBeTruthy()
   })
+
+  // v5 (C309): a sub-task's kind changed in place, and sub-tasks moved.
+  it('changes a sub-task from yours to a search to a command and back, its words kept, each with its undo', async () => {
+    const made = await R.newPlan(db, { title: 'Grant application', task: { flow: 'oneByOne' }, newId, now: at() })
+    const docketId = made.docket.id
+    const { step } = await R.planStep(db, { docketId, letter: 'a', todo: 'Last year’s figures', title: 'Figures', newId, now: at() })
+    const asSearch = await R.changeStep(db, { docketId, letter: 'a', stepId: step.id, set: { kind: 'search', model: 'openalex' }, now: at() })
+    expect(asSearch.step).toMatchObject({ prompt: 'Last year’s figures', model: 'openalex', title: 'Figures' })
+    expect(asSearch.step.todo).toBeUndefined()
+    expect(kindOf(asSearch.step, made.docket, isSource)).toBe('search')
+    await expect(R.changeStep(db, { docketId, letter: 'a', stepId: step.id, set: { kind: 'command', command: '  ' }, now: at() })).rejects.toMatchObject({ code: 'noCommand' })
+    const asCommand = await R.changeStep(db, { docketId, letter: 'a', stepId: step.id, set: { kind: 'command', command: 'compare:204 199' }, now: at() })
+    expect(asCommand.step).toMatchObject({ prompt: '', model: null, command: 'compare:204 199' })
+    const yours = await R.changeStep(db, { docketId, letter: 'a', stepId: step.id, set: { kind: 'yours', text: 'Ring Anna' }, now: at() })
+    expect(yours.step).toMatchObject({ prompt: '', model: null, todo: { text: 'Ring Anna', doneAt: null } })
+    expect(yours.step.command).toBeUndefined()
+    // Each is stored as a step of its kind is made, so a backup restores it.
+    for (const s of [asSearch.step, asCommand.step, yours.step]) {
+      expect(validateBackup({ conversations: [], dockets: [{ id: 'd1', branches: [], order: [] }], runs: [{ id: 'r1', docketId: 'd1', n: 1, branches: { a: { status: 'ready', steps: [s] } } }] }).valid).toBe(true)
+    }
+    // undo: puts the command back as it was.
+    await R.putPlanBack(db, yours.back)
+    const back = (await db.getAllFromIndex('runs', 'docketId', docketId))[0]
+    expect(back.branches.a.steps[0]).toMatchObject({ command: 'compare:204 199' })
+  })
+
+  it('moves a sub-task among those not sent, never before one sent, and undo: moves it back', async () => {
+    const made = await R.newPlan(db, { title: 'Grant application', task: { flow: 'oneByOne' }, newId, now: at() })
+    const docketId = made.docket.id
+    const one = await R.planStep(db, { docketId, letter: 'a', prompt: 'One', title: 'One', newId, now: at() })
+    await R.planStep(db, { docketId, letter: 'a', todo: 'Two', title: 'Two', newId, now: at() })
+    const three = await R.planStep(db, { docketId, letter: 'a', prompt: 'Three', title: 'Three', newId, now: at() })
+    const order = async () => (await db.getAllFromIndex('runs', 'docketId', docketId))[0].branches.a.steps.map((s) => s.title)
+    const moved = await R.moveStep(db, { docketId, letter: 'a', stepId: three.step.id, to: 0, now: at() })
+    expect(moved.index).toBe(1)
+    expect(await order()).toEqual(['Three', 'One', 'Two'])
+    await R.putPlanBack(db, moved.back)
+    expect(await order()).toEqual(['One', 'Two', 'Three'])
+    // Once the first is running, nothing goes before it, and it stays put.
+    await R.markStep(db, { docketId, n: 1, letter: 'a', stepId: one.step.id, status: STATUS.RUNNING, now: at() })
+    await R.moveStep(db, { docketId, letter: 'a', stepId: three.step.id, to: 0, now: at() })
+    expect(await order()).toEqual(['One', 'Three', 'Two'])
+    await expect(R.moveStep(db, { docketId, letter: 'a', stepId: one.step.id, to: 2, now: at() })).rejects.toMatchObject({ code: 'fixed' })
+  })
 })
 
 describe('a task run', () => {

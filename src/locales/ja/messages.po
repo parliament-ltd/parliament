@@ -6366,6 +6366,16 @@ msgstr "編集{num}として取り消し線を引きました。undo:{num} で�
 msgid "enter.subDone"
 msgstr "タスク{num}にサブタスク{index}を追加しました。何も送信していません"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subEdited"
+msgstr "タスク{num}のサブタスク{n}を変更しました。undo: で取り消せます"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subMoved"
+msgstr "タスク{num}のサブタスク{n}をサブタスク{to}に移しました。undo: で取り消せます"
+
 #. js-lingui-explicit-id
 msgid "enter.subNew"
 msgstr "Enterで、タスク{num}にサブタスク{index}「{title}」を、そのモデルへのプロンプトとして追加します。何も送信されません"
@@ -6377,6 +6387,11 @@ msgstr "Enterで、タスク{num}に空のサブタスク{index}を追加しま�
 #. js-lingui-explicit-id
 msgid "enter.subNewYours"
 msgstr "Enterで、タスク{num}にサブタスク{index}「{title}」を追加します。チェックは自分で付けます。何も送信されません"
+
+#. After a pasted list became sub-tasks. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subsAdded"
+msgstr "{count, plural, other {タスク{num}にサブタスクを#件追加しました。何も送信していません。undo: で取り消せます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6591,6 +6606,11 @@ msgstr "→ 新しいチャット（{room}、triedタグ付き）"
 #. js-lingui-explicit-id
 msgid "enter.taskChanged"
 msgstr "タスク{num}を変更しました"
+
+#. After a task was written on the Tasks board. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskEdited"
+msgstr "タスク{num}を変更しました。undo: で取り消せます"
 
 #. js-lingui-explicit-id
 msgid "enter.taskFlowRan"
@@ -10493,16 +10513,13 @@ msgid "storage.notKept"
 msgstr "このブラウザは、Parliamentのデータの保持に同意していません。ブラウザによっては、閉じたときや容量が足りなくなったときに、サイトのデータを削除します。残すには、ブラウザのプライバシー設定で、このサイトにCookieとサイトデータの保存を許可し、バックアップも取っておいてください。"
 
 #. js-lingui-explicit-id
-msgid "tasks.add"
-msgstr "タスクを追加"
-
-#. js-lingui-explicit-id
 msgid "tasks.addPlus"
 msgstr "タスクを追加"
 
+#. A pill that adds a room the answers go into
 #. js-lingui-explicit-id
-msgid "tasks.addSub"
-msgstr "サブタスクを追加"
+msgid "tasks.addRoom"
+msgstr "+ ルーム"
 
 #. js-lingui-explicit-id
 msgid "tasks.addSubPlus"
@@ -10530,10 +10547,9 @@ msgstr "タスクと同じ"
 msgid "tasks.cancel"
 msgstr "キャンセル"
 
-#. A link that opens the task’s fields to change them
 #. js-lingui-explicit-id
-msgid "tasks.change"
-msgstr "変更"
+msgid "tasks.commandEnter"
+msgstr "Enterで保存します。実行するとバーに入り、Enterを待ちます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10557,28 +10573,12 @@ msgid "tasks.doneOf"
 msgstr "{done}/{count}完了"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldCommand"
-msgstr "コマンド"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldDescription"
 msgstr "説明"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldFlow"
-msgstr "進め方"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldKind"
-msgstr "種類"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldModel"
 msgstr "モデル"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldName"
-msgstr "名前"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
@@ -10589,20 +10589,8 @@ msgid "tasks.fieldRoom"
 msgstr "ルーム"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldRooms"
-msgstr "ルーム"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldSearch"
 msgstr "検索語"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldSource"
-msgstr "情報源"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldWords"
-msgstr "内容"
 
 #. js-lingui-explicit-id
 msgid "tasks.findRooms"
@@ -10613,33 +10601,16 @@ msgid "tasks.flowOneByOne"
 msgstr "1つずつ"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowOneByOneLow"
-msgstr "1つずつ"
+msgid "tasks.flowSet"
+msgstr "タスクを一度実行すると変えられません"
 
 #. js-lingui-explicit-id
 msgid "tasks.flowTogether"
 msgstr "すべて同時に"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowTogetherLow"
-msgstr "すべて同時に"
-
-#. js-lingui-explicit-id
-msgid "tasks.ifYouLike"
-msgstr "任意"
-
-#. js-lingui-explicit-id
-msgid "tasks.keep"
-msgstr "保存"
-
-#. js-lingui-explicit-id
 msgid "tasks.kindCommand"
 msgstr "コマンド"
-
-#. The kind of a task that is the person’s own
-#. js-lingui-explicit-id
-msgid "tasks.kindNone"
-msgstr "なし"
 
 #. js-lingui-explicit-id
 msgid "tasks.kindPrompt"
@@ -10649,30 +10620,46 @@ msgstr "プロンプト"
 msgid "tasks.kindSearch"
 msgstr "検索"
 
+#. Read aloud for the Prompt, Search and Command pills
+#. js-lingui-explicit-id
+msgid "tasks.kindsLabel"
+msgstr "種類"
+
+#. Said as: Took back the move of sub-task 3 in task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineMove"
+msgstr "タスク{num}のサブタスク{n}の移動"
+
+#. Said as: Took back the 5 sub-tasks added to task 207
+#. js-lingui-explicit-id
+msgid "tasks.linePaste"
+msgstr "{count, plural, other {タスク{num}に追加した#件のサブタスク}}"
+
+#. Said as: Took back the change to sub-task 2 of task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineSub"
+msgstr "タスク{num}のサブタスク{n}の変更"
+
+#. Said as: Took back the change to task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineTask"
+msgstr "タスク{num}の変更"
+
+#. js-lingui-explicit-id
+msgid "tasks.moveSub"
+msgstr "サブタスク{n}を移動"
+
 #. js-lingui-explicit-id
 msgid "tasks.needsKey"
 msgstr "キーが必要"
-
-#. js-lingui-explicit-id
-msgid "tasks.none"
-msgstr "タスクはまだありません"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "tasks.noneHow"
-msgstr "＋で追加するか、バーに new:task \"助成金の申請\" と入力します"
-
-#. js-lingui-explicit-id
-msgid "tasks.noRoom"
-msgstr "ルームなし"
 
 #. js-lingui-explicit-id
 msgid "tasks.ownBranch"
 msgstr "このタスクのブランチ"
 
 #. js-lingui-explicit-id
-msgid "tasks.ownRoom"
-msgstr "このタスクのブランチ。チャットは初めて実行したときに作られます"
+msgid "tasks.pasted"
+msgstr "{count, plural, other {#行を貼り付けました。Enterで#件のサブタスクとして追加し、Escapeで1つの名前にまとめます}}"
 
 #. A small label: the sub-task is a command
 #. js-lingui-explicit-id
@@ -10698,21 +10685,34 @@ msgstr "ルーム{num}"
 msgid "tasks.roomOff"
 msgstr "ルーム{num}を外す"
 
+#. A button that puts run: in the bar, for your Enter
+#. js-lingui-explicit-id
+msgid "tasks.run"
+msgstr "実行"
+
 #. js-lingui-explicit-id
 msgid "tasks.runN"
 msgstr "実行{n}"
-
-#. js-lingui-explicit-id
-msgid "tasks.runs"
-msgstr "実行"
 
 #. js-lingui-explicit-id
 msgid "tasks.runWaits"
 msgstr "「{title}」で待機中"
 
 #. js-lingui-explicit-id
+msgid "tasks.save"
+msgstr "保存"
+
+#. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, other {サブタスク#件}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subName"
+msgstr "サブタスク{n}の名前"
+
+#. js-lingui-explicit-id
+msgid "tasks.taskName"
+msgstr "タスク{num}の名前"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

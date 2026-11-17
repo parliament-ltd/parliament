@@ -55,7 +55,8 @@ import { promptFacts, promptNow } from '../lib/branchVerbs'
 import { checkSourceTexts } from '../lib/sourceCheck'
 import Bar from './Bar'
 import Strip from './Strip'
-import { usePhoneBoards, useKeyboardGap, useKeyboardForWords } from './phoneBoards'
+import { usePhoneBoards, useKeyboardGap, useKeyboardForWords, useSwipeToClose } from './phoneBoards'
+import { wordFor } from '../shell/boards'
 import { BoardArrows } from './BoardArrows'
 import Board from './Board'
 import { boardName, roomLabel, andList } from './say'
@@ -84,7 +85,7 @@ import { cardsOf, tabCounts, sequenceOf, cardsShown } from '../lib/collectionCar
 import CollectionBoard from './CollectionBoard'
 import { showOf, modeOf, hiddenClasses } from '../lib/markupShow'
 import { settleable } from '../lib/editVerbs'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, changeTask, tickTask, planStep, changeStep, tickTodo, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, changeTask, tickTask, planStep, changeStep, moveStep, tickTodo, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord, removeMadeQuote } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
 import { FLOWS, isCommand, modelOf, taskLeadOf, titleOf } from '../lib/taskModel'
 import { taskRows, openTaskOf, answersOf } from '../lib/tasksBoard'
@@ -177,7 +178,7 @@ const BAR = 'command' // the popped bar's key among the windows
 const FEATURES = detectFeatures()
 const NONE = Object.freeze([])
 // What the plan commands do, carried out by planAct (stage 10, piece 2; C198).
-const PLAN_ACTS = new Set(['newPlan', 'newTask', 'changeTask', 'tickTask', 'planStep', 'tickTodo', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete', 'run', 'stop', 'stopReply'])
+const PLAN_ACTS = new Set(['newPlan', 'newTask', 'changeTask', 'changeStep', 'moveStep', 'planSteps', 'tickTask', 'planStep', 'tickTodo', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete', 'run', 'stop', 'stopReply'])
 
 // The interface language a source answers in. The test languages (en-XA,
 // ar-XB) stand for English.
@@ -3414,7 +3415,9 @@ export default function Shell() {
     const newId = () => crypto.randomUUID()
     const now = new Date().toISOString()
     const keep = (back) => { if (back) touched.current?.plans.push(back) }
-    const said = () => { if (!what.fromPrompt) remember(body) }
+    // A change written on the Tasks board (C309) is no command typed, so it
+    // is not kept among the lines you ran; undo: still takes it back.
+    const said = () => { if (!what.fromPrompt && !what.board) remember(body) }
     try {
       if (what.kind === 'newPlan') {
         const made = await newPlan(db.current, { title: what.title ?? '', newId, now })
@@ -3442,7 +3445,31 @@ export default function Shell() {
         const out = await changeTask(db.current, { docketId: what.docketId, set: what.set, now })
         keep(out.back)
         said()
-        return { done: true, says: { message: 'taskChanged', values: { num: what.num } } }
+        return { done: true, says: { message: what.board ? 'taskEdited' : 'taskChanged', values: { num: what.num } } }
+      }
+      // A sub-task written in place, its kind among it (C309).
+      if (what.kind === 'changeStep') {
+        const out = await changeStep(db.current, { docketId: what.docketId, letter: 'a', stepId: what.stepId, set: what.set, now })
+        keep(out.back)
+        said()
+        return { done: true, says: { message: 'subEdited', values: { n: what.index, num: what.num } } }
+      }
+      // A sub-task moved up or down (C309).
+      if (what.kind === 'moveStep') {
+        const out = await moveStep(db.current, { docketId: what.docketId, letter: 'a', stepId: what.stepId, to: what.to, now })
+        keep(out.back)
+        said()
+        return { done: true, says: { message: 'subMoved', values: { n: what.index, to: out.index, num: what.num } } }
+      }
+      // A pasted list, one sub-task of yours a line (C309): one change, so
+      // one undo: takes them all back.
+      if (what.kind === 'planSteps') {
+        for (const title of what.titles) {
+          const out = await planStep(db.current, { docketId: what.docketId, letter: 'a', prompt: '', todo: '', title, newId, now })
+          keep(out.back)
+        }
+        said()
+        return { done: true, says: { message: 'subsAdded', values: { count: what.titles.length, num: what.num } } }
       }
       if (what.kind === 'tickTask') {
         const out = await tickTask(db.current, { docketId: what.docketId, done: what.done, now })
@@ -4480,10 +4507,14 @@ export default function Shell() {
     return out
   }, [onRun, sayRan])
   // A task's fields, written on the board, kept as written, as a sub-task's are.
-  const taskChange = useCallback((num, docketId, set) => {
-    if (!db.current) return
-    changeTask(db.current, { docketId, set }).catch((err) => { if (err?.code === 'ran') setBarSaid({ says: { message: 'taskFlowRan', values: { num } } }) })
-  }, [])
+  // A change written on the board (C309), as an act, so it is said under
+  // the bar and undo: takes it back; its line names what changed.
+  const taskEdit = useCallback(async (what, line) => {
+    const out = await onRun(null, line, null, { ...what, board: true })
+    setBarSaid({ says: out && !out.done ? (typeof out === 'string' ? { message: out } : out) : out?.says ?? null })
+    return out
+  }, [onRun])
+  const taskChange = useCallback((num, docketId, set) => taskEdit({ kind: 'changeTask', docketId, num, set }, i18n._(COPY.tasks.lineTask, { num })), [taskEdit, i18n])
   const taskAdd = useCallback((fields) => taskDo({ kind: 'newTask', title: fields.title, task: fields }, `new:task "${fields.title}"`), [taskDo])
   const subAdd = useCallback((num, docketId, n, fields) => taskDo({
     kind: 'planStep', docketId, num, n, letter: 'a', address: String(num), title: fields.title,
@@ -4493,11 +4524,9 @@ export default function Shell() {
     model: fields.kind === 'prompt' || fields.kind === 'search' ? fields.model ?? null : null,
     into: fields.kind === 'prompt' || fields.kind === 'search' ? fields.into ?? null : null,
   }, `new:subtask ${num} "${fields.title}"`), [taskDo])
-  const subChange = useCallback((docketId, stepId, set) => {
-    const p = planBoardNow.current
-    if (!p || p.docketId !== docketId || !db.current) return
-    changeStep(db.current, { docketId, n: p.latest, letter: 'a', stepId, set }).catch(() => {})
-  }, [])
+  const subChange = useCallback((num, docketId, index, stepId, set) => taskEdit({ kind: 'changeStep', docketId, num, index, stepId, set }, i18n._(COPY.tasks.lineSub, { n: index, num })), [taskEdit, i18n])
+  const subMove = useCallback((num, docketId, index, stepId, to) => taskEdit({ kind: 'moveStep', docketId, num, index, stepId, to }, i18n._(COPY.tasks.lineMove, { n: index, num })), [taskEdit, i18n])
+  const subsPaste = useCallback((num, docketId, titles) => taskEdit({ kind: 'planSteps', docketId, num, titles }, i18n._(COPY.tasks.linePaste, { count: titles.length, num })), [taskEdit, i18n])
   // An address that asks for a board (/settings, the old page's; R37; C186)
   // opens it once the space is loaded, and the address goes back to /.
   const location = useLocation()
@@ -4715,6 +4744,23 @@ export default function Shell() {
     const row = chat ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === chat) : null
     return { board, num: row?.num ?? null }
   })
+  // On a phone a board swiped to the side closes, as close: would (C310):
+  // a room by its number, the welcome page as welcome, the rest by their
+  // word. A board close: has no word for (alarms, the dictionary) is closed
+  // as close: alone closes the board the bar points at. One that cannot
+  // close does not move.
+  const closeLineOf = (board) => {
+    const num = isRoom(board) ? stripRooms.find((r) => r.board === board)?.num : null
+    const line = board === START ? 'close:welcome' : isRoom(board) ? (num != null ? `close:${num}` : null) : `close:${wordFor(board)}`
+    const p = line ? preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} }) : null
+    if (p && (p.act || p.next)) return line
+    return planClose(current.current, board).next ? 'close:' : null
+  }
+  const swipeClose = (board, line) => {
+    if (line === 'close:' && current.current.addressed !== board) commit(address(current.current, board))
+    runClicked(line)
+  }
+  useSwipeToClose({ on: phone, stage: stageRef, columns: arrangement.columns, lineFor: closeLineOf, onClose: swipeClose })
   // The strip names the collection, as its board's head does, never its id.
   // One not found shows nothing after the title.
   const stripArrangement = useMemo(() => {
@@ -4894,7 +4940,7 @@ export default function Shell() {
           key="docket" tasks={tasksList} open={taskOpen} addressed={arrangement.addressed === 'docket'} onAddress={focusBoard}
           nameOf={planModelName} defaultModel={settings.defaultModel ?? null} models={answerRows} rooms={taskRooms} validate={(line) => preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })}
           onOpen={(num) => run(showPlan(current.current, num), null)} onRun={runClicked} onWrite={writeField}
-          onAdd={taskAdd} onChange={taskChange} onAddSub={subAdd} onChangeSub={subChange} onDelete={onPlanDelete}
+          onAdd={taskAdd} onChange={taskChange} onAddSub={subAdd} onChangeSub={subChange} onMoveSub={subMove} onPasteSubs={subsPaste} onDelete={onPlanDelete}
         />
       )
     }

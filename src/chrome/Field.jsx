@@ -58,8 +58,10 @@ const Field = forwardRef(function Field({ state, folded, win, hint = null, margi
   const { i18n } = useLingui()
   const { mode } = state
   const held = showsHeld(state)
-  // A prompt tapped into on a phone shows its pills on a second row.
-  const two = phone && mode === 'prompt' && state.focused && !folded && Boolean(marginalia)
+  // A prompt tapped into on a phone shows its pills on a second row, and
+  // keeps them while one of its menus is open, the keyboard put away (C310).
+  const menuUp = marginaliaOpen || frameworksOpen || Boolean(plus?.open)
+  const two = phone && mode === 'prompt' && (state.focused || menuUp) && !folded && Boolean(marginalia)
   const mic = Boolean(voice) && voice.status !== 'checking'
   // A swipe across the field, by touch: told as it moves and when it ends.
   const swipe = useRef(null)

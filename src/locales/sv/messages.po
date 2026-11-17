@@ -6366,6 +6366,16 @@ msgstr "Genomstruket som redigering {num}. undo:{num} ångrar den"
 msgid "enter.subDone"
 msgstr "Deluppgift {index} är tillagd i uppgift {num}. Inget skickades"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subEdited"
+msgstr "Deluppgift {n} i uppgift {num} är ändrad. undo: ångrar det"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subMoved"
+msgstr "Deluppgift {n} i uppgift {num} är nu deluppgift {to}. undo: ångrar det"
+
 #. js-lingui-explicit-id
 msgid "enter.subNew"
 msgstr "Enter lägger till deluppgift {index}, ”{title}”, i uppgift {num}, en prompt till dess modell. Inget skickas"
@@ -6377,6 +6387,11 @@ msgstr "Enter lägger till en tom deluppgift {index} i uppgift {num}, att skriva
 #. js-lingui-explicit-id
 msgid "enter.subNewYours"
 msgstr "Enter lägger till deluppgift {index}, ”{title}”, i uppgift {num}, som du bockar av. Inget skickas"
+
+#. After a pasted list became sub-tasks. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subsAdded"
+msgstr "{count, plural, one {En deluppgift är tillagd i uppgift {num}. Inget skickades. undo: ångrar det} other {# deluppgifter är tillagda i uppgift {num}. Inget skickades. undo: ångrar dem}}"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6591,6 +6606,11 @@ msgstr "→ en ny chatt i {room}, taggad tried"
 #. js-lingui-explicit-id
 msgid "enter.taskChanged"
 msgstr "Uppgift {num} är ändrad"
+
+#. After a task was written on the Tasks board. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskEdited"
+msgstr "Uppgift {num} är ändrad. undo: ångrar det"
 
 #. js-lingui-explicit-id
 msgid "enter.taskFlowRan"
@@ -10493,16 +10513,13 @@ msgid "storage.notKept"
 msgstr "Den här webbläsaren har inte lovat att behålla Parliaments data. Vissa webbläsare raderar en webbplats data när de stängs eller får ont om utrymme. För att behålla den, tillåt webbplatsen att spara cookies och webbplatsdata i webbläsarens integritetsinställningar, och gör en säkerhetskopia."
 
 #. js-lingui-explicit-id
-msgid "tasks.add"
-msgstr "Lägg till uppgiften"
-
-#. js-lingui-explicit-id
 msgid "tasks.addPlus"
 msgstr "Lägg till en uppgift"
 
+#. A pill that adds a room the answers go into
 #. js-lingui-explicit-id
-msgid "tasks.addSub"
-msgstr "Lägg till deluppgiften"
+msgid "tasks.addRoom"
+msgstr "+ rum"
 
 #. js-lingui-explicit-id
 msgid "tasks.addSubPlus"
@@ -10530,10 +10547,9 @@ msgstr "samma som uppgiften"
 msgid "tasks.cancel"
 msgstr "Avbryt"
 
-#. A link that opens the task’s fields to change them
 #. js-lingui-explicit-id
-msgid "tasks.change"
-msgstr "ändra"
+msgid "tasks.commandEnter"
+msgstr "Enter behåller det. En körning lägger det i fältet och väntar på att du trycker på Enter"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10557,28 +10573,12 @@ msgid "tasks.doneOf"
 msgstr "{done} av {count} klara"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldCommand"
-msgstr "Kommando"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldDescription"
 msgstr "Beskrivning"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldFlow"
-msgstr "Flöde"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldKind"
-msgstr "Typ"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldModel"
 msgstr "Modell"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldName"
-msgstr "Namn"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
@@ -10589,20 +10589,8 @@ msgid "tasks.fieldRoom"
 msgstr "Rum"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldRooms"
-msgstr "Rum"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldSearch"
 msgstr "Sök efter"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldSource"
-msgstr "Källa"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldWords"
-msgstr "Text"
 
 #. js-lingui-explicit-id
 msgid "tasks.findRooms"
@@ -10613,33 +10601,16 @@ msgid "tasks.flowOneByOne"
 msgstr "En i taget"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowOneByOneLow"
-msgstr "en i taget"
+msgid "tasks.flowSet"
+msgstr "Bestämt när uppgiften har körts"
 
 #. js-lingui-explicit-id
 msgid "tasks.flowTogether"
 msgstr "Alla samtidigt"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowTogetherLow"
-msgstr "alla samtidigt"
-
-#. js-lingui-explicit-id
-msgid "tasks.ifYouLike"
-msgstr "om du vill"
-
-#. js-lingui-explicit-id
-msgid "tasks.keep"
-msgstr "Spara"
-
-#. js-lingui-explicit-id
 msgid "tasks.kindCommand"
 msgstr "Kommando"
-
-#. The kind of a task that is the person’s own
-#. js-lingui-explicit-id
-msgid "tasks.kindNone"
-msgstr "Ingen"
 
 #. js-lingui-explicit-id
 msgid "tasks.kindPrompt"
@@ -10649,30 +10620,46 @@ msgstr "Prompt"
 msgid "tasks.kindSearch"
 msgstr "Sökning"
 
+#. Read aloud for the Prompt, Search and Command pills
+#. js-lingui-explicit-id
+msgid "tasks.kindsLabel"
+msgstr "Vad det är"
+
+#. Said as: Took back the move of sub-task 3 in task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineMove"
+msgstr "flytten av deluppgift {n} i uppgift {num}"
+
+#. Said as: Took back the 5 sub-tasks added to task 207
+#. js-lingui-explicit-id
+msgid "tasks.linePaste"
+msgstr "{count, plural, other {de # deluppgifterna som lades till i uppgift {num}}}"
+
+#. Said as: Took back the change to sub-task 2 of task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineSub"
+msgstr "ändringen av deluppgift {n} i uppgift {num}"
+
+#. Said as: Took back the change to task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineTask"
+msgstr "ändringen av uppgift {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.moveSub"
+msgstr "Flytta deluppgift {n}"
+
 #. js-lingui-explicit-id
 msgid "tasks.needsKey"
 msgstr "behöver en nyckel"
-
-#. js-lingui-explicit-id
-msgid "tasks.none"
-msgstr "Inga uppgifter än"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "tasks.noneHow"
-msgstr "Lägg till en med pluset, eller med new:task \"bidragsansökan\" i fältet"
-
-#. js-lingui-explicit-id
-msgid "tasks.noRoom"
-msgstr "inget rum"
 
 #. js-lingui-explicit-id
 msgid "tasks.ownBranch"
 msgstr "en gren i den här uppgiften"
 
 #. js-lingui-explicit-id
-msgid "tasks.ownRoom"
-msgstr "en gren i den här uppgiften, vars chatt skapas första gången den körs"
+msgid "tasks.pasted"
+msgstr "{count, plural, other {# rader inklistrade. Enter lägger till dem som # deluppgifter, Escape behåller dem som ett namn}}"
 
 #. A small label: the sub-task is a command
 #. js-lingui-explicit-id
@@ -10698,21 +10685,34 @@ msgstr "rum {num}"
 msgid "tasks.roomOff"
 msgstr "Ta bort rum {num}"
 
+#. A button that puts run: in the bar, for your Enter
+#. js-lingui-explicit-id
+msgid "tasks.run"
+msgstr "Kör"
+
 #. js-lingui-explicit-id
 msgid "tasks.runN"
 msgstr "Körning {n}"
-
-#. js-lingui-explicit-id
-msgid "tasks.runs"
-msgstr "Körningar"
 
 #. js-lingui-explicit-id
 msgid "tasks.runWaits"
 msgstr "väntar vid ”{title}”"
 
 #. js-lingui-explicit-id
+msgid "tasks.save"
+msgstr "Spara"
+
+#. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, one {en deluppgift} other {# deluppgifter}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subName"
+msgstr "Namnet på deluppgift {n}"
+
+#. js-lingui-explicit-id
+msgid "tasks.taskName"
+msgstr "Namnet på uppgift {num}"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

@@ -6366,6 +6366,16 @@ msgstr "Struck as edit {num}. undo:{num} takes it back"
 msgid "enter.subDone"
 msgstr "Sub-task {index} is added to task {num}. Nothing was sent"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subEdited"
+msgstr "Sub-task {n} of task {num} is changed. undo: takes it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subMoved"
+msgstr "Sub-task {n} of task {num} is now sub-task {to}. undo: takes it back"
+
 #. js-lingui-explicit-id
 msgid "enter.subNew"
 msgstr "Enter adds sub-task {index}, “{title}”, to task {num}, a prompt to its model. Nothing is sent"
@@ -6377,6 +6387,11 @@ msgstr "Enter adds an empty sub-task {index} to task {num}, to write on the boar
 #. js-lingui-explicit-id
 msgid "enter.subNewYours"
 msgstr "Enter adds sub-task {index}, “{title}”, to task {num}, for you to tick. Nothing is sent"
+
+#. After a pasted list became sub-tasks. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subsAdded"
+msgstr "{count, plural, one {One sub-task is added to task {num}. Nothing was sent. undo: takes it back} other {# sub-tasks are added to task {num}. Nothing was sent. undo: takes them back}}"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6591,6 +6606,11 @@ msgstr "→ a new chat in {room}, tagged tried"
 #. js-lingui-explicit-id
 msgid "enter.taskChanged"
 msgstr "Task {num} is changed"
+
+#. After a task was written on the Tasks board. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskEdited"
+msgstr "Task {num} is changed. undo: takes it back"
 
 #. js-lingui-explicit-id
 msgid "enter.taskFlowRan"
@@ -10493,16 +10513,13 @@ msgid "storage.notKept"
 msgstr "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup."
 
 #. js-lingui-explicit-id
-msgid "tasks.add"
-msgstr "Add the task"
-
-#. js-lingui-explicit-id
 msgid "tasks.addPlus"
 msgstr "Add a task"
 
+#. A pill that adds a room the answers go into
 #. js-lingui-explicit-id
-msgid "tasks.addSub"
-msgstr "Add the sub-task"
+msgid "tasks.addRoom"
+msgstr "+ room"
 
 #. js-lingui-explicit-id
 msgid "tasks.addSubPlus"
@@ -10530,10 +10547,9 @@ msgstr "as the task"
 msgid "tasks.cancel"
 msgstr "Cancel"
 
-#. A link that opens the task’s fields to change them
 #. js-lingui-explicit-id
-msgid "tasks.change"
-msgstr "change"
+msgid "tasks.commandEnter"
+msgstr "Enter keeps it. A run puts it in the bar, and waits for your Enter"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10557,28 +10573,12 @@ msgid "tasks.doneOf"
 msgstr "{done} of {count} done"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldCommand"
-msgstr "Command"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldDescription"
 msgstr "Description"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldFlow"
-msgstr "Flow"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldKind"
-msgstr "Kind"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldModel"
 msgstr "Model"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldName"
-msgstr "Name"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
@@ -10589,20 +10589,8 @@ msgid "tasks.fieldRoom"
 msgstr "Room"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldRooms"
-msgstr "Rooms"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldSearch"
 msgstr "Search for"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldSource"
-msgstr "Source"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldWords"
-msgstr "Words"
 
 #. js-lingui-explicit-id
 msgid "tasks.findRooms"
@@ -10613,33 +10601,16 @@ msgid "tasks.flowOneByOne"
 msgstr "One by one"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowOneByOneLow"
-msgstr "one by one"
+msgid "tasks.flowSet"
+msgstr "Set once the task has run"
 
 #. js-lingui-explicit-id
 msgid "tasks.flowTogether"
 msgstr "All at once"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowTogetherLow"
-msgstr "all at once"
-
-#. js-lingui-explicit-id
-msgid "tasks.ifYouLike"
-msgstr "if you like"
-
-#. js-lingui-explicit-id
-msgid "tasks.keep"
-msgstr "Keep"
-
-#. js-lingui-explicit-id
 msgid "tasks.kindCommand"
 msgstr "Command"
-
-#. The kind of a task that is the person’s own
-#. js-lingui-explicit-id
-msgid "tasks.kindNone"
-msgstr "None"
 
 #. js-lingui-explicit-id
 msgid "tasks.kindPrompt"
@@ -10649,30 +10620,46 @@ msgstr "Prompt"
 msgid "tasks.kindSearch"
 msgstr "Search"
 
+#. Read aloud for the Prompt, Search and Command pills
+#. js-lingui-explicit-id
+msgid "tasks.kindsLabel"
+msgstr "What it is"
+
+#. Said as: Took back the move of sub-task 3 in task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineMove"
+msgstr "the move of sub-task {n} in task {num}"
+
+#. Said as: Took back the 5 sub-tasks added to task 207
+#. js-lingui-explicit-id
+msgid "tasks.linePaste"
+msgstr "{count, plural, other {the # sub-tasks added to task {num}}}"
+
+#. Said as: Took back the change to sub-task 2 of task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineSub"
+msgstr "the change to sub-task {n} of task {num}"
+
+#. Said as: Took back the change to task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineTask"
+msgstr "the change to task {num}"
+
+#. js-lingui-explicit-id
+msgid "tasks.moveSub"
+msgstr "Move sub-task {n}"
+
 #. js-lingui-explicit-id
 msgid "tasks.needsKey"
 msgstr "needs a key"
-
-#. js-lingui-explicit-id
-msgid "tasks.none"
-msgstr "No tasks yet"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "tasks.noneHow"
-msgstr "Add one with the plus, or new:task \"grant application\" in the bar"
-
-#. js-lingui-explicit-id
-msgid "tasks.noRoom"
-msgstr "no room"
 
 #. js-lingui-explicit-id
 msgid "tasks.ownBranch"
 msgstr "a branch of this task"
 
 #. js-lingui-explicit-id
-msgid "tasks.ownRoom"
-msgstr "a branch of this task, its chat made when it first runs"
+msgid "tasks.pasted"
+msgstr "{count, plural, other {# lines pasted. Enter adds them as # sub-tasks, Escape keeps them as one name}}"
 
 #. A small label: the sub-task is a command
 #. js-lingui-explicit-id
@@ -10698,21 +10685,34 @@ msgstr "room {num}"
 msgid "tasks.roomOff"
 msgstr "Take room {num} off"
 
+#. A button that puts run: in the bar, for your Enter
+#. js-lingui-explicit-id
+msgid "tasks.run"
+msgstr "Run"
+
 #. js-lingui-explicit-id
 msgid "tasks.runN"
 msgstr "Run {n}"
-
-#. js-lingui-explicit-id
-msgid "tasks.runs"
-msgstr "Runs"
 
 #. js-lingui-explicit-id
 msgid "tasks.runWaits"
 msgstr "waits at “{title}”"
 
 #. js-lingui-explicit-id
+msgid "tasks.save"
+msgstr "Save"
+
+#. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, one {one sub-task} other {# sub-tasks}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subName"
+msgstr "Name of sub-task {n}"
+
+#. js-lingui-explicit-id
+msgid "tasks.taskName"
+msgstr "Name of task {num}"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

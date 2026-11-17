@@ -6366,6 +6366,16 @@ msgstr "Yliviivattu muokkauksena {num}. undo:{num} kumoaa sen"
 msgid "enter.subDone"
 msgstr "Alitehtävä {index} on lisätty tehtävään {num}. Mitään ei lähetetty"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subEdited"
+msgstr "Tehtävän {num} alitehtävää {n} on muutettu. undo: kumoaa sen"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subMoved"
+msgstr "Tehtävän {num} alitehtävä {n} on nyt alitehtävä {to}. undo: kumoaa sen"
+
 #. js-lingui-explicit-id
 msgid "enter.subNew"
 msgstr "Enter lisää tehtävään {num} alitehtävän {index}, ”{title}”, kehotteena sen mallille. Mitään ei lähetetä"
@@ -6377,6 +6387,11 @@ msgstr "Enter lisää tyhjän alitehtävän {index} tehtävään {num}, kirjoite
 #. js-lingui-explicit-id
 msgid "enter.subNewYours"
 msgstr "Enter lisää tehtävään {num} alitehtävän {index}, ”{title}”, jonka merkitset itse tehdyksi. Mitään ei lähetetä"
+
+#. After a pasted list became sub-tasks. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subsAdded"
+msgstr "{count, plural, one {Tehtävään {num} on lisätty yksi alitehtävä. Mitään ei lähetetty. undo: kumoaa sen} other {Tehtävään {num} on lisätty # alitehtävää. Mitään ei lähetetty. undo: kumoaa ne}}"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6591,6 +6606,11 @@ msgstr "→ uusi keskustelu, {room}, tunnisteella tried"
 #. js-lingui-explicit-id
 msgid "enter.taskChanged"
 msgstr "Tehtävää {num} on muutettu"
+
+#. After a task was written on the Tasks board. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskEdited"
+msgstr "Tehtävää {num} on muutettu. undo: kumoaa sen"
 
 #. js-lingui-explicit-id
 msgid "enter.taskFlowRan"
@@ -10493,16 +10513,13 @@ msgid "storage.notKept"
 msgstr "Tämä selain ei ole suostunut säilyttämään Parliamentin tietoja. Jotkin selaimet poistavat sivuston tiedot sulkeutuessaan tai tilan käydessä vähiin. Säilyttääksesi ne salli tämän sivuston säilyttää evästeensä ja sivustotietonsa selaimesi tietosuoja-asetuksissa, ja ota varmuuskopio."
 
 #. js-lingui-explicit-id
-msgid "tasks.add"
-msgstr "Lisää tehtävä"
-
-#. js-lingui-explicit-id
 msgid "tasks.addPlus"
 msgstr "Lisää tehtävä"
 
+#. A pill that adds a room the answers go into
 #. js-lingui-explicit-id
-msgid "tasks.addSub"
-msgstr "Lisää alitehtävä"
+msgid "tasks.addRoom"
+msgstr "+ huone"
 
 #. js-lingui-explicit-id
 msgid "tasks.addSubPlus"
@@ -10530,10 +10547,9 @@ msgstr "sama kuin tehtävällä"
 msgid "tasks.cancel"
 msgstr "Peruuta"
 
-#. A link that opens the task’s fields to change them
 #. js-lingui-explicit-id
-msgid "tasks.change"
-msgstr "muuta"
+msgid "tasks.commandEnter"
+msgstr "Enter tallentaa sen. Ajo vie sen palkkiin ja odottaa Enter-painallustasi"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10557,28 +10573,12 @@ msgid "tasks.doneOf"
 msgstr "{done}/{count} tehty"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldCommand"
-msgstr "Komento"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldDescription"
 msgstr "Kuvaus"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldFlow"
-msgstr "Kulku"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldKind"
-msgstr "Tyyppi"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldModel"
 msgstr "Malli"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldName"
-msgstr "Nimi"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
@@ -10589,20 +10589,8 @@ msgid "tasks.fieldRoom"
 msgstr "Huone"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldRooms"
-msgstr "Huoneet"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldSearch"
 msgstr "Hakusanat"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldSource"
-msgstr "Lähde"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldWords"
-msgstr "Teksti"
 
 #. js-lingui-explicit-id
 msgid "tasks.findRooms"
@@ -10613,33 +10601,16 @@ msgid "tasks.flowOneByOne"
 msgstr "Yksi kerrallaan"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowOneByOneLow"
-msgstr "yksi kerrallaan"
+msgid "tasks.flowSet"
+msgstr "Lukittu, kun tehtävä on ajettu"
 
 #. js-lingui-explicit-id
 msgid "tasks.flowTogether"
 msgstr "Kaikki yhtä aikaa"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowTogetherLow"
-msgstr "kaikki yhtä aikaa"
-
-#. js-lingui-explicit-id
-msgid "tasks.ifYouLike"
-msgstr "jos haluat"
-
-#. js-lingui-explicit-id
-msgid "tasks.keep"
-msgstr "Tallenna"
-
-#. js-lingui-explicit-id
 msgid "tasks.kindCommand"
 msgstr "Komento"
-
-#. The kind of a task that is the person’s own
-#. js-lingui-explicit-id
-msgid "tasks.kindNone"
-msgstr "Ei mitään"
 
 #. js-lingui-explicit-id
 msgid "tasks.kindPrompt"
@@ -10649,30 +10620,46 @@ msgstr "Kehote"
 msgid "tasks.kindSearch"
 msgstr "Haku"
 
+#. Read aloud for the Prompt, Search and Command pills
+#. js-lingui-explicit-id
+msgid "tasks.kindsLabel"
+msgstr "Mitä se on"
+
+#. Said as: Took back the move of sub-task 3 in task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineMove"
+msgstr "tehtävän {num} alitehtävän {n} siirto"
+
+#. Said as: Took back the 5 sub-tasks added to task 207
+#. js-lingui-explicit-id
+msgid "tasks.linePaste"
+msgstr "{count, plural, other {tehtävään {num} lisätyt # alitehtävää}}"
+
+#. Said as: Took back the change to sub-task 2 of task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineSub"
+msgstr "tehtävän {num} alitehtävän {n} muutos"
+
+#. Said as: Took back the change to task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineTask"
+msgstr "tehtävän {num} muutos"
+
+#. js-lingui-explicit-id
+msgid "tasks.moveSub"
+msgstr "Siirrä alitehtävää {n}"
+
 #. js-lingui-explicit-id
 msgid "tasks.needsKey"
 msgstr "tarvitsee avaimen"
-
-#. js-lingui-explicit-id
-msgid "tasks.none"
-msgstr "Ei vielä tehtäviä"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "tasks.noneHow"
-msgstr "Lisää sellainen plus-painikkeella, tai kirjoita palkkiin new:task \"apurahahakemus\""
-
-#. js-lingui-explicit-id
-msgid "tasks.noRoom"
-msgstr "ei huonetta"
 
 #. js-lingui-explicit-id
 msgid "tasks.ownBranch"
 msgstr "tämän tehtävän haara"
 
 #. js-lingui-explicit-id
-msgid "tasks.ownRoom"
-msgstr "tämän tehtävän haara, jonka keskustelu luodaan, kun se ajetaan ensimmäisen kerran"
+msgid "tasks.pasted"
+msgstr "{count, plural, other {# riviä liitetty. Enter lisää ne # alitehtävänä, Escape pitää ne yhtenä nimenä}}"
 
 #. A small label: the sub-task is a command
 #. js-lingui-explicit-id
@@ -10698,21 +10685,34 @@ msgstr "huone {num}"
 msgid "tasks.roomOff"
 msgstr "Ota huone {num} pois"
 
+#. A button that puts run: in the bar, for your Enter
+#. js-lingui-explicit-id
+msgid "tasks.run"
+msgstr "Aja"
+
 #. js-lingui-explicit-id
 msgid "tasks.runN"
 msgstr "Ajo {n}"
-
-#. js-lingui-explicit-id
-msgid "tasks.runs"
-msgstr "Ajot"
 
 #. js-lingui-explicit-id
 msgid "tasks.runWaits"
 msgstr "odottaa kohdassa ”{title}”"
 
 #. js-lingui-explicit-id
+msgid "tasks.save"
+msgstr "Tallenna"
+
+#. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, one {yksi alitehtävä} other {# alitehtävää}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subName"
+msgstr "Alitehtävän {n} nimi"
+
+#. js-lingui-explicit-id
+msgid "tasks.taskName"
+msgstr "Tehtävän {num} nimi"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

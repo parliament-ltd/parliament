@@ -180,6 +180,12 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   }
   const closeNow = useRef(closeMenu)
   useEffect(() => { closeNow.current = closeMenu })
+  // On a phone, a menu puts the keyboard away, so the whole of it can be
+  // seen, and dims what is behind it; a tap outside it closes it, and a tap
+  // on the bar brings the keyboard back and closes it (C310; Stefan, 17
+  // November). Not the ? reference, which is typed from.
+  const dims = phone && Boolean(menu) && menu !== 'reference'
+  useEffect(() => { if (dims) input.current?.blur() }, [dims, menu])
   // A click outside the open menu closes it (29 October): anywhere on the
   // page or in a window of its own, but not in the menu, and not on the
   // field, whose marginalia open and close the menus themselves.
@@ -192,6 +198,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       // The languages opened from the globe float under it, and the markup
       // menu under its word; the globe and the word open and close them.
       if (at.closest?.('.ch-float, .ch-globe, .ch-smarkup')) return
+      // The dimmed page behind a phone's menu closes it on its own click, so
+      // the tap does not fall through to a board.
+      if (at.closest?.('.ch-scrim')) return
       closeNow.current(menu)
     }
     // A menu floating under the strip closes on Escape wherever the focus is.
@@ -518,6 +527,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
 
   return (
     <div className={className} ref={root}>
+      {dims && <div className="ch-scrim" aria-hidden="true" onClick={() => closeMenu(menu)} />}
       <div className="ch-dock-in">
         {/* What Enter sends, by branch, above the field (C301 (d), the list). */}
         {sendList && field.mode === 'prompt' && !folded && (
@@ -568,7 +578,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             dispatch({ type: 'input', value: v })
           }}
           onKeyDown={onKeyDown}
-          onFocus={() => { dispatch({ type: 'focus' }); onFocusBoard?.(board) }}
+          onFocus={() => { if (dims) closeMenu(menu); dispatch({ type: 'focus' }); onFocusBoard?.(board) }}
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>

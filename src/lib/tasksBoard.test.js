@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { STATUS } from './docketModel'
-import { taskRows, openTaskOf, answersOf } from './tasksBoard'
+import { taskRows, openTaskOf, answersOf, pastedLines } from './tasksBoard'
 import { planBoardOf } from './planBoard'
 import { planPromptPreview, planTick, planNewSub, planNewTask } from './planVerbs'
 
@@ -107,5 +107,16 @@ describe('the task commands', () => {
   it('a prompt typed on the board adds the task’s next sub-task, by its number', () => {
     const out = planPromptPreview('Tighten it', planBoardOf(task(207, {}, [step('p1')])))
     expect(out).toMatchObject({ ready: true, says: { message: 'planPromptStep', values: { index: 2, address: '207' } }, act: { letter: 'a' } })
+  })
+})
+
+describe('a pasted list (C309)', () => {
+  it('makes one name a line, empty lines left out, and keeps a command as words', () => {
+    expect(pastedLines('Ring Anna\r\n>delete:everything\n\n  Check   the budget ')).toEqual(['Ring Anna', '>delete:everything', 'Check the budget'])
+  })
+  it('leaves one line to be typed as it is, and takes no more than the most', () => {
+    expect(pastedLines('Just one')).toBeNull()
+    expect(pastedLines('a\nb\nc', 2)).toEqual(['a', 'b'])
+    expect(pastedLines(`${'x'.repeat(300)}\ny`)[0]).toHaveLength(200)
   })
 })

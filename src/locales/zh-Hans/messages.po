@@ -6366,6 +6366,16 @@ msgstr "已作为编辑 {num} 加上删除线。undo:{num} 可撤销"
 msgid "enter.subDone"
 msgstr "第 {index} 项子任务已添加到任务 {num}。未发送任何内容"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subEdited"
+msgstr "任务 {num} 的第 {n} 项子任务已更改。undo: 可以撤销"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subMoved"
+msgstr "任务 {num} 的第 {n} 项子任务现在是第 {to} 项。undo: 可以撤销"
+
 #. js-lingui-explicit-id
 msgid "enter.subNew"
 msgstr "按 Enter 将第 {index} 项子任务“{title}”添加到任务 {num}，作为发给其模型的提示词。不会发送任何内容"
@@ -6377,6 +6387,11 @@ msgstr "按 Enter 为任务 {num} 添加空白的第 {index} 项子任务，留�
 #. js-lingui-explicit-id
 msgid "enter.subNewYours"
 msgstr "按 Enter 将第 {index} 项子任务“{title}”添加到任务 {num}，完成后由你勾选。不会发送任何内容"
+
+#. After a pasted list became sub-tasks. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.subsAdded"
+msgstr "{count, plural, other {已向任务 {num} 添加 # 项子任务。未发送任何内容。undo: 可以撤销}}"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -6591,6 +6606,11 @@ msgstr "→ “{room}”中的新对话，带有标签 tried"
 #. js-lingui-explicit-id
 msgid "enter.taskChanged"
 msgstr "任务 {num} 已更改"
+
+#. After a task was written on the Tasks board. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.taskEdited"
+msgstr "任务 {num} 已更改。undo: 可以撤销"
 
 #. js-lingui-explicit-id
 msgid "enter.taskFlowRan"
@@ -10493,16 +10513,13 @@ msgid "storage.notKept"
 msgstr "此浏览器尚未同意长期保存 Parliament 的数据。有些浏览器会在关闭或空间不足时删除网站数据。要保留这些数据，请在浏览器的隐私设置中允许本网站保存 Cookie 和网站数据，并保留一份备份。"
 
 #. js-lingui-explicit-id
-msgid "tasks.add"
-msgstr "添加任务"
-
-#. js-lingui-explicit-id
 msgid "tasks.addPlus"
 msgstr "添加任务"
 
+#. A pill that adds a room the answers go into
 #. js-lingui-explicit-id
-msgid "tasks.addSub"
-msgstr "添加子任务"
+msgid "tasks.addRoom"
+msgstr "+ 房间"
 
 #. js-lingui-explicit-id
 msgid "tasks.addSubPlus"
@@ -10530,10 +10547,9 @@ msgstr "跟随任务"
 msgid "tasks.cancel"
 msgstr "取消"
 
-#. A link that opens the task’s fields to change them
 #. js-lingui-explicit-id
-msgid "tasks.change"
-msgstr "更改"
+msgid "tasks.commandEnter"
+msgstr "按 Enter 保存。运行时会把它放进输入栏，等你按 Enter"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -10557,28 +10573,12 @@ msgid "tasks.doneOf"
 msgstr "已完成 {done} 项，共 {count} 项"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldCommand"
-msgstr "命令"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldDescription"
 msgstr "描述"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldFlow"
-msgstr "流程"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldKind"
-msgstr "类型"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldModel"
 msgstr "模型"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldName"
-msgstr "名称"
 
 #. js-lingui-explicit-id
 msgid "tasks.fieldPrompt"
@@ -10589,20 +10589,8 @@ msgid "tasks.fieldRoom"
 msgstr "房间"
 
 #. js-lingui-explicit-id
-msgid "tasks.fieldRooms"
-msgstr "房间"
-
-#. js-lingui-explicit-id
 msgid "tasks.fieldSearch"
 msgstr "搜索内容"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldSource"
-msgstr "来源"
-
-#. js-lingui-explicit-id
-msgid "tasks.fieldWords"
-msgstr "内容"
 
 #. js-lingui-explicit-id
 msgid "tasks.findRooms"
@@ -10613,33 +10601,16 @@ msgid "tasks.flowOneByOne"
 msgstr "依次进行"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowOneByOneLow"
-msgstr "依次进行"
+msgid "tasks.flowSet"
+msgstr "任务运行后便已确定"
 
 #. js-lingui-explicit-id
 msgid "tasks.flowTogether"
 msgstr "同时进行"
 
 #. js-lingui-explicit-id
-msgid "tasks.flowTogetherLow"
-msgstr "同时进行"
-
-#. js-lingui-explicit-id
-msgid "tasks.ifYouLike"
-msgstr "选填"
-
-#. js-lingui-explicit-id
-msgid "tasks.keep"
-msgstr "保存"
-
-#. js-lingui-explicit-id
 msgid "tasks.kindCommand"
 msgstr "命令"
-
-#. The kind of a task that is the person’s own
-#. js-lingui-explicit-id
-msgid "tasks.kindNone"
-msgstr "无"
 
 #. js-lingui-explicit-id
 msgid "tasks.kindPrompt"
@@ -10649,30 +10620,46 @@ msgstr "提示词"
 msgid "tasks.kindSearch"
 msgstr "搜索"
 
+#. Read aloud for the Prompt, Search and Command pills
+#. js-lingui-explicit-id
+msgid "tasks.kindsLabel"
+msgstr "类型"
+
+#. Said as: Took back the move of sub-task 3 in task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineMove"
+msgstr "任务 {num} 第 {n} 项子任务的移动"
+
+#. Said as: Took back the 5 sub-tasks added to task 207
+#. js-lingui-explicit-id
+msgid "tasks.linePaste"
+msgstr "{count, plural, other {添加到任务 {num} 的 # 项子任务}}"
+
+#. Said as: Took back the change to sub-task 2 of task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineSub"
+msgstr "对任务 {num} 第 {n} 项子任务的更改"
+
+#. Said as: Took back the change to task 207
+#. js-lingui-explicit-id
+msgid "tasks.lineTask"
+msgstr "对任务 {num} 的更改"
+
+#. js-lingui-explicit-id
+msgid "tasks.moveSub"
+msgstr "移动第 {n} 项子任务"
+
 #. js-lingui-explicit-id
 msgid "tasks.needsKey"
 msgstr "需要密钥"
-
-#. js-lingui-explicit-id
-msgid "tasks.none"
-msgstr "还没有任务"
-
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "tasks.noneHow"
-msgstr "点加号添加一个，或在输入栏中输入 new:task \"基金申请\""
-
-#. js-lingui-explicit-id
-msgid "tasks.noRoom"
-msgstr "没有房间"
 
 #. js-lingui-explicit-id
 msgid "tasks.ownBranch"
 msgstr "此任务的一个分支"
 
 #. js-lingui-explicit-id
-msgid "tasks.ownRoom"
-msgstr "此任务的一个分支，首次运行时创建其对话"
+msgid "tasks.pasted"
+msgstr "{count, plural, other {已粘贴 # 行。按 Enter 添加为 # 项子任务，按 Escape 合为一个名称}}"
 
 #. A small label: the sub-task is a command
 #. js-lingui-explicit-id
@@ -10698,21 +10685,34 @@ msgstr "房间 {num}"
 msgid "tasks.roomOff"
 msgstr "移除房间 {num}"
 
+#. A button that puts run: in the bar, for your Enter
+#. js-lingui-explicit-id
+msgid "tasks.run"
+msgstr "运行"
+
 #. js-lingui-explicit-id
 msgid "tasks.runN"
 msgstr "第 {n} 次运行"
-
-#. js-lingui-explicit-id
-msgid "tasks.runs"
-msgstr "运行"
 
 #. js-lingui-explicit-id
 msgid "tasks.runWaits"
 msgstr "在“{title}”处等待"
 
 #. js-lingui-explicit-id
+msgid "tasks.save"
+msgstr "保存"
+
+#. js-lingui-explicit-id
 msgid "tasks.subCount"
 msgstr "{count, plural, other {# 项子任务}}"
+
+#. js-lingui-explicit-id
+msgid "tasks.subName"
+msgstr "第 {n} 项子任务的名称"
+
+#. js-lingui-explicit-id
+msgid "tasks.taskName"
+msgstr "任务 {num} 的名称"
 
 #. js-lingui-explicit-id
 msgid "tasks.tickSub"

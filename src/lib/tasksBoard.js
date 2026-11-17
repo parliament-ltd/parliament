@@ -149,3 +149,17 @@ export function answersOf(chats) {
   }
   return out
 }
+
+/** The most lines a paste makes into sub-tasks at once (C309). */
+export const PASTE_MOST = 50
+
+/**
+ * A paste of several lines, as sub-tasks' names (C309): each line, its
+ * spaces closed up, empty ones left out, cut to a name's length; null for
+ * one line, which is typed as it is. Pasted text is data: a line starting
+ * with > is a name like any other, never a command.
+ */
+export function pastedLines(text, most = PASTE_MOST) {
+  const lines = String(text ?? '').split(/\r?\n/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean)
+  return lines.length > 1 ? lines.slice(0, most).map((l) => l.slice(0, 200)) : null
+}

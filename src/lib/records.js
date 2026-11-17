@@ -1352,6 +1352,24 @@ export async function changeStep(db, { docketId, n = null, letter, stepId, set, 
     if (i < 0) throw new PlanError('noStep')
     if (isFixed(branch.steps[i].status) || branch.steps[i].messageId) throw new PlanError('fixed')
     const next = { ...branch.steps[i] }
+    // Its kind changed on the board (C309): yours, a prompt or a search, or
+    // a command, its words carried over; stored as a step of that kind is
+    // made (plannedStep), so a restore reads it as ever.
+    if (set.kind !== undefined) {
+      const words = isTodo(next) ? String(next.todo.text ?? '') : isCommand(next) ? '' : String(next.prompt ?? '')
+      const line = String(set.command ?? '').trim()
+      if (set.kind === 'command' && !line) throw new PlanError('noCommand')
+      delete next.todo
+      delete next.command
+      if (set.kind === 'yours' || set.kind === 'command') delete next.into
+      if (set.kind === 'yours') {
+        Object.assign(next, { prompt: '', model: null, todo: { text: words.slice(0, TODO_MOST), doneAt: null } })
+      } else if (set.kind === 'command') {
+        Object.assign(next, { prompt: '', model: null, command: line.slice(0, COMMAND_MOST) })
+      } else {
+        Object.assign(next, { prompt: words, model: set.model ?? null })
+      }
+    }
     // A to-do's words are its own, never a prompt (C301 (g)).
     if (set.title !== undefined) {
       const name = String(set.title ?? '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MOST)
@@ -1374,8 +1392,33 @@ export async function changeStep(db, { docketId, n = null, letter, stepId, set, 
     if (set.condition !== undefined) next.condition = CONDITIONS.includes(set.condition) ? set.condition : null
     const steps = branch.steps.map((s, k) => (k === i ? next : s))
     const changes = []
-    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
-    return { result: next, changes }
+    const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { step: next, back }, changes }
+  })
+}
+
+/**
+ * A sub-task moved up or down among those not yet sent (C309): to `to`, its
+ * place from 0 among the branch's steps, never before one that has been
+ * sent or is running. The order is the one the steps are kept in already.
+ */
+export async function moveStep(db, { docketId, n = null, letter, stepId, to, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    const steps = [...branch.steps]
+    const i = steps.findIndex((s) => s.id === stepId)
+    if (i < 0) throw new PlanError('noStep')
+    if (isFixed(steps[i].status) || steps[i].messageId) throw new PlanError('fixed')
+    const first = steps.reduce((at, s, k) => (s.messageId || s.status === STATUS.RUNNING ? k + 1 : at), 0)
+    const place = Math.max(first, Math.min(Number(to) || 0, steps.length - 1))
+    if (place === i) return { result: { index: i + 1, back: null }, changes: [] }
+    const [step] = steps.splice(i, 1)
+    steps.splice(place, 0, step)
+    const changes = []
+    const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { index: place + 1, back }, changes }
   })
 }
 

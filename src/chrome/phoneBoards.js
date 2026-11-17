@@ -101,6 +101,118 @@ export function usePhoneBoards({ on, stage, columns, addressed, onAddress }) {
 }
 
 /**
+ * A board swiped to the side closes, on a phone (C310; Stefan, 17
+ * November: "can we swipe left on a board to close as long as there's
+ * sufficient clearance between the command bar and the boards"). The swipe
+ * starts on a board, above the bar with room to spare, so the bar's own
+ * swipe never closes one; it goes further across than down; it is not a
+ * long press, which selects words, nor in a text being written in, nor on
+ * something that scrolls sideways itself. The board follows the finger and,
+ * let go past a third of the screen or flicked, slides off and closes as
+ * close: would, said under the bar and taken back by undo:; else it slides
+ * back. To the left, or to the right where the page reads right to left.
+ * lineFor(board): its close: line, or null where it cannot close;
+ * onClose(board, line): runs it.
+ * @param {{ on: boolean, stage: { current: HTMLElement|null }, columns: string[][], lineFor: (board: string) => string|null, onClose: (board: string, line: string) => void }} props
+ */
+export function useSwipeToClose({ on, stage, columns, lineFor, onClose }) {
+  const now = useRef({ columns, lineFor, onClose })
+  useEffect(() => { now.current = { columns, lineFor, onClose } })
+  useEffect(() => {
+    if (!on) return undefined
+    let s = null
+    const reset = (el, animate) => {
+      el.style.transition = animate ? `transform ${SLIDE_MS}ms ease, opacity ${SLIDE_MS}ms ease` : ''
+      el.style.transform = ''
+      el.style.opacity = ''
+    }
+    const down = (e) => {
+      const root = stage.current
+      if (e.pointerType === 'mouse' || !e.isPrimary || !root?.contains(e.target)) return
+      const card = cardsIn(root, now.current.columns).find((c) => c.el.contains(e.target))
+      if (!card || !now.current.lineFor(card.board)) return
+      if (!swipeStartsClear(e.target, e.clientY)) return
+      s = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), card, on: false, dx: 0, width: card.el.getBoundingClientRect().width || window.innerWidth, dir: document.documentElement.dir === 'rtl' ? 1 : -1 }
+    }
+    const move = (e) => {
+      if (!s || e.pointerId !== s.id) return
+      const dx = e.clientX - s.x
+      const dy = e.clientY - s.y
+      if (!s.on) {
+        if (Math.abs(dy) > SWIPE_GO && Math.abs(dy) > Math.abs(dx)) { s = null; return }
+        if (Math.abs(dx) < SWIPE_GO || Math.abs(dx) < 1.5 * Math.abs(dy)) return
+        // A long press selects words; a selection, or the wrong way, is no swipe.
+        const sel = window.getSelection?.()
+        if (performance.now() - s.t > LONG_PRESS_MS || (sel && !sel.isCollapsed) || Math.sign(dx) !== s.dir) { s = null; return }
+        s.on = true
+        s.card.el.style.transition = ''
+      }
+      s.dx = s.dir < 0 ? Math.min(0, dx) : Math.max(0, dx)
+      s.card.el.style.transform = `translateX(${s.dx}px)`
+      s.card.el.style.opacity = String(Math.max(0.35, 1 - Math.abs(s.dx) / s.width))
+    }
+    const up = (e) => {
+      if (!s || e.pointerId !== s.id) return
+      const was = s
+      s = null
+      if (!was.on) return
+      const fast = Math.abs(was.dx) / Math.max(1, performance.now() - was.t) > FLICK && Math.abs(was.dx) > 60
+      const line = now.current.lineFor(was.card.board)
+      if (e.type === 'pointercancel' || !line || (Math.abs(was.dx) < was.width * CLOSE_AT && !fast)) { reset(was.card.el, true); return }
+      const el = was.card.el
+      el.style.transition = `transform ${SLIDE_MS}ms ease, opacity ${SLIDE_MS}ms ease`
+      el.style.transform = `translateX(${was.dir * was.width * 1.1}px)`
+      el.style.opacity = '0'
+      window.setTimeout(() => {
+        now.current.onClose(was.card.board, line)
+        // Still there (close: refused): back in its place.
+        window.setTimeout(() => { if (el.isConnected) reset(el, true) }, 120)
+      }, SLIDE_MS)
+    }
+    // On the page, since the stage comes and goes as the space loads.
+    document.addEventListener('pointerdown', down)
+    document.addEventListener('pointermove', move)
+    document.addEventListener('pointerup', up)
+    document.addEventListener('pointercancel', up)
+    return () => {
+      document.removeEventListener('pointerdown', down)
+      document.removeEventListener('pointermove', move)
+      document.removeEventListener('pointerup', up)
+      document.removeEventListener('pointercancel', up)
+    }
+  }, [on, stage])
+}
+
+// A swipe: this far across before it counts; a long press is this long; let
+// go past this share of the width, or this fast (px a ms), it closes.
+const SWIPE_GO = 16
+const LONG_PRESS_MS = 420
+const CLOSE_AT = 1 / 3
+const FLICK = 0.6
+const SLIDE_MS = 200
+// Room to spare above the bar, so its own swipe never reaches a board.
+const BAR_CLEARANCE = 24
+
+/**
+ * Whether a swipe may start here: above the bar with room to spare, not in
+ * a text being written in or a field, and not on something that scrolls
+ * sideways itself (a wide table).
+ */
+export function swipeStartsClear(target, y) {
+  const dock = document.querySelector('.ch-dock')
+  if (dock && y > dock.getBoundingClientRect().top - BAR_CLEARANCE) return false
+  if (!target?.closest) return false
+  if (target.closest('input, textarea, select, .ch-ref, .ch-tk-grip, [role="slider"]')) return false
+  const editing = target.closest('[contenteditable="true"]')
+  if (editing && editing.contains(document.activeElement)) return false
+  for (let el = target; el && !el.classList?.contains('ch-card'); el = el.parentElement) {
+    const cs = window.getComputedStyle(el)
+    if ((cs.overflowX === 'auto' || cs.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 1) return false
+  }
+  return true
+}
+
+/**
  * How much of the screen's foot a phone's keyboard covers, kept as --kb on
  * the page, so the bar rises above it (17 November; Stefan: "the text
  * input box gets covered by the keyboard"). A browser that shrinks the page
