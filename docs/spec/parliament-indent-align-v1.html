@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indent and align, v1</title>
+<!--
+  C304, v1 (16 November): Tab within text and aligning text, asked for by
+  Stefan while testing 0.19.0 ("how can a user tab within text? how can we
+  align the text to center, left, and right?"). Values from tokens.css; the
+  text as a room draws it.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-marg: 11.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  kbd { font: 600 11px var(--sans); padding: 1px 5px; border: .5px solid var(--border); border-bottom-width: 1.5px; border-radius: 4px; background: var(--surface); }
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; align-items: baseline; gap: 10px; padding: 12px 18px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .text { padding: 18px; font: 400 15px/1.65 var(--serif); }
+  .text p { margin: 0 0 8px; }
+  .text h3 { margin: 0 0 8px; font: 600 18px/1.35 var(--serif); }
+  .i1 { padding-inline-start: 28px; }
+  .i2 { padding-inline-start: 56px; }
+  .i3 { padding-inline-start: 84px; }
+  .c { text-align: center; }
+  .r { text-align: right; }
+  .li { position: relative; padding-inline-start: 22px; }
+  .li::before { content: "•"; position: absolute; inset-inline-start: 6px; color: var(--ink-3); }
+  .li.i1 { padding-inline-start: 50px; }
+  .li.i1::before { inset-inline-start: 34px; content: "◦"; }
+  .li.i2 { padding-inline-start: 78px; }
+  .li.i2::before { inset-inline-start: 62px; content: "▪"; font-size: 11px; }
+  .box { display: inline-block; width: 12px; height: 12px; border: 1px solid var(--soft); border-radius: 3px; margin-inline-end: 8px; vertical-align: -1px; }
+  .box.on { background: var(--ink); border-color: var(--ink); }
+  .ck { padding-inline-start: 0; }
+  .ck.i1 { padding-inline-start: 28px; }
+  .caret { display: inline-block; width: 1.5px; height: 1.05em; background: var(--ink); vertical-align: -2px; }
+  .bar { border-radius: 14px; padding: 9px 14px; background: rgb(var(--navy)); color: #fff; font: 400 13.5px var(--mono); }
+  .bar .m { display: inline-block; margin-inline-end: 10px; padding: 1px 7px; border-radius: 8px; background: rgba(255,255,255,.14); font: 600 9.5px var(--sans); letter-spacing: .06em; }
+  .under { margin: 5px 0 16px 14px; font: italic 400 12px/1.5 var(--serif); color: var(--marg); }
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  table.keys { border-collapse: collapse; font: 400 13px/1.5 var(--sans); }
+  table.keys td { padding: 4px 14px 4px 0; vertical-align: baseline; border-bottom: .5px solid var(--border-2); }
+  table.keys td:first-child { white-space: nowrap; }
+  ul.notes { margin: 12px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 13px/1.6 var(--sans); max-width: 760px; }
+  ul.notes li + li { margin-top: 4px; }
+  pre { margin: 0; padding: 12px 14px; border: .5px solid var(--border); border-radius: 10px; background: var(--surface); font: 400 12px/1.55 var(--mono); overflow-x: auto; }
+  .add { color: var(--ai); }
+  .asks ol { margin: 0; padding: 0 0 0 20px; font: 400 13.5px/1.6 var(--sans); max-width: 760px; }
+  .asks li + li { margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>Indent and align, v1</h1>
+    <p>Your two questions from testing, as one change to how a line of text is kept. Tab moves a line in, Shift+Tab out, up to three steps; a list's item becomes a sub-item. A line can sit at the left, in the centre or at the right. Both are said from the bar too, for a phone or for a whole selection.</p>
+    <p>Today neither exists: Tab moves between a table's cells, and anywhere else it leaves the text; lists are one level; nothing is centred.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · In your text</h2>
+    <p class="lede">A draft in a room, as it would look. Headings, lines, lists and checklists all take both.</p>
+    <div class="card addressed">
+      <div class="chead"><h2>Room</h2><span class="marg">211 · your text</span></div>
+      <div class="text">
+        <h3 class="c">Moving plan</h3>
+        <p class="c marg" style="font-size:13px">for the flat on Elm Street, 1 December</p>
+        <p>The week before:</p>
+        <div class="li">Kitchen</div>
+        <div class="li i1">Empty the cupboards</div>
+        <div class="li i1">Pack the glasses in towels</div>
+        <div class="li i2">the good ones in the small box</div>
+        <div class="li">Living room</div>
+        <p class="ck"><span class="box on"></span>Book the van</p>
+        <p class="ck i1"><span class="box"></span>Ask about the lift<span class="caret"></span></p>
+        <p class="i1">A line of plain text moved in one step, for a note under the list.</p>
+        <p class="r marg" style="font-size:13px">Anna</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · The keys</h2>
+    <div class="two">
+      <div>
+        <span class="tag">Indent</span>
+        <table class="keys">
+          <tr><td><kbd>Tab</kbd></td><td>the line, or every line selected, one step in; a list's item becomes a sub-item, up to three</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>one step out</td></tr>
+          <tr><td><kbd>Tab</kbd> in a table</td><td>the next cell, as now</td></tr>
+          <tr><td><kbd>Esc</kbd>, then <kbd>Tab</kbd></td><td>leaves the text, for the next thing on the page, so a keyboard alone can still move on</td></tr>
+          <tr><td><kbd>Backspace</kbd> at a line's start</td><td>one step out, before it joins the line above</td></tr>
+        </table>
+      </div>
+      <div>
+        <span class="tag">Align</span>
+        <table class="keys">
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></td><td>centre</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td><td>right</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td><td>left again</td></tr>
+        </table>
+        <p class="marg" style="margin:8px 0 0">⌘⇧E, R and L on a Mac. The lines the caret or the selection is in; a new line after Enter keeps its line's place.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · From the bar</h2>
+    <p class="lede">For a phone, which has no Tab, and for many lines at once. They act on the text last in hand, as <code>strikethrough:</code> does.</p>
+    <div class="two">
+      <div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;align:center</div>
+        <div class="under">Enter centres the 2 lines selected in 211</div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;align:right</div>
+        <div class="under">Enter puts the line with the caret in 211 at the right</div>
+      </div>
+      <div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;indent:</div>
+        <div class="under">Enter moves the 3 lines selected in 211 one step in</div>
+        <div class="bar"><span class="m">COMMAND</span>&gt;indent:off</div>
+        <div class="under">Enter moves them one step out</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li><code>align:left</code> takes a line back to the left, as <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> does. <code>undo:</code> is not needed: <kbd>Ctrl</kbd>+<kbd>Z</kbd> in the text takes either back.</li>
+      <li>The "/" menu gains nothing: these change how a line sits, not what kind of line it is.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · What it is, and what a model reads</h2>
+    <ul class="notes">
+      <li><b>Not an edit.</b> Moving a line in or centring it changes how it sits, not its words: it is never struck or marked, in a draft or in a model's reply, and it goes into no prompt as an edit. Like ticking a checklist's box.</li>
+      <li><b>A model reads the words, and the lists' levels.</b> A sub-item goes as a list inside a list, as Markdown writes it. A plain line moved in, and any alignment, are not sent: Markdown has no way to say them, and four spaces before a line would turn it into code.</li>
+      <li><b>Copied or saved as Markdown:</b> the same. In a backup, all of it is kept.</li>
+      <li><b>Right to left:</b> in Arabic or Hebrew text, "in" is from the right, and "left" and "right" are the page's own.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · What is stored: shown before building</h2>
+    <p class="lede">Two fields on a line of a message's text (its <code>blocks</code>), each left out when it is the usual: no migration, and an older Parliament shows the line as before.</p>
+<pre>blocks: [
+  { id: "b-31…", type: "heading", level: 2, text: "Moving plan", <span class="add">align: "center"</span> },
+  { id: "b-32…", type: "list_item", kind: "bullet", text: "Empty the cupboards", <span class="add">indent: 1</span> },
+  { id: "b-33…", type: "list_item", kind: "check", checked: false, text: "Ask about the lift", <span class="add">indent: 1</span> },
+  { id: "b-34…", type: "paragraph", text: "Anna", <span class="add">align: "right"</span> }
+]</pre>
+    <ul class="notes">
+      <li><code>indent</code>: 1, 2 or 3, absent at 0. <code>align</code>: "center" or "right", absent at the left. On a paragraph, a heading, a list's item, a checklist's item and a quote; not on a table or a chart.</li>
+      <li>A restore checks both: any other value, and the field is dropped, the words kept.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>Tab and Shift+Tab</b> move a line, or the lines selected, in and out, up to three steps; a list's item becomes a sub-item; in a table, the next cell as now; Esc then Tab leaves the text.</li>
+        <li><b>Ctrl+Shift+E, R and L</b> centre, right and left again.</li>
+        <li><b>From the bar:</b> <code>align:center</code>, <code>align:right</code>, <code>align:left</code>, <code>indent:</code> and <code>indent:off</code>.</li>
+        <li><b>Not an edit,</b> and a model reads only the words and the lists' levels.</li>
+        <li><b>Stored</b> as above: <code>indent</code> and <code>align</code> on a line.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
