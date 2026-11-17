@@ -9423,7 +9423,7 @@ msgstr "namnlöst rum"
 
 #. js-lingui-explicit-id
 msgid "room.writeHere"
-msgstr "Skriv här, eller skriv en prompt i fältet."
+msgstr "Skriv här eller skriv en prompt i fältet."
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id

@@ -2235,7 +2235,7 @@ export const COPY = {
     newTitle: /*i18n*/ { id: 'room.newTitle', message: 'New room' },
     empty: /*i18n*/ { id: 'room.empty', message: 'An empty room. Its first prompt, written in the bar, starts its chat.' },
     // An empty room is a page to write in (C301 (f)).
-    writeHere: /*i18n*/ { id: 'room.writeHere', message: 'Write here, or type a prompt in the bar.' },
+    writeHere: /*i18n*/ { id: 'room.writeHere', message: 'Write here or type a prompt in the bar.' },
     // Ripple's switch in a room's head (stage 12, piece 2; C231 (e)).
     rippleOff: /*i18n*/ { id: 'room.rippleOff', message: 'ripple: off' },
     rippleOn: /*i18n*/ { id: 'room.rippleOn', message: 'ripple: on' },

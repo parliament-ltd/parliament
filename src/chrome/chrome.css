@@ -635,13 +635,22 @@ html:has(.ch-shell.size-phone) { scroll-snap-type: y proximity; }
 /* An empty room is as tall as one with a chat (C302 (e)). */
 .ch-cbody.ch-room-empty { flex: none; height: max(var(--room-least), calc(100dvh - var(--room-chrome))); }
 /* And a page to write in (C301 (f)): a click anywhere in it puts the caret
-   in your text, and an empty page says what it is for. */
+   in your text, and an empty page says what it is for until it has the
+   caret (Stefan, 17 November: "if a user clicks on the text input, let's
+   hide the helper text"). The page draws no outline when it has the caret,
+   though it sits outside the room's own styles: the caret is the sign
+   (Stefan, 17 November: "can we not have that?"). */
 .ch-write-new { display: flex; flex-direction: column; overflow: auto; padding: 18px; cursor: text; }
 .ch-write-new > .p-pair-host { flex: 1; display: flex; flex-direction: column; }
 .ch-write-new > .p-pair-host > div:first-child { flex: 1; display: flex; flex-direction: column; }
 .ch-write-new .p-pair { flex: 1; outline: none; }
+.ch-shell .ch-write-new .p-pair:focus-visible { outline: none; }
 .ch-write-new .p-section, .ch-write-new .p-msg, .ch-write-new .p-msg-box, .ch-write-new .p-msg-body { height: 100%; }
-.ch-write-new .pm-section-content > p:only-child:has(> br:only-child)::before { content: var(--ph); position: absolute; color: var(--ch-ink-3); font-style: italic; pointer-events: none; }
+.ch-write-new:not(:focus-within) .pm-section-content > p:only-child:has(> br:only-child)::before { content: var(--ph); position: absolute; color: var(--ch-ink-3); font-style: italic; pointer-events: none; }
+/* Your own text in a room, written or still a page, takes no tint under the
+   pointer: all of it is yours to change (Stefan, 17 November: "can we get
+   rid of that beige-box?"). A model's reply keeps its tint. */
+.ch-shell .p-pair[contenteditable="true"] .p-msg-writing .p-edit:hover { background: none; }
 .ch-room { flex: none; height: max(var(--room-least), calc(100dvh - var(--room-chrome))); overflow: hidden; display: flex; flex-direction: column;
   background: var(--p-bg-base); color: var(--p-text-primary); font: 400 16px/1.5 var(--font-sans, ui-sans-serif, system-ui, sans-serif); text-align: start; }
 .ch-room > * { flex: 1; min-height: 0; }

@@ -5034,6 +5034,14 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Released as `v0.21.0`, 17 November** (Stefan: "Yes, release", to "Release 0.21.0 so you can try it on your phone?"; on `e6c61e4`; the check passing, 1,711 tests; `parliament-0.21.0.tar.gz` `95792980c8dbab2c…`, `parliament-keys-0.21.0.tar.gz` `631d975d743eea22…`; `main` moved forward to it and pushed with the tag to GitHub and Bitbucket. The vault's files are byte for byte those of `v0.20.0`, so only the app is to publish.)
 - **Published, 17 November** (Stefan: "Published", with the Netlify deploy). The GitHub release `v0.21.0` is immutable, and its three files have the hashes built here. www.parliament.ltd serves the release's files byte for byte (index, every asset, `changelog.json` reading 0.21.0, the browsers page, the word lists' notice and pieces), with the same security headers; the service worker lists the same files. keys.parliament.ltd serves the vault's files as `SHA256SUMS` lists them.
 
+**C306. The room page, clicked** (brought by Stefan, 17 November).
+- **Asked:** "when a user clicks on it there is a black outline over the text input area. can we not have that? there's also a beige-like line ... can we get rid of that beige-box? or at minimum make it invisible"; "if a user clicks on the text input, let's hide the helper text"; "Write here or type a prompt in the bar.", no comma.
+- **Built 17 November:**
+  - **The outline** was the page's keyboard focus, in ink, drawn on an empty room's page because it sits outside the room's own styles. The page draws none now; the caret shows where you are. A room with a chat drew none already. (Keyboard focus stays ink everywhere else.)
+  - **The beige box** was the tint that shows what can be edited under the pointer. Your own text takes none now, an empty page's and a room's you wrote in; a model's reply keeps it.
+  - **The helper text** shows only until the page has the caret, and reads "Write here or type a prompt in the bar." Swedish and Finnish lost their comma too; Japanese and Chinese keep their own punctuation.
+- **Not tried by eye:** the app's browser was hidden, so the rules were checked as written and as the page holds them, not seen. Nothing stored changes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

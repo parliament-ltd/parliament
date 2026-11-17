@@ -9423,7 +9423,7 @@ msgstr "nimetön huone"
 
 #. js-lingui-explicit-id
 msgid "room.writeHere"
-msgstr "Kirjoita tähän, tai kirjoita kehote palkkiin."
+msgstr "Kirjoita tähän tai kirjoita kehote palkkiin."
 
 #. A button that closes the map of screens
 #. js-lingui-explicit-id
