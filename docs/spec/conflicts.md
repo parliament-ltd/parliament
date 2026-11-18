@@ -5223,11 +5223,12 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Suggested:** (a) alone first, and tried for a week; (c) and (d) from the next entry; (b) after, once the index has shown which entries are settled.
 - **Asked:** the five states and their names; (b), by month brought, and the folder's name; (c) with (d)'s two exceptions; whether release lines stay under entries already written (suggested: yes, nothing already written is shortened).
 
-**C313. The version in the page's foot and in About** (brought by Stefan, 18 November). Built, not released.
+**C313. The version in the page's foot and in About** (brought by Stefan, 18 November). Released as 0.24.1.
 - **Asked:** "add to the footer of the page 'In beta, version {version}. MIT licensed, source on Github'. Ask me about any overlap."
 - **Found:** the foot already read "Created with Claude Code · MIT licensed, source on GitHub · Looking for other builders", and Settings, About, "MIT licensed, and the source is on GitHub."; no version showed anywhere.
 - **Ruled by Stefan, 18 November:** "Add beta and version first", and "Yes, add it to About".
 - **Built:** the foot reads "In beta, version 0.24.0 · Created with Claude Code · MIT licensed, source on GitHub · Looking for other builders", GitHub spelt as GitHub spells it; About's line ends "In beta, version 0.24.0." The version is read from `package.json` (`src/lib/version.js`), so each release sets it; only that field goes into the build. In the four translations. Nothing stored.
+- **Released as `v0.24.1`, 18 November, with the README and its screenshots** (Stefan: "let's do 0.24.1", to doing a release rather than a pull request; on `2ec0b2b`; the check passing, 1,739 tests; `parliament-0.24.1.tar.gz` `eafd747e23b47b84…`, `parliament-keys-0.24.1.tar.gz` `df1f8edb0dc0ff63…`; `main` moved forward to it and pushed with the tag to GitHub and Bitbucket. The vault's files are byte for byte those of `v0.24.0`, so only the app is to publish.)
 
 **C314. The README's sentence on the list of what Enter sends** (brought by the README screenshots, 18 November). Reworded; nothing built.
 - **Asked:** shot 6 of the screenshots, "open 'see what goes' on the line under the bar", in the room from shot 1, with its prompts and edit waiting.
