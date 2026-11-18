@@ -9708,6 +9708,11 @@ msgstr ""
 msgid "settings.aboutTitle"
 msgstr ""
 
+#. After the About line; the version as 0.24.0 (C312)
+#. js-lingui-explicit-id
+msgid "settings.aboutVersion"
+msgstr ""
+
 #. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
@@ -11333,6 +11338,11 @@ msgstr ""
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
+msgstr ""
+
+#. First in the page foot; the version as 0.24.0 (C312)
+#. js-lingui-explicit-id
+msgid "welcome.foot.beta"
 msgstr ""
 
 #. js-lingui-explicit-id

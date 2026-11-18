@@ -5223,6 +5223,12 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Suggested:** (a) alone first, and tried for a week; (c) and (d) from the next entry; (b) after, once the index has shown which entries are settled.
 - **Asked:** the five states and their names; (b), by month brought, and the folder's name; (c) with (d)'s two exceptions; whether release lines stay under entries already written (suggested: yes, nothing already written is shortened).
 
+**C313. The version in the page's foot and in About** (brought by Stefan, 18 November). Built, not released.
+- **Asked:** "add to the footer of the page 'In beta, version {version}. MIT licensed, source on Github'. Ask me about any overlap."
+- **Found:** the foot already read "Created with Claude Code · MIT licensed, source on GitHub · Looking for other builders", and Settings, About, "MIT licensed, and the source is on GitHub."; no version showed anywhere.
+- **Ruled by Stefan, 18 November:** "Add beta and version first", and "Yes, add it to About".
+- **Built:** the foot reads "In beta, version 0.24.0 · Created with Claude Code · MIT licensed, source on GitHub · Looking for other builders", GitHub spelt as GitHub spells it; About's line ends "In beta, version 0.24.0." The version is read from `package.json` (`src/lib/version.js`), so each release sets it; only that field goes into the build. In the four translations. Nothing stored.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

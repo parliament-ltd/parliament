@@ -1994,6 +1994,7 @@ export const COPY = {
     textDefault: /*i18n*/ { id: 'settings.textDefault', message: 'Default' },
     textLarge: /*i18n*/ { id: 'settings.textLarge', message: 'Large' },
     aboutName: /*i18n*/ { id: 'settings.aboutName', message: 'Parliament', comment: 'The name of the app' },
+    aboutVersion: /*i18n*/ { id: 'settings.aboutVersion', message: 'In beta, version {version}.', comment: 'After the About line; the version as 0.24.0 (C312)' },
     // About (stage 9, piece 5; T2; privacy-copy-draft.md, drafts 12 to 16 and
     // "What leaves your device", reviewed 12 October; C185). Each claim is
     // true of the code today; the draft's table says what each one needs.
@@ -2222,6 +2223,7 @@ export const COPY = {
     keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask it to keep the data' },
     keepBackup: /*i18n*/ { id: 'welcome.keepBackup', message: 'back up in {board}', comment: '{board} is Settings, from COPY.boards' },
     keepAsking: /*i18n*/ { id: 'welcome.keepAsking', message: 'asking' },
+    footBeta: /*i18n*/ { id: 'welcome.foot.beta', message: 'In beta, version {version}', comment: 'First in the page foot; the version as 0.24.0 (C312)' },
     footMade: /*i18n*/ { id: 'welcome.foot.made', message: 'Created with Claude Code' },
     footLicence: /*i18n*/ { id: 'welcome.foot.licence', message: 'MIT licensed, source on GitHub', comment: 'A link to the public repository (C71, C123; public since 28 October)' },
     footBuilders: /*i18n*/ { id: 'welcome.foot.builders', message: 'Looking for other builders' },

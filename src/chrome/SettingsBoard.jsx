@@ -11,6 +11,7 @@ import { money, longDay } from './say'
 import { browserAbilities } from '../shell/thisBrowser'
 import { checkOnDeviceVoice } from '../hooks/useVoiceInput'
 import { mayOfferPasskeys } from '../lib/lockPasskey'
+import { PARLIAMENT_VERSION } from '../lib/version'
 
 // This browser (stage 15, piece 5; C272 (f)): what works here, found by trying each thing.
 const ABILITY_WORDS = {
@@ -384,7 +385,7 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
           {/* About (settings spec §13) */}
           <section data-sec="about" className={`ch-sec${visible('about') ? '' : ' hidden'}`} aria-labelledby="sec-about">
             <SecHead id="about" title={say(TITLE.about)} />
-            <Row {...rowProps('about', 'parliament')} label={say(COPY.settings.aboutName)} help={say(COPY.settings.aboutWhat)} />
+            <Row {...rowProps('about', 'parliament')} label={say(COPY.settings.aboutName)} help={`${say(COPY.settings.aboutWhat)} ${say(COPY.settings.aboutVersion, { version: PARLIAMENT_VERSION })}`} />
             {/* The privacy copy (T2; privacy-copy-draft.md; C185). */}
             <Row {...rowProps('about', 'private')} label={say(COPY.settings.privateLabel)} stack
               help={<span className="ch-prose">{PRIVATE.map(([head, text]) => (

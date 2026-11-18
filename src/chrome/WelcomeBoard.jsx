@@ -6,6 +6,7 @@ import { actCommand } from '../lib/cardActs'
 import { useNarrower } from './useNarrower'
 import { modKey } from '../shell/keys'
 import BirdsMark from './BirdsMark'
+import { PARLIAMENT_VERSION } from '../lib/version'
 
 // Below this width the card is one column: steps, field, then the letter
 // (welcome spec §5), however it got narrow (C126).
@@ -246,11 +247,16 @@ export function StartBoard({ addressed, onAddress, onWrite }) {
   )
 }
 
-/** The page's foot, outside the card (W §9; C123). "Built for computer, phone later" went with the phone's own bar and menu (17 November; C261 (g)). */
+/**
+ * The page's foot, outside the card (W §9; C123). "Built for computer, phone later" went with the phone's own bar and menu (17 November; C261 (g)).
+ * In beta, and the version, first (C312; Stefan, 18 November), the licence link kept once.
+ */
 export function WelcomeFoot() {
   const { i18n } = useLingui()
   return (
     <footer className="ch-foot ch-marg">
+      <span>{i18n._(COPY.welcome.footBeta, { version: PARLIAMENT_VERSION })}</span>
+      <span className="sep" aria-hidden="true">·</span>
       <span>{i18n._(COPY.welcome.footMade)}</span>
       <span className="sep" aria-hidden="true">·</span>
       {/* The source, public since 28 October. */}

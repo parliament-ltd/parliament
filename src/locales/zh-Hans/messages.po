@@ -9708,6 +9708,11 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "关于与安全"
 
+#. After the About line; the version as 0.24.0 (C312)
+#. js-lingui-explicit-id
+msgid "settings.aboutVersion"
+msgstr "测试版，版本 {version}。"
+
 #. The first sentence is from the welcome letter (C272 (a)); the source is public since 28 October
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
@@ -11334,6 +11339,11 @@ msgstr "更多可以试试的事"
 #. js-lingui-explicit-id
 msgid "welcome.closing"
 msgstr "祝一切顺利，"
+
+#. First in the page foot; the version as 0.24.0 (C312)
+#. js-lingui-explicit-id
+msgid "welcome.foot.beta"
+msgstr "测试版，版本 {version}"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
