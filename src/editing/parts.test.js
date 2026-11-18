@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { EditorState, TextSelection } from 'prosemirror-state'
 import { schema, STRUCK } from './schema'
 import { track, createIds, SKIP } from './track'
-import { partsOf, sameParts, touchedParts, acrossParts, PARTS } from './parts'
+import { partsOf, sameParts, touchedParts, acrossParts, selectPart, PARTS } from './parts'
+import { historyPlugin, undo } from './history'
+import { editingPlugins } from './keys'
 
 // Your text, a prompt and its reply, as the room's one text holds them (C311).
 const para = (id, text) => schema.nodes.paragraph.create({ id }, text ? schema.text(text) : null)
@@ -97,6 +99,59 @@ describe('the parts of one text (C311)', () => {
     const next = run(state, typed, (m) => m === 'w')
     expect(words(next.doc)[0]).toBe('Notes on owls about')
     expect(sameParts(state.doc, next.doc)).toBe(true)
+  })
+  it('selects the part the caret is in on Ctrl+A, and the whole text on a second', () => {
+    let state = setup()
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, posOf(state, 'medium'))))
+    const first = selectPart(state)
+    expect(first.whole).toBe(false)
+    state = state.apply(first.tr)
+    expect(state.doc.textBetween(state.selection.from, state.selection.to, ' | ')).toBe('The barn owls are owls in the genus Tyto. | They are medium-sized.')
+    const second = selectPart(state)
+    expect(second.whole).toBe(true)
+    state = state.apply(second.tr)
+    expect(state.doc.textBetween(state.selection.from, state.selection.to, ' | ')).toBe('Notes on owls before the essay. | barn owl | The barn owls are owls in the genus Tyto. | They are medium-sized.')
+    // A selection across parts already: the whole text.
+    expect(selectPart(select(setup(), 'before', 'genus')).whole).toBe(true)
+  })
+  it('leaves Ctrl+A to the browser where the text is one part', () => {
+    const doc = schema.nodes.doc.create(null, [section('writing', 'w', para('t1', 'Notes on owls.'))])
+    expect(selectPart(EditorState.create({ doc }))).toBe(null)
+  })
+  it('takes a change across parts back as one step', () => {
+    let clock = 1000
+    const base = setup()
+    let state = EditorState.create({ doc: base.doc, plugins: [historyPlugin({ now: () => clock })] })
+    state = select(state, 'before', 'genus')
+    const ids = createIds(240)
+    const before = state.doc
+    for (const make of acrossParts(state, state.tr.delete(state.selection.from, state.selection.to))) {
+      state = state.apply(track(state, make(state), { ids }))
+    }
+    expect(words(state.doc)[1]).toBe('[-barn owl-]')
+    clock += 5000
+    undo(state, (tr) => { state = state.apply(tr) })
+    expect(state.doc.eq(before)).toBe(true)
+  })
+  it('stops Backspace at the start of a part, and Delete at its end', () => {
+    const ids = createIds(240)
+    let state = EditorState.create({ doc: setup().doc, plugins: editingPlugins({ ids }) })
+    const keymaps = state.plugins.filter((p) => p.props.handleKeyDown)
+    const press = (key) => {
+      let made = null
+      const view = { state, dispatch: (tr) => { made = tr }, composing: false, endOfTextblock: () => true }
+      for (const k of keymaps) if (k.props.handleKeyDown(view, { key, code: key, keyCode: key === 'Backspace' ? 8 : 46, preventDefault() {}, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false })) break
+      return made
+    }
+    // Within a part the key does change the text, so the stops below are the key's own.
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, posOf(state, 'genus'))))
+    expect(press('Backspace')?.docChanged).toBe(true)
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, posOf(state, 'The barn owls'))))
+    const back = press('Backspace')
+    expect(back == null || !back.docChanged).toBe(true)
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, posOf(state, 'barn owl') + 'barn owl'.length)))
+    const forward = press('Delete')
+    expect(forward == null || !forward.docChanged).toBe(true)
   })
   it('keeps a part whose every word was selected, empty or struck', () => {
     const state = select(setup(), 'Notes', 'medium-sized.')

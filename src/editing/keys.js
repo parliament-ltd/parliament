@@ -26,6 +26,7 @@ import { Slice, Fragment } from 'prosemirror-model'
 import { schema, STRUCK, ADDED, SUGGEST_OUT, SUGGEST_IN, isWholeBlock } from './schema'
 import { SKIP, INTENT } from './track'
 import { historyPlugin, undo, redo } from './history'
+import { selectPart } from './parts'
 import { shiftLines, alignLines, outdentAtStart } from './layout'
 
 // Escape, then Tab, leaves the text (C304): the views where Escape was the
@@ -286,6 +287,14 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     // At the start of a line moved in: one step out first (C304).
     Backspace: (state, dispatch, view) => outdentAtStart(state, dispatch) || backspace(blk, onJoin)(state, dispatch, view),
     Delete: del(onJoin),
+    // In a room's one text: the part first, the whole text on a second press (C311, step 2).
+    'Mod-a': (state, dispatch) => {
+      const picked = selectPart(state)
+      if (!picked) return false
+      dispatch(picked.tr)
+      if (picked.whole) onNote?.('All of the text is selected.')
+      return true
+    },
     'Mod-z': undo,
     'Mod-y': redo,
     'Shift-Mod-z': redo,

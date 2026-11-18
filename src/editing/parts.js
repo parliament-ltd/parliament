@@ -49,6 +49,27 @@ export function touchedParts(tr) {
 }
 
 /**
+ * Ctrl+A in one text (C311, step 2): the part the caret is in first, and the
+ * whole text once that part is selected already, so one Backspace after one
+ * Ctrl+A never reaches further than the part being worked on.
+ * @returns {{ tr: import('prosemirror-state').Transaction, whole: boolean }|null}
+ *   null where the text has one part or none: the browser's own select all.
+ */
+export function selectPart(state) {
+  const parts = partsOf(state.doc)
+  if (parts.length < 2) return null
+  const { from, to } = state.selection
+  const ends = (p) => ({ start: Selection.near(state.doc.resolve(p.from), 1).from, end: Selection.near(state.doc.resolve(p.to), -1).to })
+  const here = parts.find((p) => from >= p.from && from <= p.to)
+  const mine = here ? ends(here) : null
+  const within = mine && to <= here.to && !(from === mine.start && to === mine.end)
+  if (within) return { tr: state.tr.setSelection(TextSelection.create(state.doc, mine.start, mine.end)), whole: false }
+  const start = ends(parts[0]).start
+  const end = ends(parts[parts.length - 1]).end
+  return { tr: state.tr.setSelection(TextSelection.create(state.doc, start, end)), whole: true }
+}
+
+/**
  * A change that replaces a selection running across parts, taken apart: the
  * selection's words removed in each part, last part first, then the caret
  * put where the selection began and the typed words, if any, written there.
