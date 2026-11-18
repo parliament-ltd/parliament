@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing, v1</title>
+<!--
+  C316 (18 November): an explainer beside the empty room on the first screen,
+  and the same block in Settings, About. Stefan: "move the landing page board
+  to the left a bit and add the logo plus a small description", "add a
+  little explainer over to the right centered vertically (should it be on
+  its own board?)", and the logo, centred, in About with the description.
+  Values from tokens.css; the shadow is the bar's own (--ch-raise); the
+  birds are public/favicon.svg's. Screens are drawn at 1440x900, scaled.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --navy: 22, 38, 70;
+    --raise: 0 0 0 1px rgba(25, 25, 25, .07), 0 1px 2px rgba(40, 36, 28, .06), 0 4px 14px rgba(40, 36, 28, .08);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 1000px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 760px; }
+  .intro p + p { margin-top: 8px; }
+  .intro { margin: 0 0 26px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  code { font: 400 12px var(--mono); }
+  .tag { display: block; margin: 0 0 6px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+
+  /* A screen, drawn at 1440x900 and scaled to the page. */
+  .screen { position: relative; width: 100%; aspect-ratio: 1440 / 900; overflow: hidden; border: .5px solid var(--border); border-radius: 10px; background: var(--paper); }
+  .screen > .at { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; transform-origin: 0 0; }
+  .strip { position: absolute; left: 0; right: 0; top: 0; height: 45px; display: flex; align-items: center; gap: 22px; padding: 0 30px; border-bottom: .5px solid var(--border-2); font: 400 14px var(--sans); background: var(--surface); }
+  .strip .b { width: 22px; height: 22px; }
+  .strip .on { text-decoration: underline; text-underline-offset: 4px; }
+  .strip .right { margin-left: auto; display: flex; gap: 34px; font: italic 400 12.5px var(--serif); color: var(--marg); }
+  .room { position: absolute; top: 62px; height: 681px; width: 819px; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; }
+  .room::before { content: ""; position: absolute; inset-block: 0; left: 0; width: 2px; background: rgb(var(--navy)); border-radius: 16px 0 0 16px; }
+  .room .h { padding: 12px 16px 8px; border-bottom: .5px solid var(--border-2); font: 600 13px var(--sans); }
+  .room .ph { padding: 18px 16px; font: italic 400 15px var(--serif); color: var(--ink-3); }
+  .bar { position: absolute; left: 360px; top: 822px; width: 720px; height: 40px; border-radius: 20px; background: var(--surface); box-shadow: var(--raise); display: flex; align-items: center; padding: 0 12px; gap: 10px; font: italic 400 11.5px var(--serif); color: var(--marg); }
+  .bar .chip { font: 700 9.5px var(--sans); letter-spacing: .06em; color: #fff; background: var(--ink); border-radius: 9px; padding: 3px 7px; font-style: normal; }
+  .bar .m { margin-left: auto; }
+  .line { position: absolute; left: 372px; top: 870px; font: italic 400 11px var(--serif); color: var(--marg); }
+  .guide { position: absolute; border: 1px dashed rgba(194, 65, 12, .55); pointer-events: none; }
+  .gl { position: absolute; font: 400 11px var(--sans); color: #C2410C; }
+
+  /* The explainer. */
+  .ex { position: absolute; width: 300px; }
+  .ex.card { padding: 26px 24px; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; }
+  .icon { width: 104px; height: 104px; border-radius: 23px; background: #FFFFFF; box-shadow: var(--raise); display: grid; place-items: center; }
+  .icon svg { width: 73px; height: 73px; }
+  .ex .name, .about .name { margin: 18px 0 8px; font: 400 24px/1.2 var(--serif); }
+  .ex .desc, .about .desc { margin: 0 0 14px; font: 400 15px/1.6 var(--serif); color: var(--ink-2); }
+  .ex .ver, .about .ver { margin: 0; font: italic 400 12.5px/1.5 var(--serif); color: var(--marg); }
+  .ver a { color: inherit; text-decoration: underline; text-decoration-color: var(--soft); text-underline-offset: 2px; }
+
+  .frames { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 820px) { .frames.two { grid-template-columns: 1fr 1fr; } }
+  .frame { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 14px 18px 16px; }
+  .big { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; padding: 10px 0; }
+  .spec { font: 400 12.5px/1.7 var(--sans); color: var(--ink-2); }
+
+  /* The phone. */
+  .phones { display: flex; gap: 20px; flex-wrap: wrap; }
+  .phone { width: 260px; height: 540px; border-radius: 26px; border: .5px solid var(--border); background: var(--paper); position: relative; overflow: hidden; padding: 10px 6px; }
+  .phone .card { background: var(--surface); border: .5px solid var(--border); border-radius: 14px; height: 450px; }
+  .phone .card .h { padding: 9px 12px; border-bottom: .5px solid var(--border-2); font: 600 11.5px var(--sans); }
+  .phone .card .ph { padding: 12px; font: italic 400 12.5px var(--serif); color: var(--ink-3); }
+  .phone .pbar { position: absolute; left: 8px; right: 8px; bottom: 12px; height: 36px; border-radius: 18px; background: var(--surface); box-shadow: var(--raise); display: flex; align-items: center; gap: 8px; padding: 0 10px; font: italic 400 11px var(--serif); color: var(--marg); }
+  .phone .plus { width: 20px; height: 20px; border-radius: 50%; border: .5px solid var(--border); display: grid; place-items: center; font: 400 14px var(--sans); color: var(--ink); font-style: normal; }
+  .phone .ex { position: static; width: auto; padding: 22px 10px; }
+  .phone .icon { width: 72px; height: 72px; border-radius: 16px; }
+  .phone .icon svg { width: 50px; height: 50px; }
+  .phone .ex .name { font-size: 19px; margin-top: 12px; }
+  .phone .ex .desc { font-size: 13px; }
+  .phone .ex .ver { font-size: 11px; }
+  .phone .scroll { position: absolute; left: 6px; right: 6px; top: 10px; }
+
+  /* About, in Settings. */
+  .settings { background: var(--surface); border: .5px solid var(--border); border-radius: 16px; padding: 14px 24px 22px; }
+  .settings .sec { font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; padding: 4px 0 10px; border-bottom: .5px solid var(--border-2); }
+  .about { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 26px 0 18px; border-bottom: .5px solid var(--border-2); }
+  .about .desc { max-width: 440px; }
+  .row { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding: 12px 0; border-bottom: .5px solid var(--border-2); font: 400 13px var(--sans); }
+  .row .k { font-weight: 600; }
+  .row .v { color: var(--ink-2); }
+  .faint { opacity: .45; }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks ol { margin: 6px 0 0; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="birds" viewBox="446 577 816 816"><path fill="#191919" d="M498,685 L544,741 L583,785 L588,799 L590,817 L593,828 L596,828 L604,823 L632,797 L674,770 L727,728 L724,728 L661,762 L620,791 L616,788 L615,779 L612,774 L600,788 L586,767 L567,745 L500,685Z M894,732 L894,755 L896,759 L899,808 L904,852 L922,933 L924,995 L925,997 L929,997 L953,982 L989,951 L1023,931 L1052,910 L1126,848 L1032,903 L990,930 L968,946 L963,945 L962,918 L943,938 L940,938 L922,847Z M651,911 L653,917 L713,1020 L744,1077 L761,1105 L795,1155 L807,1179 L817,1208 L821,1229 L826,1244 L826,1249 L828,1252 L834,1278 L837,1284 L841,1283 L871,1263 L918,1226 L930,1219 L1018,1192 L1080,1168 L1116,1156 L1126,1151 L1194,1129 L1203,1124 L1208,1124 L1187,1126 L1183,1128 L1176,1128 L1128,1138 L1111,1140 L1033,1157 L1002,1166 L918,1196 L890,1210 L888,1208 L886,1173 L883,1149 L882,1148 L848,1188 L843,1192 L833,1176 L823,1153 L784,1086 L762,1053 L707,981Z"/></symbol>
+</svg>
+<div class="page">
+  <div class="intro">
+    <h1>Landing, v1</h1>
+    <p>The first screen as it is today, an empty room alone in the middle, with an explainer added to its right, centred on the room's height. The room moves left to make room; the bar stays where it is (C300). The same block, centred, heads Settings, About.</p>
+    <p>On your question, whether it should be a board of its own: suggested <b>no</b>. Drawn both ways in section 2.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · The first screen, on a computer</h2>
+    <p class="lede">The room keeps its width (819 pixels at 1,440) and moves left; the room and the explainer together are centred on the page. The explainer is centred on the room's height. The orange mark shows where the room's left edge is today; it moves 174 pixels left.</p>
+    <div class="screen" data-scale>
+      <div class="at">
+        <div class="strip">
+          <svg class="b"><use href="#birds"/></svg>
+          <span class="on">Room:</span><span>Collection:</span><span>Reflection:</span><span>Records:</span><span>Tasks:</span><span>Import:</span><span>Tour:</span>
+          <span class="right"><span>Markup ▾</span><span>Focus: off</span><span>English ▾</span></span>
+        </div>
+        <div class="guide" style="left:311px;top:50px;width:0;height:22px;border-width:0 0 0 1.5px"></div>
+        <span class="gl" style="left:318px;top:48px">the room's left edge today</span>
+        <div class="room" style="left:137px">
+          <div class="h">New room</div>
+          <div class="ph">Write here or type a prompt in the bar.</div>
+        </div>
+        <div class="ex" style="left:1004px;top:248px">
+          <div class="icon"><svg><use href="#birds"/></svg></div>
+          <p class="name">Parliament</p>
+          <p class="desc">Most AI tools have you ask and then read. Parliament has you write, question and change the answer, because what you think matters more than what a model says.</p>
+          <p class="ver">In beta, version 0.24.1. MIT licensed, <a>source on GitHub</a></p>
+        </div>
+        <div class="bar"><span class="chip">PROMPT</span><span class="m">attach · framework: none · answered from Wikipedia</span></div>
+        <div class="line">→ a new room</div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>The bar stays centred on the page, where it is today (C300: it moves only when you move it). The room now sits to its left; the bar no longer lines up under the room's middle.</li>
+      <li>The version is the app's own, read from <code>package.json</code> as the foot's is (C313). "source on GitHub" links to the public repository, as the foot does.</li>
+      <li>No gold, no button. The icon's shadow is the bar's (<code>--ch-raise</code>); nothing new.</li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · On the paper, or a board of its own</h2>
+    <div class="frames two">
+      <div class="frame">
+        <span class="tag">A · on the paper (suggested)</span>
+        <div style="position:relative;height:330px">
+          <div class="ex" style="left:10px;top:12px;width:300px">
+            <div class="icon"><svg><use href="#birds"/></svg></div>
+            <p class="name">Parliament</p>
+            <p class="desc">Most AI tools have you ask and then read. Parliament has you write, question and change the answer, because what you think matters more than what a model says.</p>
+            <p class="ver">In beta, version 0.24.1. MIT licensed, <a>source on GitHub</a></p>
+          </div>
+        </div>
+        <ul class="notes">
+          <li>Part of the first screen, not a board: not on the strip, not addressed, not in focus sets or <code>close:</code>.</li>
+          <li>The white square stands out on the paper, as the bar does.</li>
+          <li>It goes when the room has its first prompt, or another board opens; the room then centres again, as a room alone does.</li>
+        </ul>
+      </div>
+      <div class="frame">
+        <span class="tag">B · a board of its own</span>
+        <div style="position:relative;height:330px;background:var(--paper);border-radius:10px;padding:8px">
+          <div class="ex card" style="position:relative;left:0;top:0;width:300px">
+            <div class="icon"><svg><use href="#birds"/></svg></div>
+            <p class="name">Parliament</p>
+            <p class="desc" style="font-size:13.5px">Most AI tools have you ask and then read. Parliament has you write, question and change the answer, because what you think matters more than what a model says.</p>
+            <p class="ver">In beta, version 0.24.1. MIT licensed, <a>source on GitHub</a></p>
+          </div>
+        </div>
+        <ul class="notes">
+          <li>A card like the birds' of 15 November: on the strip, addressed, closed by <code>close:</code>.</li>
+          <li>White on white: the square's edge is only its shadow.</li>
+          <li>Brings back the second board you let go in C302 (e) ("we don't need the second board").</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · The icon</h2>
+    <div class="frame">
+      <div class="big">
+        <div class="icon"><svg><use href="#birds"/></svg></div>
+        <div class="icon" style="width:52px;height:52px;border-radius:12px"><svg style="width:36px;height:36px"><use href="#birds"/></svg></div>
+        <div class="spec">
+          A rounded square, white (<code>#FFFFFF</code>) on the paper.<br>
+          104 pixels on a computer, corners 23 pixels (22%).<br>
+          The three birds of <code>public/favicon.svg</code>, in ink (<code>#191919</code>), 70% of the square.<br>
+          The bar's shadow, <code>--ch-raise</code>. No gold.
+        </div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>The same square, drawn to a file, can head the README and be the icon a phone keeps on its home screen (<code>apple-touch-icon</code>, today the hexagon). <code>parliament_logo.png</code>, the hexagon, stays in the repository.</li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · On a phone</h2>
+    <p class="lede">A phone's first screen is the room, the width of the screen. Put above it, the explainer would push the room down; so it comes after the room, a scroll or an arrow below, and the room keeps the first screen.</p>
+    <div class="phones">
+      <div class="phone">
+        <div class="card"><div class="h">New room</div><div class="ph">Write here or type a prompt in the bar.</div></div>
+        <div class="pbar"><span class="plus">+</span><span>Prompt</span></div>
+      </div>
+      <div class="phone">
+        <div class="ex">
+          <div class="icon"><svg><use href="#birds"/></svg></div>
+          <p class="name">Parliament</p>
+          <p class="desc">Most AI tools have you ask and then read. Parliament has you write, question and change the answer, because what you think matters more than what a model says.</p>
+          <p class="ver">In beta, version 0.24.1. MIT licensed, <a>source on GitHub</a></p>
+        </div>
+        <div class="pbar"><span class="plus">+</span><span>Prompt</span></div>
+      </div>
+    </div>
+    <ul class="notes">
+      <li>Left: the first screen, the room alone, as today. Right: scrolled down, the explainer, 72 pixels square, then nothing more.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · Settings, About</h2>
+    <p class="lede">The same block, centred, at the head of About, in place of the line there today. Today's line, faint, below, for comparison: it would say beta twice beside the new block.</p>
+    <div class="settings">
+      <div class="sec">About and security</div>
+      <div class="about">
+        <div class="icon"><svg><use href="#birds"/></svg></div>
+        <p class="name">Parliament</p>
+        <p class="desc">Most AI tools have you ask and then read. Parliament has you write, question and change the answer, because what you think matters more than what a model says.</p>
+        <p class="ver">Parliament is in beta. Version 0.24.1. MIT licensed, <a>source on GitHub</a></p>
+      </div>
+      <div class="row faint"><span class="k">Parliament</span><span class="v">Parliament is an attempt to rethink how we interact with AI. MIT licensed, and the source is on GitHub. In beta, version 0.24.1.</span></div>
+      <div class="row"><span class="k">Private by design</span><span class="v">…</span></div>
+    </div>
+    <ul class="notes">
+      <li>"Parliament is in beta." starts its last line, as asked; the version follows. Everything else in About stays as it is.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · What is stored</h2>
+    <p class="lede">Nothing. The explainer and the About block are words and a drawing; nothing is kept about whether you have seen them.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2>7 · To rule</h2>
+    <div class="asks">
+      <ol>
+        <li><b>On the paper (A) or a board of its own (B).</b> Suggested A.</li>
+        <li><b>When it goes:</b> at the room's first prompt or when another board opens, the room then centring again; or kept while the room stands alone.</li>
+        <li><b>The bar</b> stays centred on the page (C300), no longer under the room's middle; or it moves under the room while the explainer shows.</li>
+        <li><b>On a phone,</b> after the room, a scroll down.</li>
+        <li><b>About:</b> the block in place of today's line, as drawn.</li>
+        <li><b>The icon as a file,</b> for the README's head and a phone's home screen, now or later.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+<script>
+  // Each drawn screen is 1440 wide, scaled to the page.
+  const fit = () => document.querySelectorAll('[data-scale]').forEach((s) => { s.querySelector('.at').style.transform = `scale(${s.clientWidth / 1440})` })
+  addEventListener('resize', fit)
+  fit()
+</script>
+</body>
+</html>
