@@ -3,6 +3,11 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.24.1, 18 November 2026
+
+- The page's foot, and Settings under About, say which version is running: "In beta, version 0.24.1".
+- The README on GitHub shows what you can do with Parliament, with screenshots taken with no API key.
+
 ## 0.24.0, 18 November 2026
 
 - A room is one text. Your own writing, each prompt you sent and each reply can be selected across, typed over and deleted together. Where a model has read the words they are struck and told to it once, as edits always were; in your own text that no model has read, they simply go.
