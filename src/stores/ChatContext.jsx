@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, getSuggestionsOfChat, answerAsks, replyAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
 import { changeStored } from '../editing/storedChange'
-import { noteFor, waiting, tellNote } from '../editing/told'
+import { noteFor, waiting, waitingAsk, tellNote } from '../editing/told'
 import { isDraft, writingOf, draftWords } from '../lib/writing'
 import { answersIn } from '../editing/answers'
 import { askToKeepStorage } from '../lib/storageKeep'
@@ -321,7 +321,30 @@ export function ChatProvider({ children }) {
   // group: the branches a prompt to several went to (C172 (b)); describe:
   // whether a first answer asks for the chat's title (C62), once per prompt
   // to several, not once per branch (C172 (e)).
-  const sendNow = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null, into = null } = {}) => {
+  // Prompts in the text answered in a reply (C301 (e); from a source, C311
+  // (b)): each is replied, and its marks leave the text, the passage as it was.
+  const settleReplied = useCallback(async (conversationId, replied, by, inReply) => {
+    const at = new Date().toISOString()
+    const current = new Map((hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId).catch(() => [])).map((m) => [m.id, m]))
+    const texts = []
+    for (const messageId of new Set(replied.map((a) => a.messageId))) {
+      let blocks = current.get(messageId)?.blocks ?? null
+      for (const a of replied.filter((x) => x.messageId === messageId)) {
+        const next = Array.isArray(blocks) ? changeStored(blocks, 'drop', a.edit) : null
+        if (next) blocks = next.blocks
+      }
+      if (Array.isArray(blocks)) texts.push({ messageId, blocks })
+    }
+    const rewritten = await replyAsks(replied.map((a) => ({ id: a.id, by, at, inReply })), texts).catch(() => [])
+    if (rewritten.length) {
+      const byId = new Map(rewritten.map((t) => [t.messageId, t.blocks]))
+      updateMessages(conversationId, (prev) => prev.map((m) => (byId.has(m.id) ? { ...m, blocks: byId.get(m.id) } : m)))
+    }
+  }, [])
+
+  const sendNow = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null, into = null, asks: withAsks = true } = {}) => {
+    // asks: false on a source's branch, where the prompts in the text go to
+    // the source and only the edits to the model that reads them (C311 (a)).
     // into: the messages a prompt and reply were joined from, whose edits
     // went into this prompt's words and are not told again (C214 (c)).
     // One reply at a time in a chat; other chats are free.
@@ -352,7 +375,7 @@ export function ChatProvider({ children }) {
     const editRecords = await getEditsOfChat(conversationId).catch(() => [])
     const joinedFrom = new Set(Array.isArray(into) ? into : [])
     // Asks waiting go the same way, each to be answered in place (C218).
-    const askRecords = await getAsksOfChat(conversationId).catch(() => [])
+    const askRecords = withAsks ? await getAsksOfChat(conversationId).catch(() => []) : []
     // And changes accepted from a sweep, never told yet (stage 12, piece 3; C233 (a)).
     const sweepRecords = await getSuggestionsOfChat(conversationId).catch(() => [])
     // With nothing typed, the model writes only its answers in the text (C301 (f)).
@@ -548,24 +571,7 @@ export function ChatProvider({ children }) {
       // finished reply is their answer; their marks leave the text, the
       // passage as it was.
       const replied = cut || !finalContent ? [] : askRecords.filter((a) => note.askIds.includes(a.id) && a.reply === true)
-      if (replied.length) {
-        const at = new Date().toISOString()
-        const current = new Map((hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId).catch(() => [])).map((m) => [m.id, m]))
-        const texts = []
-        for (const messageId of new Set(replied.map((a) => a.messageId))) {
-          let blocks = current.get(messageId)?.blocks ?? null
-          for (const a of replied.filter((x) => x.messageId === messageId)) {
-            const next = Array.isArray(blocks) ? changeStored(blocks, 'drop', a.edit) : null
-            if (next) blocks = next.blocks
-          }
-          if (Array.isArray(blocks)) texts.push({ messageId, blocks })
-        }
-        const rewritten = await replyAsks(replied.map((a) => ({ id: a.id, by: model, at, inReply: assistantMsg.id })), texts).catch(() => [])
-        if (rewritten.length) {
-          const byId = new Map(rewritten.map((t) => [t.messageId, t.blocks]))
-          updateMessages(conversationId, (prev) => prev.map((m) => (byId.has(m.id) ? { ...m, blocks: byId.get(m.id) } : m)))
-        }
-      }
+      if (replied.length) await settleReplied(conversationId, replied, model, assistantMsg.id)
 
       // Update cumulative token usage (accumulated across all tool loop turns)
       if (activeRef.current === conversationId) {
@@ -594,7 +600,7 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
-  }, [persistEvery, keepPartial, describeNewChat, updateConversation, holdTell])
+  }, [persistEvery, keepPartial, describeNewChat, updateConversation, holdTell, settleReplied])
 
   // A chat takes one send at a time from the moment it is asked, not only
   // once its reply starts: a second Enter while the first is still being
@@ -713,6 +719,7 @@ export function ChatProvider({ children }) {
 
     const controller = new AbortController()
     startStream(conversationId, { messageId: placeholder.id, controller })
+    let answered = null
     try {
       const sent = asked?.text ?? question
       let found = await gateway.call(source, 'answer', [sent, { lang, signal: controller.signal }], { label: 'prompt' })
@@ -745,6 +752,7 @@ export function ChatProvider({ children }) {
         : { content: '', incomplete: false, source: { id: source, name: destination(source)?.name ?? source, found: false } }
       await updateMessage(placeholder.id, updates)
       updateMessages(conversationId, prev => prev.map(m => (m.id === placeholder.id ? { ...m, ...updates } : m)))
+      answered = { id: placeholder.id, found: Boolean(found) }
     } catch (error) {
       if (error.name !== 'AbortError') noteCut(conversationId)
       await keepPartial(conversationId, placeholder.id)
@@ -752,7 +760,28 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
+    // The reply once it is whole; null when it was stopped.
+    return answered
   }, [keepPartial, titleIfUntitled])
+
+  // The prompts in the text waiting in a chat a source answers (C311 (a),
+  // (b)): each goes as a search of its own words, one after another, through
+  // `search` (the shell's, which leaves the question words out, C168). Its
+  // answer is a reply under the text, and the prompt is answered in it. One
+  // stopped or failed stops the rest, which wait as they were.
+  const askSourceWaiting = useCallback(async (conversationId, by, search) => {
+    const asks = (await getAsksOfChat(conversationId).catch(() => [])).filter(waitingAsk).sort((a, b) => (a.num ?? 0) - (b.num ?? 0))
+    let asked = 0
+    for (const a of asks) {
+      const words = String(a.question ?? '').trim()
+      if (!words) continue
+      const reply = await search(words)
+      if (!reply?.id) break
+      await settleReplied(conversationId, [a], by, reply.id)
+      asked += 1
+    }
+    return asked
+  }, [settleReplied])
 
   // A veil for a request to a provider off this computer with the filter
   // on (C167 (e); C179): its fixed formats, and with privacy:names the names
@@ -1002,6 +1031,7 @@ export function ChatProvider({ children }) {
       sendMessage,
       resendWhole,
       askSource,
+      askSourceWaiting,
       summarizeChat,
       regroupPrompt,
       veilFor,

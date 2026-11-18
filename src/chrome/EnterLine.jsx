@@ -34,7 +34,7 @@ function Parts({ parts }) {
  */
 // see: opens the bar's list of what Enter sends, by branch (C301 (d)), "on a click on the line".
 // only: on a phone, the line shows just what it was told (17 November).
-export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false, learning = true, see = null, only = false }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false, held = false, learning = true, see = null, waits = null, only = false }) {
   const { i18n } = useLingui()
   // What Enter will do, in the language a language: line names, once its
   // words are loaded (C184); until then, in the page's.
@@ -108,6 +108,8 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
     <div className={`ch-enter${hidden ? ' hide' : ''}${only ? ' only' : ''}`} aria-live="polite" aria-hidden={hidden ? 'true' : undefined}>
       <Parts parts={parts} />
       {see && !only &&<button type="button" className="ch-enter-see" onMouseDown={(e) => e.preventDefault()} onClick={see}>{i18n._(COPY.sendList.see)}</button>}
+      {/* Prompts in the text that wait, said outside prompt mode too (C311 (e)). */}
+      {waits && !only && <button type="button" className="ch-enter-see" onMouseDown={(e) => e.preventDefault()} onClick={waits.onOpen}>{i18n._(COPY.enter.promptsWait, { count: waits.count })}</button>}
     </div>
   )
 }

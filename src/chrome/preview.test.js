@@ -1413,10 +1413,28 @@ describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
     expect(say(i18n, p.says.message, p.says.values)).toBe('Wikipedia reads none of your 2 edits. A model reads them once it has a key: api:')
     const reader = { id: 'm', group: 'model', name: 'Haiku 9' }
     const only = promptPreview('', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 2, asks: 1, chars: 0 } })
+    // Its prompts in the text go to the source itself; the edits to the reader (C311 (a)).
     expect(only).toMatchObject({ ready: true, editsOnly: true, toReader: true })
-    expect(say(i18n, only.says.message, only.says.values)).toBe('Enter sends just your 2 edits and 1 prompt in the text to Haiku 9, about 100 tokens · Wikipedia reads none')
+    expect(say(i18n, only.says.message, only.says.values)).toBe('Enter searches Wikipedia for your 1 prompt in the text, by its own words alone. The answer comes as a reply')
+    expect(also(only)).toContain('Your 2 edits go to Haiku 9 at the same time, about 100 tokens · Wikipedia reads none')
+    const justEdits = promptPreview('', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 2, chars: 0 } })
+    expect(say(i18n, justEdits.says.message, justEdits.says.values)).toBe('Enter sends just your 2 edits to Haiku 9, about 100 tokens · Wikipedia reads none')
     const along = promptPreview('glass', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 1, chars: 0 } })
     expect(also(along)).toContain('Your 1 edit goes to Haiku 9 at the same time, about 100 tokens · Wikipedia reads none')
+  })
+  it('on the branch of a source, a prompt in the text searches it, with no model and no key (C311 (a))', () => {
+    const wiki = { id: 'wikipedia', group: 'source', name: 'Wikipedia' }
+    const p = promptPreview('', { ...room, answerer: wiki, edits: { count: 0, asks: 2, chars: 0 } })
+    expect(p).toMatchObject({ ready: true, editsOnly: true, toReader: false })
+    expect(say(i18n, p.says.message, p.says.values)).toBe('Enter searches Wikipedia for each of your 2 prompts in the text, by its own words alone. Each answer comes as a reply')
+    // Edits beside them still wait for a model.
+    const mixed = promptPreview('', { ...room, answerer: wiki, edits: { count: 1, asks: 1, chars: 0 } })
+    expect(mixed.ready).toBe(true)
+    expect(also(mixed)).toContain('Wikipedia reads none of your 1 edit. A model reads them once it has a key: api:')
+    // With words typed, the prompts in the text search too.
+    const typed = promptPreview('glass', { ...room, answerer: wiki, edits: { count: 0, asks: 1, chars: 0 } })
+    expect(also(typed)).toContain('Your 1 prompt in the text searches Wikipedia too, by its own words alone')
+    expect(also(typed).some((l) => l.includes('reads none'))).toBe(false)
   })
   it('holds an edit here back, and lets it go (C216 (f))', () => {
     const heldEdits = { byNum: new Map([[242, { id: 'm:e1', held: false, sent: false }], [243, { id: 'm:e2', held: true, sent: false }], [244, { id: 'm:e3', held: false, sent: true }]]) }

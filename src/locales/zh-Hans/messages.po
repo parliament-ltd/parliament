@@ -1541,6 +1541,14 @@ msgid "collection.actReject"
 msgstr "拒绝"
 
 #. js-lingui-explicit-id
+msgid "collection.actSendHelp"
+msgstr "把输入栏切换为该对话中的提示词。按 Enter 发送在那里等待的内容，输入栏下方的那一行会先说明发给谁"
+
+#. js-lingui-explicit-id
+msgid "collection.actSendWaiting"
+msgstr "发送待发送的内容"
+
+#. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "总结"
 
@@ -5052,6 +5060,18 @@ msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, other {{nums} 是摘录，此前一直不发给模型；这一次会附上其文字}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptAsksSearch"
+msgstr "{asks, plural, other {按 Enter 用你 # 条正文中的提示词各自的文字在 {source} 中搜索，不发送其他内容。答案以回复的形式返回}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchIn"
+msgstr "在 {address} 中，{asks, plural, other {你的 # 条正文中的提示词各自搜索 {source}}}{edits, plural, =0 {} other {，它不会读取你的 # 处编辑}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchToo"
+msgstr "{asks, plural, other {你的 # 条正文中的提示词也会各自只用自己的文字搜索 {source}}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptBranchesOnly"
 msgstr "{count, plural, other {未输入新内容：按 Enter 只把等待中的内容发给 {nums}}}"
 
@@ -5430,6 +5450,11 @@ msgstr "{count, plural, other {来自 {sources} 的 # 个回答不会发送}}"
 #. js-lingui-explicit-id
 msgid "enter.promptStalled"
 msgstr "回复停滞了。有些网络会把流式回复积压起来，就会出现这种情况"
+
+#. At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt
+#. js-lingui-explicit-id
+msgid "enter.promptsWait"
+msgstr "{count, plural, other {# 条提示词待发送}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"

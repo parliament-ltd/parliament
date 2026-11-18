@@ -317,7 +317,7 @@ function ReviewBar({ open, active, onRun, onFind }) {
  * actions, which run at once (C298 (a)), and the four acts (C145 (d)), which
  * take notes, quotes and highlights only.
  */
-function Acts({ cards, picked, onPick, onClearPicked, onWrite, onRun, onPrompt }) {
+function Acts({ cards, picked, onPick, onClearPicked, onWrite, onRun, onPrompt, onSendWaiting }) {
   const { i18n } = useLingui()
   const sel = selectionOf(cards, picked)
   const n = sel.nums.length
@@ -325,6 +325,8 @@ function Acts({ cards, picked, onPick, onClearPicked, onWrite, onRun, onPrompt }
   const own = sharedActs(sel.nums.map((x) => byNum.get(x)).filter(Boolean))
   const worded = sel.items.filter((c) => WORDED.has(c.kind)).map((c) => c.num)
   const w = worded.length
+  // Prompts in the text that wait, picked with nothing to quote: Prompt sends them (C311 (d)).
+  const waits = w === 0 && onSendWaiting ? sel.nums.filter((x) => { const c = byNum.get(x); return c?.kind === 'ask' && c.change?.state === 'open' && !c.change.sent && !c.change.held }) : []
   const act = (word, command, extra = null, disabled = false) => (
     <button type="button" className="ch-act" disabled={disabled} title={command ? i18n._(COPY.collections.actHelp, { command: command.slice(1) }) : undefined} onClick={() => onWrite(command)}>
       {i18n._(word)}{extra && <small>{extra}</small>}
@@ -357,9 +359,17 @@ function Acts({ cards, picked, onPick, onClearPicked, onWrite, onRun, onPrompt }
         {act(COPY.collections.actNote, actCommand.note(worded), w ? i18n._(COPY.collections.actNoteQuoting, { count: w }) : null)}
         {act(COPY.collections.actTag, actCommand.tag(worded), null, w === 0)}
         {act(COPY.collections.actSummarize, actCommand.summarize(worded), i18n._(COPY.collections.actOneCall), n > 0 && w === 0)}
-        <button type="button" className="ch-act" disabled={w === 0} title={i18n._(COPY.collections.actPromptHelp)} onClick={onPrompt}>
-          {i18n._(COPY.collections.actPrompt)}<small>{i18n._(COPY.collections.actNewChat)}</small>
-        </button>
+        {waits.length > 0
+          ? (
+            <button type="button" className="ch-act" title={i18n._(COPY.collections.actSendHelp)} onClick={() => onSendWaiting(waits)}>
+              {i18n._(COPY.collections.actPrompt)}<small>{i18n._(COPY.collections.actSendWaiting)}</small>
+            </button>
+          )
+          : (
+            <button type="button" className="ch-act" disabled={w === 0} title={i18n._(COPY.collections.actPromptHelp)} onClick={onPrompt}>
+              {i18n._(COPY.collections.actPrompt)}<small>{i18n._(COPY.collections.actNewChat)}</small>
+            </button>
+          )}
       </div>
     </div>
   )
@@ -401,7 +411,7 @@ function Picker({ pickable, sources, onWrite }) {
  *   onView: (change: object) => void, onShow: (collection: object) => void }} props
  *   entries: the sequence to draw (collectionCards.sequenceOf); counts: cards by kind; pickable: plans and chats to hold
  */
-export default function CollectionBoard({ collection, collections, label, entries, counts, view, sources, pickable, searching, addressed, onAddress, onWrite, onView, onShow, cards = [], picked = [], onPick, onClearPicked, onFind, onPrompt, rowOf = () => null,
+export default function CollectionBoard({ collection, collections, label, entries, counts, view, sources, pickable, searching, addressed, onAddress, onWrite, onView, onShow, cards = [], picked = [], onPick, onClearPicked, onFind, onPrompt, onSendWaiting = null, rowOf = () => null,
   clean = false, onRun = () => {}, onFindChange = () => {}, nameOf = (id) => id, notHeld = null, filtered = null, shownCount = 0, onClear = () => {} }) {
   const { i18n } = useLingui()
   const [picking, setPicking] = useState(false)
@@ -498,7 +508,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
         ) : null}
         {view.tab === 'suggestion' && <ReviewBar open={waiting} active={addressed} onRun={onRun} onFind={onFindChange} />}
         <div className="ch-col-list">{list}</div>
-        <Acts cards={cards} picked={picked} onPick={onPick} onClearPicked={onClearPicked} onWrite={onWrite} onRun={onRun} onPrompt={onPrompt} />
+        <Acts cards={cards} picked={picked} onPick={onPick} onClearPicked={onClearPicked} onWrite={onWrite} onRun={onRun} onPrompt={onPrompt} onSendWaiting={onSendWaiting} />
       </>
     )
   }

@@ -98,8 +98,13 @@ describe('the Enter line among branches', () => {
     const one = promptPreview('', { ...room, many: [sonnet, haiku], toMany: ['201a', '201b'], branchWaits: [waits[0], { ...waits[1], prompts: 0, chars: 0 }] })
     expect(say(i18n, one.says.message, one.says.values)).toMatch(/^Nothing typed: Enter sends just what waits, to 201a/)
   })
-  it('says a source reads none of what waits, and sends nothing', () => {
+  it('a source searches for the prompts in the text in its branch (C311 (a))', () => {
     const p = promptPreview('', { ...room, many: [sonnet, wiki], toMany: ['201a', '201b'], branchWaits: waits })
+    expect(p).toMatchObject({ ready: true, editsOnly: true })
+    expect(p.says.also.map((x) => say(i18n, x.message, x.values))).toContain('In 201b, your 1 prompt in the text searches Wikipedia')
+  })
+  it('says a source reads none of the edits that wait alone, and sends nothing', () => {
+    const p = promptPreview('', { ...room, many: [sonnet, wiki], toMany: ['201a', '201b'], branchWaits: [waits[0], { ...waits[1], prompts: 0, edits: 1 }] })
     expect(p.ready).toBe(false)
     expect(say(i18n, p.says.message, p.says.values)).toBe('Wikipedia answers 201b and reads none of what waits there. Untick 201b in the list, or type a prompt')
   })

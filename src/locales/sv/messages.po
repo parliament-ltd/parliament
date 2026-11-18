@@ -1541,6 +1541,14 @@ msgid "collection.actReject"
 msgstr "Avvisa"
 
 #. js-lingui-explicit-id
+msgid "collection.actSendHelp"
+msgstr "Gör fältet till en prompt i deras chatt. Enter skickar det som väntar där, och raden under fältet säger först till vem"
+
+#. js-lingui-explicit-id
+msgid "collection.actSendWaiting"
+msgstr "skickar det som väntar"
+
+#. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "Sammanfatta"
 
@@ -5052,6 +5060,18 @@ msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} är ett citat som hittills inte skickats till någon modell: orden följer med den här gången} other {{nums} är citat som hittills inte skickats till någon modell: orden följer med den här gången}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptAsksSearch"
+msgstr "{asks, plural, one {Enter söker i {source} efter din # prompt i texten, med bara dess egna ord. Svaret kommer som ett svar} other {Enter söker i {source} efter var och en av dina # promptar i texten, med bara dess egna ord. Varje svar kommer som ett svar}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchIn"
+msgstr "I {address} {asks, plural, one {söker din # prompt i texten i {source}} other {söker dina # promptar i texten var för sig i {source}}}{edits, plural, =0 {} one {, som inte läser din # redigering} other {, som inte läser dina # redigeringar}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchToo"
+msgstr "{asks, plural, one {Din # prompt i texten söker också i {source}, med bara sina egna ord} other {Dina # promptar i texten söker också i {source}, var och en med bara sina egna ord}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptBranchesOnly"
 msgstr "{count, plural, other {Inget skrivet: Enter skickar bara det som väntar, till {nums}}}"
 
@@ -5430,6 +5450,11 @@ msgstr "{count, plural, one {# svar från {sources} lämnas utanför} other {# s
 #. js-lingui-explicit-id
 msgid "enter.promptStalled"
 msgstr "Svaret stannade upp, vilket händer i nätverk som håller kvar strömmade svar"
+
+#. At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt
+#. js-lingui-explicit-id
+msgid "enter.promptsWait"
+msgstr "{count, plural, one {# prompt väntar} other {# promptar väntar}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"

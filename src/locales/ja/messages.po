@@ -1541,6 +1541,14 @@ msgid "collection.actReject"
 msgstr "却下する"
 
 #. js-lingui-explicit-id
+msgid "collection.actSendHelp"
+msgstr "バーを、そのチャットでのプロンプトに切り替えます。Enterでそこで待機中のものを送り、バーの下の行が先に送り先を示します"
+
+#. js-lingui-explicit-id
+msgid "collection.actSendWaiting"
+msgstr "待機中のものを送る"
+
+#. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "要約"
 
@@ -5052,6 +5060,18 @@ msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, other {{nums}は引用で、これまでモデルには送っていません。今回だけ、その言葉を一緒に送ります}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptAsksSearch"
+msgstr "{asks, plural, other {Enterで、テキスト内のプロンプト#件をそれぞれの言葉だけで{source}で検索します。答えは返答として届きます}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchIn"
+msgstr "{address}では、{asks, plural, other {テキスト内のプロンプト#件がそれぞれ{source}を検索します}}{edits, plural, =0 {} other {。{source}は編集#件を読みません}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchToo"
+msgstr "{asks, plural, other {テキスト内のプロンプト#件も、それぞれの言葉だけで{source}を検索します}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptBranchesOnly"
 msgstr "{count, plural, other {入力なし：Enterで、待っているものだけを{nums}に送ります}}"
 
@@ -5430,6 +5450,11 @@ msgstr "{count, plural, other {{sources}からの回答#件は送りません}}"
 #. js-lingui-explicit-id
 msgid "enter.promptStalled"
 msgstr "返答が止まりました。ストリーミングの返答を溜めてしまうネットワークでは、こうなることがあります"
+
+#. At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt
+#. js-lingui-explicit-id
+msgid "enter.promptsWait"
+msgstr "{count, plural, other {プロンプト#件が待機中}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"

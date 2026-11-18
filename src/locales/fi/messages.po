@@ -1541,6 +1541,14 @@ msgid "collection.actReject"
 msgstr "Hylkää"
 
 #. js-lingui-explicit-id
+msgid "collection.actSendHelp"
+msgstr "Muuttaa palkin kehotteeksi niiden keskustelussa. Enter lähettää sen, mikä siellä odottaa, ja palkin alla oleva rivi kertoo ensin kenelle"
+
+#. js-lingui-explicit-id
+msgid "collection.actSendWaiting"
+msgstr "lähettää odottavat"
+
+#. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "Tiivistä"
 
@@ -5052,6 +5060,18 @@ msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} on lainaus, joka on tähän asti pidetty malleilta piilossa: sen sanat lähtevät mukaan tämän kerran} other {{nums} ovat lainauksia, jotka on tähän asti pidetty malleilta piilossa: niiden sanat lähtevät mukaan tämän kerran}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptAsksSearch"
+msgstr "{asks, plural, one {Enter hakee lähteestä {source} # kehotteellasi tekstissä, vain sen omilla sanoilla. Vastaus tulee vastauksena} other {Enter hakee lähteestä {source} jokaisella # kehotteestasi tekstissä, vain sen omilla sanoilla. Kukin vastaus tulee vastauksena}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchIn"
+msgstr "Haarassa {address} {asks, plural, one {# kehotteesi tekstissä hakee lähteestä {source}} other {# kehotettasi tekstissä hakevat kukin lähteestä {source}}}{edits, plural, =0 {} one {, joka ei lue # muokkaustasi} other {, joka ei lue # muokkaustasi}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchToo"
+msgstr "{asks, plural, one {Myös # kehotteesi tekstissä hakee lähteestä {source}, vain omilla sanoillaan} other {Myös # kehotettasi tekstissä hakevat lähteestä {source}, kukin vain omilla sanoillaan}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptBranchesOnly"
 msgstr "{count, plural, other {Ei kirjoitettua tekstiä: Enter lähettää vain odottavat haaroihin {nums}}}"
 
@@ -5430,6 +5450,11 @@ msgstr "{count, plural, one {# vastaus lähteestä {sources} jää pois} other {
 #. js-lingui-explicit-id
 msgid "enter.promptStalled"
 msgstr "Vastaus jumittui, kuten käy verkoissa, jotka pidättävät suoratoistettuja vastauksia"
+
+#. At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt
+#. js-lingui-explicit-id
+msgid "enter.promptsWait"
+msgstr "{count, plural, one {# kehote odottaa} other {# kehotetta odottaa}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"

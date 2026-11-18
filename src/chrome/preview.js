@@ -1520,6 +1520,11 @@ export function promptPreview(text, target = {}) {
   const told = target.told?.count ? target.told : null
   const what = edits ? { edits: edits.count ?? 0, asks: edits.asks ?? 0, total: (edits.count ?? 0) + (edits.asks ?? 0), both: edits.count && edits.asks ? 'yes' : 'no' } : null
   const toModel = (w) => w && w.group !== 'source'
+  // On a source's branch the prompts in the text go to the source, each as a
+  // search of its own words, answered as a reply (C311 (a), (b), ruled 18
+  // November); its edits still wait for a model, or go to the one that reads
+  // them there. So the edits are counted apart.
+  const editsAlone = what ? { ...what, asks: 0, total: what.edits, both: 'no' } : null
   // On a source's branch, edits and asks go to a model at the same time as
   // the prompt searches again (the editing spec, "Keyless sources"; C218 (e)).
   const r = target.reader
@@ -1533,11 +1538,15 @@ export function promptPreview(text, target = {}) {
   const branchLine = (b) => {
     const who = whoIn(b)
     const values = { edits: b.edits, asks: b.prompts, total: b.edits + b.prompts, both: b.edits && b.prompts ? 'yes' : 'no', address: b.address }
-    return toModel(who) ? { message: 'promptEditsGoIn', values: { ...values, name: who?.name ?? b.name } } : { message: 'promptEditsWaitIn', values: { ...values, source: who?.name ?? b.name } }
+    if (toModel(who)) return { message: 'promptEditsGoIn', values: { ...values, name: who?.name ?? b.name } }
+    return b.prompts
+      ? { message: 'promptAsksSearchIn', values: { asks: b.prompts, edits: b.edits, address: b.address, source: who?.name ?? b.name } }
+      : { message: 'promptEditsWaitIn', values: { ...values, source: who?.name ?? b.name } }
   }
   if (goingBranches.length && !String(text ?? '').trim() && !target.streaming) {
     // Nothing typed: what waits goes, to each branch with something going.
-    const source = goingBranches.find((b) => !toModel(whoIn(b)))
+    // A source's branch with edits alone has nothing a source reads.
+    const source = goingBranches.find((b) => !toModel(whoIn(b)) && !b.prompts)
     if (source) return { ready: false, says: { message: 'promptBranchSourceWaits', values: { address: source.address, source: whoIn(source)?.name ?? source.name } } }
     const chars = Math.max(1, ...goingBranches.map((b) => b.chars ?? 1))
     const p = manyPreview('·'.repeat(chars), { ...target, many: goingBranches.map(whoIn), toMany: goingBranches.map((b) => b.address) })
@@ -1570,6 +1579,18 @@ export function promptPreview(text, target = {}) {
   if (edits && !String(text ?? '').trim() && !target.streaming && !(Array.isArray(target.many) && target.many.length > 1)) {
     // Enter on an empty field sends just the edits and asks (C216 (e)).
     const who = target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
+    if (!toModel(who) && what.asks) {
+      const source = who.name ?? target.source ?? ''
+      const also = []
+      const mine = ownLine(who)
+      if (mine) also.push(mine)
+      if (what.edits) {
+        also.push(reader
+          ? { message: 'promptEditsToReader', values: { ...editsAlone, name: reader.name ?? '', source, tokens: readerTokens() } }
+          : { message: 'promptEditsWait', values: { ...editsAlone, source } })
+      }
+      return { ready: true, editsOnly: true, toReader: Boolean(reader && what.edits), says: { message: 'promptAsksSearch', values: { asks: what.asks, source }, also } }
+    }
     if (!toModel(who)) {
       if (!reader) return { ready: false, says: { message: 'promptEditsWait', values: { ...what, source: who.name ?? target.source ?? '' } } }
       return { ready: true, editsOnly: true, toReader: true, says: { message: 'promptEditsOnlyReader', values: { ...what, name: reader.name ?? '', source: who.name ?? target.source ?? '', tokens: readerTokens() } } }
@@ -1597,11 +1618,16 @@ export function promptPreview(text, target = {}) {
   if (goingBranches.length) for (const b of goingBranches) lines.push(branchLine(b))
   else if (edits) {
     const first = Array.isArray(target.many) && target.many.length > 1 ? target.many[0] : target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
-    lines.push(toModel(first)
-      ? { message: 'promptEditsGo', values: { ...what, name: first.name ?? '' } }
-      : reader
-        ? { message: 'promptEditsToReader', values: { ...what, name: reader.name ?? '', source: first.name ?? target.source ?? '', tokens: readerTokens() } }
-        : { message: 'promptEditsWait', values: { ...what, source: first.name ?? target.source ?? '' } })
+    if (toModel(first)) lines.push({ message: 'promptEditsGo', values: { ...what, name: first.name ?? '' } })
+    else {
+      const source = first.name ?? target.source ?? ''
+      if (what.asks) lines.push({ message: 'promptAsksSearchToo', values: { asks: what.asks, source } })
+      if (what.edits) {
+        lines.push(reader
+          ? { message: 'promptEditsToReader', values: { ...editsAlone, name: reader.name ?? '', source, tokens: readerTokens() } }
+          : { message: 'promptEditsWait', values: { ...editsAlone, source } })
+      }
+    }
   }
   // Ripple's checks when these edits go (stage 12, piece 2; C231 (d)): to one branch only.
   // Only when a model answers here: a source's branch is not checked from (C228 (d)).

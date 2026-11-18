@@ -960,6 +960,13 @@ export const COPY = {
     promptManySourceWaits: /*i18n*/ { id: 'enter.promptManySourceWaits', message: '{source} reads none of what waits. Type a prompt, or ask only models' },
     promptEditsToReader: /*i18n*/ { id: 'enter.promptEditsToReader', message: 'Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} {total, plural, one {goes} other {go}} to {name} at the same time, about {tokens} tokens · {source} reads none' },
     promptEditsOnlyReader: /*i18n*/ { id: 'enter.promptEditsOnlyReader', message: 'Enter sends just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# prompt in the text} other {# prompts in the text}} to {name}, about {tokens} tokens · {source} reads none' },
+    // Prompts in the text on a source's branch go to the source, each as a
+    // search of its own words, answered as a reply (C311 (a), (b)).
+    promptAsksSearch: /*i18n*/ { id: 'enter.promptAsksSearch', message: '{asks, plural, one {Enter searches {source} for your # prompt in the text, by its own words alone. The answer comes as a reply} other {Enter searches {source} for each of your # prompts in the text, by its own words alone. Each answer comes as a reply}}' },
+    promptAsksSearchToo: /*i18n*/ { id: 'enter.promptAsksSearchToo', message: '{asks, plural, one {Your # prompt in the text searches {source} too, by its own words alone} other {Your # prompts in the text each search {source} too, by their own words alone}}' },
+    promptAsksSearchIn: /*i18n*/ { id: 'enter.promptAsksSearchIn', message: 'In {address}, {asks, plural, one {your # prompt in the text searches {source}} other {your # prompts in the text each search {source}}}{edits, plural, =0 {} one {, which reads none of your # edit} other {, which reads none of your # edits}}' },
+    // What waits, said in search and command mode too (C311 (e)).
+    promptsWait: /*i18n*/ { id: 'enter.promptsWait', message: '{count, plural, one {# prompt waits} other {# prompts wait}}', comment: 'At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt' },
     // ask: (stage 11, piece 4; C218 (a)).
     askOpen: /*i18n*/ { id: 'enter.askOpen', message: 'Enter opens the prompt box on the words you selected in a reply, or where the cursor was' },
     askKeep: /*i18n*/ { id: 'enter.askKeep', message: 'Enter keeps this prompt on the words you selected in a reply, or where the cursor was. It goes with your next Enter' },
@@ -2621,6 +2628,9 @@ export const COPY = {
     actOneCall: /*i18n*/ { id: 'collection.actOneCall', message: '1 call' },
     actPrompt: /*i18n*/ { id: 'collection.actPrompt', message: 'Prompt' },
     actNewChat: /*i18n*/ { id: 'collection.actNewChat', message: 'new chat' },
+    // With prompts that wait selected, Prompt sends them (C311 (d)).
+    actSendWaiting: /*i18n*/ { id: 'collection.actSendWaiting', message: 'sends what waits' },
+    actSendHelp: /*i18n*/ { id: 'collection.actSendHelp', message: 'Turns the bar to a prompt in their chat. Enter sends what waits there, and the line under the bar says to whom first' },
     actHelp: /*i18n*/ { id: 'collection.actHelp', message: 'Writes {command} in the bar', comment: '{command} is a command, which stays English' },
     actPromptHelp: /*i18n*/ { id: 'collection.actPromptHelp', message: 'Turns the bar to a prompt about what is selected' },
     findHelp: /*i18n*/ { id: 'collection.findHelp', message: 'Finds it in its chat' },

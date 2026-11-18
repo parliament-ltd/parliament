@@ -71,7 +71,7 @@ const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 // How far a swipe across the field goes before it changes the mode, in pixels.
 const SWIPE_GO = 48
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, sendList = null, onSeeList = null, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true, phone = false, plus = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSwitchAnswerer = null, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, markupMenu = null, onMarkupRun, onMarkupMenuClose, sendList = null, onSeeList = null, waiting = 0, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null, alsoDocs = null, onAway = null, onDropDraft = null, learning = true, phone = false, plus = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -594,7 +594,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           </div>
         )}
         {/* On a phone, the line under the field only when it has something to tell (17 November). */}
-        <EnterLine hidden={folded || (phone && !notice)} only={phone} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} see={onSeeList && field.mode === 'prompt' ? onSeeList : null} />
+        <EnterLine hidden={folded || (phone && !notice)} only={phone} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} held={showsHeld(field)} learning={learning} see={onSeeList && field.mode === 'prompt' ? onSeeList : null} waits={waiting > 0 && field.mode !== 'prompt' ? { count: waiting, onOpen: () => { dispatch({ type: 'mode', to: 'prompt' }); onSeeList?.(); input.current?.focus() } } : null} />
         {/* Extra screen detected (C259 (g)): once, under the field. */}
         {note && !folded && (
           <p className="ch-snote ch-marg">

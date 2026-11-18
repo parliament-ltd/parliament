@@ -1541,6 +1541,14 @@ msgid "collection.actReject"
 msgstr "Reject"
 
 #. js-lingui-explicit-id
+msgid "collection.actSendHelp"
+msgstr "Turns the bar to a prompt in their chat. Enter sends what waits there, and the line under the bar says to whom first"
+
+#. js-lingui-explicit-id
+msgid "collection.actSendWaiting"
+msgstr "sends what waits"
+
+#. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr "Summarize"
 
@@ -5052,6 +5060,18 @@ msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} is a quote, kept from models until now: its words go along this once} other {{nums} are quotes, kept from models until now: their words go along this once}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptAsksSearch"
+msgstr "{asks, plural, one {Enter searches {source} for your # prompt in the text, by its own words alone. The answer comes as a reply} other {Enter searches {source} for each of your # prompts in the text, by its own words alone. Each answer comes as a reply}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchIn"
+msgstr "In {address}, {asks, plural, one {your # prompt in the text searches {source}} other {your # prompts in the text each search {source}}}{edits, plural, =0 {} one {, which reads none of your # edit} other {, which reads none of your # edits}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchToo"
+msgstr "{asks, plural, one {Your # prompt in the text searches {source} too, by its own words alone} other {Your # prompts in the text each search {source} too, by their own words alone}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptBranchesOnly"
 msgstr "{count, plural, other {Nothing typed: Enter sends just what waits, to {nums}}}"
 
@@ -5430,6 +5450,11 @@ msgstr "{count, plural, one {# answer from {sources} stays out} other {# answers
 #. js-lingui-explicit-id
 msgid "enter.promptStalled"
 msgstr "The reply stalled, as happens on networks that hold streamed replies"
+
+#. At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt
+#. js-lingui-explicit-id
+msgid "enter.promptsWait"
+msgstr "{count, plural, one {# prompt waits} other {# prompts wait}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptSweepsGo"

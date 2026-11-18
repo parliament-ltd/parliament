@@ -1541,6 +1541,14 @@ msgid "collection.actReject"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.actSendHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actSendWaiting"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.actSummarize"
 msgstr ""
 
@@ -5052,6 +5060,18 @@ msgid "enter.promptAboutQuotes"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptAsksSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAsksSearchToo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptBranchesOnly"
 msgstr ""
 
@@ -5429,6 +5449,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptStalled"
+msgstr ""
+
+#. At the end of the line under the bar, outside prompt mode: prompts in the text not yet sent. A click turns the bar to prompt
+#. js-lingui-explicit-id
+msgid "enter.promptsWait"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -927,6 +927,15 @@ export default function Shell() {
   }), [shownId])
   const clearPicked = useCallback(() => setPickedIn({ id: null, nums: NO_NUMS }), [])
   const cardsNow = useRef([])
+  // The Collection's Prompt act on prompts that wait (C311 (d)): their chat
+  // comes on screen and the bar turns to prompt, where the line says what
+  // Enter sends and to whom.
+  const findPassageNow = useRef(null)
+  const toSendWaiting = useCallback(async (nums) => {
+    if (nums?.[0] != null) await findPassageNow.current?.(nums[0])
+    clearPicked()
+    toPrompt()
+  }, [clearPicked, toPrompt])
   useEffect(() => { cardsNow.current = collectionAll.cards }, [collectionAll])
   const numberedNow = useRef(new Map())
   useEffect(() => { numberedNow.current = numbered }, [numbered])
@@ -1287,6 +1296,7 @@ export default function Shell() {
     flashWhenDrawn([spot ?? `[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null], 60, gone)
     return null
   }, [run])
+  useEffect(() => { findPassageNow.current = findPassage }, [findPassage])
 
   /** Its row on Records, scrolled to where the rows are drawn (C142). */
   const findRow = useCallback((num) => {
@@ -2509,7 +2519,7 @@ export default function Shell() {
   const onRoomLeave = useCallback((chatId) => { readyRooms.current.delete(chatId) }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { sendMessage, resendWhole, askSource, keepTranslation, summarizeChat, regroupPrompt, veilFor, focusChat } = useChat()
+  const { sendMessage, resendWhole, askSource, askSourceWaiting, keepTranslation, summarizeChat, regroupPrompt, veilFor, focusChat } = useChat()
   useEffect(() => { veilForNow.current = veilFor }, [veilFor])
   // A source answers a search (C168), with its edition (C166 (e)).
   const askSourceAs = useCallback((to, text, w, extra = {}) => {
@@ -2520,6 +2530,9 @@ export default function Shell() {
     const searchedFor = words === text.trim().replace(/[?？!.]+$/u, '').trim() ? null : { text: words.slice(0, 300), lang: baseOf(yours ? lang : 'en'), by: 'search', at: new Date().toISOString() }
     return askSource(to, text, { source: w.id, lang, fallbackLang: yours ? 'en' : null, asked: searchedFor, ...extra })
   }, [askSource])
+  // The prompts in the text waiting in a source's branch (C311 (a)): each a
+  // search of its own words, answered as a reply under the text.
+  const searchWaiting = useCallback((to, w, extra = {}) => askSourceWaiting(to, w.id, (words) => askSourceAs(to, words, w, extra)), [askSourceWaiting, askSourceAs])
   useEffect(() => { keepTranslationNow.current = keepTranslation }, [keepTranslation])
   useEffect(() => { summarizeChatNow.current = summarizeChat }, [summarizeChat])
   const { settings, updateSetting, loaded: settingsLoaded } = useSettings()
@@ -4098,17 +4111,19 @@ export default function Shell() {
       const convs = await Promise.all(branchesGoing.map((b) => getConversation(b.chatId).catch(() => null)))
       if (convs.some((c) => !c)) return { refused: 'promptChanged' }
       const whos = convs.map((c) => answererOf({ chosen: c.answerer ?? null, keyed: fresh, defaultModel: latest.current.settings.defaultModel }))
-      if (whos.some((w) => w.group === 'source' || w.later || w.gone || w.needsKey || w.unchecked || (w.group === 'model' && !fresh[w.provider]))) return { refused: 'promptChanged' }
+      if (whos.some((w, i) => (w.group === 'source' && !branchesGoing[i].prompts) || w.later || w.gone || w.needsKey || w.unchecked || (w.group === 'model' && !fresh[w.provider]))) return { refused: 'promptChanged' }
       // A prompt going out with an edit crosses the welcome step off (C225 (b)).
       if (carriesEdit({ edits: { count: branchesGoing.reduce((n, b) => n + b.edits, 0), asks: branchesGoing.reduce((n, b) => n + b.prompts, 0) }, read: true })) updateWelcome((w) => tick(w, 'send'))
       const all = convs.map((c, i) => {
         const fw = frameworksOf(c.frameworks ?? [], fwListNow.current).map((x) => x.id)
+        // A source's branch: its prompts in the text, each a search (C311 (a)).
+        if (whos[i].group === 'source') return searchWaiting(c.id, whos[i])
         return sendMessage(c.id, '', whos[i].id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false })
       })
       const done = Promise.allSettled(all).then((results) => {
         loadConversations().catch(() => {})
         const bad = results.findIndex((r) => r.status === 'rejected' && r.reason?.name !== 'AbortError')
-        return bad < 0 ? null : failure(results[bad].reason)
+        return bad < 0 ? null : failure(results[bad].reason, whos[bad].group === 'source' ? whos[bad].name : undefined)
       })
       return { done }
     }
@@ -4172,7 +4187,7 @@ export default function Shell() {
       if (new Set(whos.map((w) => w.id)).size > 1) updateWelcome((w) => tick(w, 'sources'))
       const sendOne = (c, w) => {
         const fw = frameworksOf(c.frameworks ?? [], fwListNow.current).map((x) => x.id)
-        if (w.group === 'source') return askOne(c.id, w)
+        if (w.group === 'source') return askOne(c.id, w).then((r) => (r ? searchWaiting(c.id, w) : null))
         const f = featured(w, text)
         return sendMessage(c.id, f.content, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), f.tools, f.attachments, { frameworks: recordOf(fw, fwListNow.current), ...withInc(w) })
       }
@@ -4275,7 +4290,7 @@ export default function Shell() {
       }
       const sendOne = (to, w, i) => (w.group !== 'source'
         ? (() => { const f = featured(w, text); return sendMessage(to, f.content, w.id, system(), f.tools, f.attachments, { ...under, group, describe: i === 0, ...withInc(w) }) })()
-        : askOne(to, w, { group }))
+        : askOne(to, w, { group }).then((r) => (r ? searchWaiting(to, w) : null)))
       spentInc(whos)
       const first = isReady(id)
         ? sendOne(id, whos[0], 0)
@@ -4305,20 +4320,25 @@ export default function Shell() {
     const toReader = (to) => {
       // On a source's branch, the edits and asks go to the default model at
       // the same time as the source is asked (C218 (e)).
+      // The prompts in the text there go to the source itself (C311 (a)), so
+      // the reader is sent the edits and tell: notes alone.
       const r = shown?.reader
-      if (!r || who.group !== 'source' || !(shown?.edits || shown?.told) || r.needsKey || r.later || r.gone || r.unchecked) return null
+      if (!r || who.group !== 'source' || !(shown?.edits?.count || shown?.told) || r.needsKey || r.later || r.gone || r.unchecked) return null
       if (r.group === 'model' && !fresh[r.provider]) return null
-      return sendMessage(to, '', r.id, system(), [], null, { describe: false })
+      return sendMessage(to, '', r.id, system(), [], null, { describe: false, asks: false })
     }
+    const asksHere = who.group === 'source' ? shown?.edits?.asks ?? 0 : 0
     // A prompt going out with an edit crosses the welcome step off at once,
     // from what the Enter line counted (C225 (b)); the stored marks say so
     // again once they are read.
     const sendsEdit = (going) => { if (carriesEdit(going)) updateWelcome((w) => tick(w, 'send')) }
     if (!text && chatId && who.group === 'source' && shown?.edits) {
-      const sent = toReader(chatId)
+      // Its prompts in the text search the source, one after another; then
+      // the edits go to the model that reads them, if there is one.
+      const sent = asksHere ? searchWaiting(chatId, who).then(() => toReader(chatId)) : toReader(chatId)
       if (!sent) return { refused: 'promptFailed' }
       sendsEdit({ edits: shown.edits, read: true })
-      return { done: sent.then(() => { loadConversations().catch(() => {}); return null }).catch(failure) }
+      return { done: sent.then(() => { loadConversations().catch(() => {}); return null }).catch((err) => failure(err, asksHere ? who.name : undefined)) }
     }
     if (!text && (shown?.edits?.count || shown?.edits?.asks) && chatId && who.group !== 'source' && !shown?.resend) {
       if (who.group === 'model' && !fresh[who.provider]) return { refused: 'promptFailed' }
@@ -4390,9 +4410,12 @@ export default function Shell() {
       }
       // The source is asked first, then the reader, as before.
       const asking = askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) })
-      const reading = toReader(id)
-      sendsEdit({ edits: shown?.edits, read: Boolean(reading), joined })
-      return Promise.all([asking, reading])
+      // Then the prompts in the text, each a search of its own (C311 (a)),
+      // unless the first was stopped; then the reader, for the edits.
+      const r = shown?.reader
+      const reads = Boolean(r && (shown?.edits?.count || shown?.told) && !r.needsKey && !r.later && !r.gone && !r.unchecked && !(r.group === 'model' && !fresh[r.provider]))
+      sendsEdit({ edits: shown?.edits, read: reads || asksHere > 0, joined })
+      return asking.then((got) => (got && asksHere ? searchWaiting(id, who) : null)).then(() => toReader(id))
     }
     // The edition a source with one in each language is asked in (C166 (e));
     // nothing found there, the English one (LPN §6).
@@ -4423,7 +4446,7 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done: withRipple(done, going, id) }
-  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell, talkToReflection, tagTried])
+  }, [askSource, askSourceAs, searchWaiting, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell, talkToReflection, tagTried])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
   // asked as a new branch of its plan, the next letter, by who answers that
@@ -4928,7 +4951,7 @@ export default function Shell() {
           filtered={collectionFiltered} shownCount={collectionShown.cards.length} onClear={onCollectionClear}
           onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
           cards={collectionAll.cards} picked={pickedHere} onPick={onPick} onClearPicked={clearPicked}
-          onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}
+          onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} onSendWaiting={toSendWaiting} rowOf={(n) => numbered.get(n) ?? null}
           clean={false} onRun={onPlanDelete} onFindChange={(num) => { findPassage(num) }}
           nameOf={planModelName} notHeld={roomNotHeld}
         />
@@ -5006,6 +5029,7 @@ export default function Shell() {
           languagePicker={langPicking ? { items: languageRows(), now: i18n.locale, at: langAt } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`, { say: true })} onLanguagePickerClose={() => setLangPicking(false)}
           markupMenu={markupPicking ? { show: markupShow, mode: markupMode, waiting: markupWaiting, at: markupAt } : null} onMarkupRun={runClicked} onMarkupMenuClose={() => setMarkupPicking(false)}
           sendList={listShown ? { rows: listRows, onBranch: toggleReplyTarget, onItem: (num, held) => runClicked(held ? `hold:off ${num}` : `hold:${num}`), onAnswers: (num, reply) => runClicked(`answers:${num} ${reply ? 'reply' : 'text'}`), onFold: () => { setListFoldedFor(listGroup); setListOpenFor(null) } } : null}
+          waiting={(roomAsks.get(roomId) ?? []).filter(waitingAsk).length}
           onSeeList={listAny && !listShown ? () => { setListOpenFor(listGroup); setListFoldedFor(null) } : null} />,
         barHost,
       )}
