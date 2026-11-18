@@ -3,6 +3,12 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.25.0, 18 November 2026
+
+- An empty room on its own stands a little to the left, with Parliament's logo and a few lines on what it is beside it, until you type in the room or the bar. On a phone they come after the room.
+- Settings, under About, opens with the same logo and lines, centred.
+- The logo is the white square with the three birds, on a phone's home screen too.
+
 ## 0.24.1, 18 November 2026
 
 - The page's foot, and Settings under About, say which version is running: "In beta, version 0.24.1".
