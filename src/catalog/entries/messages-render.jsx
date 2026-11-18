@@ -43,6 +43,12 @@ const NO_ASK_INFO = new Map()
 import { waiting as editWaits, tellsOf } from '../../editing/told'
 import { withoutAnswers, answersIn } from '../../editing/answers'
 import { isDraft, draftWords } from '../../lib/writing'
+
+// The room as one text (C311, piece 2, step 1; ruled 18 November): your text
+// and every prompt with its finished reply, one after another, are parts of
+// one editor, so a selection runs across them. false: each an editor of its
+// own, as before.
+const ONE_TEXT = true
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
 import { usePlanOf, waitingIn } from '../../stores/usePlanOf'
@@ -611,7 +617,19 @@ export default function MessagesRender() {
       out.push({ kind: 'pair', key: `pair-${m.id}`, id: m.id, prompt: m, reply })
       if (reply) i++
     }
-    return out
+    // One text (C311): what stands one after another is one editor's parts.
+    // Anything else between them (the tabs of several branches, a reply
+    // still arriving, a source's list of results) ends the run.
+    if (!ONE_TEXT) return out
+    const runs = []
+    for (const [at, item] of out.entries()) {
+      const part = item.kind === 'pair' || item.kind === 'writing'
+      const last = runs[runs.length - 1]
+      if (part && last?.kind === 'text') last.items.push({ ...item, at })
+      else if (part) runs.push({ kind: 'text', key: `text-${item.id}`, id: item.id, items: [{ ...item, at }] })
+      else runs.push(item)
+    }
+    return runs
   }, [items, replyEditable])
 
   // Highlights are each message's own now, drawn where selected (highlightsByMessage, C285).
@@ -646,33 +664,15 @@ export default function MessagesRender() {
   const pairAsks = useCallback((sections) => new Map(sections.flatMap((s) => [...askInfoOf(s.message.id)])), [askInfoOf])
   const pairSugs = useCallback((sections) => new Map(sections.flatMap((s) => [...sugInfoOf(s.message.id)])), [sugInfoOf])
 
-  const renderPair = useCallback((item, idx) => {
+  // The parts a prompt with its reply, or your own text, makes in an editor.
+  const partsOf = useCallback((item, idx) => {
+    const marks = (m) => ({ quotes: quotesByMessage.get(m.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(m.id) ?? NO_QUOTES, comments: comments.get(m.id)?.words ?? NO_QUOTES })
+    if (item.kind === 'writing') return [{ part: 'writing', message: item.message, card: cardPropsOf(item.message, idx), ...marks(item.message) }]
     const { prompt, reply } = item
-    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(prompt.id) ?? NO_QUOTES, comments: comments.get(prompt.id)?.words ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
-    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(reply.id) ?? NO_QUOTES, comments: comments.get(reply.id)?.words ?? NO_QUOTES })
-    return (
-      <EditableMessages
-        key={item.key}
-        sections={sections}
-        terms={NO_QUOTES}
-        quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
-        clean={false}
-        onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, { ...saved, held: suggesting })}
-        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.pairLabel) }}
-        closedEdits={closedEdits}
-        heldEdits={heldEdits}
-        askInfo={pairAsks(sections)}
-        onSettleAsk={settleAskOf}
-        askWords={askWords}
-        sugInfo={pairSugs(sections)}
-        onSettleSuggestion={settleSugOf}
-        sugWords={sugWords}
-        titleWords={titleWords}
-        onComment={keepComment}
-        commentWords={commentWords}
-      />
-    )
-  }, [cardPropsOf, quotesByMessage, highlightsByMessage, comments, keepComment, commentWords, editedLineOf, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords])
+    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), ...marks(prompt), editedLine: editedLineOf(prompt) }]
+    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), ...marks(reply) })
+    return sections
+  }, [cardPropsOf, quotesByMessage, highlightsByMessage, comments, editedLineOf])
 
   // Your own text (C301 (f)): a page of its own, marked like any reply. Until
   // a model has read it, it is a draft: in Editing what you type is simply
@@ -695,10 +695,13 @@ export default function MessagesRender() {
     keptWas.current = key
     keepDraftEdits(activeConversationId, own.id, letGo).catch(() => { keptWas.current = '' })
   }, [draftNow, messages, letGoIn, keepDraftEdits, activeConversationId])
-  const renderWriting = useCallback((item, idx) => {
-    const message = item.message
-    const sections = [{ part: 'writing', message, card: cardPropsOf(message, idx), quotes: quotesByMessage.get(message.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(message.id) ?? NO_QUOTES, comments: comments.get(message.id)?.words ?? NO_QUOTES }]
+  // One editor for the parts given: a prompt with its reply, your own text,
+  // or, as one text (C311), all of those that stand one after another.
+  const renderText = useCallback((key, parts) => {
+    const sections = parts.flatMap((x) => partsOf(x.item, x.idx))
+    const own = sections.find((s) => s.part === 'writing')?.message ?? null
     const onSave = (messageId, saved) => {
+      if (messageId !== own?.id) return saveEditedReply(activeConversationId, messageId, { ...saved, held: suggesting })
       // In a draft, every change marked is held back unless it was let go.
       const letGo = letGoIn(messageId)
       const held = [...(saved.edits?.keys?.() ?? [])].map(String).filter((k) => !letGo.has(k))
@@ -706,14 +709,16 @@ export default function MessagesRender() {
     }
     return (
       <EditableMessages
-        key={item.key}
+        key={key}
         sections={sections}
         terms={NO_QUOTES}
         quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
         clean={false}
-        untracked={draftNow && !suggesting}
+        // Your own text no model has read, in Editing, is simply the text;
+        // the other parts are tracked as ever.
+        untracked={own && draftNow && !suggesting ? own.id : null}
         onSave={onSave}
-        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.writingLabel) }}
+        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(sections.length === 1 && own ? COPY.chat.writingLabel : COPY.chat.pairLabel) }}
         closedEdits={closedEdits}
         heldEdits={heldEdits}
         askInfo={pairAsks(sections)}
@@ -727,7 +732,7 @@ export default function MessagesRender() {
         commentWords={commentWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, highlightsByMessage, comments, keepComment, commentWords, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords, draftNow, letGoIn])
+  }, [partsOf, keepComment, commentWords, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords, draftNow, letGoIn])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {
@@ -755,8 +760,8 @@ export default function MessagesRender() {
   // draws its thread the same way, so a later prompt there to several gets
   // tabs of its own (again:, C177).
   function renderItem(item, idx) {
-    if (item.kind === 'pair') return renderPair(item, idx)
-    if (item.kind === 'writing') return renderWriting(item, idx)
+    if (item.kind === 'text') return renderText(item.key, item.items.map((x) => ({ item: x, idx: x.at })))
+    if (item.kind === 'pair' || item.kind === 'writing') return renderText(item.key, [{ item, idx }])
     return item.kind === 'slider'
       ? <BranchSlider key={item.key} item={item} line={activeConversationId} infoOf={infoOf} renderLine={renderItem} numberOf={numberOf} />
       : renderCard(item, idx)

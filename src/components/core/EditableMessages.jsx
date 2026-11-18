@@ -26,6 +26,7 @@ import { titlesPlugin } from '../../editing/titles'
 import MessageCard from './MessageCard'
 import { isReleased, onRelease } from '../../editing/across'
 import { takeFocus, wantsFocus } from '../../editing/writeFocus'
+import { partsOf, sameParts, touchedParts, acrossParts, PARTS } from '../../editing/parts'
 
 // A prompt and its reply, edited in place as one (stage 11, piece 2; the
 // editing spec, "Editing prompts"; C214, ruled 26 October). One editor draws
@@ -95,10 +96,17 @@ const COMMENT_WORDS = { label: 'COMMENT', placeholder: '', keys: 'Ctrl+Alt+M', m
 // onComment({ messageId, passage, nth, text }): a comment kept on words by
 // Ctrl+Alt+M (C301 (c)); commentWords: its box's and the text's words.
 // untracked: your own text no model has read, in Editing: what you type is
-// simply the text, not an edit (C301 (f)).
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, untracked = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
+// simply the text, not an edit (C301 (f)). true for every part, or the id of
+// the one message it holds for, the other parts tracked as ever (C311).
+// joins: a prompt and its reply struck or typed over together fill the bar
+// (C214 (a), (b)). Off since the room became one text (C311, ruled 18
+// November): a change across parts is made in each part, and the bar is left.
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, untracked = false, joins = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
   const untrackedRef = useRef(untracked)
   useEffect(() => { untrackedRef.current = untracked }, [untracked])
+  const plainIn = (message) => untrackedRef.current === true || (untrackedRef.current != null && untrackedRef.current !== false && untrackedRef.current === message)
+  const joinsRef = useRef(joins)
+  useEffect(() => { joinsRef.current = joins }, [joins])
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -241,7 +249,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     savedKeys.current = {}
     doc.forEach((sec) => { savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
-      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), onSend: () => sendFromText(), ...menuOptions, ...askOptions, ...commentOptions }),
+      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => { if (joinsRef.current) join() }, onSend: () => sendFromText(), ...menuOptions, ...askOptions, ...commentOptions }),
       // Comments on words, after their passage (C301 (c)).
       commentsPlugin({ words: {
         get more() { return commentWordsRef.current.more },
@@ -315,13 +323,30 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       attributes: () => ({ class: `p-pair${cleanRef.current ? ' clean' : ''}`, 'aria-label': wordsRef.current?.label ?? '', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' }),
       dispatchTransaction(tr) {
         const before = v.state
+        // A change across parts (C311): made in each part, never across the
+        // edge between two, so no part is joined to another or lost. Where a
+        // part is your own text no model has read, its words go; elsewhere
+        // the editing rules strike them, as within one part.
+        if (tr.docChanged && !tr.getMeta(PARTS) && !tr.getMeta(SKIP) && crosses(before.selection) && !joinsRef.current) {
+          const steps = acrossParts(before, tr, plainIn)
+          if (steps) {
+            for (const make of steps) v.dispatch(make(v.state))
+            return
+          }
+        }
         // Your own text before any model read it, in Editing: simply the text (C301 (f)).
-        if (untrackedRef.current && tr.docChanged) tr.setMeta(SKIP, true)
-        const joining = crosses(before.selection) && tr.docChanged && !tr.getMeta(SKIP)
+        const touched = tr.docChanged ? touchedParts(tr) : []
+        if (touched.length && touched.every(plainIn)) tr.setMeta(SKIP, true)
+        const joining = joinsRef.current && crosses(before.selection) && tr.docChanged && !tr.getMeta(SKIP)
         const out = track(before, tr, { ids, onError: (e) => console.error('[editing] a change was refused', e) })
         if (out.getMeta(REFUSED)) setSaid('That change could not be made here.')
         let next = before.apply(out)
-        if (!v.composing && !untrackedRef.current) {
+        // No change removes a part or joins two (C311, step 1): refused whole.
+        if (out.docChanged && !sameParts(before.doc, next.doc)) {
+          setSaid('That change could not be made here.')
+          return
+        }
+        if (!v.composing && !plainIn(partsOf(next.doc).find((x) => x.from <= next.selection.from && next.selection.from <= x.to)?.message ?? null)) {
           const marks = cursorMarks(next, ids)
           if (marks && !(next.storedMarks && Mark.sameSet(next.storedMarks, marks))) next = next.apply(next.tr.setStoredMarks(marks))
         }
