@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The room as one text</title>
+<!--
+  C311, piece 2 (18 November): the room as one text to edit. Your text, each
+  prompt sent and each reply in one editor, so a selection runs across all of
+  it and can be typed over, struck or deleted. Proposed, nothing built. The
+  room and its marks as parliament-write-room-v2.html drew them. Values from
+  src/styles/tokens.css and src/editing/editing.css.
+-->
+<style>
+  :root {
+    --paper: #FCFCFA; --surface: #FFFFFF; --subtle: #FAF9F5;
+    --ink: #191919; --ink-2: #45433F; --ink-3: #6B6964; --marg: rgba(25, 25, 25, .62); --soft: rgba(25, 25, 25, .30);
+    --border: #E9E9E7; --border-2: #F1F1EF; --divider: #DEDDD8;
+    --navy: 22, 38, 70;
+    --you: #2B5CB8; --ai: #2E7458; --prompt: #C2410C; --prompt-tint: rgba(194, 65, 12, .07);
+    --sel: rgba(43, 92, 184, .22);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --t-id: 10.5px; --t-marg: 11.5px; --t-small: 12.5px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 56px; }
+  .intro { margin: 0 0 26px; }
+  .intro h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+  .intro p, .lede { margin: 0; color: var(--ink-2); font: 400 13.5px/1.6 var(--sans); max-width: 740px; }
+  .intro p + p { margin-top: 8px; }
+  section { margin: 0 0 40px; }
+  section > h2 { margin: 0 0 4px; font: 600 13px var(--sans); letter-spacing: .02em; }
+  section > .lede { margin-bottom: 14px; }
+  .marg { font: italic 400 var(--t-marg)/1.5 var(--serif); color: var(--marg); }
+  code { font: 400 12px var(--mono); }
+  kbd { font: 500 11px var(--mono); padding: 1px 5px; border: .5px solid var(--border); border-radius: 4px; background: var(--surface); }
+
+  .screen { background: var(--paper); border: .5px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .stage { padding: 18px 16px 14px; }
+  .room { max-width: 620px; margin: 0 auto; }
+  .card { position: relative; background: var(--surface); border: .5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--navy)); }
+  .chead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 12px 22px 8px; border-bottom: .5px solid var(--border-2); }
+  .chead h2 { margin: 0; font: 600 13px var(--sans); }
+  .chead .num { font: 400 var(--t-id) var(--mono); color: var(--ink-3); }
+  .chead .right { margin-inline-start: auto; }
+  .text { padding: 16px 22px 18px; font: 400 15.5px/1.7 var(--serif); }
+  .text p { margin: 0 0 .8em; }
+  .text > :last-child { margin-bottom: 0; }
+  .caret { display: inline-block; width: 1.5px; height: 1.1em; background: var(--ink); vertical-align: text-bottom; }
+
+  /* A prompt sent, in the text: p> and its words, in the prompt colour. */
+  .sent { margin: 1.1em 0 .5em; color: var(--prompt); font: 400 15.5px/1.6 var(--serif); }
+  .sent b { font: 600 11px var(--mono); margin-inline-end: 5px; letter-spacing: -.02em; }
+  .sent .how { margin-inline-start: 8px; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  /* A reply: a quote block, with its line of where it came from. */
+  blockquote { margin: 0 0 .3em; padding: 0 0 0 12px; border-inline-start: 2px solid var(--divider); }
+  blockquote p { margin: 0 0 .6em; }
+  blockquote > :last-child { margin-bottom: 0; }
+  blockquote.arriving { border-inline-start-style: dashed; color: var(--ink-2); }
+  .from { margin: 0 0 1em; padding-inline-start: 14px; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .from a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .fixed { outline: 1px dashed var(--soft); outline-offset: 3px; border-radius: 3px; }
+  .results { list-style: none; margin: 0; padding: 0 0 0 12px; border-inline-start: 2px solid var(--divider); font: 400 14px/1.5 var(--sans); }
+  .results li { margin: 0 0 6px; }
+  .results small { display: block; color: var(--ink-3); font-size: 12px; }
+
+  .sel { background: var(--sel); }
+  s.was { color: var(--ink-3); }
+  ins.you { color: var(--you); text-decoration: underline; text-underline-offset: 3px; }
+  .pr-at { background: var(--prompt-tint); border-radius: 2px; }
+  .pr-at::before, .pr-at::after { content: ""; display: inline-block; width: 5px; height: .78em; border: 0 solid var(--prompt); }
+  .pr-at::before { border-width: 1.5px 0 0 1.5px; vertical-align: text-top; margin-inline-end: 1px; }
+  .pr-at::after { border-width: 0 1.5px 1.5px 0; vertical-align: baseline; margin-inline-start: 1px; }
+  .pr { margin-inline-start: 5px; font: italic 400 12.5px/1.4 var(--serif); color: var(--prompt); }
+  .pr b { font: 600 10.5px var(--mono); font-style: normal; margin-inline-end: 3px; }
+
+  /* Today's editors, each with its own edge. */
+  .ed { position: relative; margin: 0 0 12px; padding: 10px 12px; border: 1px dashed var(--soft); border-radius: 8px; }
+  .ed > .lab { position: absolute; top: -9px; inset-inline-end: 10px; padding: 0 6px; background: var(--surface); font: 600 10px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+  .ed .bubble { display: inline-block; padding: 8px 12px; background: var(--subtle); border-radius: 12px; font: 400 13.5px/1.5 var(--sans); }
+
+  .bar { max-width: 620px; margin: 14px auto 0; background: var(--surface); border: .5px solid var(--border); border-radius: 14px; }
+  .field { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border-radius: 14px; background: var(--subtle); }
+  .field .chip { padding: 2px 7px; border-radius: 9px; background: var(--ink); color: #fff; font: 600 9px var(--sans); letter-spacing: .06em; }
+  .field .chip.cmd { background: rgb(var(--navy)); }
+  .field .v { font: 400 14px var(--sans); }
+  .field .who-s { margin-inline-start: auto; font: italic 400 var(--t-marg) var(--serif); color: var(--marg); }
+  .enter { max-width: 620px; margin: 7px auto 0; padding: 0 6px; }
+  .enter b { font-weight: 400; color: var(--ink); }
+
+  .two { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 780px) { .two { grid-template-columns: 1fr 1fr; } }
+  .tag { display: inline-block; margin: 0 0 8px; font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .notes { margin: 10px 0 0; padding: 0 0 0 18px; color: var(--ink-2); font: 400 12.5px/1.6 var(--sans); }
+  .notes li { margin: 3px 0; }
+  .notes b { color: var(--ink); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: .5px solid var(--border); border-radius: 12px; overflow: hidden; font: 400 12.5px/1.5 var(--sans); }
+  th, td { text-align: start; vertical-align: top; padding: 8px 12px; border-bottom: .5px solid var(--border-2); }
+  th { font: 600 11px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { width: 34%; color: var(--ink); }
+  td { color: var(--ink-2); }
+  .asks { background: var(--surface); border: .5px solid var(--border); border-radius: 12px; padding: 12px 18px 14px; }
+  .asks h3 { margin: 0; font: 600 12px var(--sans); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .asks h3 + ol, .asks h3 + ul { margin-top: 6px; }
+  .asks ol, .asks ul { margin: 0 0 12px; padding-inline-start: 20px; font: 400 13px/1.6 var(--sans); color: var(--ink-2); }
+  .asks li { margin: 6px 0; }
+  .asks b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="intro">
+    <h1>The room as one text</h1>
+    <p>C311, piece 2. Your text, each prompt you sent and each reply become one text in one editor, so a selection runs across all of it and can be typed over, struck or deleted. A prompt sent shows as <code>p&gt;</code> and its words in the prompt colour. A reply is a quote block. Nothing here is built, and nothing stored changes.</p>
+    <p>Piece 1 is built (prompts in the text follow the bar). Every section below draws one decision; section 10 lists what to rule.</p>
+  </div>
+
+  <!-- 1 -->
+  <section>
+    <h2>1 · Today: several editors, and a selection that stops</h2>
+    <p class="lede">Each dashed box is an editor of its own. A browser keeps a selection inside the editor it began in, so a drag across them was made the page's own selection (C280 (d)): it copies, and nothing can be typed into it.</p>
+    <div class="screen"><div class="stage"><div class="room">
+      <div class="card addressed">
+        <div class="chead"><h2>testing items here before sending any</h2><span class="num">202</span></div>
+        <div class="text">
+          <div class="ed"><span class="lab">editor 1 · your text</span><p>testing items here before <span class="sel">sending anything via a prompt.</span></p></div>
+          <div class="ed"><span class="lab">editor 2 · a prompt and its reply</span>
+            <p><span class="bubble"><span class="sel">tell me a bit about chicago</span></span></p>
+            <blockquote><p><span class="sel">Chicago is the most populous city in the U.S. state of Illinois</span> and in the Midwestern United States.</p></blockquote>
+            <p class="from">Answered from Wikipedia · <a>Chicago</a> · revision 1384650492 · <a>CC BY-SA 4.0</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="enter marg">A selection across cards copies. Typing, Backspace and Delete do nothing in it</div>
+    </div></div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2 · One text</h2>
+    <p class="lede">The same room as one editor. Your text first; under it each prompt as <code>p&gt;</code> and its words, in vermillion, where a bubble is now; under each prompt its reply as a quote block, with the line of where it came from. The caret moves through all of it with the arrow keys, and a selection can start and end anywhere.</p>
+    <div class="screen"><div class="stage"><div class="room">
+      <div class="card addressed">
+        <div class="chead"><h2>testing items here before sending any</h2><span class="num">202</span><span class="marg right">one text</span></div>
+        <div class="text">
+          <p>testing items here before <span class="sel">sending anything via a prompt.</span></p>
+          <p class="sent"><b>p&gt;</b><span class="sel">tell me a bit about chicago</span></p>
+          <blockquote><p><span class="sel">Chicago is the most populous city in the U.S. state of Illinois</span><span class="caret"></span> and in the Midwestern United States. With a population of 2.7 million, it is the third-most populous city in the United States.</p></blockquote>
+          <p class="from">Answered from Wikipedia · <a>Chicago</a> · revision 1384650492 · <a>CC BY-SA 4.0</a></p>
+          <p class="sent"><b>p&gt;</b>which of its buildings should I see first?</p>
+          <blockquote><p>Start with the Rookery and the Monadnock, two blocks apart, then the river: the early towers read best from the water.</p></blockquote>
+          <p class="from">Sonnet 5.5 · 18 Nov</p>
+        </div>
+      </div>
+    </div>
+    <div class="bar"><div class="field"><span class="chip">PROMPT</span><span class="v"></span><span class="who-s">answered by Sonnet 5.5</span></div></div>
+    <div class="enter marg">→ 202 · <b>Your text is never sent by itself. Ctrl+Alt+P writes a prompt in it, or type one here</b></div>
+    </div></div>
+    <ul class="notes">
+      <li><b>A prompt is still typed in the bar,</b> or written in the text with Ctrl+Alt+P. Typing <code>p&gt;</code> in the page does not make one: the page is text, and the bar is the only place a prompt is sent from.</li>
+      <li><b>The rule beside a reply is grey for a source and a model alike;</b> the line under it says who answered. A model's suggestion in the text stays green and dotted, as now.</li>
+      <li><b>A quote inside a reply</b> (a line a model began with <code>&gt;</code>) sits one step further in, with its own rule.</li>
+      <li><b>Each part keeps its buttons</b> (copy, again, hide, delete) on the line under it, shown when the pointer or the caret is in that part.</li>
+    </ul>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3 · Typing over, or deleting, a selection across parts</h2>
+    <p class="lede">The selection in section 2, with Backspace pressed. What happens depends on whether a model has read the words, which is the rule edits already follow (C216, C301 (f)).</p>
+    <div class="two">
+      <div>
+        <span class="tag">Where no model has read them</span>
+        <div class="card"><div class="text">
+          <p>testing items here before<span class="caret"></span> and in the Midwestern United States. With a population of 2.7 million, it is the third-most populous city in the United States.</p>
+          <p class="from">Answered from Wikipedia · <a>Chicago</a> · revision 1384650492 · <a>CC BY-SA 4.0</a> · edited by you</p>
+        </div></div>
+        <ul class="notes">
+          <li>Only a source has answered here, so nothing has been read by a model. The words are simply gone, as in a draft.</li>
+          <li>The prompt's words were all selected, so the prompt is gone with them, and what is left of the reply joins your text. Its line stays, with "edited by you".</li>
+          <li><code>undo:</code> and Ctrl+Z bring all of it back as one step.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="tag">Where a model has read them</span>
+        <div class="card"><div class="text">
+          <p>testing items here before <s class="was">sending anything via a prompt.</s></p>
+          <p class="sent"><b>p&gt;</b><s class="was">tell me a bit about chicago</s></p>
+          <blockquote><p><s class="was">Chicago is the most populous city in the U.S. state of Illinois</s><span class="caret"></span> and in the Midwestern United States.</p></blockquote>
+          <p class="from">Sonnet 5.5 · 18 Nov</p>
+        </div></div>
+        <ul class="notes">
+          <li>The words are struck, one edit in each part (three here), numbered and in the Collection, and told to the model once with your next prompt. What it said earlier still makes sense.</li>
+          <li>Typed over, your new words follow in blue where the selection began.</li>
+          <li>Markup's Show hides the struck words, as now; Suggesting holds the edits back, as now.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4 · Deleting a whole prompt or reply</h2>
+    <p class="lede">A part selected whole and deleted is the delete you have now (Enter twice, 20 seconds to bring it back), reached from the text. It is not an edit: the part leaves the chat, and a model is no longer sent it.</p>
+    <div class="screen"><div class="stage"><div class="room">
+      <div class="card addressed"><div class="text">
+        <p>testing items here before sending anything via a prompt.</p>
+        <p class="sent"><span class="sel"><b>p&gt;</b>tell me a bit about chicago</span></p>
+        <blockquote><p><span class="sel">Chicago is the most populous city in the U.S. state of Illinois and in the Midwestern United States.</span></p></blockquote>
+        <p class="from"><span class="sel">Answered from Wikipedia · Chicago · revision 1384650492 · CC BY-SA 4.0</span></p>
+      </div></div>
+    </div>
+    <div class="bar"><div class="field"><span class="chip">PROMPT</span><span class="v"></span></div></div>
+    <div class="enter marg">→ 202 · <b>Delete again removes this prompt and its reply from the chat. Escape keeps them</b> · For 20 seconds the chat offers to bring them back</div>
+    </div></div>
+    <ul class="notes">
+      <li><b>Two presses, as now:</b> the first Delete or Backspace on a part selected whole says what will go; the second does it. Any other key keeps it.</li>
+      <li><b>Several parts at once</b> are one act and one <code>undo:</code>.</li>
+      <li><b>A selection that takes a whole part and some words beside it</b> deletes the part this way and treats the words as section 3 does, in the one step.</li>
+      <li><b>Your own text</b> is never removed this way: emptied, it stays an empty page, and its chat stays until <code>delete:202</code>.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5 · What is fixed inside the text</h2>
+    <p class="lede">Three things can be selected and deleted whole, and copied, but not typed into. Drawn here with a dashed outline; in the app the caret steps over them.</p>
+    <div class="screen"><div class="stage"><div class="room">
+      <div class="card addressed"><div class="text">
+        <p class="sent"><b>p&gt;</b>barn owl hunting</p>
+        <ul class="results fixed">
+          <li>How barn owls hunt in total darkness<small>Hacker News · 214 points · 3 March 2026</small></li>
+          <li>The asymmetric ears of Tyto alba<small>Hacker News · 88 points · 11 January 2026</small></li>
+        </ul>
+        <p class="from" style="margin-top:.5em"><span class="fixed">Answered from Hacker News · 2 results</span></p>
+        <p class="sent"><b>p&gt;</b>why are their ears uneven?</p>
+        <blockquote class="arriving fixed"><p>One ear sits higher than the other, so a sound from below reaches</p></blockquote>
+        <p class="from">Sonnet 5.5 is answering · Escape stops it</p>
+      </div></div>
+    </div></div></div>
+    <ul class="notes">
+      <li><b>A source's list of results:</b> each result is the source's record, with a link. It can be deleted whole or brought into a prompt (include:), not rewritten.</li>
+      <li><b>The line of where words came from</b> (source, page, revision, licence; or the model and the day). It stays with its quote however the words are edited, and reads "edited by you" once they are. Deleting the quote deletes its line.</li>
+      <li><b>A reply still arriving:</b> fixed until it has finished, then text like the rest. Typing elsewhere in the room goes on meanwhile.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6 · A prompt you sent, changed</h2>
+    <p class="lede">Changing a sent prompt's words is an edit, as now (C214): it says what you meant, and is told to a model once. It never sends anything by itself, and to a source it searches nothing again.</p>
+    <div class="screen"><div class="stage"><div class="room">
+      <div class="card addressed"><div class="text">
+        <p class="sent"><b>p&gt;</b>tell me a bit about <s class="was">chicago</s> <ins class="you">Chicago's architecture</ins><span class="caret"></span></p>
+        <blockquote><p>Chicago is the most populous city in the U.S. state of Illinois and in the Midwestern United States.</p></blockquote>
+        <p class="from">Answered from Wikipedia · <a>Chicago</a> · revision 1384650492 · <a>CC BY-SA 4.0</a></p>
+      </div></div>
+    </div>
+    <div class="bar"><div class="field"><span class="chip">PROMPT</span><span class="v"></span><span class="who-s">answered from Wikipedia</span></div></div>
+    <div class="enter marg">→ 202 · <b>Wikipedia reads none of your 1 edit. A model reads them once it has a key: api:</b> · again: asks it as it reads now</div>
+    </div></div>
+    <ul class="notes">
+      <li><b>To ask it again as changed,</b> <code>again:</code> on that prompt, which exists (C177), sends its words as they now read, as a new branch. Suggested: the line under the bar offers it whenever the caret is in a changed prompt.</li>
+      <li><b>Replaces C214 (a) and (b):</b> today, typing over a prompt and its reply together joins them and fills the bar with the words left. In one text that is section 3, and nothing fills the bar.</li>
+    </ul>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2>7 · Ctrl+A, and other keys that reach far</h2>
+    <p class="lede">In one editor, Ctrl+A would select the whole chat, and one Backspace after it would strike or delete everything. That slip has already happened on a single reply (C301 (e)).</p>
+    <table>
+      <tr><th>Key</th><th>Does</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd>, once</td><td>Selects the part the caret is in: your text, one prompt, or one reply.</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd>, again</td><td>Selects the whole text. The line under the bar says "All of 202 is selected".</td></tr>
+      <tr><td><kbd>Backspace</kbd> at the start of a part</td><td>Stops there. It does not join a reply to its prompt, or a prompt to your text. To join, select across and delete.</td></tr>
+      <tr><td><kbd>Enter</kbd> in a prompt</td><td>Does nothing, as now: a prompt is one line of its own.</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd> anywhere</td><td>What Enter in the bar would do, as now.</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Takes back the last change in the text, across parts, as one step. <code>undo:</code> does the same from the bar.</td></tr>
+    </table>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <h2>8 · Marks across parts</h2>
+    <p class="lede">A highlight, a comment and a prompt in the text are each kept with the one message they are on. A selection across parts is for editing, copying and deleting.</p>
+    <div class="screen"><div class="stage"><div class="room">
+      <div class="card addressed"><div class="text">
+        <p>testing items here before <span class="sel">sending anything via a prompt.</span></p>
+        <p class="sent"><b>p&gt;</b><span class="sel">tell me a bit</span> about chicago</p>
+      </div></div>
+    </div>
+    <div class="bar"><div class="field"><span class="chip cmd">COMMAND</span><span class="v">prompt:</span></div></div>
+    <div class="enter marg">→ 202 · <b>A prompt in the text sits in one part. Select within your text, a prompt or a reply</b></div>
+    </div></div>
+    <ul class="notes">
+      <li>Suggested: refused with that line, for a prompt, a comment and a highlight alike. The other way, a mark split into one per part, makes two numbers from one act.</li>
+      <li>Within one part, everything works as now, in every part: a prompt in the text can now be written on a prompt you sent, which today says "Prompts in the text are for replies".</li>
+    </ul>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <h2>9 · Stored, and what each act writes</h2>
+    <p class="lede">Nothing new is stored and nothing is migrated. The editor is one; the messages under it stay the records they are, and every backup reads as before. An older Parliament opening the same data draws its cards as it always did.</p>
+    <table>
+      <tr><th>You do</th><th>Written</th></tr>
+      <tr><td>Type or delete within a part</td><td>That message's <code>blocks</code>, and an edit record where a model has read it. As now.</td></tr>
+      <tr><td>Delete or type over across parts</td><td>The same, once for each message touched, in one transaction, so one undo.</td></tr>
+      <tr><td>Delete a part whole</td><td>The message is deleted as <code>delete:</code> deletes one now, with its 20 seconds.</td></tr>
+      <tr><td>Words left over from a deleted part</td><td>They become words of the part before, as typed there.</td></tr>
+      <tr><td>Change a sent prompt</td><td>An edit record on that prompt. Its <code>content</code>, what was sent, stays as sent.</td></tr>
+      <tr><td>Edit a source's quote</td><td>An edit record, waiting for a model; its <code>source</code> (page, revision, licence) untouched.</td></tr>
+    </table>
+    <ul class="notes">
+      <li><b>Branches:</b> the editor shows the branch on screen. A prompt above several branches is one line with the branch tabs under it, as now; each branch holds its own copy (ruled 16 November).</li>
+      <li><b>A long chat:</b> one editor over hundreds of messages is to be measured before building. If it is slow, parts far from the screen are drawn as plain text until scrolled to.</li>
+      <li><b>A screen reader</b> is told each part as it is entered: "your text", "your prompt", "reply from Wikipedia".</li>
+      <li><b>A phone:</b> long-press selection across parts needs trying on one.</li>
+    </ul>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <h2>10 · To rule</h2>
+    <div class="asks">
+      <h3>Replaces</h3>
+      <ul>
+        <li><b>C280 (d):</b> a selection across cards is to copy only.</li>
+        <li><b>C214 (a), (b):</b> a prompt and its reply typed over together join and fill the bar.</li>
+        <li><b>C301 (f):</b> "a prompt typed in the bar stays as it is", and one text of your own per room.</li>
+        <li><b>The prompt's bubble,</b> which becomes a line of <code>p&gt;</code> and its words.</li>
+      </ul>
+      <h3>To rule</h3>
+      <ol>
+        <li><b>One text</b> (section 2): a prompt sent as <code>p&gt;</code> and its words in vermillion, no bubble; a reply as a quote block with a grey rule, a source and a model alike, the line under it saying who.</li>
+        <li><b>Struck where a model has read, gone where none has</b> (section 3).</li>
+        <li><b>A part selected whole is deleted with two presses</b> and 20 seconds to bring it back (section 4).</li>
+        <li><b>Three fixed things:</b> a source's list of results, the line of where words came from, a reply still arriving (section 5).</li>
+        <li><b>A changed prompt is an edit and sends nothing;</b> <code>again:</code> asks it as it now reads (section 6).</li>
+        <li><b>Ctrl+A in two steps,</b> and Backspace stopping at the start of a part (section 7).</li>
+        <li><b>Marks stay within one part;</b> across parts they are refused with a line (section 8).</li>
+        <li><b>Order of building:</b> the one editor with nothing else changed (selection, typing and striking across parts) first; then deleting a part from the text; then the look (<code>p&gt;</code> and quote blocks). Or the look first, since it is what you asked to see.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+</body>
+</html>
