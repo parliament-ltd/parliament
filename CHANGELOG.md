@@ -3,6 +3,14 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.24.0, 18 November 2026
+
+- A room is one text. Your own writing, each prompt you sent and each reply can be selected across, typed over and deleted together. Where a model has read the words they are struck and told to it once, as edits always were; in your own text that no model has read, they simply go.
+- A prompt you sent is a line of the text, p> and its words in the prompt colour, where a bubble was. A reply is a quote, with a rule at its edge and who answered under it, and "edited by you" once you have changed it.
+- A prompt or reply selected whole is deleted with Backspace or Delete pressed twice: the first says what will go. For 20 seconds the chat offers to bring it back, and several deleted together come back together.
+- Ctrl+A selects the part you are in, and the whole text on a second press. Ctrl+Z takes back a change across parts as one step. A reply still arriving and a source's list of results sit in the text, and typing elsewhere goes on while a reply arrives.
+- A prompt written in the text with Ctrl+Alt+P now follows the bar: a source such as Wikipedia searches for its own words and answers under the text, with no model and no key. It can be written on a prompt you sent, too. The Collection's Prompt button sends the prompts that wait, and the line under the bar says when one waits.
+
 ## 0.23.0, 17 November 2026
 
 - Tasks are simpler. "Add a task" is a field to type in: Enter saves the task and leaves the next row ready. Its Model pill opens the rest: a description, Prompt, Search or Command, who answers, rooms, one by one or all at once, and Save.
