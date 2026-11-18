@@ -18,7 +18,7 @@ Most AI tools have you ask, then read what comes back. Parliament is built so
 you take part: you write, you decide what a model sees, and you change what it
 says.
 
-*The screenshots were taken with no API key: the replies come from llama3.2,
+*The screenshots were taken with no API key: the replies come from bonsai-2,
 running on the same computer through Ollama, and the sources' answers from
 Wikipedia.*
 
@@ -79,7 +79,7 @@ Enter.
 
 ### Ask several at once
 
-`by:llama3.2, wikipedia` sends one prompt to each, and their answers sit side
+`by:bonsai-2, wikipedia` sends one prompt to each, and their answers sit side
 by side as branches of the chat. `compare:201a 201b` sets two answers next to
 each other and marks the words that differ, with no model.
 
