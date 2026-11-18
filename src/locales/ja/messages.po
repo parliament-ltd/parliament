@@ -2579,7 +2579,7 @@ msgstr "先に返答をクリックするか、対象の言葉を選択してか
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "テキスト内のプロンプトは返答に付けるものです。自分のプロンプトでは、取り消し線を引くか上書きしてください"
+msgstr "テキスト内のプロンプトは1つの部分に付けます。あなたのテキスト、1つのプロンプト、または1つの返答の中で選択してください"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"

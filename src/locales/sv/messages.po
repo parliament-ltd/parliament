@@ -2579,7 +2579,7 @@ msgstr "Klicka först i ett svar, eller markera orden den gäller, sedan prompt:
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "Promptar i texten är till för svar. I din egen prompt stryker du igenom eller skriver över"
+msgstr "En prompt i texten hör till en del. Markera inom din text, en prompt eller ett svar"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"

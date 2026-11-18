@@ -172,7 +172,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   useEffect(() => { onSettleRef.current = onSettleAsk }, [onSettleAsk])
   const onSettleSugRef = useRef(onSettleSuggestion)
   useEffect(() => { onSettleSugRef.current = onSettleSuggestion }, [onSettleSuggestion])
-  const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords, inReply)
+  const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords, (state) => !crosses(state.selection))
   const askOptions = askBox.options
   // Comments on words (C301 (c)): their words read when drawn, so a change of language shows.
   const commentWordsRef = useRef(commentWords)
@@ -265,7 +265,12 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     savedKeys.current = {}
     doc.forEach((sec) => { if (sec.type === schema.nodes.section) savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
-      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => { if (joinsRef.current) join() }, onSend: () => sendFromText(), ...menuOptions, ...askOptions, ...commentOptions }),
+      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => { if (joinsRef.current) join() }, onSend: () => sendFromText(), ...menuOptions, ...askOptions, ...commentOptions,
+        // A prompt in the text sits in one part (C311, step 6): across parts it is refused, with a line.
+        ...(askOptions.onAsk ? { onAsk: (view) => {
+          if (crosses(view.state.selection)) { setSaid(wordsRef.current?.onePart ?? ''); return true }
+          return askOptions.onAsk(view)
+        } } : {}) }),
       // Comments on words, after their passage (C301 (c)).
       commentsPlugin({ words: {
         get more() { return commentWordsRef.current.more },

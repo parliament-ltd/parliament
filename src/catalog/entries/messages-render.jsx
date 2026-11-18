@@ -744,7 +744,7 @@ export default function MessagesRender() {
         untracked={own && draftNow && !suggesting ? own.id : null}
         onSave={onSave}
         onDeleteParts={handleDeleteParts}
-        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(sections.length === 1 && own ? COPY.chat.writingLabel : COPY.chat.pairLabel), deleteAgain: (count, part) => i18n._(COPY.chat.deletePartsAgain, { count, part }) }}
+        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(sections.length === 1 && own ? COPY.chat.writingLabel : COPY.chat.pairLabel), deleteAgain: (count, part) => i18n._(COPY.chat.deletePartsAgain, { count, part }), onePart: i18n._(COPY.enter.askNotPrompt) }}
         closedEdits={closedEdits}
         heldEdits={heldEdits}
         askInfo={pairAsks(sections)}

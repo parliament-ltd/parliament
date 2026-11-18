@@ -2579,7 +2579,7 @@ msgstr "Napsauta ensin vastausta tai valitse sanat, joita se koskee, ja kirjoita
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "Kehotteet tekstissä tehdään vastauksiin. Omassa kehotteessasi yliviivaa tai kirjoita päälle"
+msgstr "Kehote tekstissä kuuluu yhteen osaan. Valitse omasta tekstistäsi, yhdestä kehotteesta tai yhdestä vastauksesta"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"

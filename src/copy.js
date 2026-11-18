@@ -972,7 +972,7 @@ export const COPY = {
     askKeep: /*i18n*/ { id: 'enter.askKeep', message: 'Enter keeps this prompt on the words you selected in a reply, or where the cursor was. It goes with your next Enter' },
     askLong: /*i18n*/ { id: 'enter.askLong', message: 'A prompt in the text holds up to {max} characters' },
     askNoReply: /*i18n*/ { id: 'enter.askNoReply', message: 'Click into a reply first, or select the words it is about, then prompt: again' },
-    askNotPrompt: /*i18n*/ { id: 'enter.askNotPrompt', message: 'Prompts in the text are for replies. In your own prompt, strike or type over it' },
+    askNotPrompt: /*i18n*/ { id: 'enter.askNotPrompt', message: 'A prompt in the text sits in one part. Select within your text, a prompt or a reply' },
     askKept: /*i18n*/ { id: 'enter.askKept', message: 'Kept as a prompt in the text. It goes with your next Enter' },
     // The Lab (stage 13, piece 1; C238).
     labAlready: /*i18n*/ { id: 'enter.labAlready', message: 'The Lab is open already' },

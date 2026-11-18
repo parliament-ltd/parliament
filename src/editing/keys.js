@@ -269,11 +269,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
   const nothing = () => true
   // An ask, now a prompt in the text (C218; C301 (d)): in a reply only.
   const askHere = (state, view) => {
+    // In your text, a reply, or a prompt you sent (C311, step 6); whether the
+    // selection sits in one part is the editor's to say.
     if (!onAsk) return false
-    if (!blk(state)) {
-      onNote?.('Prompts in the text are for replies. In your own prompt, strike or type over it.')
-      return true
-    }
     return onAsk(view)
   }
   const strike = (state, dispatch) => {

@@ -2579,7 +2579,7 @@ msgstr "请先点击进入一条回复，或选中它针对的文字，然后再
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "正文中的提示词只用于回复。在你自己的提示词中，可以加删除线或直接改写"
+msgstr "正文中的提示词只能位于一个部分内。请在你的文本、一条提示词或一条回复之内选择"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"

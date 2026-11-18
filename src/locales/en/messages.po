@@ -2579,7 +2579,7 @@ msgstr "Click into a reply first, or select the words it is about, then prompt: 
 
 #. js-lingui-explicit-id
 msgid "enter.askNotPrompt"
-msgstr "Prompts in the text are for replies. In your own prompt, strike or type over it"
+msgstr "A prompt in the text sits in one part. Select within your text, a prompt or a reply"
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
