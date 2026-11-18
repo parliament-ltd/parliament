@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { EditorState, TextSelection } from 'prosemirror-state'
+import { EditorState, TextSelection, NodeSelection } from 'prosemirror-state'
 import { schema, STRUCK } from './schema'
 import { track, createIds, SKIP } from './track'
 import { partsOf, sameParts, touchedParts, acrossParts, selectPart, wholeParts, PARTS } from './parts'
@@ -178,6 +178,50 @@ describe('the parts of one text (C311)', () => {
       'barn owl',
       '[-The barn owls are owls in the genus-] Tyto. | They are medium-sized.',
     ])
+  })
+  describe('a fixed part: a list of results, a reply still arriving (step 4)', () => {
+    // A prompt, a source's list of results, then a prompt and its reply.
+    const withFixed = () => EditorState.create({ doc: schema.nodes.doc.create(null, [
+      section('prompt', 'p1', para('t1', 'barn owl hunting')),
+      schema.nodes.fixed.create({ message: 'list' }),
+      section('prompt', 'p2', para('t2', 'why are their ears uneven')),
+      section('reply', 'r2', para('t3', 'One ear sits higher than the other.')),
+    ]) })
+    it('is a part, with no words of its own', () => {
+      const state = withFixed()
+      expect(partsOf(state.doc).map((x) => `${x.part}:${x.message}`)).toEqual(['prompt:p1', 'fixed:list', 'prompt:p2', 'reply:r2'])
+      expect(partsOf(state.doc)[1].fixed).toBe(true)
+    })
+    it('is left as it is by a change across the parts around it', () => {
+      const state = select(withFixed(), 'hunting', 'why are')
+      const next = run(state, state.tr.delete(state.selection.from, state.selection.to))
+      expect(sameParts(state.doc, next.doc)).toBe(true)
+      expect(next.doc.child(1).type).toBe(schema.nodes.fixed)
+      expect(next.doc.child(0).textContent).toBe('barn owl hunting')
+      expect(next.doc.child(0).firstChild.lastChild.marks.some((m) => m.type === STRUCK)).toBe(true)
+    })
+    it('is seen as lost when a raw change would remove it', () => {
+      const state = select(withFixed(), 'hunting', 'why are')
+      expect(sameParts(state.doc, state.tr.delete(state.selection.from, state.selection.to).doc)).toBe(false)
+    })
+    it('is named whole when the selection runs over it, or it is selected by itself', () => {
+      expect(wholeParts(select(withFixed(), 'hunting', 'why are')).map((x) => x.message)).toEqual(['list'])
+      expect(wholeParts(select(withFixed(), 'barn owl hunting', 'why are')).map((x) => x.message)).toEqual(['p1', 'list'])
+      const state = withFixed()
+      const at = partsOf(state.doc)[1].from
+      const picked = state.apply(state.tr.setSelection(NodeSelection.create(state.doc, at)))
+      expect(wholeParts(picked).map((x) => x.message)).toEqual(['list'])
+    })
+    it('is passed over by Ctrl+A, which selects the written parts', () => {
+      let state = withFixed()
+      state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, posOf(state, 'ears'))))
+      const first = selectPart(state)
+      expect(first.whole).toBe(false)
+      state = state.apply(first.tr)
+      expect(state.doc.textBetween(state.selection.from, state.selection.to)).toBe('why are their ears uneven')
+      const all = selectPart(state)
+      expect(all.whole).toBe(true)
+    })
   })
   it('keeps a part whose every word was selected, empty or struck', () => {
     const state = select(setup(), 'Notes', 'medium-sized.')

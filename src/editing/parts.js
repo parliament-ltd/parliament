@@ -18,16 +18,21 @@ export const PARTS = 'editParts'
 
 /**
  * A document's parts, in order: each section's message, its kind, and where
- * its content starts and ends.
- * @returns {Array<{ message: string|null, part: string, from: number, to: number }>}
+ * its content starts and ends. A fixed part (step 4) holds no words: from
+ * and to are its own edges.
+ * @returns {Array<{ message: string|null, part: string, from: number, to: number, fixed?: true }>}
  */
 export function partsOf(doc) {
   const out = []
   doc.forEach((node, offset) => {
     if (node.type === schema.nodes.section) out.push({ message: node.attrs.message, part: node.attrs.part, from: offset + 1, to: offset + node.nodeSize - 1 })
+    else if (node.type === schema.nodes.fixed) out.push({ message: node.attrs.message, part: 'fixed', from: offset, to: offset + node.nodeSize, fixed: true })
   })
   return out
 }
+
+// The parts that are written in.
+const written = (doc) => partsOf(doc).filter((p) => !p.fixed)
 
 /** Whether two documents hold the same parts, in the same order. */
 export function sameParts(a, b) {
@@ -56,7 +61,7 @@ export function touchedParts(tr) {
  *   null where the text has one part or none: the browser's own select all.
  */
 export function selectPart(state) {
-  const parts = partsOf(state.doc)
+  const parts = written(state.doc)
   if (parts.length < 2) return null
   const { from, to } = state.selection
   const ends = (p) => ({ start: Selection.near(state.doc.resolve(p.from), 1).from, end: Selection.near(state.doc.resolve(p.to), -1).to })
@@ -79,6 +84,8 @@ export function wholeParts(state) {
   if (empty) return []
   return partsOf(state.doc).filter((p) => {
     if (p.part === 'writing') return false
+    // A fixed part: selected by itself, or lying inside the selection.
+    if (p.fixed) return from <= p.from && to >= p.to
     const start = Selection.near(state.doc.resolve(p.from), 1).from
     const end = Selection.near(state.doc.resolve(p.to), -1).to
     return from <= start && to >= end
@@ -108,7 +115,7 @@ export function acrossParts(state, tr, plain = () => false, leave = new Set()) {
   if (tr.steps.length !== 1) return null
   const step = tr.steps[0]
   if (step.from !== from || step.to !== to || !step.slice || step.gapFrom != null) return null
-  const reached = partsOf(state.doc).filter((p) => from < p.to && to > p.from)
+  const reached = written(state.doc).filter((p) => from < p.to && to > p.from)
   if (reached.length < 2) return null
   const parts = reached.filter((p) => !leave.has(p.message))
   if (!parts.length) return []

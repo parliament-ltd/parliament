@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { EditorState, Selection } from 'prosemirror-state'
+import { EditorState, Selection, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { Mark } from 'prosemirror-model'
 import '../../editing/editing.css'
@@ -63,6 +63,20 @@ function sectionAt($pos) {
   return null
 }
 const inReply = (state) => sectionAt(state.selection.$from)?.node.attrs.part !== 'prompt'
+// A part's node: a section of its message's text, or, for a part that is not
+// written in (C311, step 4), a fixed one its card is drawn in.
+function nodeOf(s, ids) {
+  const m = s.message
+  if (s.part === 'fixed') return schema.nodes.fixed.create({ message: m.id })
+  const inner = fromBlocks(m.blocks, ids.block)
+    ?? (s.part === 'prompt' ? promptFromText(stripAttachedFileBlocks(m.content), ids.block)
+      // A source's answer is plain text, never read as Markdown (stage 4).
+      : s.plain ? promptFromText(m.content, ids.block)
+        : replyFromMarkdown(withoutAnswers(m.content), ids.block, { anchors: `msg-${m.id}` }))
+  return schema.nodes.section.create({ part: s.part, message: m.id }, inner.content)
+}
+const keyOfNode = (node) => `${node.type === schema.nodes.fixed ? 'fixed' : node.attrs.part}:${node.attrs.message}`
+
 // Whether a selection runs from one card into the other.
 function crosses(sel) {
   if (sel.empty) return false
@@ -234,6 +248,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   }, [join])
 
   const sectionsKey = sections.map((s) => `${s.part}:${s.message.id}`).join('|')
+  // The parts the editor was last built or kept for.
+  const builtKey = useRef('')
 
   // The editor, made again only when its cards change (a reply arriving
   // under a prompt): its own saves must not draw it again.
@@ -241,20 +257,13 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     const ids = createEditIds()
     ids.setClosed((edit) => closedRef.current.has(edit))
     idsRef.current = ids
-    const made = sectionsRef.current.map((s) => {
-      const m = s.message
-      const inner = fromBlocks(m.blocks, ids.block)
-        ?? (s.part === 'prompt' ? promptFromText(stripAttachedFileBlocks(m.content), ids.block)
-          // A source's answer is plain text, never read as Markdown (stage 4).
-          : s.plain ? promptFromText(m.content, ids.block)
-            : replyFromMarkdown(withoutAnswers(m.content), ids.block, { anchors: `msg-${m.id}` }))
-      return schema.nodes.section.create({ part: s.part, message: m.id }, inner.content)
-    })
+    const made = sectionsRef.current.map((s) => nodeOf(s, ids))
     const doc = schema.nodes.doc.create(null, made)
+    builtKey.current = sectionsKey
     // A new editor has no comments yet: given them again below.
     commentsWas.current = ''
     savedKeys.current = {}
-    doc.forEach((sec) => { savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
+    doc.forEach((sec) => { if (sec.type === schema.nodes.section) savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
       ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => { if (joinsRef.current) join() }, onSend: () => sendFromText(), ...menuOptions, ...askOptions, ...commentOptions }),
       // Comments on words, after their passage (C301 (c)).
@@ -323,10 +332,32 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
         }),
       }
     }
+    // A fixed part (C311, step 4): its card, drawn by React, and nothing to write in.
+    const fixedView = (node) => {
+      const dom = document.createElement('div')
+      dom.className = 'p-section p-fixed'
+      dom.contentEditable = 'false'
+      const id = node.attrs.message
+      setHosts((h) => ({ ...h, [id]: { dom, contentDOM: null } }))
+      return {
+        dom,
+        update: (next) => next.type === node.type && next.attrs.message === id,
+        ignoreMutation: () => true,
+        stopEvent: () => true,
+        selectNode: () => dom.classList.add('picked'),
+        deselectNode: () => dom.classList.remove('picked'),
+        destroy: () => setHosts((h) => {
+          if (h[id]?.dom !== dom) return h
+          const rest = { ...h }
+          delete rest[id]
+          return rest
+        }),
+      }
+    }
     const v = new EditorView(host.current, {
       state: EditorState.create({ doc, plugins }),
       editable: () => !cleanRef.current && !isReleased(),
-      nodeViews: { section: sectionView, chart: (node) => chartView(node) },
+      nodeViews: { section: sectionView, fixed: fixedView, chart: (node) => chartView(node) },
       attributes: () => ({ class: `p-pair${cleanRef.current ? ' clean' : ''}`, 'aria-label': wordsRef.current?.label ?? '', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' }),
       dispatchTransaction(tr) {
         const before = v.state
@@ -442,7 +473,48 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       v.destroy()
       view.current = null
     }
-    // Made again only when its cards change.
+    // Made once: as its parts change it is kept, below (C311, step 4).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Its parts changed (a prompt sent, a reply arriving or finished, one
+  // deleted): the editor is kept, with the caret and what is being typed.
+  // Parts still there keep their text as it stands, saved or not; new ones
+  // are made from their messages. Undo starts again from here, as it did
+  // when the editor was made again.
+  useEffect(() => {
+    const v = view.current
+    if (!v || builtKey.current === sectionsKey) return
+    builtKey.current = sectionsKey
+    if (timer.current) save()
+    const ids = idsRef.current
+    const old = new Map()
+    v.state.doc.forEach((node, offset) => old.set(keyOfNode(node), { node, offset }))
+    const made = sectionsRef.current.map((s) => old.get(`${s.part}:${s.message.id}`)?.node ?? nodeOf(s, ids))
+    const doc = schema.nodes.doc.create(null, made)
+    const starts = new Map()
+    doc.forEach((node, offset) => starts.set(keyOfNode(node), offset))
+    // The caret, in the part it was in.
+    const moved = (pos) => {
+      for (const [key, was] of old) {
+        if (pos > was.offset && pos < was.offset + was.node.nodeSize && was.node.type === schema.nodes.section) return starts.has(key) ? starts.get(key) + (pos - was.offset) : null
+      }
+      return null
+    }
+    let selection
+    const a = moved(v.state.selection.anchor)
+    const h = moved(v.state.selection.head)
+    if (a != null && h != null) {
+      try { selection = TextSelection.create(doc, a, h) } catch { selection = undefined }
+    }
+    doc.forEach((sec) => {
+      if (sec.type === schema.nodes.section && savedKeys.current[sec.attrs.message] == null) savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec))
+    })
+    // Marks drawn from outside are given again, to the new state.
+    commentsWas.current = ''
+    shownWas.current = ''
+    armed.current = null
+    v.updateState(EditorState.create({ doc, plugins: v.state.plugins, ...(selection ? { selection } : {}) }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionsKey])
 
@@ -453,11 +525,12 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   useEffect(() => {
     const v = view.current
     if (!v) return
-    const changed = sectionsRef.current.some((s) => s.message.blocks != null && JSON.stringify(s.message.blocks) !== savedKeys.current[s.message.id])
+    const changed = sectionsRef.current.some((s) => s.part !== 'fixed' && s.message.blocks != null && JSON.stringify(s.message.blocks) !== savedKeys.current[s.message.id])
     if (!changed) return
     const ids = idsRef.current
     const made = []
     v.state.doc.forEach((sec) => {
+      if (sec.type !== schema.nodes.section) { made.push(sec); return }
       const s = sectionsRef.current.find((x) => x.message.id === sec.attrs.message)
       const fresh = s?.message.blocks != null ? fromBlocks(s.message.blocks, ids.block) : null
       made.push(fresh ? schema.nodes.section.create(sec.attrs, fresh.content) : sec)
@@ -516,7 +589,11 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       <div ref={host} />
       {sections.map((s) => {
         const h = hosts[s.message.id]
-        return h ? createPortal(<MessageCard {...s.card} hostContent={h.contentDOM} editedLine={s.editedLine ?? null} />, h.dom, s.message.id) : null
+        if (!h) return null
+        // A fixed part draws its own card whole; a written one, the card around its text.
+        return s.part === 'fixed'
+          ? createPortal(<MessageCard {...s.card} />, h.dom, s.message.id)
+          : createPortal(<MessageCard {...s.card} hostContent={h.contentDOM} editedLine={s.editedLine ?? null} />, h.dom, s.message.id)
       })}
       {said && <p className="p-edit-said" role="status">{said}</p>}
       {blockMenu.element}

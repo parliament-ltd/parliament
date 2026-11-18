@@ -23,6 +23,10 @@
 .p-chat > * + * { margin-top: 12px; }
 .p-chat > * + :is(.p-pair-host, .p-msg-prompt) { margin-top: 20px; }
 .p-pair > .p-section + .p-section { margin-top: 12px; }
+/* One text (C311): a new turn stands off from the one before, as cards did. */
+.p-pair > .p-section + .p-section.p-prompt { margin-top: 20px; }
+/* A fixed part, selected whole. */
+.p-pair > .p-fixed.picked { outline: 1px solid var(--ch-ink); outline-offset: 4px; border-radius: 6px; }
 /* The tabs of several branches, as wide as a reply with its arrows. */
 .p-chat .ch-branches { max-width: calc(var(--p-measure) + 72px); margin: 12px auto 0; }
 /* The tabs stay at the top as their replies scroll, on the board's own

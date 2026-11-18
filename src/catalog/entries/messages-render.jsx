@@ -631,12 +631,15 @@ export default function MessagesRender() {
       if (reply) i++
     }
     // One text (C311): what stands one after another is one editor's parts.
-    // Anything else between them (the tabs of several branches, a reply
-    // still arriving, a source's list of results) ends the run.
+    // A reply on its own is a part too, and what is not written in (a reply
+    // still arriving or cut off, a source's list of results, an answer shown
+    // translated) is a fixed part (step 4). Only the tabs of several
+    // branches end a run.
     if (!ONE_TEXT) return out
     const runs = []
-    for (const [at, item] of out.entries()) {
-      const part = item.kind === 'pair' || item.kind === 'writing'
+    for (const [at, raw] of out.entries()) {
+      const item = raw.kind ? raw : { kind: replyEditable(raw) ? 'reply' : 'fixed', key: `part-${raw.id}`, id: raw.id, message: raw }
+      const part = item.kind !== 'slider'
       const last = runs[runs.length - 1]
       if (part && last?.kind === 'text') last.items.push({ ...item, at })
       else if (part) runs.push({ kind: 'text', key: `text-${item.id}`, id: item.id, items: [{ ...item, at }] })
@@ -681,6 +684,8 @@ export default function MessagesRender() {
   const partsOf = useCallback((item, idx) => {
     const marks = (m) => ({ quotes: quotesByMessage.get(m.id) ?? NO_QUOTES, highlights: highlightsByMessage.get(m.id) ?? NO_QUOTES, comments: comments.get(m.id)?.words ?? NO_QUOTES })
     if (item.kind === 'writing') return [{ part: 'writing', message: item.message, card: cardPropsOf(item.message, idx), ...marks(item.message) }]
+    if (item.kind === 'fixed') return [{ part: 'fixed', message: item.message, card: cardPropsOf(item.message, idx) }]
+    if (item.kind === 'reply') return [{ part: 'reply', message: item.message, plain: Boolean(item.message.source), card: cardPropsOf(item.message, idx), ...marks(item.message) }]
     const { prompt, reply } = item
     const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), ...marks(prompt), editedLine: editedLineOf(prompt) }]
     if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), ...marks(reply) })

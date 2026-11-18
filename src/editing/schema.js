@@ -57,7 +57,17 @@ export const schema = new Schema({
   nodes: {
     // A reply on its own is its blocks. A prompt and its reply edited as one
     // (piece 2; C214) are two sections, each a card on screen.
-    doc: { content: '(block | section)+' },
+    doc: { content: '(block | section | fixed)+' },
+    // A part of a room's one text that is not written in (C311, step 4): a
+    // reply still arriving or cut off, a source's list of results, an answer
+    // shown translated. Its card is drawn in it; it is selected and deleted
+    // whole, and the caret steps over it. Never stored: it is the message.
+    fixed: {
+      atom: true, selectable: true, isolating: true,
+      attrs: { message: { default: null } },
+      toDOM: (n) => ['div', { class: 'pm-fixed', 'data-message': n.attrs.message ?? '' }],
+      parseDOM: [{ tag: 'div.pm-fixed', getAttrs: (dom) => ({ message: dom.getAttribute('data-message') || null }) }],
+    },
     // part: 'prompt' or 'reply'; message: the id of the message it is.
     // isolating: no command joins or lifts across it; only joining crosses
     // the gap between a prompt and its reply, by sending them to the bar.
