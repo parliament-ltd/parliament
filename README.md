@@ -70,10 +70,11 @@ there.
 
 ### Decide what goes before it goes
 
-The line under the bar names who will be asked before you press Enter. When
-prompts in the text or edits are waiting, it opens a list of what Enter
-sends. Untick one to hold it back. Nothing leaves your device until you press
-Enter.
+The line under the bar names who will be asked, and what goes with it, before
+you press Enter. Where a prompt went to several answerers, it also opens a
+list of what Enter sends, branch by branch. Untick one to hold it back, or
+`hold:203` holds one back from the bar. Nothing leaves your device until you
+press Enter.
 
 ![The list of what Enter sends](docs/screenshots/what-enter-sends.png)
 

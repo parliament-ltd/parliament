@@ -5229,6 +5229,17 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Ruled by Stefan, 18 November:** "Add beta and version first", and "Yes, add it to About".
 - **Built:** the foot reads "In beta, version 0.24.0 · Created with Claude Code · MIT licensed, source on GitHub · Looking for other builders", GitHub spelt as GitHub spells it; About's line ends "In beta, version 0.24.0." The version is read from `package.json` (`src/lib/version.js`), so each release sets it; only that field goes into the build. In the four translations. Nothing stored.
 
+**C314. The README's sentence on the list of what Enter sends** (brought by the README screenshots, 18 November). Reworded; nothing built.
+- **Asked:** shot 6 of the screenshots, "open 'see what goes' on the line under the bar", in the room from shot 1, with its prompts and edit waiting.
+- **Found:** the list is drawn from the branch slider (`listRows` in `Shell.jsx`, from `shownIn(roomId)`), so it exists only in a room where a prompt went to several answerers; a room with one branch never offers "see what goes", however much waits there. The README said "When prompts in the text or edits are waiting, it opens a list of what Enter sends."
+- **Ruled by Stefan, 18 November:** "let's reword for now", to "Reword the README's send-list sentence to match the list appearing only with branches?"
+- **Done:** the README now says the line names who is asked and what goes with it, and that where a prompt went to several answerers it also opens the list, branch by branch; `hold:203` is named as the way to hold one back from the bar. Shot 6 was taken in a room with two branches (213). Whether the list should come to a one-branch room too is open.
+
+**C315. The Lab named before it is offered, and add: for collections** (brought by Stefan, 18 November). Noted, nothing built.
+- **Asked:** "take a note to hide the reference to Lab until that is available as well as letting add work for collections".
+- **Found:** `add:213`, typed with a room addressed and the Collection in a window of its own, was refused with "add: works on Records, Collection, and Lab". The reference `?` already leaves the Lab out of where a verb works until it is offered (`shownOn`, `registry.js`; C279 (a)), but the refusal (`elsewhere`, `registry.js` line 211) passes a verb's `on` boards as written, and `add:` and `rm:` carry `'lab'` there (`verbs.js`). The Collection did not take the chat, because the bar pointed at the room.
+- **Proposed:** (a) the refusal names boards through `shownOn`, as the reference does, so the Lab is not named before it is offered; (b) read as: `add:` puts a chat into the collection on screen from a room too, or says to address the Collection first. Both wait for a ruling.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
