@@ -1256,6 +1256,10 @@ msgid "chat.describeSettingHelp"
 msgstr "开启：对话收到首个回答后，会向模型发一个简短请求，获取标题、一句话摘要和标签。发送前，输入栏下方的提示行会说明这一点。关闭：以提示词开头的几个字作为对话标题，不额外发送任何内容。"
 
 #. js-lingui-explicit-id
+msgid "chat.editedByYou"
+msgstr "已由你编辑"
+
+#. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
 msgstr "{count, plural, other {# 处编辑等待随下一条提示词发给此分支}}"
 

@@ -1256,6 +1256,10 @@ msgid "chat.describeSettingHelp"
 msgstr "オン：チャットの最初の回答のあと、短いリクエストを1回送り、タイトル、1行の要約、タグをモデルに求めます。送信前に、バーの下の行でそのことを示します。オフ：チャットのタイトルはプロンプトの最初の言葉になり、それ以上は何も送りません。"
 
 #. js-lingui-explicit-id
+msgid "chat.editedByYou"
+msgstr "あなたが編集"
+
+#. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
 msgstr "{count, plural, other {編集#件}}が、このブランチへの次のプロンプトを待っています"
 

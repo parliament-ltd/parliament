@@ -39,12 +39,14 @@
 
 .p-msg { margin-inline: auto; color: var(--p-text-primary, var(--ch-ink)); }
 .p-msg-reply { max-width: var(--p-measure, 640px); }
-.p-msg-prompt { max-width: 600px; }
+.p-msg-prompt { max-width: var(--p-measure, 640px); }
 .p-msg-body { position: relative; overflow-wrap: break-word; }
 
-/* The prompt, set apart. */
-.p-msg-prompt > .p-msg-box { padding: 11px 14px; background: var(--ch-subtle); border-radius: 12px; transition: box-shadow .15s; }
-.p-msg-prompt .p-msg-text { font: 400 13.5px/1.5 var(--ch-sans); }
+/* The prompt (C311, step 5; one text v1): a line of the text, p> and its
+   words in the prompt colour, where a bubble was. The sign is drawn, never
+   part of the words: it is not selected, copied or sent. */
+.p-msg-prompt .p-msg-text { font: 400 var(--ch-t-lead)/1.6 var(--ch-serif); color: var(--ch-prompt); }
+.p-msg-prompt .p-msg-text p:first-child::before { content: "p>"; margin-inline-end: 6px; font: 600 11px/1 var(--ch-mono); letter-spacing: -.02em; }
 
 /* The reply, text on the board. */
 .p-msg-reply .p-msg-text { font: 400 var(--ch-t-lead)/1.68 var(--ch-serif); }
@@ -62,9 +64,11 @@
 /* Links in ink, never gold: a reply's own, a source's results, the sources it cited. */
 .p-msg :is(.p-msg-body, .p-msg-lines) a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
-/* An answer from a source: a rule at its edge. One cut off: the rule dashed. */
-.p-msg-reply.from-source > .p-msg-box > .p-msg-body,
-.p-msg-reply.ghost > .p-msg-box > .p-msg-body { padding-inline-start: 12px; border-inline-start: 2px solid var(--ch-divider); }
+/* A reply is a quote (C311, step 5): a grey rule at its edge, a source's
+   and a model's alike; the line under it says who answered. Your own text
+   has none. One cut off: the rule dashed. */
+.p-msg-reply:not(.p-msg-writing) > .p-msg-box > .p-msg-body { padding-inline-start: 12px; border-inline-start: 2px solid var(--ch-divider); }
+.p-msg-reply:not(.p-msg-writing) > .p-msg-lines { padding-inline-start: 14px; }
 .p-msg-reply.ghost > .p-msg-box > .p-msg-body { border-inline-start-style: dashed; border-inline-start-color: var(--ch-soft); }
 /* A source's list of results. */
 .p-results { list-style: none; margin: 0; padding: 0; }
@@ -84,7 +88,7 @@
 .p-pair[contenteditable="true"] .p-msg-reply .p-edit { margin: -2px -6px; padding: 2px 6px; border-radius: 6px; transition: background-color .15s; }
 .p-pair[contenteditable="true"] .p-msg-reply .p-edit:hover,
 .p-msg .p-edit .ProseMirror[contenteditable="true"]:hover { background: var(--ch-subtle); }
-.p-pair[contenteditable="true"] .p-msg-prompt > .p-msg-box:hover { box-shadow: inset 0 0 0 1px var(--ch-divider); }
+/* A prompt is a line of the text now, with no box to outline (C311, step 5). */
 
 /* Marginalia. */
 .p-msg-lines { margin-top: 6px; }

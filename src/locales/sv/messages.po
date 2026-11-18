@@ -1256,6 +1256,10 @@ msgid "chat.describeSettingHelp"
 msgstr "På: efter en chatts första svar ber en kort förfrågan modellen om en titel, en sammanfattning på en rad och taggar. Raden under fältet nämner förfrågan innan du skickar. Av: en chatt får de första orden i sin prompt som titel, och inget mer skickas."
 
 #. js-lingui-explicit-id
+msgid "chat.editedByYou"
+msgstr "redigerad av dig"
+
+#. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
 msgstr "{count, plural, one {# redigering väntar} other {# redigeringar väntar}} på att följa med nästa prompt till den här grenen"
 

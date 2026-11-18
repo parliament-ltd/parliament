@@ -1256,6 +1256,10 @@ msgid "chat.describeSettingHelp"
 msgstr "Päällä: keskustelun ensimmäisen vastauksen jälkeen yksi lyhyt pyyntö kysyy mallilta otsikon, yhden rivin yhteenvedon ja tunnisteet. Palkin alla oleva rivi kertoo siitä ennen lähettämistä. Pois: keskustelun otsikoksi tulevat kehotteen ensimmäiset sanat, eikä mitään muuta lähetetä."
 
 #. js-lingui-explicit-id
+msgid "chat.editedByYou"
+msgstr "sinun muokkaamasi"
+
+#. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
 msgstr "{count, plural, one {# muokkaus odottaa} other {# muokkausta odottaa}} tämän haaran seuraavaa kehotetta"
 

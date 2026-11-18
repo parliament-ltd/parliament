@@ -19,6 +19,7 @@ import { askInBar } from '../../editing/titles'
 import { modelFacts } from '../../net'
 import { instructionLike } from '../../lib/injection'
 import { CARD_HEAD } from '../../lib/release'
+import { dayOf } from '../../chrome/when'
 import './chat.css'
 
 // The comments' bubble (C301 (c)), as the text draws it after a passage.
@@ -89,6 +90,9 @@ export default function MessageCard({
   // card's own and is never part of the text. editedLine: said under an
   // edited prompt.
   hostContent = null, editedLine = null,
+  // by: who answered and when, said under a model's finished reply; edited:
+  // its words were changed by you, said at the end of that line (C311, step 5).
+  by = null, edited = false,
   // Edits already told to a model (C216 (i)); toldTo: who was told the
   // edits this prompt carried, for a prompt that was only those (C216 (e)).
   closedEdits, toldTo = null,
@@ -606,7 +610,15 @@ export default function MessageCard({
 
       {/* Where an answer from a source came from: the page, its revision and
           its licence (stage 4). Words come from the copy table. */}
-      {source && source.found !== false && <SourceLine source={source} />}
+      {source && source.found !== false && <SourceLine source={source} edited={edited} />}
+      {/* Who answered, and when, under a model's reply (C311, step 5). */}
+      {!source && by?.name && (
+        <p className="p-marg">
+          <span>{by.name}</span>
+          {by.at && <><span className="sep" aria-hidden="true"> · </span><span>{dayOf(i18n, by.at)}</span></>}
+          {edited && <><span className="sep" aria-hidden="true"> · </span><span>{i18n._(COPY.chat.editedByYou)}</span></>}
+        </p>
+      )}
       {/* Words that read like instructions to a model, marked, never blocked (C169). */}
       {source && source.found !== false && <InstructionLine text={displayContent} />}
       {/* Its translation, by whom, and the source's own words a click away (C166 (f)). */}
@@ -874,7 +886,7 @@ function TitledLines({ text, titles, words }) {
 
 // "Answered from Wikipedia · Barn owl · revision 1381083335 · CC BY-SA 4.0",
 // each part a link where it has one; or that nothing was found (stage 4).
-function SourceLine({ source }) {
+function SourceLine({ source, edited = false }) {
   const { i18n } = useLingui()
   const name = source.name || source.id
   if (source.found === false) {
@@ -893,6 +905,8 @@ function SourceLine({ source }) {
     source.title && <span key="title">{link(source.url, source.title, true)}</span>,
     source.revision && <span key="rev">{i18n._(COPY.chat.sourceRevision, { revision: source.revision })}</span>,
     source.licence?.name && <span key="lic">{link(source.licence.url, source.licence.name)}</span>,
+    // Its words changed since the source gave them (C311, step 5).
+    edited && <span key="edited">{i18n._(COPY.chat.editedByYou)}</span>,
   ].filter(Boolean)
   return (
     <p className="p-marg">

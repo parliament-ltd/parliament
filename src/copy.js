@@ -3223,6 +3223,8 @@ export const COPY = {
     aboutCard: /*i18n*/ { id: 'chat.aboutCard', message: '{kind, select, note {comment {num}} term {highlight {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament' },
     // An answer from a source (stage 4). {source} is its name, from the list.
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
+    // At the end of the line under a reply whose words you changed (C311, step 5).
+    editedByYou: /*i18n*/ { id: 'chat.editedByYou', message: 'edited by you' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
     // A line of an answer from a source that is the title of a page it
     // links to (C287): a quiet word after it, which writes the title into

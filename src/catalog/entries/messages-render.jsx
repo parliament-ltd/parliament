@@ -128,6 +128,9 @@ const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, err
 // answer too, read as plain text, whose edits go to a model and never to the
 // source (the editing spec; the spike's 201b). Not one still arriving or cut
 // off, a source's list of results, or an answer shown translated.
+// Whether a message's stored text carries a change of yours: struck or added words.
+const changedByYou = (m) => Array.isArray(m?.blocks) && m.blocks.some((b) => b?.struck != null || (Array.isArray(b?.text) && b.text.some((r) => r?.struck != null || r?.added != null)))
+
 const editableReply = (m, streamingId) => m.role === 'assistant' && m.id !== streamingId && !m.incomplete && Boolean(m.content)
   && (!m.source || (m.source.shape !== 'list' && !m.translation))
 
@@ -549,6 +552,10 @@ export default function MessagesRender() {
       source: msg.source ?? null,
       frameworks: msg.role === 'assistant' ? msg.frameworks ?? null : null,
       translation: msg.role === 'assistant' ? msg.translation ?? null : null,
+      // Who answered and when, under a model's finished reply; and whether
+      // its words, or a source's, were changed by you (C311, step 5).
+      by: msg.role === 'assistant' && !msg.source && !isLatestAssistantStreaming && !isGhost && msg.content ? { name: modelFacts(msg.model)?.name ?? '', at: msg.createdAt ?? null } : null,
+      edited: msg.role === 'assistant' && changedByYou(msg),
       citations: msg.role === 'assistant' ? msg.citations ?? null : null,
       asked: msg.role === 'user' ? msg.asked ?? null : null,
       included: msg.role === 'user' ? msg.included ?? null : null,

@@ -1256,6 +1256,10 @@ msgid "chat.describeSettingHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.editedByYou"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
 msgstr ""
 

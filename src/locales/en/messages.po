@@ -1256,6 +1256,10 @@ msgid "chat.describeSettingHelp"
 msgstr "On: after a chat's first answer, one short request asks the model for its title, a one-line summary and tags. The line under the bar names it before you send. Off: a chat is titled with the first words of its prompt, and nothing more is sent."
 
 #. js-lingui-explicit-id
+msgid "chat.editedByYou"
+msgstr "edited by you"
+
+#. js-lingui-explicit-id
 msgid "chat.editsWaitingTab"
 msgstr "{count, plural, one {# edit waits} other {# edits wait}} to go with the next prompt to this branch"
 
