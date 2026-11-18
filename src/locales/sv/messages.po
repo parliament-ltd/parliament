@@ -9699,6 +9699,11 @@ msgstr "Det här skickar Enter"
 msgid "sendList.waits"
 msgstr "väntar"
 
+#. Under the logo in About, before the link "MIT licensed, source on GitHub" (C316)
+#. js-lingui-explicit-id
+msgid "settings.aboutBeta"
+msgstr "Parliament är i beta. Version {version}."
+
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -11339,6 +11344,15 @@ msgstr "Fler saker att prova"
 #. js-lingui-explicit-id
 msgid "welcome.closing"
 msgstr "Allt gott,"
+
+#. js-lingui-explicit-id
+msgid "welcome.explainer"
+msgstr "De flesta AI-verktyg låter dig fråga och sedan läsa. Parliament låter dig skriva, ifrågasätta och ändra svaret, eftersom det du tänker betyder mer än det en modell säger."
+
+#. Before the link "MIT licensed, source on GitHub"; the version as 0.24.1 (C316)
+#. js-lingui-explicit-id
+msgid "welcome.explainerBeta"
+msgstr "I beta, version {version}."
 
 #. First in the page foot; the version as 0.24.0 (C312)
 #. js-lingui-explicit-id

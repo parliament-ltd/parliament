@@ -1994,6 +1994,7 @@ export const COPY = {
     textDefault: /*i18n*/ { id: 'settings.textDefault', message: 'Default' },
     textLarge: /*i18n*/ { id: 'settings.textLarge', message: 'Large' },
     aboutName: /*i18n*/ { id: 'settings.aboutName', message: 'Parliament', comment: 'The name of the app' },
+    aboutBeta: /*i18n*/ { id: 'settings.aboutBeta', message: 'Parliament is in beta. Version {version}.', comment: 'Under the logo in About, before the link "MIT licensed, source on GitHub" (C316)' },
     aboutVersion: /*i18n*/ { id: 'settings.aboutVersion', message: 'In beta, version {version}.', comment: 'After the About line; the version as 0.24.0 (C312)' },
     // About (stage 9, piece 5; T2; privacy-copy-draft.md, drafts 12 to 16 and
     // "What leaves your device", reviewed 12 October; C185). Each claim is
@@ -2223,6 +2224,9 @@ export const COPY = {
     keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask it to keep the data' },
     keepBackup: /*i18n*/ { id: 'welcome.keepBackup', message: 'back up in {board}', comment: '{board} is Settings, from COPY.boards' },
     keepAsking: /*i18n*/ { id: 'welcome.keepAsking', message: 'asking' },
+    // The explainer beside the first screen's room, and in About (C316).
+    explainer: /*i18n*/ { id: 'welcome.explainer', message: 'Most AI tools have you ask and then read. Parliament has you write, question and change the answer, because what you think matters more than what a model says.' },
+    explainerBeta: /*i18n*/ { id: 'welcome.explainerBeta', message: 'In beta, version {version}.', comment: 'Before the link "MIT licensed, source on GitHub"; the version as 0.24.1 (C316)' },
     footBeta: /*i18n*/ { id: 'welcome.foot.beta', message: 'In beta, version {version}', comment: 'First in the page foot; the version as 0.24.0 (C312)' },
     footMade: /*i18n*/ { id: 'welcome.foot.made', message: 'Created with Claude Code' },
     footLicence: /*i18n*/ { id: 'welcome.foot.licence', message: 'MIT licensed, source on GitHub', comment: 'A link to the public repository (C71, C123; public since 28 October)' },

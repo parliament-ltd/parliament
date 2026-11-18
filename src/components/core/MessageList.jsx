@@ -38,7 +38,7 @@ export default function MessageList({
       {messages.length === 0 && !isStreaming && hiddenCount === 0 && (
         <div className="flex flex-col items-center justify-center h-full text-center">
           <img
-            src="/parliament_logo.png"
+            src="/icon-192.png"
             alt=""
             className="w-16 h-16 mb-4 object-contain"
             style={{ opacity: 0.26 }}

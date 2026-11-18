@@ -4,7 +4,13 @@
 // square. The birds stay ink on paper so the icon shows on light and dark
 // taskbars alike. The maskable icon (full bleed, for shapes a system cuts) is
 // left as it is.
-//   node scripts/icons.mjs      writes public/icon-192.png and public/icon-512.png
+//   node scripts/icons.mjs      writes public/icon-192.png, public/icon-512.png
+//                               and public/apple-touch-icon.png
+//
+// The Apple touch icon is the logo's square (C316: "this is the new logo,
+// hexagon is old"): white to its edges, since a phone rounds its corners
+// itself and shows transparent ones as black, the birds in ink at 70% of it,
+// as public/favicon.svg's square holds them.
 // No library: the shapes are straight lines, filled with 4x4 samples a pixel,
 // and the PNG is written with node's zlib.
 
@@ -101,6 +107,30 @@ function draw(size) {
   return png(size, out)
 }
 
+// The logo's square, white to its edges, the birds at 70% of the favicon's
+// square: 64.5% of the side, across the mark's own width, centred.
+function drawFull(size) {
+  const scale = (size * 0.645) / VIEW.w
+  const ox = (size - VIEW.w * scale) / 2
+  const oy = (size - VIEW.h * scale) / 2
+  const out = Buffer.alloc(size * size * 4)
+  for (let py = 0; py < size; py++) {
+    for (let px = 0; px < size; px++) {
+      let ink = 0
+      for (let sy = 0; sy < SS; sy++) {
+        for (let sx = 0; sx < SS; sx++) {
+          if (bird((px + (sx + 0.5) / SS - ox) / scale + VIEW.x, (py + (sy + 0.5) / SS - oy) / scale + VIEW.y)) ink++
+        }
+      }
+      const t = ink / (SS * SS)
+      const i = (py * size + px) * 4
+      for (let c = 0; c < 3; c++) out[i + c] = Math.round(255 * (1 - t) + INK[c] * t)
+      out[i + 3] = 255
+    }
+  }
+  return png(size, out)
+}
+
 // A PNG: RGBA, eight bits, each row unfiltered.
 function png(size, rgba) {
   const crcTable = Array.from({ length: 256 }, (_, n) => {
@@ -141,3 +171,5 @@ for (const size of [192, 512]) {
   writeFileSync(file, draw(size))
   console.log(`wrote public/icon-${size}.png`)
 }
+writeFileSync(new URL('../public/apple-touch-icon.png', import.meta.url), drawFull(180))
+console.log('wrote public/apple-touch-icon.png')

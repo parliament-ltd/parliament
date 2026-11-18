@@ -58,6 +58,7 @@ import Strip from './Strip'
 import { usePhoneBoards, useKeyboardGap, useKeyboardForWords, useSwipeToClose } from './phoneBoards'
 import { wordFor } from '../shell/boards'
 import { BoardArrows } from './BoardArrows'
+import Explainer from './Explainer'
 import Board from './Board'
 import { boardName, roomLabel, andList } from './say'
 import RoomBoard from './RoomBoard'
@@ -4740,6 +4741,19 @@ export default function Shell() {
   // what is open, and calm's switch, can always be seen (30 October). The
   // welcome page alone has nothing for it to name.
   const welcomeAlone = onWelcome && arrangement.columns.flat().length === 1 && !(arrangement.popped ?? []).length
+  // What Parliament is, beside the first screen's empty room (C316; Stefan,
+  // 18 November): on the paper, not a board; the room moves left, the bar
+  // stays. It goes once anything is typed in the room or the bar, in any
+  // mode, and stays gone until the page is opened again. Nothing is stored.
+  const loneRoom = !onWelcome && arrangement.columns.length === 1 && arrangement.columns[0].length === 1 && isRoom(arrangement.columns[0][0]) && !(arrangement.popped ?? []).length
+  const [typedOnce, setTypedOnce] = useState(false)
+  const explain = loneRoom && !chatIn(arrangement, arrangement.columns[0][0]) && !typedOnce
+  useEffect(() => {
+    if (!explain) return undefined
+    const typed = (e) => { if (e.target?.closest?.('.ch-stage, .ch-field')) setTypedOnce(true) }
+    document.addEventListener('input', typed, true)
+    return () => document.removeEventListener('input', typed, true)
+  }, [explain])
   const shares = useMemo(() => columnShares(arrangement), [arrangement])
   const shareTotal = shares.reduce((sum, x) => sum + x, 0) || 1
   // What stands beside an edge, named in a sentence.
@@ -5042,7 +5056,7 @@ export default function Shell() {
         />
       )}
       {/* The boards stay as they are under the map, drawn but out of sight. */}
-      <main className={`ch-stage space${mapShown ? ' under-map' : ''}`} ref={stageRef} aria-hidden={mapShown || undefined}>
+      <main className={`ch-stage space${mapShown ? ' under-map' : ''}${explain ? ' explaining' : ''}`} ref={stageRef} aria-hidden={mapShown || undefined}>
         {arrangement.columns.map((column, i) => (
           <Fragment key={column.join(' ')}>
             {i > 0 && (
@@ -5070,6 +5084,7 @@ export default function Shell() {
             </div>
           </Fragment>
         ))}
+        {explain && <Explainer />}
       </main>
       {barWindow && createPortal(
         <div className="ch-shell ch-in-window">

@@ -1,3 +1,5 @@
+<p align="center"><img src="public/parliament-icon.svg" width="136" height="136" alt="Parliament"></p>
+
 # Parliament
 
 Parliament is an attempt to rethink how we interact with AI.

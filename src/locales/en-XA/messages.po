@@ -9699,6 +9699,11 @@ msgstr ""
 msgid "sendList.waits"
 msgstr ""
 
+#. Under the logo in About, before the link "MIT licensed, source on GitHub" (C316)
+#. js-lingui-explicit-id
+msgid "settings.aboutBeta"
+msgstr ""
+
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -11338,6 +11343,15 @@ msgstr ""
 #. The line before the name that signs the letter
 #. js-lingui-explicit-id
 msgid "welcome.closing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.explainer"
+msgstr ""
+
+#. Before the link "MIT licensed, source on GitHub"; the version as 0.24.1 (C316)
+#. js-lingui-explicit-id
+msgid "welcome.explainerBeta"
 msgstr ""
 
 #. First in the page foot; the version as 0.24.0 (C312)

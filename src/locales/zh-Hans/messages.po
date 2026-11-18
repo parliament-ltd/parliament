@@ -9699,6 +9699,11 @@ msgstr "按 Enter 发送的内容"
 msgid "sendList.waits"
 msgstr "等待中"
 
+#. Under the logo in About, before the link "MIT licensed, source on GitHub" (C316)
+#. js-lingui-explicit-id
+msgid "settings.aboutBeta"
+msgstr "Parliament 处于测试阶段。版本 {version}。"
+
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -11339,6 +11344,15 @@ msgstr "更多可以试试的事"
 #. js-lingui-explicit-id
 msgid "welcome.closing"
 msgstr "祝一切顺利，"
+
+#. js-lingui-explicit-id
+msgid "welcome.explainer"
+msgstr "大多数 AI 工具让你提问，然后阅读。Parliament 让你写作、质疑并修改答案，因为你的想法比模型说的话更重要。"
+
+#. Before the link "MIT licensed, source on GitHub"; the version as 0.24.1 (C316)
+#. js-lingui-explicit-id
+msgid "welcome.explainerBeta"
+msgstr "测试版，版本 {version}。"
 
 #. First in the page foot; the version as 0.24.0 (C312)
 #. js-lingui-explicit-id
