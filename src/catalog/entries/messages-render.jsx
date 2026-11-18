@@ -184,8 +184,21 @@ export default function MessagesRender() {
     scheduleDelete(activeConversationId, msgId, { remove: dbDeleteMessage, ms: DELETE_UNDO_MS })
   }, [activeConversationId])
 
+  // Several deleted in one act, from the text (C311, step 3), come back in one.
   const handleUndoDelete = useCallback((msgId) => {
-    if (activeConversationId) undoDelete(activeConversationId, msgId)
+    if (!activeConversationId) return
+    const at = pendingDeletes.find((p) => p.messageId === msgId)?.at
+    const together = at == null ? [msgId] : pendingDeletes.filter((p) => p.at === at).map((p) => p.messageId)
+    for (const id of together) undoDelete(activeConversationId, id)
+  }, [activeConversationId, pendingDeletes])
+
+  // A prompt or reply selected whole in the text and deleted with two
+  // presses: each leaves the chat as delete: takes one, with the same 20
+  // seconds, all at the one moment so they come back together.
+  const handleDeleteParts = useCallback((ids) => {
+    if (!activeConversationId) return
+    const at = Date.now()
+    for (const id of ids) scheduleDelete(activeConversationId, id, { remove: dbDeleteMessage, ms: DELETE_UNDO_MS, at })
   }, [activeConversationId])
 
   // ─── Send to branch / Pin for reference state ─────────────
@@ -718,7 +731,8 @@ export default function MessagesRender() {
         // the other parts are tracked as ever.
         untracked={own && draftNow && !suggesting ? own.id : null}
         onSave={onSave}
-        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(sections.length === 1 && own ? COPY.chat.writingLabel : COPY.chat.pairLabel) }}
+        onDeleteParts={handleDeleteParts}
+        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(sections.length === 1 && own ? COPY.chat.writingLabel : COPY.chat.pairLabel), deleteAgain: (count, part) => i18n._(COPY.chat.deletePartsAgain, { count, part }) }}
         closedEdits={closedEdits}
         heldEdits={heldEdits}
         askInfo={pairAsks(sections)}
@@ -732,7 +746,7 @@ export default function MessagesRender() {
         commentWords={commentWords}
       />
     )
-  }, [partsOf, keepComment, commentWords, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords, draftNow, letGoIn])
+  }, [partsOf, handleDeleteParts, keepComment, commentWords, i18n, suggesting, saveEditedReply, activeConversationId, closedEdits, heldEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords, titleWords, draftNow, letGoIn])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

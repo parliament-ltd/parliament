@@ -1244,6 +1244,10 @@ msgid "chat.cutLimit"
 msgstr "Katkesi: vastaus saavutti yhden vastauksen enimmäispituuden. Saapunut osa säilytetään."
 
 #. js-lingui-explicit-id
+msgid "chat.deletePartsAgain"
+msgstr "{count, plural, one {Paina uudelleen, niin {part, select, prompt {tämä kehote} other {tämä vastaus}} poistetaan keskustelusta. Mikä tahansa muu näppäin säilyttää sen. Keskustelu tarjoaa 20 sekunnin ajan sen palauttamista} other {Paina uudelleen, niin nämä # kehotetta ja vastausta poistetaan keskustelusta. Mikä tahansa muu näppäin säilyttää ne. Keskustelu tarjoaa 20 sekunnin ajan niiden palauttamista}}"
+
+#. js-lingui-explicit-id
 msgid "chat.describeSetting"
 msgstr "Nimeä uusi keskustelu ensimmäisen vastauksen jälkeen"
 

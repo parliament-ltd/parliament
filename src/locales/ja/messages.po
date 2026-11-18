@@ -1244,6 +1244,10 @@ msgid "chat.cutLimit"
 msgstr "途切れました：返答が1回分の長さの上限に達しました。届いた分は残してあります。"
 
 #. js-lingui-explicit-id
+msgid "chat.deletePartsAgain"
+msgstr "{count, plural, other {もう一度押すと、{part, select, prompt {プロンプト} other {返答}}など#件をチャットから削除します。ほかのキーを押せば残ります。20秒間、チャットが元に戻す操作を表示します}}"
+
+#. js-lingui-explicit-id
 msgid "chat.describeSetting"
 msgstr "最初の回答のあと、新しいチャットに名前を付ける"
 

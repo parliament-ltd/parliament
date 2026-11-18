@@ -1244,6 +1244,10 @@ msgid "chat.cutLimit"
 msgstr "Cut off: the reply reached the length allowed for one reply. What arrived is kept."
 
 #. js-lingui-explicit-id
+msgid "chat.deletePartsAgain"
+msgstr "{count, plural, one {Press it again to delete this {part, select, prompt {prompt} other {reply}} from the chat. Any other key keeps it. For 20 seconds the chat offers to bring it back} other {Press it again to delete these # prompts and replies from the chat. Any other key keeps them. For 20 seconds the chat offers to bring them back}}"
+
+#. js-lingui-explicit-id
 msgid "chat.describeSetting"
 msgstr "Name a new chat after its first answer"
 

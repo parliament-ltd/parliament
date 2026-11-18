@@ -1244,6 +1244,10 @@ msgid "chat.cutLimit"
 msgstr "Avbrutet: svaret nådde den längd som tillåts för ett svar. Det som hann komma sparas."
 
 #. js-lingui-explicit-id
+msgid "chat.deletePartsAgain"
+msgstr "{count, plural, one {Tryck igen för att radera {part, select, prompt {den här prompten} other {det här svaret}} ur chatten. Vilken annan tangent som helst behåller det. I 20 sekunder erbjuder chatten att hämta tillbaka det} other {Tryck igen för att radera de här # prompterna och svaren ur chatten. Vilken annan tangent som helst behåller dem. I 20 sekunder erbjuder chatten att hämta tillbaka dem}}"
+
+#. js-lingui-explicit-id
 msgid "chat.describeSetting"
 msgstr "Namnge en ny chatt efter första svaret"
 

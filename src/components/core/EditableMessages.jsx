@@ -26,7 +26,7 @@ import { titlesPlugin } from '../../editing/titles'
 import MessageCard from './MessageCard'
 import { isReleased, onRelease } from '../../editing/across'
 import { takeFocus, wantsFocus } from '../../editing/writeFocus'
-import { partsOf, sameParts, touchedParts, acrossParts, PARTS } from '../../editing/parts'
+import { partsOf, sameParts, touchedParts, acrossParts, wholeParts, PARTS } from '../../editing/parts'
 
 // A prompt and its reply, edited in place as one (stage 11, piece 2; the
 // editing spec, "Editing prompts"; C214, ruled 26 October). One editor draws
@@ -101,12 +101,19 @@ const COMMENT_WORDS = { label: 'COMMENT', placeholder: '', keys: 'Ctrl+Alt+M', m
 // joins: a prompt and its reply struck or typed over together fill the bar
 // (C214 (a), (b)). Off since the room became one text (C311, ruled 18
 // November): a change across parts is made in each part, and the bar is left.
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, untracked = false, joins = false, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
+// onDeleteParts(messageIds): a prompt or reply selected whole and deleted
+// with two presses leaves the chat as a message does (C311, step 3);
+// words.deleteAgain(count, part) says so after the first press.
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, untracked = false, joins = false, onDeleteParts = null, onSave, words, closedEdits = NO_CLOSED, heldEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS, titleWords = NO_TITLE_WORDS, onComment, commentWords = COMMENT_WORDS }) {
   const untrackedRef = useRef(untracked)
   useEffect(() => { untrackedRef.current = untracked }, [untracked])
   const plainIn = (message) => untrackedRef.current === true || (untrackedRef.current != null && untrackedRef.current !== false && untrackedRef.current === message)
   const joinsRef = useRef(joins)
   useEffect(() => { joinsRef.current = joins }, [joins])
+  const onDeletePartsRef = useRef(onDeleteParts)
+  useEffect(() => { onDeletePartsRef.current = onDeleteParts }, [onDeleteParts])
+  // The whole parts a first Backspace or Delete named, waiting for the second.
+  const armed = useRef(null)
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -365,6 +372,30 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
           if (tr.getMeta(INTENT)) join(true)
           else joinSoon()
         } else if (joinTimer.current && tr.docChanged) joinSoon()
+      },
+      // A prompt or reply selected whole (C311, step 3): the first Backspace
+      // or Delete says what will go, the second takes it out of the chat,
+      // with the chat's own offer to bring it back. Any other key keeps it.
+      // Words selected beside it, in other parts, change as within any part.
+      handleKeyDown: (view, event) => {
+        const deletes = event.key === 'Backspace' || event.key === 'Delete'
+        const whole = deletes && onDeletePartsRef.current && !cleanRef.current ? wholeParts(view.state) : []
+        if (!whole.length) { armed.current = null; return false }
+        const { from, to } = view.state.selection
+        const key = whole.map((p) => p.message).join('|') + ':' + from + ':' + to
+        event.preventDefault()
+        if (armed.current !== key) {
+          armed.current = key
+          setSaid(wordsRef.current?.deleteAgain?.(whole.length, whole[0].part) ?? '')
+          return true
+        }
+        armed.current = null
+        const going = new Set(whole.map((p) => p.message))
+        const beside = acrossParts(view.state, view.state.tr.delete(from, to), plainIn, going)
+        for (const make of beside ?? []) view.dispatch(make(view.state))
+        setSaid('')
+        onDeletePartsRef.current([...going])
+        return true
       },
       handleDOMEvents: {
         blur: () => {

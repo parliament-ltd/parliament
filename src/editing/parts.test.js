@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { EditorState, TextSelection } from 'prosemirror-state'
 import { schema, STRUCK } from './schema'
 import { track, createIds, SKIP } from './track'
-import { partsOf, sameParts, touchedParts, acrossParts, selectPart, PARTS } from './parts'
+import { partsOf, sameParts, touchedParts, acrossParts, selectPart, wholeParts, PARTS } from './parts'
 import { historyPlugin, undo } from './history'
 import { editingPlugins } from './keys'
 
@@ -46,6 +46,14 @@ function run(state, tr, plain = () => false) {
     if (touched.length && touched.every(plain)) made.setMeta(SKIP, true)
     s = s.apply(track(s, made, { ids }))
   }
+  return s
+}
+
+// As run, with some parts left alone: those being deleted whole.
+function runLeaving(state, leave) {
+  const ids = createIds(240)
+  let s = state
+  for (const make of acrossParts(state, state.tr.delete(state.selection.from, state.selection.to), () => false, leave)) s = s.apply(track(s, make(s), { ids }))
   return s
 }
 
@@ -152,6 +160,24 @@ describe('the parts of one text (C311)', () => {
     state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, posOf(state, 'barn owl') + 'barn owl'.length)))
     const forward = press('Delete')
     expect(forward == null || !forward.docChanged).toBe(true)
+  })
+  it('names the parts a selection covers whole, never your own text', () => {
+    expect(wholeParts(setup())).toEqual([])
+    expect(wholeParts(select(setup(), 'barn owl', 'barn owl')).map((p) => p.message)).toEqual(['p'])
+    expect(wholeParts(select(setup(), 'barn owl', 'medium-sized.')).map((p) => p.message)).toEqual(['p', 'r'])
+    // Part of a reply is not the reply.
+    expect(wholeParts(select(setup(), 'barn owl', 'genus')).map((p) => p.message)).toEqual(['p'])
+    // All of the text selected: your own text stays a page.
+    expect(wholeParts(select(setup(), 'Notes', 'medium-sized.')).map((p) => p.message)).toEqual(['p', 'r'])
+  })
+  it('changes the words beside a part being deleted, and leaves that part alone', () => {
+    const state = select(setup(), 'before', 'genus')
+    const next = runLeaving(state, new Set(['p']))
+    expect(words(next.doc)).toEqual([
+      'Notes on owls [-before the essay.-]',
+      'barn owl',
+      '[-The barn owls are owls in the genus-] Tyto. | They are medium-sized.',
+    ])
   })
   it('keeps a part whose every word was selected, empty or struck', () => {
     const state = select(setup(), 'Notes', 'medium-sized.')

@@ -1244,6 +1244,10 @@ msgid "chat.cutLimit"
 msgstr "已截断：回复达到了单条回复的长度上限。已收到的内容会保留。"
 
 #. js-lingui-explicit-id
+msgid "chat.deletePartsAgain"
+msgstr "{count, plural, other {再按一次，将从对话中删除这 # 条{part, select, prompt {提示词} other {回复}}等内容。按其他任意键则保留。对话会在 20 秒内提供恢复}}"
+
+#. js-lingui-explicit-id
 msgid "chat.describeSetting"
 msgstr "在首个回答后为新对话命名"
 

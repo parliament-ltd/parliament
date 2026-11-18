@@ -3208,6 +3208,8 @@ export const COPY = {
     // Your own text in a room (C301 (f)).
     writingLabel: /*i18n*/ { id: 'chat.writingLabel', message: 'Your text' },
     toldNote: /*i18n*/ { id: 'chat.toldNote', message: 'Your note, told once: {note}', comment: 'A tell: note the prompt carried, in the words of the person (C225 (d))' },
+    // A prompt or reply selected whole in the text, after the first Backspace or Delete (C311, step 3).
+    deletePartsAgain: /*i18n*/ { id: 'chat.deletePartsAgain', message: '{count, plural, one {Press it again to delete this {part, select, prompt {prompt} other {reply}} from the chat. Any other key keeps it. For 20 seconds the chat offers to bring it back} other {Press it again to delete these # prompts and replies from the chat. Any other key keeps them. For 20 seconds the chat offers to bring them back}}' },
     pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote
     // beside a chat; and the quotes kept beside this one.

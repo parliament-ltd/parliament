@@ -70,6 +70,22 @@ export function selectPart(state) {
 }
 
 /**
+ * The parts a selection covers whole, from the first word to the last (C311,
+ * step 3): these are deleted from the chat as messages, not struck. Your own
+ * text is never among them: emptied, it stays a page.
+ */
+export function wholeParts(state) {
+  const { from, to, empty } = state.selection
+  if (empty) return []
+  return partsOf(state.doc).filter((p) => {
+    if (p.part === 'writing') return false
+    const start = Selection.near(state.doc.resolve(p.from), 1).from
+    const end = Selection.near(state.doc.resolve(p.to), -1).to
+    return from <= start && to >= end
+  })
+}
+
+/**
  * A change that replaces a selection running across parts, taken apart: the
  * selection's words removed in each part, last part first, then the caret
  * put where the selection began and the typed words, if any, written there.
@@ -83,15 +99,19 @@ export function selectPart(state) {
  * @param {(message: string|null) => boolean} [plain] whether a part's words
  *   simply go (your own text no model has read); elsewhere they are struck,
  *   and the caret goes after them
+ * @param {Set<string>} [leave] parts left as they are: those being deleted
+ *   whole from the chat (step 3), whose words need no striking
  * @returns {Array<(state: import('prosemirror-state').EditorState) => import('prosemirror-state').Transaction>|null}
  */
-export function acrossParts(state, tr, plain = () => false) {
+export function acrossParts(state, tr, plain = () => false, leave = new Set()) {
   const { from, to } = state.selection
   if (tr.steps.length !== 1) return null
   const step = tr.steps[0]
   if (step.from !== from || step.to !== to || !step.slice || step.gapFrom != null) return null
-  const parts = partsOf(state.doc).filter((p) => from < p.to && to > p.from)
-  if (parts.length < 2) return null
+  const reached = partsOf(state.doc).filter((p) => from < p.to && to > p.from)
+  if (reached.length < 2) return null
+  const parts = reached.filter((p) => !leave.has(p.message))
+  if (!parts.length) return []
   const text = step.slice.content.textBetween(0, step.slice.content.size, ' ')
   // The ends of the selection inside one part, each within a line of text.
   const within = (doc, p) => {

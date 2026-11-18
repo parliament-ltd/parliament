@@ -1244,6 +1244,10 @@ msgid "chat.cutLimit"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.deletePartsAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.describeSetting"
 msgstr ""
 
