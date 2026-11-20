@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="136" height="136" viewBox="0 0 136 136">
   <title>Parliament</title>
-  <!-- The logo (C316): a white square, the bar's shadow (--ch-raise), the three birds of favicon.svg in ink at 70% of it. -->
+  <!-- The logo (C316): a white square, the bar's own shadow, the three birds of favicon.svg in ink at 70% of it. No double hyphen may stand in an XML comment. -->
   <defs>
     <filter id="raise" x="-30%" y="-30%" width="160%" height="170%">
       <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#28241C" flood-opacity="0.06"/>
