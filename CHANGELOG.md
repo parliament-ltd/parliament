@@ -3,6 +3,10 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
+## 0.25.1, 20 November 2026
+
+- The logo at the head of the README shows on GitHub, and wherever else it is linked: its file was refused as an image.
+
 ## 0.25.0, 18 November 2026
 
 - An empty room on its own stands a little to the left, with Parliament's logo and a few lines on what it is beside it, until you type in the room or the bar. On a phone they come after the room.
